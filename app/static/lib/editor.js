@@ -150,10 +150,10 @@ export function deleteElement(v, cm, modifyerKey = false) {
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
-          pointingElement.nodeName +
-          '>: "' +
-          pointingElement.getAttribute('xml:id') +
-          '"'
+            pointingElement.nodeName +
+            '>: "' +
+            pointingElement.getAttribute('xml:id') +
+            '"'
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
@@ -1073,7 +1073,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   let n2 = v.xmlDoc.querySelector('[*|id="' + id2 + '"]');
   let par1 = n1.parentNode;
   v.allowCursorActivity = false;
-  cm.blockChanges = true
+  cm.blockChanges = true;
   // let checkPoint = buffer.createCheckpoint(); TODO
   // add beam element, if selected elements have same parent
   // TODO check whether inside tuplets and accept that as well
@@ -1896,16 +1896,16 @@ export function removeInEditor(cm, xmlNode) {
   if (sc.findNext()) {
     console.debug(
       'removeInEditor() self closing element "' +
-      id +
-      '" from ln:' +
-      sc.from().line +
-      '/ch:' +
-      sc.from().ch +
-      ' to ln:' +
-      sc.to().line +
-      '/ch:' +
-      sc.to().ch +
-      '.'
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
     );
   } else {
     let searchFullElement =
@@ -1920,16 +1920,16 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.debug(
         'removeInEditor() full element "' +
-        id +
-        '" from ln:' +
-        sc.from().line +
-        '/ch:' +
-        sc.from().ch +
-        ' to ln:' +
-        sc.to().line +
-        '/ch:' +
-        sc.to().ch +
-        '.'
+          id +
+          '" from ln:' +
+          sc.from().line +
+          '/ch:' +
+          sc.from().ch +
+          ' to ln:' +
+          sc.to().line +
+          '/ch:' +
+          sc.to().ch +
+          '.'
       );
     }
   }
@@ -1948,11 +1948,11 @@ export function removeInEditor(cm, xmlNode) {
 } // removeInEditor()
 
 /**
- * Modifies visual offset of element (@version, @ho)
+ * Modifies visual offset of element (@vo, @ho)
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {string} direction "up" | "down" | "left" | "right"
- * @param {number} increment increment value in vo virtual units (default: 0.5)
+ * @param {number} increment increment value in vo virtual units (default: 0.5vo)
  * @returns
  */
 export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
@@ -1972,7 +1972,7 @@ export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
         if (att.attVisualOffsetVo.includes(element.nodeName)) {
           offset = parseFloat(element.getAttribute('vo') || '0');
           offset = direction === 'up' ? offset + increment : offset - increment;
-          element.setAttribute('vo', offset.toString());
+          Math.abs(offset) < 0.0001 ? element.removeAttribute('vo') : element.setAttribute('vo', offset.toString());
           console.info(
             'Editor shiftVisualOffset(): element ' + id + ' ' + direction + ' by ' + increment + ' to ' + offset
           );
@@ -1988,7 +1988,7 @@ export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
         if (att.attVisualOffsetHo.includes(element.nodeName)) {
           offset = parseFloat(element.getAttribute('ho') || '0');
           offset = direction === 'right' ? offset + increment : offset - increment;
-          element.setAttribute('ho', offset.toString());
+          Math.abs(offset) < 0.0001 ? element.removeAttribute('ho') : element.setAttribute('ho', offset.toString());
           console.info(
             'Editor shiftVisualOffset(): element ' + id + ' ' + direction + ' by ' + increment + ' to ' + offset
           );
@@ -2004,7 +2004,7 @@ export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
         break;
     }
     replaceInEditor(cm, element, true);
-    addApplicationInfo(v, cm);    
+    addApplicationInfo(v, cm);
   } // for selectedElements
   v.allowCursorActivity = true;
   cm.blockChanges = false;
