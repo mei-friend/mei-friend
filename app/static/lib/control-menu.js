@@ -3,7 +3,7 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
-import { choiceOptions } from './markup.js';
+import { choiceOrigRegOptions, choiceSicCorrOptions, substOptions } from './markup.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -240,11 +240,23 @@ export function createNotationControlBar(parentElement, scale) {
   choiceCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(choiceCtrls);
 
-  let choiceSelector = document.createElement('select');
-  choiceSelector.id = 'choiceSelect';
-  choiceSelector.classList.add('btn', 'input-select');
-  choiceSelector.title = 'Choose displayed content for choice elements';
-  choiceCtrls.appendChild(choiceSelector);
+  let choiceOrigRegSelector = document.createElement('select');
+  choiceOrigRegSelector.id = 'choiceOrigRegSelect';
+  choiceOrigRegSelector.classList.add('btn', 'input-select');
+  choiceOrigRegSelector.title = 'Choose displayed content for choice elements: orig or reg';
+  choiceCtrls.appendChild(choiceOrigRegSelector);
+
+  let choiceSicCorrSelector = document.createElement('select');
+  choiceSicCorrSelector.id = 'choiceSicCorrSelect';
+  choiceSicCorrSelector.classList.add('btn', 'input-select');
+  choiceSicCorrSelector.title = 'Choose displayed content for choice elements: sic or corr';
+  choiceCtrls.appendChild(choiceSicCorrSelector);
+
+  let substSelector = document.createElement('select');
+  substSelector.id = 'substSelect';
+  substSelector.classList.add('btn', 'input-select');
+  substSelector.title = 'Choose displayed content for subst elements: add or del';
+  choiceCtrls.appendChild(substSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -660,37 +672,52 @@ export function handleSmartBreaksOption(speedMode) {
  * Adds the options for choice to the choiceSelect in the
  * notation control bar.
  * @param {string} active value of currently active selection
+ * @param {string} selector id of the select element
  */
-export function setChoiceOptions(active) {
-  let choiceSelect = document.getElementById('choiceSelect');
+export function setChoiceOptions(active, selector) {
+  let choiceOptions;
+  switch (selector) {
+    case 'choiceOrigRegSelect':
+      choiceOptions = choiceOrigRegOptions;
+      break;
+    case 'choiceSicCorrSelect':
+      choiceOptions = choiceSicCorrOptions;
+      break;
+    case 'substSelect':
+      choiceOptions = substOptions;
+      break;
+    default:
+      console.error('setChoiceOptions: Unknown selector ', selector);
+      return;
+  }
+  let choiceSelect = document.getElementById(selector);
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
   }
   if (choiceOptions.length > 0) {
-    choiceOptions.forEach((groupEl) => {
-      let group = document.createElement('optgroup');
-      group.label = groupEl.label ? groupEl.label : groupEl.elName;
-      if (groupEl.id) group.id = groupEl.id;
+    let groupEl = choiceOptions[0]; // take first, because always same structure in this array
+    let group = document.createElement('optgroup');
+    group.label = groupEl.label ? groupEl.label : groupEl.elName;
+    if (groupEl.id) group.id = groupEl.id;
 
-      groupEl.options.forEach((el) => {
-        let option;
-        if (active && el.value === active) {
-          option = new Option(el.label, el.value, false, true);
-        } else {
-          option = new Option(el.label, el.value, false, false);
-        }
-        option.id = el.id;
-        option.dataset.prop = el.prop;
-        group.appendChild(option);
-      });
-      choiceSelect.appendChild(group);
+    groupEl.options.forEach((el) => {
+      let option;
+      if (active && el.value === active) {
+        option = new Option(el.label, el.value, false, true);
+      } else {
+        option = new Option(el.label, el.value, false, false);
+      }
+      option.id = el.id;
+      option.dataset.prop = el.prop;
+      group.appendChild(option);
     });
+    choiceSelect.appendChild(group);
   } else {
     let option = new Option(translator.lang.noChoice.text, '', false, false);
     option.id = 'noChoice';
     choiceSelect.appendChild(option);
   }
-}
+} // setChoiceOptions()
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {

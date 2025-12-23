@@ -75,7 +75,9 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
+    this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
+    this.choiceSicCorrSelect = document.getElementById('choiceSicCorrSelect'); //choice select control
+    this.substSelect = document.getElementById('substSelect'); //subst select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -262,15 +264,17 @@ export default class Viewer {
     this.loadXml(mei, forceReload);
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    // TODO: instead of cloning node, just work in this.xmlDoc and force reload when required
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
-    const choiceOption = this.choiceSelect.value;
-    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
-    if (markupResult?.changed === true) {
-      speedMeiDoc = markupResult.doc;
-      //this.xmlDocOutdated = true;
-      // unnecessary if this.xmlDoc is not touched
-    }
+    const choiceOrigRegOption = this.choiceOrigRegSelect.value;
+    const choiceSicCorrOption = this.choiceSicCorrSelect.value;
+    const substOption = this.substSelect.value;
+    // Check if any of the multilevel markup options have been changed:
+    selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
+    selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
+
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = speedMeiDoc.querySelector('music score');
@@ -399,18 +403,33 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let choiceSelect = this.choiceSelect;
-    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
-      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
-      if (selectedChoice.dataset.prop) {
-        if (selectedChoice.value != '') {
-          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
-        } else {
-          this.vrvOptions[selectedChoice.dataset.prop] = [];
-        }
+    let choiceOrigRegSelect = this.choiceOrigRegSelect;
+    let choiceSicCorrSelect = this.choiceSicCorrSelect;
+    let substSelect = this.substSelect;
+    // handle choice translation to Vervio options
+    let choiceSelections = [...choiceOrigRegSelect.selectedOptions, ...choiceSicCorrSelect.selectedOptions];
+    console.log('choiceSelections: ', choiceSelections);
+    let choiceXpath = [];
+    choiceSelections.forEach((opt) => {
+      if (opt.value != '') {
+        choiceXpath.push('./' + opt.value);
       }
+    });
+    if (choiceXpath.length > 0) {
+      this.vrvOptions.choiceXPathQuery = choiceXpath;
     }
-
+    // handle subst translation to Verovio options
+    let substXpath = [];
+    if (substSelect && substSelect.selectedOptions.length > 0) {
+      substXpath = ['./' + substSelect.value];
+    }
+    console.log('substXpath: ', substXpath);
+    console.log('substSelect value: ', substSelect.value);
+    console.log('substSelect.selectedOptions: ', substSelect.selectedOptions);
+    if (substXpath.length > 0) {
+      this.vrvOptions.substXPathQuery = substXpath;
+    }
+    console.log('!!!! ', this.vrvOptions);
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {
       let vpw = document.getElementById('vrv-pageWidth');
@@ -620,11 +639,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-          ' (' +
-          translator.lang.manipulateMenuTitle.text +
-          '&mdash;' +
-          translator.lang.addIdsText.text +
-          ')',
+        ' (' +
+        translator.lang.manipulateMenuTitle.text +
+        '&mdash;' +
+        translator.lang.addIdsText.text +
+        ')',
         'warning'
       );
     }
@@ -1903,8 +1922,8 @@ export default class Viewer {
           option,
           value
             ? {
-                bothTags: true,
-              }
+              bothTags: true,
+            }
             : {}
         );
         break;
@@ -2052,14 +2071,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-            o.type +
-            ', title: ' +
-            o.title +
-            ' [' +
-            o.type +
-            '], default: [' +
-            optDefault +
-            ']'
+          o.type +
+          ', title: ' +
+          o.title +
+          ' [' +
+          o.type +
+          '], default: [' +
+          optDefault +
+          ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2597,7 +2616,10 @@ export default class Viewer {
    */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      // clear validation error reports in CodeMirror
+      this.updateLinting(cm, []);
+    }
     // Remove schema from validator and hinting / code completion
     rngLoader.clearRelaxNGSchema();
     console.log('Schema removed from validator', this.currentSchema);
@@ -2744,7 +2766,9 @@ export default class Viewer {
       });
       i += 1;
     }
-    this.updateLinting(cm, found);
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, found);
+    }
 
     // update overall status of validation
     let vs = document.getElementById('validation-status');
@@ -2814,13 +2838,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-        ' ' +
-        this.currentSchema +
-        ': ' +
-        Object.keys(messages).length +
-        ' ' +
-        translator.lang.validationMessages.text +
-        '.'
+      ' ' +
+      this.currentSchema +
+      ': ' +
+      Object.keys(messages).length +
+      ' ' +
+      translator.lang.validationMessages.text +
+      '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2832,8 +2856,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-          !document.getElementById('autoValidate')?.checked ||
-          showValidation
+            !document.getElementById('autoValidate')?.checked ||
+            showValidation
             ? 'visible'
             : 'hidden';
     }

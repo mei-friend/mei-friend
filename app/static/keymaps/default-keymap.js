@@ -103,6 +103,10 @@ export const keymap = {
   '.all': {
     'alt-.': 'consultGuidelines',
     'shift-space': 'switchFocus',
+    'alt-up': 'shiftVisualOffsetUp',
+    'alt-down': 'shiftVisualOffsetDown',
+    'alt-left': 'shiftVisualOffsetLeft',
+    'alt-right': 'shiftVisualOffsetRight',
   },
 
   // mapped to body under MAC OSX
