@@ -639,11 +639,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-          ' (' +
-          translator.lang.manipulateMenuTitle.text +
-          '&mdash;' +
-          translator.lang.addIdsText.text +
-          ')',
+        ' (' +
+        translator.lang.manipulateMenuTitle.text +
+        '&mdash;' +
+        translator.lang.addIdsText.text +
+        ')',
         'warning'
       );
     }
@@ -1922,8 +1922,8 @@ export default class Viewer {
           option,
           value
             ? {
-                bothTags: true,
-              }
+              bothTags: true,
+            }
             : {}
         );
         break;
@@ -2071,14 +2071,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-            o.type +
-            ', title: ' +
-            o.title +
-            ' [' +
-            o.type +
-            '], default: [' +
-            optDefault +
-            ']'
+          o.type +
+          ', title: ' +
+          o.title +
+          ' [' +
+          o.type +
+          '], default: [' +
+          optDefault +
+          ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2616,7 +2616,10 @@ export default class Viewer {
    */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      // clear validation error reports in CodeMirror
+      this.updateLinting(cm, []);
+    }
     // Remove schema from validator and hinting / code completion
     rngLoader.clearRelaxNGSchema();
     console.log('Schema removed from validator', this.currentSchema);
@@ -2763,7 +2766,9 @@ export default class Viewer {
       });
       i += 1;
     }
-    this.updateLinting(cm, found);
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, found);
+    }
 
     // update overall status of validation
     let vs = document.getElementById('validation-status');
@@ -2833,13 +2838,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-        ' ' +
-        this.currentSchema +
-        ': ' +
-        Object.keys(messages).length +
-        ' ' +
-        translator.lang.validationMessages.text +
-        '.'
+      ' ' +
+      this.currentSchema +
+      ': ' +
+      Object.keys(messages).length +
+      ' ' +
+      translator.lang.validationMessages.text +
+      '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2851,8 +2856,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-          !document.getElementById('autoValidate')?.checked ||
-          showValidation
+            !document.getElementById('autoValidate')?.checked ||
+            showValidation
             ? 'visible'
             : 'hidden';
     }

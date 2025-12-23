@@ -431,10 +431,6 @@ export function addMarkup(event) {
     v.showAlert('Please first select a content option for this markup element!');
   } else {
     addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
-    handleEditorChanges(); // update editor content
-    //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
-    // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
-    refreshAnnotationsList();
     //select elements of last reading for alternative encodings if copied
     if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
       let newSelection = [];
@@ -466,10 +462,10 @@ export function addMarkup(event) {
       if (correspondingDropdown) {
         setChoiceOptions(lastMultilayerContentItem, correspondingDropdown);
       }
-      handleEditorChanges();
       v.selectedElements = newSelection;
       v.setFocusToVerovioPane();
     }
+    handleEditorChanges();
   }
 } // addMarkup()
 
