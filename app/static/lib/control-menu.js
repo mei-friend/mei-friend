@@ -569,12 +569,23 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     const padding = 5; // px padding to avoid edge issues
     let firstOverflowingIndex = children.findIndex((child) => {
       let childRect = child.getBoundingClientRect();
-      return childRect.right > ctrlBarRect.right + padding || childRect.left < ctrlBarRect.left - padding;
+      return (
+        (child.style.display !== 'none' && childRect.right > ctrlBarRect.right + padding) ||
+        childRect.left < ctrlBarRect.left - padding
+      );
     });
     const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
     // move overflowing items into overflow menu
+    console.log('firstOverflowingIndex: ', firstOverflowingIndex);
+    console.log('CtrlBarRight: ', ctrlBarRect.right);
     if (firstOverflowingIndex !== -1) {
-      let overflowing = children.slice(firstOverflowingIndex);
+      let overflowing = children.slice(firstOverflowingIndex).filter(
+        // skip invisible, fillSpace, and topright divs
+        (child) =>
+          child.style.display !== 'none' &&
+          !child.classList.contains('fillSpace') &&
+          !child.classList.contains('topright')
+      );
       overflowing.forEach((child) => {
         overflowContent.prepend(child);
       });
@@ -583,14 +594,34 @@ export function adjustCtrlBarOverflow(ctrlBar) {
       // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
       const currentlyOverflowing = Array.from(overflowContent.children);
       for (let overflowing of currentlyOverflowing) {
-        let currentChildren = Array.from(ctrlBar.children);
+        let currentChildren = Array.from(ctrlBar.children).filter(
+          // only consider visible, non-fillSpace, non-topright children
+          (child) => {
+            console.log('Overflow determination: considering child ', child.id);
+            return (
+              child &&
+              !child.classList.contains('fillSpace') &&
+              !child.classList.contains('topright') &&
+              child.style.display !== 'none'
+            );
+          }
+        );
+        console.log('Overflow determination: found current children ', currentChildren);
         let availableSpace =
           ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
         const childRect = overflowing.getBoundingClientRect();
-        console.log('availableSpace: ', availableSpace, ' child width: ', childRect.width);
-        // check if there is space in the ctrlBar to add this child
+        // check if there is space in the ctrlBar to add this as the last child before fillSpace
         if (childRect.width + padding < availableSpace) {
-          ctrlBar.appendChild(overflowing);
+          console.log('Fitting back into ctrlBar: ', ctrlBar.children, overflowing);
+          // insert before fillSpace or topright divs if they exist
+          let firstFillSpaceOrTopright = Array.from(ctrlBar.children).find(
+            (child) => child.classList.contains('fillSpace') || child.classList.contains('topright')
+          );
+          if (firstFillSpaceOrTopright) {
+            ctrlBar.insertBefore(overflowing, firstFillSpaceOrTopright);
+          } else {
+            ctrlBar.appendChild(overflowing);
+          }
         } else {
           /// if we can't fit this one, don't try to fit any more
           break;
