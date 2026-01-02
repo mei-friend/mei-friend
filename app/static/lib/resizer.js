@@ -1,3 +1,4 @@
+import { adjustCtrlBarOverflow } from './control-menu.js';
 import {
   annotationPanelExtent,
   defaultNotationResizerWidth,
@@ -361,6 +362,16 @@ export function addNotationResizerHandlers(v, cm) {
     // save notationPorportion in local storage
     if (storage && storage.supported) {
       storage.notationProportion = notationProportion;
+    }
+
+    // adjust control bars, moving occluded buttons into overflow menu if necessary
+    const notationControlBar = document.getElementById('notationControlBar');
+    if (notationControlBar && notationControlBar.style.display !== 'none') {
+      adjustCtrlBarOverflow(notationControlBar);
+    }
+    const facsimileControlBar = document.getElementById('facsimileControlBar');
+    if (facsimileControlBar && facsimileContainer.style.display !== 'none') {
+      adjustCtrlBarOverflow(facsimileControlBar);
     }
   }; // mouseUpHandler
 

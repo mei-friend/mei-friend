@@ -62,6 +62,28 @@ export function createNotationDiv(parentElement, scale) {
   if (resizer) resizer.innerHTML = icon.kebab;
 } // createNotationDiv()
 
+function wrapControlBar(controlBar) {
+  // create wrapper div for control bar and overflow menu
+  let wrapper = document.createElement('div');
+  wrapper.classList.add('control-menu-wrapper');
+  wrapper.id = controlBar.id + '-wrapper';
+  controlBar.parentElement.insertBefore(wrapper, controlBar);
+  wrapper.appendChild(controlBar);
+  let overflowMenu = document.createElement('div');
+  let overflowIcon = document.createElement('div');
+  overflowIcon.innerHTML = '&#8595;'; // down arrow
+  overflowIcon.id = controlBar.id + '-overflow-icon';
+  let overflowContent = document.createElement('div');
+  overflowContent.classList.add('control-menu-overflow-content');
+  overflowContent.id = controlBar.id + '-overflow-content';
+  overflowMenu.appendChild(overflowIcon);
+  overflowMenu.appendChild(overflowContent);
+  overflowMenu.classList.add('control-menu-overflow');
+  overflowMenu.id = controlBar.id + '-overflow';
+  wrapper.appendChild(overflowMenu);
+  return wrapper;
+}
+
 export function createNotationControlBar(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
@@ -399,6 +421,7 @@ export function createNotationControlBar(parentElement, scale) {
   vrvCtrlMenu.appendChild(pdfCloseButton);
 
   parentElement.appendChild(vrvCtrlMenu);
+  wrapControlBar(vrvCtrlMenu);
 } // createNotationControlBar()
 
 export function createFacsimileControlBar(parentElement) {
@@ -532,7 +555,102 @@ export function createFacsimileControlBar(parentElement) {
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
   facsCtrlBar.appendChild(facsimileCloseButton);
+  wrapControlBar(facsCtrlBar);
 } // createFacsimileControlBar()
+
+export function adjustCtrlBarOverflow(ctrlBar) {
+  // adjust the overflow of the control bar
+  if (ctrlBar) {
+    // We want to maintain the order of the items in the control bar
+    // If any of the children are overflowing, move the first overflowing child AND ALL SUBSEQUENT CHILDREN into the overflow menu
+    // If there is space in the control bar, move items back from the overflow menu in order.
+    const children = Array.from(ctrlBar.children);
+    const ctrlBarRect = ctrlBar.getBoundingClientRect();
+    const padding = 5; // px padding to avoid edge issues
+    let firstOverflowingIndex = children.findIndex((child) => {
+      let childRect = child.getBoundingClientRect();
+      return childRect.right > ctrlBarRect.right + padding || childRect.left < ctrlBarRect.left - padding;
+    });
+    const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
+    // move overflowing items into overflow menu
+    if (firstOverflowingIndex !== -1) {
+      let overflowing = children.slice(firstOverflowingIndex);
+      overflowing.forEach((child) => {
+        overflowContent.prepend(child);
+      });
+    } else {
+      // move items back from overflow menu if there is space
+      // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
+      const currentlyOverflowing = Array.from(overflowContent.children);
+      for (let overflowing of currentlyOverflowing) {
+        let currentChildren = Array.from(ctrlBar.children);
+        let availableSpace =
+          ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
+        const childRect = overflowing.getBoundingClientRect();
+        console.log('availableSpace: ', availableSpace, ' child width: ', childRect.width);
+        // check if there is space in the ctrlBar to add this child
+        if (childRect.width + padding < availableSpace) {
+          ctrlBar.appendChild(overflowing);
+        } else {
+          /// if we can't fit this one, don't try to fit any more
+          break;
+        }
+      }
+    }
+    // show or hide the overflow menu button based on whether it has children
+    let overflow = document.getElementById(ctrlBar.id + '-overflow');
+    if (overflowContent.children.length > 0) {
+      overflow.style.display = 'inline-block';
+    } else {
+      overflow.style.display = 'none';
+    }
+  }
+}
+
+/*
+export function adjustCtrlBarOverflow(ctrlBar) {
+  // adjust the overflow of the control bar
+  if (ctrlBar) {
+    // check if any of the children are overflowing:
+    // that is, whether the left or right edge of any child is beyond the left or right edge of the container
+    // any overflow requires moving items into the overflow content area (overflow menu)
+    const children = Array.from(ctrlBar.children);
+    const ctrlBarRect = ctrlBar.getBoundingClientRect();
+    const padding = 5; // px padding to avoid edge issues
+    let overflowing = children.filter((child) => {
+      let childRect = child.getBoundingClientRect();
+      return childRect.right > ctrlBarRect.right + padding || childRect.left < ctrlBarRect.left - padding;
+    });
+    const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
+    // move overflowing items into overflow menu
+    overflowing.forEach((child) => {
+      overflowContent.appendChild(child);
+    });
+    // move items back from overflow menu if there is space
+    // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
+    const currentlyOverflowing = Array.from(overflowContent.children);
+    for (let overflowing of currentlyOverflowing) {
+      let currentChildren = Array.from(ctrlBar.children);
+      let availableSpace =
+        ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
+      const childRect = overflowing.getBoundingClientRect();
+      console.log('availableSpace: ', availableSpace, ' child width: ', childRect.width);
+      // check if there is space in the ctrlBar to add this child
+      if (childRect.width + padding < availableSpace) {
+        ctrlBar.appendChild(overflowing);
+      } else {
+        /// if we can't fit this one, don't try to fit any more
+        break;
+      }
+    }
+    // show or hide the overflow menu button based on whether it has children
+    if (overflowContent.children.length > 0) {
+      overflowContent.style.display = 'inline-block';
+    } else {
+      overflowContent.style.display = 'none';
+    }
+  }
+}*/
 
 export function createEncodingPanel() {
   let codeCheckerResizer = document.getElementById('codeCheckerResizer');

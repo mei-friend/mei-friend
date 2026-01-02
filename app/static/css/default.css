@@ -991,6 +991,31 @@ a:active {
   background-color: var(--controlMenuBackgroundColor);
 }
 
+/* control menu overflow: when there are too many buttons to fit */
+/* Display a down-arrow button that shows the hidden buttons in a dropdown menu */
+.control-menu-overflow {
+  /* Down arrow*/
+  width: 30px;
+  flex: 0 0 auto;
+  background:green;
+}
+
+.control-menu-overflow-content { 
+  position: fixed; 
+  top: calc(inherit + 1.5em);
+  left: inherit;
+  display:inline;
+  background-color: var(--dropdownBackgroundColor);
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  z-index: 20;
+  width: calc(fit-content + 20px);
+}
+
+.control-menu-overflow-content div {
+  width: 100%;
+}
+
 .controls {
   display: flex;
   align-items: center;
@@ -998,7 +1023,9 @@ a:active {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
+  width:fit-content;
 }
+
 
 .btn {
   margin: 2px;
