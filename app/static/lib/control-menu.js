@@ -5,6 +5,72 @@ import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
 import { choiceOptions } from './markup.js';
 
+const overflowMenus = [];
+let overflowGlobalHandlersAttached = false;
+
+function hideOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'hidden';
+  overflowContent.style.opacity = '0';
+  overflowContent.style.pointerEvents = 'none';
+  overflowContent.dataset.open = 'false';
+  overflowContent.setAttribute('aria-hidden', 'true');
+}
+
+function showOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'visible';
+  overflowContent.style.opacity = '1';
+  overflowContent.style.pointerEvents = 'auto';
+  overflowContent.dataset.open = 'true';
+  overflowContent.setAttribute('aria-hidden', 'false');
+}
+
+export function hideAllOverflowContents(exceptContent = null) {
+  overflowMenus.forEach(({ content }) => {
+    if (content !== exceptContent) hideOverflowContent(content);
+  });
+}
+
+function attachOverflowGlobalHandlers() {
+  if (overflowGlobalHandlersAttached) return;
+
+  document.addEventListener('click', (event) => {
+    overflowMenus.forEach(({ icon, content }) => {
+      if (content.dataset.open !== 'true') return;
+      if (!content.contains(event.target) && !icon.contains(event.target)) {
+        hideOverflowContent(content);
+      }
+    });
+  });
+
+  overflowGlobalHandlersAttached = true;
+}
+
+function registerOverflowMenu(overflowMenu) {
+  const overflowIcon = overflowMenu.querySelector('.control-menu-overflow-icon');
+  const overflowContent = overflowMenu.querySelector('.control-menu-overflow-content');
+  if (!overflowIcon || !overflowContent) return;
+
+  hideOverflowContent(overflowContent);
+  overflowMenus.push({ icon: overflowIcon, content: overflowContent });
+
+  overflowIcon.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = overflowContent.dataset.open === 'true';
+    if (isOpen) {
+      hideOverflowContent(overflowContent);
+    } else {
+      hideAllOverflowContents(overflowContent);
+      showOverflowContent(overflowContent);
+    }
+  });
+
+  overflowContent.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  attachOverflowGlobalHandlers();
+}
+
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
   // container for Verovio
@@ -73,6 +139,7 @@ function wrapControlBar(controlBar) {
   let overflowIcon = document.createElement('div');
   overflowIcon.innerHTML = '&#8595;'; // down arrow
   overflowIcon.id = controlBar.id + '-overflow-icon';
+  overflowIcon.classList.add('control-menu-overflow-icon');
   let overflowContent = document.createElement('div');
   overflowContent.classList.add('control-menu-overflow-content');
   overflowContent.id = controlBar.id + '-overflow-content';
@@ -81,6 +148,7 @@ function wrapControlBar(controlBar) {
   overflowMenu.classList.add('control-menu-overflow');
   overflowMenu.id = controlBar.id + '-overflow';
   wrapper.appendChild(overflowMenu);
+  registerOverflowMenu(overflowMenu);
   return wrapper;
 }
 
