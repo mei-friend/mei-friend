@@ -235,6 +235,10 @@ export function addNotationResizerHandlers(v, cm) {
   let notationSize = 0;
 
   const mouseDownHandler = function (e) {
+    // hide control bar overflow
+    Array.from(document.getElementsByClassName('control-menu-overflow')).forEach((content) => {
+      content.style.display = 'none';
+    });
     x = e.clientX;
     y = e.clientY;
     if (notationOrientation === 'top' || notationOrientation === 'bottom') {

@@ -137,7 +137,7 @@ function wrapControlBar(controlBar) {
   wrapper.appendChild(controlBar);
   let overflowMenu = document.createElement('div');
   let overflowIcon = document.createElement('div');
-  overflowIcon.innerHTML = '&#8595;'; // down arrow
+  overflowIcon.innerHTML = 'More...&nbsp;';
   overflowIcon.id = controlBar.id + '-overflow-icon';
   overflowIcon.classList.add('control-menu-overflow-icon');
   let overflowContent = document.createElement('div');

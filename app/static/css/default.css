@@ -978,26 +978,54 @@ a:active {
   white-space: nowrap;
 }
 
+.control-menu-wrapper {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+  background-color: var(--controlMenuBackgroundColor);
+  box-sizing: border-box;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding-bottom: 4px;
+}
+
 .control-menu {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  height: 28px;
+  height: auto;
+  min-height: 28px;
   padding: 2px;
   margin: 0px;
   z-index: 6;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.control-menu > * {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 /* control menu overflow: when there are too many buttons to fit */
-/* Display a down-arrow button that shows the hidden buttons in a dropdown menu */
+/* Display an ellipsis button that shows the hidden buttons in a dropdown menu */
 .control-menu-overflow {
-  /* Down arrow*/
-  width: 30px;
+  box-sizing: border-box;
+  /* Ellipsis */
   flex: 0 0 auto;
-  background:green;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .control-menu-overflow-content { 
@@ -1012,6 +1040,22 @@ a:active {
   width: calc(fit-content + 20px);
 }
 
+.control-menu-overflow-icon { 
+  box-sizing: border-box;
+  cursor: pointer;
+  background-color: var(--controlMenuBackgroundColor);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12x;
+  width: fit-content;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.control-menu-overflow-icon:hover {
+  color: var(--dropdownBorderColor);
+} 
 .control-menu-overflow-content div {
   width: 100%;
   border:none;
