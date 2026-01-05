@@ -4,7 +4,13 @@ import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as pageRagenSelector from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
+import {
+  getControlMenuState,
+  showPdfButtons,
+  setControlMenuState,
+  setCheckbox,
+  adjustCtrlBarOverflow,
+} from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
 import { codeCheckerHeight } from './resizer.js';
@@ -620,11 +626,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-        ' (' +
-        translator.lang.manipulateMenuTitle.text +
-        '&mdash;' +
-        translator.lang.addIdsText.text +
-        ')',
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
         'warning'
       );
     }
@@ -1034,6 +1040,7 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
+    adjustCtrlBarOverflow();
   } // pageModeOn()
 
   // Switches back from pdfMode
@@ -1067,6 +1074,7 @@ export default class Viewer {
       this.allowNotationInteraction = true;
     }
     this.pdfMode = false;
+    adjustCtrlBarOverflow();
   } // pageModeOff()
 
   saveAsPdf() {
@@ -1288,7 +1296,7 @@ export default class Viewer {
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
-          document.getElementById('speedDiv').style.display = value ? 'inherit' : 'none';
+          document.getElementById('speedDiv').style.display = value ? 'flex' : 'none';
           break;
         case 'controlMenuNavigateArrows':
           document.getElementById('navigationControls').style.display = value ? 'inherit' : 'none';
@@ -1557,7 +1565,7 @@ export default class Viewer {
           case 'controlMenuSpeedmodeCheckbox':
             document.getElementById('speedDiv').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
-              ? 'inherit'
+              ? 'flex'
               : 'none';
             break;
           case 'controlMenuNavigateArrows':
@@ -1903,8 +1911,8 @@ export default class Viewer {
           option,
           value
             ? {
-              bothTags: true,
-            }
+                bothTags: true,
+              }
             : {}
         );
         break;
@@ -2052,14 +2060,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-          o.type +
-          ', title: ' +
-          o.title +
-          ' [' +
-          o.type +
-          '], default: [' +
-          optDefault +
-          ']'
+            o.type +
+            ', title: ' +
+            o.title +
+            ' [' +
+            o.type +
+            '], default: [' +
+            optDefault +
+            ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2819,13 +2827,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-      ' ' +
-      this.currentSchema +
-      ': ' +
-      Object.keys(messages).length +
-      ' ' +
-      translator.lang.validationMessages.text +
-      '.'
+        ' ' +
+        this.currentSchema +
+        ': ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2837,8 +2845,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-            !document.getElementById('autoValidate')?.checked ||
-            showValidation
+          !document.getElementById('autoValidate')?.checked ||
+          showValidation
             ? 'visible'
             : 'hidden';
     }
