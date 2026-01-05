@@ -128,7 +128,13 @@ export function createNotationDiv(parentElement, scale) {
   if (resizer) resizer.innerHTML = icon.kebab;
 } // createNotationDiv()
 
-function wrapControlBar(controlBar) {
+/**
+ * Wraps a control bar in a wrapper div that contains an overflow menu
+ * @param {HTMLElement} controlBar - The control bar to wrap
+ * @param {boolean|HTMLElement[]} toprightElements - Optional array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @return {HTMLElement} The wrapper div containing the control bar and overflow menu
+ */
+function wrapControlBar(controlBar, toprightElements = false) {
   // create wrapper div for control bar and overflow menu
   let wrapper = document.createElement('div');
   wrapper.classList.add('control-menu-wrapper');
@@ -148,6 +154,11 @@ function wrapControlBar(controlBar) {
   overflowMenu.classList.add('control-menu-overflow');
   overflowMenu.id = controlBar.id + '-overflow';
   wrapper.appendChild(overflowMenu);
+  if (toprightElements && Array.isArray(toprightElements)) {
+    toprightElements.forEach((el) => {
+      wrapper.appendChild(el);
+    });
+  }
   registerOverflowMenu(overflowMenu);
   return wrapper;
 }
@@ -457,19 +468,14 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  vrvCtrlMenu.appendChild(filler);
-
   // page range selector for PDF export
-  vrvCtrlMenu.appendChild(createPageRangeSelector('none'));
+  let pdfPageRange = createPageRangeSelector('none');
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
   pdfCtrlDiv.id = 'pdfControlsDiv';
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
-  vrvCtrlMenu.appendChild(pdfCtrlDiv);
 
   let savePdfButton = document.createElement('button');
   savePdfButton.id = 'pdfSaveButton';
@@ -477,8 +483,8 @@ export function createNotationControlBar(parentElement, scale) {
   // savePdfButton.classList.add('icon');
   savePdfButton.textContent = 'Save PDF'; // icon.pdfIcon;
   savePdfButton.classList.add('inline-block-tight');
+  savePdfButton.style.display = 'none';
   savePdfButton.title = 'Save as PDF';
-  pdfCtrlDiv.appendChild(savePdfButton);
 
   let pdfCloseButton = document.createElement('div');
   pdfCloseButton.id = 'pdfCloseButton';
@@ -486,10 +492,9 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.style.display = 'none';
   pdfCloseButton.classList.add('topright');
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  vrvCtrlMenu.appendChild(pdfCloseButton);
 
   parentElement.appendChild(vrvCtrlMenu);
-  wrapControlBar(vrvCtrlMenu);
+  wrapControlBar(vrvCtrlMenu, [pdfPageRange, pdfCtrlDiv, savePdfButton, pdfCloseButton]);
 } // createNotationControlBar()
 
 export function createFacsimileControlBar(parentElement) {
@@ -613,17 +618,12 @@ export function createFacsimileControlBar(parentElement) {
 
   facsCtrlBar.appendChild(editZonesDiv);
 
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  facsCtrlBar.appendChild(filler);
-
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  facsCtrlBar.appendChild(facsimileCloseButton);
-  wrapControlBar(facsCtrlBar);
+  wrapControlBar(facsCtrlBar, [facsimileCloseButton]);
 } // createFacsimileControlBar()
 
 export function adjustCtrlBarOverflow(ctrlBar) {
@@ -634,7 +634,7 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     // If there is space in the control bar, move items back from the overflow menu in order.
     const children = Array.from(ctrlBar.children);
     const ctrlBarRect = ctrlBar.getBoundingClientRect();
-    const padding = 5; // px padding to avoid edge issues
+    const padding = 25; // px padding to avoid edge issues
     let firstOverflowingIndex = children.findIndex((child) => {
       let childRect = child.getBoundingClientRect();
       return (
@@ -648,11 +648,8 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     console.log('CtrlBarRight: ', ctrlBarRect.right);
     if (firstOverflowingIndex !== -1) {
       let overflowing = children.slice(firstOverflowingIndex).filter(
-        // skip invisible, fillSpace, and topright divs
-        (child) =>
-          child.style.display !== 'none' &&
-          !child.classList.contains('fillSpace') &&
-          !child.classList.contains('topright')
+        // skip invisible
+        (child) => child.style.display !== 'none'
       );
       overflowing.forEach((child) => {
         overflowContent.prepend(child);
@@ -663,33 +660,26 @@ export function adjustCtrlBarOverflow(ctrlBar) {
       const currentlyOverflowing = Array.from(overflowContent.children);
       for (let overflowing of currentlyOverflowing) {
         let currentChildren = Array.from(ctrlBar.children).filter(
-          // only consider visible, non-fillSpace, non-topright children
+          // only consider visible children
           (child) => {
             console.log('Overflow determination: considering child ', child.id);
-            return (
-              child &&
-              !child.classList.contains('fillSpace') &&
-              !child.classList.contains('topright') &&
-              child.style.display !== 'none'
-            );
+            return child && child.style.display !== 'none';
           }
         );
         console.log('Overflow determination: found current children ', currentChildren);
         let availableSpace =
           ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
+        // account for any topright elements (e.g., close buttons)
+        let toprightsWidth = Array.from(ctrlBar.querySelectorAll('.topright')).reduce((sum, el) => {
+          let rect = el.getBoundingClientRect();
+          return sum + rect.width;
+        }, 0);
+        availableSpace -= toprightsWidth;
         const childRect = overflowing.getBoundingClientRect();
-        // check if there is space in the ctrlBar to add this as the last child before fillSpace
+        // check if there is space in the ctrlBar to add this as the last child
         if (childRect.width + padding < availableSpace) {
           console.log('Fitting back into ctrlBar: ', ctrlBar.children, overflowing);
-          // insert before fillSpace or topright divs if they exist
-          let firstFillSpaceOrTopright = Array.from(ctrlBar.children).find(
-            (child) => child.classList.contains('fillSpace') || child.classList.contains('topright')
-          );
-          if (firstFillSpaceOrTopright) {
-            ctrlBar.insertBefore(overflowing, firstFillSpaceOrTopright);
-          } else {
-            ctrlBar.appendChild(overflowing);
-          }
+          ctrlBar.appendChild(overflowing);
         } else {
           /// if we can't fit this one, don't try to fit any more
           break;
@@ -762,6 +752,7 @@ export function createEncodingPanel() {
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
   document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdfSaveButton').style.display = show ? '' : 'none';
   document.getElementById('pdfCloseButton').style.display = show ? '' : 'none';
 } // showPdfButtons()
 

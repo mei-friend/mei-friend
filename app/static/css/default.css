@@ -182,9 +182,6 @@ a:active {
   height: 1.6em;
 }
 
-.fillSpace {
-  flex: auto;
-}
 
 .settingsButton {
   width: 16px;
