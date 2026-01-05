@@ -1060,6 +1060,7 @@ a:active {
 .control-menu-overflow-content div {
   width: 100%;
   border:none;
+  margin-bottom: .25em;
 }
 
 .control-menu-fixed-left, .control-menu-fixed-right { 
