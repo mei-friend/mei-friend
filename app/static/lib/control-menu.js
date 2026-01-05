@@ -131,14 +131,23 @@ export function createNotationDiv(parentElement, scale) {
 /**
  * Wraps a control bar in a wrapper div that contains an overflow menu
  * @param {HTMLElement} controlBar - The control bar to wrap
- * @param {boolean|HTMLElement[]} fixedElementsRight - Optional array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @param {HTMLElement[]} fixedElementsLeft - Array of button(s) to add to the left corner of the control bar (e.g., Verovio logo, Facsimile icon, ...). These will not be part of the overflow menu.
+ * @param {HTMLElement[]} fixedElementsRight - Array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
  * @return {HTMLElement} The wrapper div containing the control bar, overflow menu, and any fixed elements
  */
-function wrapControlBar(controlBar, fixedElementsRight = false) {
+function wrapControlBar(controlBar, fixedElementsLeft, fixedElementsRight) {
   // create wrapper div for control bar and overflow menu
   let wrapper = document.createElement('div');
   wrapper.classList.add('control-menu-wrapper');
   wrapper.id = controlBar.id + '-wrapper';
+  if (fixedElementsLeft && Array.isArray(fixedElementsLeft)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsLeft.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
+    });
+    fixedElementsDiv.classList.add('control-menu-fixed-left');
+    wrapper.appendChild(fixedElementsDiv);
+  }
   controlBar.parentElement.insertBefore(wrapper, controlBar);
   wrapper.appendChild(controlBar);
   let overflowMenu = document.createElement('div');
@@ -179,7 +188,6 @@ export function createNotationControlBar(parentElement, scale) {
   verovioIcon.title = `mei-friend worker activity:
      clockwise rotation denotes Verovio activity,
      anticlockwise rotation speed worker activity`;
-  vrvCtrlMenu.appendChild(verovioIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -497,7 +505,7 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
 
   parentElement.appendChild(vrvCtrlMenu);
-  wrapControlBar(vrvCtrlMenu, [pdfPageRange, pdfCtrlDiv, savePdfButton, pdfCloseButton]);
+  wrapControlBar(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, savePdfButton, pdfCloseButton]);
 } // createNotationControlBar()
 
 export function createFacsimileControlBar(parentElement) {
@@ -512,7 +520,6 @@ export function createFacsimileControlBar(parentElement) {
   facsimileIcon.innerHTML = icon.log;
   facsimileIcon.id = 'facsimileIcon';
   facsimileIcon.title = 'Facsimile panel';
-  facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -626,7 +633,7 @@ export function createFacsimileControlBar(parentElement) {
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  wrapControlBar(facsCtrlBar, [facsimileCloseButton]);
+  wrapControlBar(facsCtrlBar, [facsimileIcon], [facsimileCloseButton]);
 } // createFacsimileControlBar()
 
 export function adjustCtrlBarOverflow(ctrlBar) {
@@ -650,25 +657,26 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     if (firstOverflowingIndex !== -1) {
       let overflowing = children.slice(firstOverflowingIndex);
       overflowing.forEach((child) => {
-        overflowContent.prepend(child);
+        overflowContent.appendChild(child);
       });
     } else {
       // move items back from overflow menu if there is space
       // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
       const currentlyOverflowing = Array.from(overflowContent.children);
       for (let overflowingItem of currentlyOverflowing) {
-        let currentlyInCtrlBar = Array.from(ctrlBar.children);
-        let availableSpace =
-          ctrlBarRect.right -
-          currentlyInCtrlBar[currentlyInCtrlBar.length - 1].getBoundingClientRect().right -
-          2 * padding;
+        // re-measure after every insertion to avoid stale rects
+        const currentRect = ctrlBar.getBoundingClientRect();
+        const existingChildren = Array.from(ctrlBar.children);
+        let availableSpace = currentRect.right - 2 * padding;
+        if (existingChildren.length) {
+          availableSpace -= existingChildren[existingChildren.length - 1].getBoundingClientRect().right;
+        }
         const childRect = overflowingItem.getBoundingClientRect();
         // check if there is space in the ctrlBar to add this as the last child
         if (childRect.width < availableSpace) {
-          console.log('Fitting back into ctrlBar: ', ctrlBar.children, overflowingItem);
           ctrlBar.appendChild(overflowingItem);
         } else {
-          /// if we can't fit this one, don't try to fit any more
+          // if we can't fit this one, don't try to fit any more
           break;
         }
       }

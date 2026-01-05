@@ -1062,14 +1062,14 @@ a:active {
   border:none;
 }
 
-.control-menu-fixed-right { 
+.control-menu-fixed-left, .control-menu-fixed-right { 
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.control-menu-fixed-right > * {
+.control-menu-fixed-left > *, control-menu-fixed-right > * {
   box-sizing: border-box;
   width: fit-content;
   display:flex;
