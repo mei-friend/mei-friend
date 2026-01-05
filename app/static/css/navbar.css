@@ -386,6 +386,8 @@
 #pageRangeItems {
   max-width: 160px;
   float: left;
+  position: fixed;
+  margin-top:2em;
 }
 
 #pageRangeItems div {

@@ -1002,9 +1002,10 @@ a:active {
   z-index: 6;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
-  flex: 1 1 0;
+  flex: 1 1 auto;
   min-width: 0;
   max-width: 100%;
+  overflow:hidden;
 }
 
 .control-menu > * {
@@ -1041,8 +1042,11 @@ a:active {
   box-sizing: border-box;
   cursor: pointer;
   background-color: var(--controlMenuBackgroundColor);
-  font-style: italic;
   display: flex;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  z-index: 20;
+  font-style: bold;
   align-items: center;
   width: fit-content;
   height: 100%;
@@ -1056,6 +1060,19 @@ a:active {
 .control-menu-overflow-content div {
   width: 100%;
   border:none;
+}
+
+.control-menu-fixed-right { 
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.control-menu-fixed-right > * {
+  box-sizing: border-box;
+  width: fit-content;
+  display:flex;
 }
 
 .controls {

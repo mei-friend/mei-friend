@@ -131,10 +131,10 @@ export function createNotationDiv(parentElement, scale) {
 /**
  * Wraps a control bar in a wrapper div that contains an overflow menu
  * @param {HTMLElement} controlBar - The control bar to wrap
- * @param {boolean|HTMLElement[]} toprightElements - Optional array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
- * @return {HTMLElement} The wrapper div containing the control bar and overflow menu
+ * @param {boolean|HTMLElement[]} fixedElementsRight - Optional array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @return {HTMLElement} The wrapper div containing the control bar, overflow menu, and any fixed elements
  */
-function wrapControlBar(controlBar, toprightElements = false) {
+function wrapControlBar(controlBar, fixedElementsRight = false) {
   // create wrapper div for control bar and overflow menu
   let wrapper = document.createElement('div');
   wrapper.classList.add('control-menu-wrapper');
@@ -143,7 +143,7 @@ function wrapControlBar(controlBar, toprightElements = false) {
   wrapper.appendChild(controlBar);
   let overflowMenu = document.createElement('div');
   let overflowIcon = document.createElement('div');
-  overflowIcon.innerHTML = 'More...&nbsp;';
+  overflowIcon.innerHTML = '&#9776;';
   overflowIcon.id = controlBar.id + '-overflow-icon';
   overflowIcon.classList.add('control-menu-overflow-icon');
   let overflowContent = document.createElement('div');
@@ -154,10 +154,13 @@ function wrapControlBar(controlBar, toprightElements = false) {
   overflowMenu.classList.add('control-menu-overflow');
   overflowMenu.id = controlBar.id + '-overflow';
   wrapper.appendChild(overflowMenu);
-  if (toprightElements && Array.isArray(toprightElements)) {
-    toprightElements.forEach((el) => {
-      wrapper.appendChild(el);
+  if (fixedElementsRight && Array.isArray(fixedElementsRight)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsRight.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
     });
+    fixedElementsDiv.classList.add('control-menu-fixed-right');
+    wrapper.appendChild(fixedElementsDiv);
   }
   registerOverflowMenu(overflowMenu);
   return wrapper;
@@ -634,23 +637,18 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     // If there is space in the control bar, move items back from the overflow menu in order.
     const children = Array.from(ctrlBar.children);
     const ctrlBarRect = ctrlBar.getBoundingClientRect();
-    const padding = 25; // px padding to avoid edge issues
+    const padding = 50; // px padding to avoid edge issues
+
     let firstOverflowingIndex = children.findIndex((child) => {
       let childRect = child.getBoundingClientRect();
-      return (
-        (child.style.display !== 'none' && childRect.right > ctrlBarRect.right + padding) ||
-        childRect.left < ctrlBarRect.left - padding
-      );
+      return childRect.right > ctrlBarRect.right;
     });
     const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
     // move overflowing items into overflow menu
     console.log('firstOverflowingIndex: ', firstOverflowingIndex);
     console.log('CtrlBarRight: ', ctrlBarRect.right);
     if (firstOverflowingIndex !== -1) {
-      let overflowing = children.slice(firstOverflowingIndex).filter(
-        // skip invisible
-        (child) => child.style.display !== 'none'
-      );
+      let overflowing = children.slice(firstOverflowingIndex);
       overflowing.forEach((child) => {
         overflowContent.prepend(child);
       });
@@ -658,28 +656,17 @@ export function adjustCtrlBarOverflow(ctrlBar) {
       // move items back from overflow menu if there is space
       // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
       const currentlyOverflowing = Array.from(overflowContent.children);
-      for (let overflowing of currentlyOverflowing) {
-        let currentChildren = Array.from(ctrlBar.children).filter(
-          // only consider visible children
-          (child) => {
-            console.log('Overflow determination: considering child ', child.id);
-            return child && child.style.display !== 'none';
-          }
-        );
-        console.log('Overflow determination: found current children ', currentChildren);
+      for (let overflowingItem of currentlyOverflowing) {
+        let currentlyInCtrlBar = Array.from(ctrlBar.children);
         let availableSpace =
-          ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
-        // account for any topright elements (e.g., close buttons)
-        let toprightsWidth = Array.from(ctrlBar.querySelectorAll('.topright')).reduce((sum, el) => {
-          let rect = el.getBoundingClientRect();
-          return sum + rect.width;
-        }, 0);
-        availableSpace -= toprightsWidth;
-        const childRect = overflowing.getBoundingClientRect();
+          ctrlBarRect.right -
+          currentlyInCtrlBar[currentlyInCtrlBar.length - 1].getBoundingClientRect().right -
+          2 * padding;
+        const childRect = overflowingItem.getBoundingClientRect();
         // check if there is space in the ctrlBar to add this as the last child
-        if (childRect.width + padding < availableSpace) {
-          console.log('Fitting back into ctrlBar: ', ctrlBar.children, overflowing);
-          ctrlBar.appendChild(overflowing);
+        if (childRect.width < availableSpace) {
+          console.log('Fitting back into ctrlBar: ', ctrlBar.children, overflowingItem);
+          ctrlBar.appendChild(overflowingItem);
         } else {
           /// if we can't fit this one, don't try to fit any more
           break;

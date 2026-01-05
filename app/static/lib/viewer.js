@@ -1306,7 +1306,7 @@ export default class Viewer {
           document.getElementById('flipButton').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('updateControls').style.display = value ? 'flex' : 'none';
           break;
         case 'facsimileZoomInput':
           document.getElementById('facsimileZoom').value = value;
@@ -1582,7 +1582,7 @@ export default class Viewer {
             break;
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
-            document.getElementById('updateControls').style.display = u ? 'inherit' : 'none';
+            document.getElementById('updateControls').style.display = u ? 'flex' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
