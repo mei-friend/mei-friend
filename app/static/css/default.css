@@ -1047,15 +1047,15 @@ a:active {
   font-style: italic;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 12x;
   width: fit-content;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  height: 100%;
+  margin: 0px 3px;
 }
+
 .control-menu-overflow-icon:hover {
-  color: var(--dropdownBorderColor);
-} 
+  background-color: var(--settingsLinkHoverColor);
+}
+
 .control-menu-overflow-content div {
   width: 100%;
   border:none;

@@ -172,6 +172,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       setTimeout(() => v.updateLayout(), 33);
     }
   }
+  // handle any overflowing buttons in currently available control bars
+  adjustOverflows();
 } // setOrientation()
 
 export function getOrientation() {
@@ -367,20 +369,25 @@ export function addNotationResizerHandlers(v, cm) {
     if (storage && storage.supported) {
       storage.notationProportion = notationProportion;
     }
-
-    // adjust control bars, moving occluded buttons into overflow menu if necessary
-    const notationControlBar = document.getElementById('notationControlBar');
-    if (notationControlBar && notationControlBar.style.display !== 'none') {
-      adjustCtrlBarOverflow(notationControlBar);
-    }
-    const facsimileControlBar = document.getElementById('facsimileControlBar');
-    if (facsimileControlBar && facsimileContainer.style.display !== 'none') {
-      adjustCtrlBarOverflow(facsimileControlBar);
-    }
   }; // mouseUpHandler
+
+  // handle any overflowing buttons in currently available control bars
+  adjustOverflows();
 
   notationResizer.addEventListener('mousedown', mouseDownHandler);
 } // addNotationResizerHandlers()
+
+function adjustOverflows() {
+  // adjust control bars, moving occluded buttons into overflow menu if necessary
+  const notationControlBar = document.getElementById('notationControlBar');
+  if (notationControlBar && notationControlBar.style.display !== 'none') {
+    adjustCtrlBarOverflow(notationControlBar);
+  }
+  const facsimileControlBar = document.getElementById('facsimileControlBar');
+  if (facsimileControlBar && facsimileContainer.style.display !== 'none') {
+    adjustCtrlBarOverflow(facsimileControlBar);
+  }
+}
 
 /**
  * Adds resizer handlers for resizing the facsimile panel

@@ -75,6 +75,7 @@ import {
   setBreaksOptions,
   setChoiceOptions,
   hideAllOverflowContents,
+  adjustCtrlBarOverflow,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
