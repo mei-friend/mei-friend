@@ -725,51 +725,6 @@ export function adjustCtrlBarOverflow(ctrlBar) {
   }
 }
 
-/*
-export function adjustCtrlBarOverflow(ctrlBar) {
-  // adjust the overflow of the control bar
-  if (ctrlBar) {
-    // check if any of the children are overflowing:
-    // that is, whether the left or right edge of any child is beyond the left or right edge of the container
-    // any overflow requires moving items into the overflow content area (overflow menu)
-    const children = Array.from(ctrlBar.children);
-    const ctrlBarRect = ctrlBar.getBoundingClientRect();
-    const padding = 5; // px padding to avoid edge issues
-    let overflowing = children.filter((child) => {
-      let childRect = child.getBoundingClientRect();
-      return childRect.right > ctrlBarRect.right + padding || childRect.left < ctrlBarRect.left - padding;
-    });
-    const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
-    // move overflowing items into overflow menu
-    overflowing.forEach((child) => {
-      overflowContent.appendChild(child);
-    });
-    // move items back from overflow menu if there is space
-    // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
-    const currentlyOverflowing = Array.from(overflowContent.children);
-    for (let overflowing of currentlyOverflowing) {
-      let currentChildren = Array.from(ctrlBar.children);
-      let availableSpace =
-        ctrlBarRect.right - currentChildren[currentChildren.length - 1].getBoundingClientRect().right;
-      const childRect = overflowing.getBoundingClientRect();
-      console.log('availableSpace: ', availableSpace, ' child width: ', childRect.width);
-      // check if there is space in the ctrlBar to add this child
-      if (childRect.width + padding < availableSpace) {
-        ctrlBar.appendChild(overflowing);
-      } else {
-        /// if we can't fit this one, don't try to fit any more
-        break;
-      }
-    }
-    // show or hide the overflow menu button based on whether it has children
-    if (overflowContent.children.length > 0) {
-      overflowContent.style.display = 'inline-block';
-    } else {
-      overflowContent.style.display = 'none';
-    }
-  }
-}*/
-
 export function createEncodingPanel() {
   let codeCheckerResizer = document.getElementById('codeCheckerResizer');
   codeCheckerResizer.classList.add('resizer');
