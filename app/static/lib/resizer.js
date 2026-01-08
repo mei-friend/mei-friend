@@ -1,4 +1,4 @@
-import { adjustCtrlBarOverflow } from './control-menu.js';
+import { adjustCtrlMenuOverflow } from './control-menu.js';
 import {
   annotationPanelExtent,
   defaultNotationResizerWidth,
@@ -172,7 +172,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       setTimeout(() => v.updateLayout(), 33);
     }
   }
-  // handle any overflowing buttons in currently available control bars
+  // handle any overflowing buttons in currently available control menus
   adjustOverflows();
 } // setOrientation()
 
@@ -237,7 +237,7 @@ export function addNotationResizerHandlers(v, cm) {
   let notationSize = 0;
 
   const mouseDownHandler = function (e) {
-    // hide control bar overflow
+    // hide control menu overflow
     Array.from(document.getElementsByClassName('control-menu-overflow')).forEach((content) => {
       content.style.display = 'none';
     });
@@ -371,21 +371,21 @@ export function addNotationResizerHandlers(v, cm) {
     }
   }; // mouseUpHandler
 
-  // handle any overflowing buttons in currently available control bars
+  // handle any overflowing buttons in currently available control menus
   adjustOverflows();
 
   notationResizer.addEventListener('mousedown', mouseDownHandler);
 } // addNotationResizerHandlers()
 
 function adjustOverflows() {
-  // adjust control bars, moving occluded buttons into overflow menu if necessary
-  const notationControlBar = document.getElementById('notationControlBar');
-  if (notationControlBar && notationControlBar.style.display !== 'none') {
-    adjustCtrlBarOverflow(notationControlBar);
+  // adjust control menus, moving occluded buttons into overflow menu if necessary
+  const notationControlMenu = document.getElementById('notationControlMenu');
+  if (notationControlMenu && notationControlMenu.style.display !== 'none') {
+    adjustCtrlMenuOverflow(notationControlMenu);
   }
-  const facsimileControlBar = document.getElementById('facsimileControlBar');
-  if (facsimileControlBar && facsimileContainer.style.display !== 'none') {
-    adjustCtrlBarOverflow(facsimileControlBar);
+  const facsimileControlMenu = document.getElementById('facsimileControlMenu');
+  if (facsimileControlMenu && facsimileContainer.style.display !== 'none') {
+    adjustCtrlMenuOverflow(facsimileControlMenu);
   }
 }
 

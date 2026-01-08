@@ -9,7 +9,7 @@ import {
   showPdfButtons,
   setControlMenuState,
   setCheckbox,
-  adjustCtrlBarOverflow,
+  adjustCtrlMenuOverflow,
 } from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
@@ -1040,11 +1040,11 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
-    // for each visible .control-bar, adjust overflow
-    let ctrlBars = document.querySelectorAll('.control-menu');
-    ctrlBars.forEach((bar) => {
-      if (bar.style.display !== 'none') {
-        adjustCtrlBarOverflow(bar);
+    // for each visible .control-menu, adjust overflow
+    let ctrlMenus = document.querySelectorAll('.control-menu');
+    ctrlMenus.forEach((ctrlMenu) => {
+      if (ctrlMenu.style.display !== 'none') {
+        adjustCtrlMenuOverflow(ctrlMenu);
       }
     });
   } // pageModeOn()
@@ -1080,7 +1080,7 @@ export default class Viewer {
       this.allowNotationInteraction = true;
     }
     this.pdfMode = false;
-    adjustCtrlBarOverflow();
+    adjustCtrlMenuOverflow();
   } // pageModeOff()
 
   saveAsPdf() {

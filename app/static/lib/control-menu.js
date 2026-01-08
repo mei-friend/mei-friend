@@ -77,7 +77,7 @@ export function createNotationDiv(parentElement, scale) {
   let verovioContainer = document.createElement('div');
   verovioContainer.id = 'verovioContainer';
 
-  createNotationControlBar(verovioContainer, scale);
+  createNotationControlMenu(verovioContainer, scale);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
@@ -94,7 +94,7 @@ export function createNotationDiv(parentElement, scale) {
   let facsimileContainer = document.createElement('div');
   facsimileContainer.id = 'facsimileContainer';
 
-  createFacsimileControlBar(facsimileContainer);
+  createFacsimileControlMenu(facsimileContainer);
 
   // Create container element for Facsimile Image
   let facsimilePanel = document.createElement('div');
@@ -129,17 +129,17 @@ export function createNotationDiv(parentElement, scale) {
 } // createNotationDiv()
 
 /**
- * Wraps a control bar in a wrapper div that contains an overflow menu
- * @param {HTMLElement} controlBar - The control bar to wrap
- * @param {HTMLElement[]} fixedElementsLeft - Array of button(s) to add to the left corner of the control bar (e.g., Verovio logo, Facsimile icon, ...). These will not be part of the overflow menu.
- * @param {HTMLElement[]} fixedElementsRight - Array of button(s) to add to the right corner of the control bar (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
- * @return {HTMLElement} The wrapper div containing the control bar, overflow menu, and any fixed elements
+ * Wraps a control menu in a wrapper div that contains an overflow menu
+ * @param {HTMLElement} controlMenu - The control menu to wrap
+ * @param {HTMLElement[]} fixedElementsLeft - Array of button(s) to add to the left corner of the control menu (e.g., Verovio logo, Facsimile icon, ...). These will not be part of the overflow menu.
+ * @param {HTMLElement[]} fixedElementsRight - Array of button(s) to add to the right corner of the control menu (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @return {HTMLElement} The wrapper div containing the control menu, overflow menu, and any fixed elements
  */
-function wrapControlBar(controlBar, fixedElementsLeft, fixedElementsRight) {
-  // create wrapper div for control bar and overflow menu
+function wrapControlMenu(controlMenu, fixedElementsLeft, fixedElementsRight) {
+  // create wrapper div for control menu and overflow menu
   let wrapper = document.createElement('div');
   wrapper.classList.add('control-menu-wrapper');
-  wrapper.id = controlBar.id + '-wrapper';
+  wrapper.id = controlMenu.id + '-wrapper';
   if (fixedElementsLeft && Array.isArray(fixedElementsLeft)) {
     let fixedElementsDiv = document.createElement('div');
     fixedElementsLeft.forEach((el) => {
@@ -148,20 +148,20 @@ function wrapControlBar(controlBar, fixedElementsLeft, fixedElementsRight) {
     fixedElementsDiv.classList.add('control-menu-fixed-left');
     wrapper.appendChild(fixedElementsDiv);
   }
-  controlBar.parentElement.insertBefore(wrapper, controlBar);
-  wrapper.appendChild(controlBar);
+  controlMenu.parentElement.insertBefore(wrapper, controlMenu);
+  wrapper.appendChild(controlMenu);
   let overflowMenu = document.createElement('div');
   let overflowIcon = document.createElement('div');
   overflowIcon.innerHTML = '&#9776;';
-  overflowIcon.id = controlBar.id + '-overflow-icon';
+  overflowIcon.id = controlMenu.id + '-overflow-icon';
   overflowIcon.classList.add('control-menu-overflow-icon');
   let overflowContent = document.createElement('div');
   overflowContent.classList.add('control-menu-overflow-content');
-  overflowContent.id = controlBar.id + '-overflow-content';
+  overflowContent.id = controlMenu.id + '-overflow-content';
   overflowMenu.appendChild(overflowIcon);
   overflowMenu.appendChild(overflowContent);
   overflowMenu.classList.add('control-menu-overflow');
-  overflowMenu.id = controlBar.id + '-overflow';
+  overflowMenu.id = controlMenu.id + '-overflow';
   wrapper.appendChild(overflowMenu);
   if (fixedElementsRight && Array.isArray(fixedElementsRight)) {
     let fixedElementsDiv = document.createElement('div');
@@ -171,13 +171,13 @@ function wrapControlBar(controlBar, fixedElementsLeft, fixedElementsRight) {
     fixedElementsDiv.classList.add('control-menu-fixed-right');
     wrapper.appendChild(fixedElementsDiv);
   }
-  assignOrderKeys(controlBar);
+  assignOrderKeys(controlMenu);
   registerOverflowMenu(overflowMenu);
   return wrapper;
 }
 
-function assignOrderKeys(controlBar) {
-  Array.from(controlBar.children).forEach((child, index) => {
+function assignOrderKeys(controlMenu) {
+  Array.from(controlMenu.children).forEach((child, index) => {
     if (!child.dataset.order) child.dataset.order = String(index);
   });
 }
@@ -202,12 +202,11 @@ function getVisibleWidth(el) {
   return Number(el.dataset.visWidth ?? 0);
 }
 
-export function createNotationControlBar(parentElement, scale) {
+export function createNotationControlMenu(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'notationControlBar';
-
+  vrvCtrlMenu.id = 'notationControlMenu';
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
@@ -533,15 +532,15 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
 
   parentElement.appendChild(vrvCtrlMenu);
-  wrapControlBar(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, pdfCloseButton]);
-} // createNotationControlBar()
+  wrapControlMenu(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, pdfCloseButton]);
+} // createNotationControlMenu()
 
-export function createFacsimileControlBar(parentElement) {
+export function createFacsimileControlMenu(parentElement) {
   // Create control form
-  let facsCtrlBar = document.createElement('div');
-  facsCtrlBar.classList.add('control-menu');
-  facsCtrlBar.id = 'facsimileControlBar';
-  parentElement.appendChild(facsCtrlBar);
+  let facsCtrlMenu = document.createElement('div');
+  facsCtrlMenu.classList.add('control-menu');
+  facsCtrlMenu.id = 'facsimileControlMenu';
+  parentElement.appendChild(facsCtrlMenu);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
@@ -553,7 +552,7 @@ export function createFacsimileControlBar(parentElement) {
   let zoomCtrls = document.createElement('div');
   zoomCtrls.id = 'facsimileZoomControls';
   zoomCtrls.classList.add('controls');
-  facsCtrlBar.appendChild(zoomCtrls);
+  facsCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
   decreaseBtn.id = 'facsimileDecreaseZoomButton';
@@ -606,7 +605,7 @@ export function createFacsimileControlBar(parentElement) {
   fullPageCheckbox.disabled = false;
   fullPageDiv.appendChild(fullPageCheckbox);
 
-  facsCtrlBar.appendChild(fullPageDiv);
+  facsCtrlMenu.appendChild(fullPageDiv);
 
   // show zone rectangles
   let showZonesDiv = document.createElement('div');
@@ -630,7 +629,7 @@ export function createFacsimileControlBar(parentElement) {
   showZonesCheckbox.disabled = false;
   showZonesDiv.appendChild(showZonesCheckbox);
 
-  facsCtrlBar.appendChild(showZonesDiv);
+  facsCtrlMenu.appendChild(showZonesDiv);
 
   // edit zones
   let editZonesDiv = document.createElement('div');
@@ -654,42 +653,40 @@ export function createFacsimileControlBar(parentElement) {
   editZonesCheckbox.disabled = false;
   editZonesDiv.appendChild(editZonesCheckbox);
 
-  facsCtrlBar.appendChild(editZonesDiv);
+  facsCtrlMenu.appendChild(editZonesDiv);
 
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  wrapControlBar(facsCtrlBar, [facsimileIcon], [facsimileCloseButton]);
-} // createFacsimileControlBar()
+  wrapControlMenu(facsCtrlMenu, [facsimileIcon], [facsimileCloseButton]);
+} // createFacsimileControlMenu()
 
-export function adjustCtrlBarOverflow(ctrlBar) {
-  // adjust the overflow of the control bar
-  if (ctrlBar) {
-    // We want to maintain the order of the items in the control bar
+export function adjustCtrlMenuOverflow(ctrlMenu) {
+  // adjust the overflow of the control menu
+  if (ctrlMenu) {
+    // We want to maintain the order of the items in the control menu
     // If any of the children are overflowing, move the first overflowing child AND ALL SUBSEQUENT CHILDREN into the overflow menu
-    // If there is space in the control bar, move items back from the overflow menu in order.
-    const children = Array.from(ctrlBar.children);
-    const ctrlBarRect = ctrlBar.getBoundingClientRect();
+    // If there is space in the control menu, move items back from the overflow menu in order.
+    const children = Array.from(ctrlMenu.children);
+    const ctrlMenuRect = ctrlMenu.getBoundingClientRect();
     const padding = 40; // px padding to avoid edge issues
 
     // determine first overflowing child using cumulative widths for consistency
     let cumulative = 0;
     let firstOverflowingIndex = children.findIndex((child) => {
       const childWidth = getVisibleWidth(child);
-      const wouldOverflow = cumulative + childWidth + padding > ctrlBarRect.width;
+      const wouldOverflow = cumulative + childWidth + padding > ctrlMenuRect.width;
       cumulative += childWidth;
       return wouldOverflow;
     });
-    const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
+    const overflowContent = document.getElementById(ctrlMenu.id + '-overflow-content');
     // move overflowing items into overflow menu
-    console.log('firstOverflowingIndex: ', firstOverflowingIndex);
-    console.log('CtrlBarRight: ', ctrlBarRect.right);
     if (firstOverflowingIndex !== -1) {
       let overflowing = children.slice(firstOverflowingIndex);
       overflowing.forEach((child) => {
-        if (!child.dataset.order) assignOrderKeys(ctrlBar);
+        if (!child.dataset.order) assignOrderKeys(ctrlMenu);
         getVisibleWidth(child); // cache width while visible
         insertByOrder(overflowContent, child);
       });
@@ -701,14 +698,14 @@ export function adjustCtrlBarOverflow(ctrlBar) {
       );
       for (let overflowingItem of currentlyOverflowing) {
         // re-measure after every insertion to avoid stale rects
-        const currentRect = ctrlBar.getBoundingClientRect();
-        const currentChildren = Array.from(ctrlBar.children);
+        const currentRect = ctrlMenu.getBoundingClientRect();
+        const currentChildren = Array.from(ctrlMenu.children);
         const usedWidth = currentChildren.reduce((acc, el) => acc + getVisibleWidth(el), 0);
         let availableSpace = currentRect.width - padding - usedWidth;
         const childWidth = getVisibleWidth(overflowingItem);
-        // check if there is space in the ctrlBar to add this as the last child
+        // check if there is space in the ctrlMenu to add this as the last child
         if (childWidth <= availableSpace) {
-          ctrlBar.appendChild(overflowingItem);
+          ctrlMenu.appendChild(overflowingItem);
         } else {
           // if we can't fit this one, don't try to fit any more
           break;
@@ -716,7 +713,7 @@ export function adjustCtrlBarOverflow(ctrlBar) {
       }
     }
     // show or hide the overflow menu button based on whether it has children
-    let overflow = document.getElementById(ctrlBar.id + '-overflow');
+    let overflow = document.getElementById(ctrlMenu.id + '-overflow');
     if (overflowContent.children.length > 0) {
       overflow.style.display = 'inline-block';
     } else {
@@ -850,7 +847,7 @@ export function handleSmartBreaksOption(speedMode) {
 
 /**
  * Adds the options for choice to the choiceSelect in the
- * notation control bar.
+ * notation control menu.
  * @param {string} active value of currently active selection
  */
 export function setChoiceOptions(active) {
