@@ -171,8 +171,35 @@ function wrapControlBar(controlBar, fixedElementsLeft, fixedElementsRight) {
     fixedElementsDiv.classList.add('control-menu-fixed-right');
     wrapper.appendChild(fixedElementsDiv);
   }
+  assignOrderKeys(controlBar);
   registerOverflowMenu(overflowMenu);
   return wrapper;
+}
+
+function assignOrderKeys(controlBar) {
+  Array.from(controlBar.children).forEach((child, index) => {
+    if (!child.dataset.order) child.dataset.order = String(index);
+  });
+}
+
+function insertByOrder(container, child) {
+  const order = Number(child.dataset.order ?? Number.MAX_SAFE_INTEGER);
+  const siblings = Array.from(container.children);
+  const before = siblings.find((el) => Number(el.dataset.order ?? Number.MAX_SAFE_INTEGER) > order);
+  if (before) {
+    container.insertBefore(child, before);
+  } else {
+    container.appendChild(child);
+  }
+}
+
+function getVisibleWidth(el) {
+  const rect = el.getBoundingClientRect();
+  if (rect.width > 0) {
+    el.dataset.visWidth = String(rect.width);
+    return rect.width;
+  }
+  return Number(el.dataset.visWidth ?? 0);
 }
 
 export function createNotationControlBar(parentElement, scale) {
@@ -644,11 +671,15 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     // If there is space in the control bar, move items back from the overflow menu in order.
     const children = Array.from(ctrlBar.children);
     const ctrlBarRect = ctrlBar.getBoundingClientRect();
-    const padding = 50; // px padding to avoid edge issues
+    const padding = 40; // px padding to avoid edge issues
 
+    // determine first overflowing child using cumulative widths for consistency
+    let cumulative = 0;
     let firstOverflowingIndex = children.findIndex((child) => {
-      let childRect = child.getBoundingClientRect();
-      return childRect.right > ctrlBarRect.right;
+      const childWidth = getVisibleWidth(child);
+      const wouldOverflow = cumulative + childWidth + padding > ctrlBarRect.width;
+      cumulative += childWidth;
+      return wouldOverflow;
     });
     const overflowContent = document.getElementById(ctrlBar.id + '-overflow-content');
     // move overflowing items into overflow menu
@@ -657,23 +688,25 @@ export function adjustCtrlBarOverflow(ctrlBar) {
     if (firstOverflowingIndex !== -1) {
       let overflowing = children.slice(firstOverflowingIndex);
       overflowing.forEach((child) => {
-        overflowContent.appendChild(child);
+        if (!child.dataset.order) assignOrderKeys(ctrlBar);
+        getVisibleWidth(child); // cache width while visible
+        insertByOrder(overflowContent, child);
       });
     } else {
       // move items back from overflow menu if there is space
       // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
-      const currentlyOverflowing = Array.from(overflowContent.children);
+      const currentlyOverflowing = Array.from(overflowContent.children).sort(
+        (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
+      );
       for (let overflowingItem of currentlyOverflowing) {
         // re-measure after every insertion to avoid stale rects
         const currentRect = ctrlBar.getBoundingClientRect();
-        const existingChildren = Array.from(ctrlBar.children);
-        let availableSpace = currentRect.right - 2 * padding;
-        if (existingChildren.length) {
-          availableSpace -= existingChildren[existingChildren.length - 1].getBoundingClientRect().right;
-        }
-        const childRect = overflowingItem.getBoundingClientRect();
+        const currentChildren = Array.from(ctrlBar.children);
+        const usedWidth = currentChildren.reduce((acc, el) => acc + getVisibleWidth(el), 0);
+        let availableSpace = currentRect.width - padding - usedWidth;
+        const childWidth = getVisibleWidth(overflowingItem);
         // check if there is space in the ctrlBar to add this as the last child
-        if (childRect.width < availableSpace) {
+        if (childWidth <= availableSpace) {
           ctrlBar.appendChild(overflowingItem);
         } else {
           // if we can't fit this one, don't try to fit any more
