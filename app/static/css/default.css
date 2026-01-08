@@ -192,6 +192,13 @@ a:active {
   fill: var(--textColor);
 }
 
+.settingsButtonWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 #facsimileCloseButton {
   fill: var(--dropdownBorderColor);
 }
@@ -982,11 +989,11 @@ a:active {
   width: 100%;
   overflow-x: hidden;
   overflow-y: visible;
-  background-color: var(--controlMenuBackgroundColor);
   box-sizing: border-box;
-  margin-top: 2px;
-  margin-bottom: 2px;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
+  font-size: 10pt;
+  color: var(--textColor);
+  background-color: var(--controlMenuBackgroundColor);
 }
 
 .control-menu {
@@ -994,14 +1001,11 @@ a:active {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  font-size: 10pt;
   height: auto;
   min-height: 28px;
   padding: 2px;
   margin: 0px;
   z-index: 6;
-  color: var(--textColor);
-  background-color: var(--controlMenuBackgroundColor);
   flex: 1 1 auto;
   min-width: 0;
   max-width: 100%;
@@ -1041,7 +1045,6 @@ a:active {
 .control-menu-overflow-icon { 
   box-sizing: border-box;
   cursor: pointer;
-  background-color: var(--controlMenuBackgroundColor);
   display: flex;
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 4px;

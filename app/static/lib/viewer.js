@@ -1040,7 +1040,13 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
-    adjustCtrlBarOverflow();
+    // for each visible .control-bar, adjust overflow
+    let ctrlBars = document.querySelectorAll('.control-menu');
+    ctrlBars.forEach((bar) => {
+      if (bar.style.display !== 'none') {
+        adjustCtrlBarOverflow(bar);
+      }
+    });
   } // pageModeOn()
 
   // Switches back from pdfMode
