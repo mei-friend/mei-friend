@@ -523,6 +523,7 @@ export function createNotationControlBar(parentElement, scale) {
   savePdfButton.classList.add('inline-block-tight');
   savePdfButton.style.display = 'none';
   savePdfButton.title = 'Save as PDF';
+  pdfCtrlDiv.appendChild(savePdfButton);
 
   let pdfCloseButton = document.createElement('div');
   pdfCloseButton.id = 'pdfCloseButton';
@@ -532,7 +533,7 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
 
   parentElement.appendChild(vrvCtrlMenu);
-  wrapControlBar(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, savePdfButton, pdfCloseButton]);
+  wrapControlBar(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, pdfCloseButton]);
 } // createNotationControlBar()
 
 export function createFacsimileControlBar(parentElement) {

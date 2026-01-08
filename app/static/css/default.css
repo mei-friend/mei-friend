@@ -984,13 +984,13 @@ a:active {
 
 .control-menu-wrapper {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   flex-wrap: nowrap;
   width: 100%;
   overflow-x: hidden;
   overflow-y: visible;
   box-sizing: border-box;
-  padding-bottom: 2px;
+  padding: 0px;
   font-size: 10pt;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
@@ -1012,12 +1012,12 @@ a:active {
   overflow:hidden;
 }
 
-.control-menu > * {
+/*.control-menu > * {
   padding-top: 0px;
   padding-bottom: 0px;
   margin-top: 4px;
   margin-bottom: 4px;
-}
+}*/
 
 /* control menu overflow: when there are too many buttons to fit */
 /* Display an ellipsis button that shows the hidden buttons in a dropdown menu */
@@ -1052,7 +1052,9 @@ a:active {
   font-style: bold;
   align-items: center;
   width: fit-content;
-  height: 100%;
+  height: 26px;
+  min-height: 26px;
+  max-height: 26px;
   margin: 0px 3px;
 }
 
@@ -1073,10 +1075,10 @@ a:active {
   align-items: center;
 }
 
-.control-menu-fixed-left > *, control-menu-fixed-right > * {
+.control-menu-fixed-left > *, .control-menu-fixed-right > * {
   box-sizing: border-box;
   width: fit-content;
-  display:flex;
+  display: flex;
 }
 
 .controls {
