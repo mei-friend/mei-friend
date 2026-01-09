@@ -820,11 +820,11 @@ async function completeInitialLoad() {
 
   setNotationProportion(np);
   setFacsimileProportion(fp);
+  addAnnotationHandlers();
+  addMarkupHandlers();
   setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
-  addAnnotationHandlers();
-  addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   addCodeCheckerResizerHandlers(v, cm);
