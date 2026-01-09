@@ -712,6 +712,13 @@ export const lang = {
     text: 'Pokaż pole wyboru trybu szybkiego',
     description: 'Pokaż pole wyboru trybu szybkiego w menu sterowania notacją',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Pokaż dodatkowe przyciski sterowania',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Pokaż dodatkowe przyciski sterowania',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {

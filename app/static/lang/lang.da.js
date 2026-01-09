@@ -605,6 +605,13 @@ export const lang = {
     text: 'Vis hastigheds mode afkrydsningsfelt',
     description: 'Vis hastigheds mode afkrydsningsfelt i notations kontrolmenu',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Vis ekstra kontrolknapper',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Vis ekstra kontrolknapper',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {

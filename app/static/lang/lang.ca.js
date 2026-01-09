@@ -713,6 +713,13 @@ export const lang = {
     text: 'Mostra casella de selecció de mode de velocitat',
     description: 'Mostra la casella de selecció de mode de velocitat en el menú de control de la notació',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Mostra botons de control addicionals',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Mostra botons de control addicionals',
+  },
 
   // MIDI Playback / Reproducció MIDI
   titleMidiPlayback: {

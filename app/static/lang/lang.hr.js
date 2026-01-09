@@ -599,6 +599,13 @@ export const lang = {
     text: 'Prikaži kućicu za brzi način',
     description: 'Prikaži kućicu za brzi način notacije u izborniku kontrole notacije',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Prikaži dodatna kontrolna dugmad',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Prikaži dodatna kontrolna dugmad',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {
