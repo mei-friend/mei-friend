@@ -607,6 +607,13 @@ export const lang = {
     text: 'Toon snelheidsmodus selectievakje',
     description: 'Toon snelheidsmodus selectievakje in het notatiebedieningsmenu',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Extra bedieningsknoppen tonen',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Extra bedieningsknoppen tonen',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {
@@ -973,7 +980,9 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'maten hernummerd' },
 
   // Code checker @accid.ges
-  accidGesCodeCheckerTitle: { text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).' },
+  accidGesCodeCheckerTitle: {
+    text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).',
+  },
   codeCheckerFix: { text: 'Repareren' },
   codeCheckerFixAll: { text: 'Alles repareren' },
   codeCheckerIgnore: { text: 'Negeren' },

@@ -718,6 +718,13 @@ export const lang = {
     text: 'Mostra la casella di controllo della modalità di velocità',
     description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo dello spartito',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Mostra pulsanti di controllo aggiuntivi',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Mostra pulsanti di controllo aggiuntivi',
+  },
 
   // MIDI Playback / Riproduzione MIDI
   titleMidiPlayback: {

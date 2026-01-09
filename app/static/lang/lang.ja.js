@@ -677,6 +677,13 @@ export const lang = {
     text: 'スピードモードチェックボックスを表示',
     description: '楽譜操作メニューにスピードモードチェックボックスを表示',
   },
+  notationControlMenuOverflowIcon: {
+    description: '追加の操作ボタンを表示',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: '追加の操作ボタンを表示',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {

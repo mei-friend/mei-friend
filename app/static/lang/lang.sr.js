@@ -598,6 +598,13 @@ export const lang = {
     text: 'Прикажи кућицу за режим брзине',
     description: 'Прикажи кућицу за режим брзине нотације у менију контроле нотације',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Прикажи додатна контролна дугмад',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Прикажи додатна контролна дугмад',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {
@@ -962,7 +969,9 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'тактова је пребројано' },
 
   // Code checker @accid.ges
-  accidGesCodeCheckerTitle: { text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).' },
+  accidGesCodeCheckerTitle: {
+    text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).',
+  },
   codeCheckerFix: { text: 'Исправи' },
   codeCheckerFixAll: { text: 'Исправи све' },
   codeCheckerIgnore: { text: 'Занемари' },

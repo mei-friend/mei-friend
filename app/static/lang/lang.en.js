@@ -751,6 +751,14 @@ export const lang = {
     description: 'Show speed mode checkbox in notation control menu',
   },
 
+  notationControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
+  },
+
   // MIDI Playback
   titleMidiPlayback: {
     text: 'MIDI playback',
