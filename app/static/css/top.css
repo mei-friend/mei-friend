@@ -58,7 +58,7 @@
   flex-direction: column;
 }
 
-.control-menu-overflow-content {
+#friendContainer:not(.pdfMode) .control-menu-overflow-content {
   left: auto;
   right: 0;
 }

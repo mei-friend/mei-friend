@@ -53,7 +53,7 @@
   flex-wrap: wrap;
 }
 
-.control-menu-overflow-content {
+#friendContainer:not(.pdfMode) .control-menu-overflow-content {
   left: auto;
   right: 0;
 }

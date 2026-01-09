@@ -153,15 +153,15 @@ function wrapControlMenu(controlMenu, fixedElementsLeft, fixedElementsRight) {
   let overflowMenu = document.createElement('div');
   let overflowIcon = document.createElement('div');
   overflowIcon.innerHTML = '&#9776;';
-  overflowIcon.id = controlMenu.id + '-overflow-icon';
+  overflowIcon.id = controlMenu.id + 'OverflowIcon';
   overflowIcon.classList.add('control-menu-overflow-icon');
   let overflowContent = document.createElement('div');
   overflowContent.classList.add('control-menu-overflow-content');
-  overflowContent.id = controlMenu.id + '-overflow-content';
+  overflowContent.id = controlMenu.id + 'OverflowContent';
   overflowMenu.appendChild(overflowIcon);
   overflowMenu.appendChild(overflowContent);
   overflowMenu.classList.add('control-menu-overflow');
-  overflowMenu.id = controlMenu.id + '-overflow';
+  overflowMenu.id = controlMenu.id + 'Overflow';
   wrapper.appendChild(overflowMenu);
   if (fixedElementsRight && Array.isArray(fixedElementsRight)) {
     let fixedElementsDiv = document.createElement('div');
@@ -671,7 +671,7 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
     // If there is space in the control menu, move items back from the overflow menu in order.
     const children = Array.from(ctrlMenu.children);
     const ctrlMenuRect = ctrlMenu.getBoundingClientRect();
-    const padding = 40; // px padding to avoid edge issues
+    const padding = 25; // px padding to avoid edge issues
 
     // determine first overflowing child using cumulative widths for consistency
     let cumulative = 0;
@@ -681,7 +681,7 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
       cumulative += childWidth;
       return wouldOverflow;
     });
-    const overflowContent = document.getElementById(ctrlMenu.id + '-overflow-content');
+    const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
     // move overflowing items into overflow menu
     if (firstOverflowingIndex !== -1) {
       let overflowing = children.slice(firstOverflowingIndex);
@@ -713,7 +713,7 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
       }
     }
     // show or hide the overflow menu button based on whether it has children
-    let overflow = document.getElementById(ctrlMenu.id + '-overflow');
+    let overflow = document.getElementById(ctrlMenu.id + 'Overflow');
     if (overflowContent.children.length > 0) {
       overflow.style.display = 'inline-block';
     } else {
