@@ -1,3 +1,4 @@
+import { adjustCtrlMenuOverflow } from './control-menu.js';
 import {
   annotationPanelExtent,
   defaultNotationResizerWidth,
@@ -171,6 +172,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       setTimeout(() => v.updateLayout(), 33);
     }
   }
+  // handle any overflowing buttons in currently available control menus
+  adjustOverflows();
 } // setOrientation()
 
 export function getOrientation() {
@@ -234,6 +237,10 @@ export function addNotationResizerHandlers(v, cm) {
   let notationSize = 0;
 
   const mouseDownHandler = function (e) {
+    // hide control menu overflow
+    Array.from(document.getElementsByClassName('control-menu-overflow')).forEach((content) => {
+      content.style.display = 'none';
+    });
     x = e.clientX;
     y = e.clientY;
     if (notationOrientation === 'top' || notationOrientation === 'bottom') {
@@ -364,8 +371,23 @@ export function addNotationResizerHandlers(v, cm) {
     }
   }; // mouseUpHandler
 
+  // handle any overflowing buttons in currently available control menus
+  adjustOverflows();
+
   notationResizer.addEventListener('mousedown', mouseDownHandler);
 } // addNotationResizerHandlers()
+
+function adjustOverflows() {
+  // adjust control menus, moving occluded buttons into overflow menu if necessary
+  const notationControlMenu = document.getElementById('notationControlMenu');
+  if (notationControlMenu && notationControlMenu.style.display !== 'none') {
+    adjustCtrlMenuOverflow(notationControlMenu);
+  }
+  const facsimileControlMenu = document.getElementById('facsimileControlMenu');
+  if (facsimileControlMenu && facsimileContainer.style.display !== 'none') {
+    adjustCtrlMenuOverflow(facsimileControlMenu);
+  }
+}
 
 /**
  * Adds resizer handlers for resizing the facsimile panel

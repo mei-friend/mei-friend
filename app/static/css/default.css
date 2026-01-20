@@ -182,9 +182,6 @@ a:active {
   height: 1.6em;
 }
 
-.fillSpace {
-  flex: auto;
-}
 
 .settingsButton {
   width: 16px;
@@ -193,6 +190,13 @@ a:active {
   padding-right: 4px;
   cursor: pointer;
   fill: var(--textColor);
+}
+
+.settingsButtonWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 #facsimileCloseButton {
@@ -978,17 +982,101 @@ a:active {
   white-space: nowrap;
 }
 
+.control-menu-wrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2px 0px;
+  font-size: 10pt;
+  color: var(--textColor);
+  background-color: var(--controlMenuBackgroundColor);
+}
+
 .control-menu {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  font-size: 10pt;
-  height: 28px;
-  padding: 2px;
-  margin: 0px;
+  height: auto;
+  min-height: 28px;
   z-index: 6;
-  color: var(--textColor);
-  background-color: var(--controlMenuBackgroundColor);
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/*.control-menu > * {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}*/
+
+/* control menu overflow: when there are too many buttons to fit */
+/* Display a menu button that shows the hidden buttons in a dropdown menu */
+.control-menu-overflow {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-menu-overflow-content { 
+  position: fixed; 
+  top: calc(inherit + 1.5em);
+  left: inherit;
+  display:inline;
+  background-color: var(--dropdownBackgroundColor);
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  z-index: 20;
+  width: calc(fit-content + 20px);
+}
+
+.control-menu-overflow-icon { 
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  z-index: 20;
+  font-style: bold;
+  align-items: center;
+  width: fit-content;
+  height: 26px;
+  min-height: 26px;
+  max-height: 26px;
+  margin: 0px 3px;
+}
+
+.control-menu-fixed-right .topright {
+  padding: 0px 12px;
+}
+
+.control-menu-overflow-icon:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.control-menu-overflow-content div {
+  width: 100%;
+  border:none;
+  margin-bottom: .25em;
+}
+
+.control-menu-fixed-left, .control-menu-fixed-right { 
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.control-menu-fixed-left > *, .control-menu-fixed-right > * {
+  box-sizing: border-box;
+  width: fit-content;
+  display: flex;
 }
 
 /* Hide the choice / subst control bar menus if they only contain one option (which will be "no choice available")
@@ -1004,7 +1092,9 @@ n.b. if there are choices available, they are wrapped within an optgroup element
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
+  width:fit-content;
 }
+
 
 .btn {
   margin: 2px;

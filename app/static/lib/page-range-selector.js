@@ -35,7 +35,6 @@ export function createPageRangeSelector(display = 'none') {
             <input type="number" id="selectFrom" class="preventKeyBindings" name="firstPage" value="1" min="1"/>
         </div>
         <div>
-            <div class="fillSpace"></div>
             <label for="selectFromTo" id="selectToLabel">to:</label>
             <input type="number" id="selectTo" class="preventKeyBindings" name="endPage" value="1" min="1" />
         </div>
@@ -177,7 +176,7 @@ function readValues() {
 function redrawTitle() {
   let pl = document.getElementById('pagesLegendLabel');
   if (pl && pages.length <= 1) {
-    pl.innerHTML = translator.lang.pagesLegendLabel.singlePage + ': '
+    pl.innerHTML = translator.lang.pagesLegendLabel.singlePage + ': ';
   } else {
     pl.innerHTML = translator.lang.pagesLegendLabel.multiplePages + ': ';
   }
@@ -186,9 +185,9 @@ function redrawTitle() {
 
 /**
  * Creates array of integers from i1 to i2
- * @param {number} i1 
- * @param {number} i2 
- * @returns 
+ * @param {number} i1
+ * @param {number} i2
+ * @returns
  */
 function seq(i1, i2) {
   let arr = [];

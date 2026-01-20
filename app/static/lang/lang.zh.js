@@ -571,6 +571,13 @@ export const lang = {
     text: '显示速度模式复选框',
     description: '在乐谱控制菜单中显示速度模式复选框',
   },
+  notationControlMenuOverflowIcon: {
+    description: '显示其他控制按钮',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: '显示其他控制按钮',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {

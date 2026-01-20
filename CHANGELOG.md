@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.11 patch
+* Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
+* Restrict ALT + arrow key bindings for shifting visual offset to notation panel
+
 ### 1.2.10 patch
 * Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
 * Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)

@@ -87,6 +87,10 @@ export const keymap = {
     'ctrl-cmd-left': 'previousPage',
     'cmd-up': 'firstPage',
     'cmd-down': 'lastPage',
+    'alt-up': 'shiftVisualOffsetUp',
+    'alt-down': 'shiftVisualOffsetDown',
+    'alt-left': 'shiftVisualOffsetLeft',
+    'alt-right': 'shiftVisualOffsetRight',
   },
 
   // mapped to #notation under Win/Linux
@@ -97,16 +101,16 @@ export const keymap = {
     'ctrl-alt-left': 'previousPage',
     'ctrl-up': 'firstPage',
     'ctrl-down': 'lastPage',
+    'alt-up': 'shiftVisualOffsetUp',
+    'alt-down': 'shiftVisualOffsetDown',
+    'alt-left': 'shiftVisualOffsetLeft',
+    'alt-right': 'shiftVisualOffsetRight',
   },
 
   // mapped to all under all operating systems
   '.all': {
     'alt-.': 'consultGuidelines',
     'shift-space': 'switchFocus',
-    'alt-up': 'shiftVisualOffsetUp',
-    'alt-down': 'shiftVisualOffsetDown',
-    'alt-left': 'shiftVisualOffsetLeft',
-    'alt-right': 'shiftVisualOffsetRight',
   },
 
   // mapped to body under MAC OSX

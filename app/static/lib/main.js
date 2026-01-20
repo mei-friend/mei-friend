@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.10';
-export const versionDate = '23 December 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.11';
+export const versionDate = '20 January 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -74,6 +74,7 @@ import {
   manualCurrentPage,
   setBreaksOptions,
   setChoiceOptions,
+  hideAllOverflowContents,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
@@ -819,11 +820,11 @@ async function completeInitialLoad() {
 
   setNotationProportion(np);
   setFacsimileProportion(fp);
+  addAnnotationHandlers();
+  addMarkupHandlers();
   setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
-  addAnnotationHandlers();
-  addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   addCodeCheckerResizerHandlers(v, cm);
@@ -1911,15 +1912,15 @@ export let cmd = {
     if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
     // now modify last slash to navigate to /logout
     window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
-    
   },
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
+    // hide any control bar overflow content menus
+    hideAllOverflowContents();
     // hide overlays
     // TODO refactor logic for all overlays below. For now only splash overlay...
     document.getElementById('splashOverlay').style.display = 'none';
-
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&

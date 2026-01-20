@@ -716,6 +716,13 @@ export const lang = {
     text: 'Speed Mode Auswahl anzeigen',
     description: 'Speed Mode Auswahl anzeigen in der Notationskontrollleiste',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Zusätzliche Steuerelemente anzeigen',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Zusätzliche Steuerelemente anzeigen',
+  },
   // MIDI Playback
   titleMidiPlayback: {
     text: 'MIDI-Wiedergabe',
