@@ -195,7 +195,7 @@
           <button
             class="dropbtn GithubButton"
             id="GithubButton"
-            onclick="if (typeof isLoggedIn === 'undefined') window.location.href='/login'"
+            onclick="if (typeof isLoggedIn === 'undefined') window.location.href = '/login';"
           >
             <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path
@@ -796,6 +796,7 @@
             <span id="githubActionsHeadingText">Request GitHub Action workflow:</span>
             <span id="requestedWorkflowName"></span>
           </h3>
+
           <p id="githubActionsDescription">
             Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input
             configuration specified below. Your encoding will be reloaded in its latest version once the workflow run
@@ -939,7 +940,7 @@
         <div id="alertOverlay" class="alert" style="display: none">
           <span id="alertIcon" class="alertIcon"></span>
           <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
-          <span class="alertCloseButton" onclick="this.parentElement.style.display='none';">&times;</span>
+          <span class="alertCloseButton" onclick="this.parentElement.style.display = 'none'">&times;</span>
         </div>
         <div id="promptOverlay" class="alert" style="display: none">
           <span id="promptIcon" class="alertIcon"></span>
@@ -1396,8 +1397,7 @@
           <fieldset class="annotationToolsIconGroup">
             <legend id="insertStandoffAnnotationLegend">Stand-off annotation tools</legend>
           </fieldset>
-          -->
-          </menu>
+          --></menu>
         </div>
         <div id="listAnnotations" class="tabcontent">No annotations present.</div>
         <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
