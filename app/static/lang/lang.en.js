@@ -398,7 +398,7 @@ export const lang = {
   githubActionsInputContainerHeader: { text: 'Input configuration' },
   githubActionsCustomContainerHeader: { text: 'Custom configuration' },
   githubActionsCustomContainerExplanation: {
-    text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file below. ENTER DOCUMENTATION LINK HERE!',
+    text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. ENTER DOCUMENTATION LINK HERE!',
   },
   githubActionsCustomConfigInvalidResponse: {
     text: 'The JSON configuration file you have specified does not conform to the expected schema. Please check the documentation for details.',

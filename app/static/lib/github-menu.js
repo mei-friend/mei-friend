@@ -880,10 +880,6 @@ async function handleClickGithubAction(e, gm) {
 
         const customContainer = document.createElement('div');
         customContainer.setAttribute('id', 'githubActionsCustomContainer');
-        const githubActionsCustomContainerExplanation = document.createElement('p');
-        githubActionsCustomContainerExplanation.innerText =
-          translator.lang.githubActionsCustomContainerExplanation.text;
-        customContainer.appendChild(githubActionsCustomContainerExplanation);
         let customConfigParams = document.createElement('div');
         customConfigParams.setAttribute('id', 'githubActionsCustomConfigParams');
         // the URL box takes the value, placeholder, and jsonResponse from supplyCustomGithubActionsConfiguration in the settings.
@@ -906,12 +902,20 @@ async function handleClickGithubAction(e, gm) {
           checkAndRetrieveJson(githubActionsCustomConfigurationUrl);
         }
         customContainer.appendChild(githubActionsCustomConfigurationUrl);
+        const githubActionsCustomContainerExplanation = document.createElement('p');
+        githubActionsCustomContainerExplanation.innerText =
+          translator.lang.githubActionsCustomContainerExplanation.text;
+        customContainer.appendChild(githubActionsCustomContainerExplanation);
         customContainer.appendChild(customConfigParams);
         customTabPanel.insertAdjacentElement('beforeend', customContainer);
 
         const configUrlObserver = new MutationObserver(() => {
           const resp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
-          if (!resp) return;
+          if (!resp) {
+            // clear all githubActionsCustomConfigParams
+            customConfigParams.innerHTML = '';
+            return;
+          }
           try {
             const parsed = JSON.parse(resp);
             fillCustomConfigParams(customConfigParams, parsed);
@@ -930,7 +934,13 @@ async function handleClickGithubAction(e, gm) {
             fillCustomConfigParams(customConfigParams, JSON.parse(initialResp));
           } catch (err) {
             console.warn('githubActions custom config: could not parse initial data-json-response', err);
+            // clear all githubActionsCustomConfigParams
+            customConfigParams.innerHTML = '';
           }
+        } else {
+          console.log('githubActions custom config: no initial data-json-response');
+          // clear all githubActionsCustomConfigParams
+          customConfigParams.innerHTML = '';
         }
 
         const inputContainer = document.createElement('div');
