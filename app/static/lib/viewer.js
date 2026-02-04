@@ -44,7 +44,6 @@ import {
   supportedVerovioVersions,
 } from './defaults.js';
 import * as icon from './../css/icons.js';
-import { fillCustomConfigParams } from './github-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {

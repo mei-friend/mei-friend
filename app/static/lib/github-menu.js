@@ -51,9 +51,10 @@ export function fillCustomConfigParams(container, jsonResponse) {
   }
   // build a workpackage selection dropdown, using 'label' property of each item
   const select = document.createElement('select');
+  jsonResponse = jsonResponse.filter((item) => 'userFacing' in item && item.userFacing == true);
   jsonResponse.forEach((param, ix) => {
     const option = document.createElement('option');
-    option.value = ix;
+    option.value = param.id;
     option.innerText = param.label ? param.label : `Workpackage ${ix + 1}`;
     select.appendChild(option);
   });
@@ -62,11 +63,12 @@ export function fillCustomConfigParams(container, jsonResponse) {
   const customParamList = document.createElement('div');
   container.appendChild(customParamList);
 
-  const renderParamList = (ix) => {
-    console.log('Selected custom config workpackage index: ', ix);
+  const renderParamList = (wp_id) => {
+    console.log('Selected custom config workpackage index: ', wp_id);
     customParamList.innerHTML = '';
-    const selected = jsonResponse[ix];
+    const selected = jsonResponse.filter((item) => item.id === wp_id)[0];
     if (!selected || !('params' in selected)) {
+      console.log('Problem with selected custom config workpackage: ', selected, jsonResponse, wp_id);
       customParamList.innerHTML =
         '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
       return;
@@ -918,6 +920,7 @@ async function handleClickGithubAction(e, gm) {
           }
           try {
             const parsed = JSON.parse(resp);
+            console.log('About to call fillCustom with parsed ', parsed);
             fillCustomConfigParams(customConfigParams, parsed);
           } catch (err) {
             console.warn('githubActions custom config: could not parse data-json-response', err);
@@ -929,9 +932,11 @@ async function handleClickGithubAction(e, gm) {
         });
 
         const initialResp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
-        if (initialResp) {
+        let parsedInitialResp = initialResp in window ? JSON.parse(initialResp) : null;
+        if (parsedInitialResp) {
           try {
-            fillCustomConfigParams(customConfigParams, JSON.parse(initialResp));
+            console.log('About to call fillCustom with initialResp ', parsedInitialResp);
+            fillCustomConfigParams(customConfigParams, parsedInitialResp);
           } catch (err) {
             console.warn('githubActions custom config: could not parse initial data-json-response', err);
             // clear all githubActionsCustomConfigParams
@@ -987,70 +992,96 @@ async function handleClickGithubAction(e, gm) {
     statusMsg.innerHTML = '';
   };
   runBtn.onclick = () => {
-    statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
-    cancelBtn.setAttribute('disabled', true);
-    runBtn.setAttribute('disabled', true);
-    ghLogo.classList.add('clockwise');
-    // gather inputs:
-    const specifiedInputs = {};
-    document.querySelectorAll('.githubActionsInputField').forEach((i) => {
-      specifiedInputs[i.dataset.input] = i.value;
-    });
-    gm.requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
-      .then((workflowRunResp) => {
-        console.log('Got workflow run response: ', workflowRunResp);
-        if (workflowRunResp.status >= 400) {
-          // error
-          statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
-        } else {
-          // poll on latest workflow run
-          gm.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
-            console.log('Got workflow completion resp: ', workflowCompletionResp);
-            if ('conclusion' in workflowCompletionResp) {
-              if (workflowCompletionResp.conclusion === 'success') {
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
-                runBtn.removeAttribute('disabled');
-                ghLogo.classList.remove('clockwise');
-                runBtn.onclick = async () => {
-                  ghLogo.classList.add('clockwise');
-                  // do a pull to refresh the file
-                  await gm.pull();
-                  // redraw github menu to reflect changes in git log
-                  fillInCommitLog('withRefresh');
-                  console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
-                  loadFile();
-                  overlay.style.display = 'none';
-                  statusMsg.innerHTML = '';
-                  runBtn.innerText = translator.lang.githubActionsRunButton.text;
+    let activeTab = document.querySelector('.githubActionsTabPanel.active');
+    if (activeTab) {
+      let isCustom = activeTab.dataset.tab === 'custom';
+      // gather inputs:
+      const specifiedInputs = {};
+      activeTab.querySelectorAll('.githubActionsInputField').forEach((i) => {
+        specifiedInputs[i.dataset.input] = i.value;
+      });
+      // if we are in custom mode, we must repackage the inputs to the expected format
+      let repackagedInputs;
+      if (isCustom) {
+        try {
+          repackagedInputs = {};
+          repackagedInputs.addargs = JSON.stringify(specifiedInputs);
+          let select = activeTab.querySelector('#githubActionsCustomConfigParams select');
+          let selectId = select.value;
+          let selectText = select.options[select.selectedIndex].text;
+          repackagedInputs.workpackage_id = selectId;
+          let strippedPath = gm.filepath.startsWith('/') ? gm.filepath.substring(1) : gm.filepath;
+          repackagedInputs.filepath = strippedPath;
+          repackagedInputs.commit_message =
+            'mei-friend: Used GitHub Action to apply ' + selectText + ' to ' + strippedPath;
+        } catch (err) {
+          console.error('Could not repackage custom GitHub Actions inputs: ', err);
+          statusMsg.innerHTML = 'Error - could not repackage custom inputs (see console)';
+          return;
+        }
+      }
+      statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
+      cancelBtn.setAttribute('disabled', true);
+      runBtn.setAttribute('disabled', true);
+      ghLogo.classList.add('clockwise');
+      const actionInputs = repackagedInputs ? repackagedInputs : specifiedInputs;
+      console.log('Requesting workflow run ' + workflowName.dataset.id + ' with inputs: ', actionInputs);
+      gm.requestActionWorkflowRun(workflowName.dataset.id, actionInputs)
+        .then((workflowRunResp) => {
+          console.log('Got workflow run response: ', workflowRunResp);
+          if (workflowRunResp.status >= 400) {
+            // error
+            statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+          } else {
+            // poll on latest workflow run
+            gm.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
+              console.log('Got workflow completion resp: ', workflowCompletionResp);
+              if ('conclusion' in workflowCompletionResp) {
+                if (workflowCompletionResp.conclusion === 'success') {
+                  statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                  runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
+                  runBtn.removeAttribute('disabled');
+                  ghLogo.classList.remove('clockwise');
+                  runBtn.onclick = async () => {
+                    ghLogo.classList.add('clockwise');
+                    // do a pull to refresh the file
+                    await gm.pull();
+                    // redraw github menu to reflect changes in git log
+                    fillInCommitLog('withRefresh');
+                    console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
+                    loadFile();
+                    overlay.style.display = 'none';
+                    statusMsg.innerHTML = '';
+                    runBtn.innerText = translator.lang.githubActionsRunButton.text;
+                    cancelBtn.removeAttribute('disabled');
+                    ghLogo.classList.add('clockwise');
+                  };
+                } else {
+                  statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
                   cancelBtn.removeAttribute('disabled');
-                  ghLogo.classList.add('clockwise');
-                };
+                  runBtn.removeAttribute('disabled');
+                  ghLogo.classList.remove('clockwise');
+                }
               } else {
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                console.error('Invalid response received from GitHub API', workflowCompletionResp);
                 cancelBtn.removeAttribute('disabled');
                 runBtn.removeAttribute('disabled');
                 ghLogo.classList.remove('clockwise');
+                statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
               }
-            } else {
-              console.error('Invalid response received from GitHub API', workflowCompletionResp);
-              cancelBtn.removeAttribute('disabled');
-              runBtn.removeAttribute('disabled');
-              ghLogo.classList.remove('clockwise');
-              statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
-            }
-          });
-          //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
-        }
-      })
-      .catch((e) => {
-        // network error
-        console.error('Could not start workflow - perhaps network error?', e);
-        statusMsg.innerHTML = 'Error';
-        cancelBtn.removeAttribute('disabled');
-        runBtn.removeAttribute('disabled');
-        ghLogo.classList.remove('clockwise');
-      });
+            });
+            //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
+          }
+        })
+        .catch((e) => {
+          // network error
+          console.error('Could not start workflow - perhaps network error?', e);
+          statusMsg.innerHTML = 'Error';
+          cancelBtn.removeAttribute('disabled');
+          runBtn.removeAttribute('disabled');
+          ghLogo.classList.remove('clockwise');
+        });
+    }
   };
 } // handleClickGithubAction()
 

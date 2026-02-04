@@ -97,7 +97,7 @@ export function checkAndRetrieveJson(el, delay = 600) {
           el.dataset['jsonResponse'] = JSON.stringify(json);
           console.log('Dataset jsonResponse set to: ', el.dataset['jsonResponse']);
         } catch (err) {
-          console.warn('checkAndRetrieveJson: could not parse JSON response', err);
+          console.warn('checkAndRetrieveJson: could not parse JSON response', err, resp);
           el.removeAttribute('data-json-response');
           el.classList.add('urlDoesNotResolve');
         }
