@@ -967,7 +967,13 @@ async function handleClickGithubAction(e, gm) {
         };
         inputTab.addEventListener('click', () => activateTab('input'));
         customTab.addEventListener('click', () => activateTab('custom'));
-        activateTab('input');
+        // if there is a custom configuration URL already specified,
+        // start on the custom tab
+        if (githubActionsCustomConfigurationUrl.value) {
+          activateTab('custom');
+        } else {
+          activateTab('input');
+        }
       }
     })
     .finally(() => {
