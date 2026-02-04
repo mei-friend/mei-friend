@@ -1621,6 +1621,11 @@ export default class Viewer {
               'renumberMeasuresUseSuffixAtMeasures'
             );
             break;
+          case 'supplyCustomGithubActionsConfiguration':
+            console.log('Update to GitHub Actions configuration URL');
+            if (this.urlResolveTimeout) clearTimeout(this.urlResolveTimeout);
+            this.urlResolveTimeout = utils.checkUrlResolves(ev.target);
+            break;
         }
         if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
@@ -2081,6 +2086,15 @@ export default class Viewer {
         input.setAttribute('id', opt);
         input.setAttribute('value', o.title);
         input.setAttribute('title', o.description);
+        break;
+      case 'string':
+        input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', optDefault);
+        input.setAttribute('placeholder', o.placeholder ? o.placeholder : '');
+        input.setAttribute('size', o.size ? o.size : '30');
         break;
       default:
         console.log(

@@ -77,6 +77,28 @@ export function findNotes(elId) {
 } // findNotes()
 
 /**
+ * Check whether a URL resolves and update an input element's state classes.
+ * @param {HTMLInputElement} el
+ * @param {number} delay
+ * @returns {number|null} timeout id
+ */
+export function checkUrlResolves(el, delay = 400) {
+  if (!el) return null;
+  return setTimeout(async () => {
+    el.classList.remove('urlResolves', 'urlDoesNotResolve');
+    let resolves = false;
+    if (!el.value || el.value.trim() === '') return;
+    try {
+      const resp = await fetch(el.value, { method: 'HEAD' });
+      resolves = resp.status === 200;
+    } catch (err) {
+      resolves = false;
+    }
+    el.classList.add(resolves ? 'urlResolves' : 'urlDoesNotResolve');
+  }, delay);
+}
+
+/**
  * CodeMirror search: look for elementname (e.g., 'staff') upwards
  * in the xml file and return attribute value (searchString defaults
  * to the "@n" attribute).

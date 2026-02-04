@@ -20,6 +20,7 @@ import {
   updateGithubInLocalStorage,
   v,
 } from './main.js';
+import { checkUrlResolves } from './utils.js';
 import * as icon from './../css/icons.js';
 
 const ghActionsInputSetters = [
@@ -803,18 +804,87 @@ async function handleClickGithubAction(e, gm) {
       if (!inputs) {
         return;
       }
-      let keys = Object.keys(inputs);
+      const keys = Object.keys(inputs);
       if (keys.length) {
+        const tabsWrapper = document.createElement('div');
+        tabsWrapper.classList.add('githubActionsTabs');
+
+        const tabList = document.createElement('div');
+        tabList.classList.add('githubActionsTabList');
+
+        const inputTab = document.createElement('button');
+        inputTab.setAttribute('type', 'button');
+        inputTab.setAttribute('id', 'githubActionsInputContainerHeader');
+        inputTab.classList.add('githubActionsTab');
+        inputTab.innerText = translator.lang.githubActionsInputContainerHeader.text;
+
+        const customTab = document.createElement('button');
+        customTab.setAttribute('type', 'button');
+        customTab.setAttribute('id', 'githubActionsCustomContainerHeader');
+        customTab.classList.add('githubActionsTab');
+        customTab.innerText = translator.lang.githubActionsCustomContainerHeader.text;
+
+        tabList.append(inputTab, customTab);
+
+        const tabPanels = document.createElement('div');
+        tabPanels.classList.add('githubActionsTabPanels');
+
+        const inputTabPanel = document.createElement('div');
+        inputTabPanel.classList.add('githubActionsTabPanel');
+        inputTabPanel.dataset.tab = 'input';
+
+        const customTabPanel = document.createElement('div');
+        customTabPanel.classList.add('githubActionsTabPanel');
+        customTabPanel.dataset.tab = 'custom';
+
+        const customContainer = document.createElement('div');
+        customContainer.setAttribute('id', 'githubActionsCustomContainer');
+        const githubActionsCustomContainerExplanation = document.createElement('p');
+        githubActionsCustomContainerExplanation.innerText =
+          translator.lang.githubActionsCustomContainerExplanation.text;
+        customContainer.appendChild(githubActionsCustomContainerExplanation);
+        // the URL box takes the value and placeholder from supplyCustomGithubActionsConfiguration in the settings.
+        const githubActionsCustomConfigurationUrl = document.createElement('input');
+        githubActionsCustomConfigurationUrl.setAttribute('type', 'text');
+        githubActionsCustomConfigurationUrl.setAttribute('id', 'githubActionsCustomConfigurationUrl');
+        const customConfigUrlSetting = document.getElementById('supplyCustomGithubActionsConfiguration');
+        if (customConfigUrlSetting) {
+          githubActionsCustomConfigurationUrl.setAttribute('value', customConfigUrlSetting.value);
+          githubActionsCustomConfigurationUrl.setAttribute('placeholder', customConfigUrlSetting.placeholder);
+          // changes here should be reflected in the settings and vice versa
+          githubActionsCustomConfigurationUrl.addEventListener('input', (ev) => {
+            customConfigUrlSetting.value = ev.target.value;
+            checkUrlResolves(ev.target);
+          });
+        }
+        customContainer.appendChild(githubActionsCustomConfigurationUrl);
+        customTabPanel.insertAdjacentElement('beforeend', customContainer);
+
         const inputContainer = document.createElement('div');
-        const inputContainerHeader = document.createElement('h4');
-        inputContainerHeader.setAttribute('id', 'githubActionsInputContainerHeader');
-        inputContainerHeader.innerText = translator.lang.githubActionsInputContainerHeader.text;
-        inputContainer.insertAdjacentElement('afterbegin', inputContainerHeader);
         keys.forEach((k) => {
           const inputConfig = generateGithubActionsInputConfig(inputs, k);
           inputContainer.insertAdjacentElement('beforeend', inputConfig);
         });
-        inputContainerWrapper.insertAdjacentElement('beforeend', inputContainer);
+        inputTabPanel.insertAdjacentElement('beforeend', inputContainer);
+
+        tabPanels.append(inputTabPanel, customTabPanel);
+        tabsWrapper.append(tabList, tabPanels);
+        inputContainerWrapper.insertAdjacentElement('beforeend', tabsWrapper);
+
+        const tabs = [
+          { button: inputTab, panel: inputTabPanel },
+          { button: customTab, panel: customTabPanel },
+        ];
+        const activateTab = (tabKey) => {
+          tabs.forEach(({ button, panel }) => {
+            const isActive = panel.dataset.tab === tabKey;
+            button.classList.toggle('active', isActive);
+            panel.classList.toggle('active', isActive);
+          });
+        };
+        inputTab.addEventListener('click', () => activateTab('input'));
+        customTab.addEventListener('click', () => activateTab('custom'));
+        activateTab('input');
       }
     })
     .finally(() => {

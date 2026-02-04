@@ -396,7 +396,10 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
-
+  githubActionsCustomContainerHeader: { text: 'Custom configuration' },
+  githubActionsCustomContainerExplanation: {
+    text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file below. ENTER DOCUMENTATION LINK HERE!',
+  },
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {

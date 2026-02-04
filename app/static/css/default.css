@@ -294,6 +294,53 @@ a:active {
   height: fit-content !important;
 }
 
+#githubActionsInputConfigContainer {
+  width: 100%;
+}
+
+.githubActionsTabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 100%;
+}
+
+.githubActionsTabList {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+}
+
+.githubActionsTab {
+  border: 1px solid var(--dropdownBorderColor);
+  background-color: var(--settingsLinkBackgroundColor);
+  color: var(--textColor);
+  padding: 0.4em 0.75em;
+  border-radius: 0.5em 0.5em 0 0;
+  cursor: pointer;
+}
+
+.githubActionsTab.active {
+  background-color: var(--dropdownBackgroundColor);
+}
+
+.githubActionsTabPanels {
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 0.5em;
+  background-color: var(--navbarBackgroundColor);
+  padding: 0.75em;
+}
+
+.githubActionsTabPanel {
+  display: none;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.githubActionsTabPanel.active {
+  display: flex;
+}
+
 .githubActionsInputConfig {
   display: flex;
   flex-direction: row;
@@ -336,6 +383,14 @@ a:active {
 
 .actionsContainer.notAllowed {
   cursor: not-allowed;
+}
+
+input.urlDoesNotResolve { 
+  border: 3px solid var(--fileStatusWarnColor);
+}
+
+input.urlResolves {
+  border: 3px solid var(--fileStatusColor);
 }
 
 .openUrlOverlay a,

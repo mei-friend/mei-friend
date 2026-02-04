@@ -1046,6 +1046,13 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: false,
   },
+  supplyCustomGithubActionsConfiguration: {
+    title: 'Custom configuration',
+    description: 'Use a custom GitHub Actions workflow configuration file',
+    type: 'string',
+    placeholder: 'https://...',
+    default: false,
+  },
 }; // meiFriendSettingsOptions object
 
 /**
