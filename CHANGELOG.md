@@ -1,6 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.2.11 patch
+* Implement [#140](https://github.com/mei-friend/mei-friend/issues/140) to support custom GitHub Actions configurations
+
+### 1.2.11 patch
 * Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
 * Restrict ALT + arrow key bindings for shifting visual offset to notation panel
 * Add Verovio version 6.0.0
