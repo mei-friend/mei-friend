@@ -902,6 +902,8 @@ async function handleClickGithubAction(e, gm) {
             checkAndRetrieveJson(ev.target);
             // TODO potential race condition -- dataset will not be updated in the settings
           });
+          // launch checkAndRetrieveJson on first load
+          checkAndRetrieveJson(githubActionsCustomConfigurationUrl);
         }
         customContainer.appendChild(githubActionsCustomConfigurationUrl);
         customContainer.appendChild(customConfigParams);
