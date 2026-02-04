@@ -287,6 +287,10 @@ a:active {
   width: 200px;
 }
 
+#githubActionsCustomConfigurationUrl, #supplyCustomGithubActionsConfiguration { 
+  width: 100%;
+}
+
 #githubActionsUI {
   display: flex;
   flex-direction: column;
@@ -301,14 +305,12 @@ a:active {
 .githubActionsTabs {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
   width: 100%;
 }
 
 .githubActionsTabList {
   display: flex;
   flex-direction: row;
-  gap: 0.5em;
 }
 
 .githubActionsTab {
@@ -321,13 +323,20 @@ a:active {
 }
 
 .githubActionsTab.active {
-  background-color: var(--dropdownBackgroundColor);
+  background-color: var(--navbarBackgroundColor);
+  border:0px;
+}
+
+.githubActionsTab:not(.active):hover { 
+  background-color: var(--settingsLinkHoverColor);
 }
 
 .githubActionsTabPanels {
-  border: 1px solid var(--dropdownBorderColor);
-  border-radius: 0.5em;
-  background-color: var(--navbarBackgroundColor);
+  border: 1px solid var(--navbarBorderColor);
+  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  background-color: var(--dropdownBackgroundColor);
   padding: 0.75em;
 }
 
@@ -345,14 +354,17 @@ a:active {
   display: flex;
   flex-direction: row;
   align-items: end;
-  background-color: var(--navbarBackgroundColor);
+  background-color: var(--dropdownBackgroundColor);
   border-radius: 1em;
   width: 90%;
   padding: 0.5em;
   margin-bottom: 0.5em;
 }
 
-.githubActionsInputConfig span, .githubActionsCustomConfig span {
+#githubActionsCustomContainer { 
+  color: var(--textColor);
+}
+.githubActionsInputConfig span, .githubActionsCustomConfig span  {
   color: var(--textColor);
 }
 
@@ -506,7 +518,6 @@ input.urlResolves {
 #githubActionsUI details,
 #githubActionsUI button {
   cursor: pointer;
-  margin-bottom: 1em;
 }
 
 #githubActionsUI details label {
