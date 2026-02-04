@@ -341,7 +341,7 @@ a:active {
   display: flex;
 }
 
-.githubActionsInputConfig {
+.githubActionsInputConfig, .githubActionsCustomConfig {
   display: flex;
   flex-direction: row;
   align-items: end;
@@ -352,7 +352,7 @@ a:active {
   margin-bottom: 0.5em;
 }
 
-.githubActionsInputConfig span {
+.githubActionsInputConfig span, .githubActionsCustomConfig span {
   color: var(--textColor);
 }
 
@@ -364,7 +364,7 @@ a:active {
   fill: var(--textColor);
 }
 
-.githubActionsInputConfig div {
+.githubActionsInputConfig div, .githubActionsCustomConfig div {
   padding-left: 0.5em;
   padding-right: 0.5em;
 }

@@ -66,18 +66,15 @@ export function fillCustomConfigParams(container, jsonResponse) {
     console.log('Selected custom config workpackage index: ', ix);
     customParamList.innerHTML = '';
     const selected = jsonResponse[ix];
-    if (!selected || (!'params') in selected) {
+    if (!selected || !('params' in selected)) {
       customParamList.innerHTML =
         '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
       return;
     }
-    const list = document.createElement('ul');
     Object.keys(selected.params).forEach((p) => {
-      const li = document.createElement('li');
-      li.innerText = p + ': ' + JSON.stringify(selected.params[p]);
-      list.appendChild(li);
+      const cfg = generateGithubActionsInputConfig(selected.params, p, true);
+      customParamList.appendChild(cfg);
     });
-    customParamList.appendChild(list);
   };
 
   select.addEventListener('change', () => renderParamList(select.value));
@@ -1281,7 +1278,10 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputConfig.setAttribute('id', 'githubActions' + configType + '_' + input);
   const inputName = document.createElement('span');
   inputName.innerText = input;
-  if ('description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
+  if (!custom && 'description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
+  if (custom && inputs[input] && inputs[input].type) {
+    inputName.setAttribute('title', `type: ${inputs[input].type}`);
+  }
   const inputFieldWrapper = document.createElement('div');
   inputFieldWrapper.classList.add('githubActionsInputFieldWrapper');
   const inputField = document.createElement('input');
@@ -1290,8 +1290,18 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputField.dataset.input = input;
   inputField.setAttribute('id', 'githubActionsInputField_' + input);
   if ('default' in inputs[input]) {
-    inputField.defaultValue = inputs[input].default;
+    // use value so it persists for custom params, defaultValue for standard inputs
+    if (custom) {
+      inputField.value = inputs[input].default ? inputs[input].default : '';
+    } else {
+      inputField.defaultValue = inputs[input].default;
+    }
   }
+  if (custom && inputs[input] && inputs[input].type) {
+    inputField.dataset.type = inputs[input].type;
+    inputField.setAttribute('placeholder', inputs[input].type);
+  }
+
   const inputSetters = document.createElement('div');
   ghActionsInputSetters.forEach((inp) => {
     // create "input setters" that copy useful content into the input field on user request
