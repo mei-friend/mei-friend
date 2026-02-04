@@ -77,24 +77,38 @@ export function findNotes(elId) {
 } // findNotes()
 
 /**
- * Check whether a URL resolves and update an input element's state classes.
+ * Check whether a URL resolves, update an input element's state classes, and send JSON response to a callback.
  * @param {HTMLInputElement} el
+ * @param {(json: any) => void} onResolve
  * @param {number} delay
  * @returns {number|null} timeout id
  */
-export function checkUrlResolves(el, delay = 400) {
+export function checkAndRetrieveJson(el, delay = 600) {
   if (!el) return null;
   return setTimeout(async () => {
     el.classList.remove('urlResolves', 'urlDoesNotResolve');
     let resolves = false;
-    if (!el.value || el.value.trim() === '') return;
     try {
-      const resp = await fetch(el.value, { method: 'HEAD' });
-      resolves = resp.status === 200;
+      const resp = await fetch(el.value);
+      resolves = resp.ok;
+      if (resolves) {
+        try {
+          const json = await resp.json();
+          el.dataset['jsonResponse'] = JSON.stringify(json);
+          console.log('Dataset jsonResponse set to: ', el.dataset['jsonResponse']);
+        } catch (err) {
+          console.warn('checkAndRetrieveJson: could not parse JSON response', err);
+        }
+      } else {
+        el.removeAttribute('data-json-response');
+      }
     } catch (err) {
       resolves = false;
+      el.removeAttribute('data-json-response');
     }
-    el.classList.add(resolves ? 'urlResolves' : 'urlDoesNotResolve');
+    if (el.value) {
+      el.classList.add(resolves ? 'urlResolves' : 'urlDoesNotResolve');
+    }
   }, delay);
 }
 

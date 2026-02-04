@@ -400,6 +400,9 @@ export const lang = {
   githubActionsCustomContainerExplanation: {
     text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file below. ENTER DOCUMENTATION LINK HERE!',
   },
+  githubActionsCustomConfigInvalidResponse: {
+    text: 'The JSON configuration file you have specified does not conform to the expected schema. Please check the documentation for details.',
+  },
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {

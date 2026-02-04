@@ -44,6 +44,7 @@ import {
   supportedVerovioVersions,
 } from './defaults.js';
 import * as icon from './../css/icons.js';
+import { fillCustomConfigParams } from './github-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1624,7 +1625,8 @@ export default class Viewer {
           case 'supplyCustomGithubActionsConfiguration':
             console.log('Update to GitHub Actions configuration URL');
             if (this.urlResolveTimeout) clearTimeout(this.urlResolveTimeout);
-            this.urlResolveTimeout = utils.checkUrlResolves(ev.target);
+            const customParams = 'githubActionsCustomConfigParams';
+            this.urlResolveTimeout = utils.checkAndRetrieveJson(ev.target);
             break;
         }
         if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {

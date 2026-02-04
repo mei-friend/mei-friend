@@ -20,7 +20,7 @@ import {
   updateGithubInLocalStorage,
   v,
 } from './main.js';
-import { checkUrlResolves } from './utils.js';
+import { checkAndRetrieveJson } from './utils.js';
 import * as icon from './../css/icons.js';
 
 const ghActionsInputSetters = [
@@ -39,6 +39,50 @@ const ghActionsInputSetters = [
     },
   },
 ];
+
+export function fillCustomConfigParams(container, jsonResponse) {
+  if (!container) return;
+  container.innerHTML = '';
+  console.log('Filling custom config params with: ', jsonResponse);
+  if (!jsonResponse) return;
+  if (!Array.isArray(jsonResponse) || jsonResponse.length === 0) {
+    container.innerHTML =
+      '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
+  }
+  // build a workpackage selection dropdown, using 'label' property of each item
+  const select = document.createElement('select');
+  jsonResponse.forEach((param, ix) => {
+    const option = document.createElement('option');
+    option.value = ix;
+    option.innerText = param.label ? param.label : `Workpackage ${ix + 1}`;
+    select.appendChild(option);
+  });
+  container.appendChild(select);
+
+  const customParamList = document.createElement('div');
+  container.appendChild(customParamList);
+
+  const renderParamList = (ix) => {
+    console.log('Selected custom config workpackage index: ', ix);
+    customParamList.innerHTML = '';
+    const selected = jsonResponse[ix];
+    if (!selected || (!'params') in selected) {
+      customParamList.innerHTML =
+        '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
+      return;
+    }
+    const list = document.createElement('ul');
+    Object.keys(selected.params).forEach((p) => {
+      const li = document.createElement('li');
+      li.innerText = p + ': ' + JSON.stringify(selected.params[p]);
+      list.appendChild(li);
+    });
+    customParamList.appendChild(list);
+  };
+
+  select.addEventListener('change', () => renderParamList(select.value));
+  renderParamList(select.value || 0);
+}
 
 const REPO_SIZE_WARNING_THRESHOLD = 100 * 1024; // 100MB; consider making this a user setting
 
@@ -843,7 +887,9 @@ async function handleClickGithubAction(e, gm) {
         githubActionsCustomContainerExplanation.innerText =
           translator.lang.githubActionsCustomContainerExplanation.text;
         customContainer.appendChild(githubActionsCustomContainerExplanation);
-        // the URL box takes the value and placeholder from supplyCustomGithubActionsConfiguration in the settings.
+        let customConfigParams = document.createElement('div');
+        customConfigParams.setAttribute('id', 'githubActionsCustomConfigParams');
+        // the URL box takes the value, placeholder, and jsonResponse from supplyCustomGithubActionsConfiguration in the settings.
         const githubActionsCustomConfigurationUrl = document.createElement('input');
         githubActionsCustomConfigurationUrl.setAttribute('type', 'text');
         githubActionsCustomConfigurationUrl.setAttribute('id', 'githubActionsCustomConfigurationUrl');
@@ -851,14 +897,42 @@ async function handleClickGithubAction(e, gm) {
         if (customConfigUrlSetting) {
           githubActionsCustomConfigurationUrl.setAttribute('value', customConfigUrlSetting.value);
           githubActionsCustomConfigurationUrl.setAttribute('placeholder', customConfigUrlSetting.placeholder);
+          githubActionsCustomConfigurationUrl.dataset.jsonResponse = customConfigUrlSetting.dataset.jsonResponse;
           // changes here should be reflected in the settings and vice versa
           githubActionsCustomConfigurationUrl.addEventListener('input', (ev) => {
             customConfigUrlSetting.value = ev.target.value;
-            checkUrlResolves(ev.target);
+            customConfigUrlSetting.removeAttribute('data-json-response');
+            checkAndRetrieveJson(ev.target);
+            // TODO potential race condition -- dataset will not be updated in the settings
           });
         }
         customContainer.appendChild(githubActionsCustomConfigurationUrl);
+        customContainer.appendChild(customConfigParams);
         customTabPanel.insertAdjacentElement('beforeend', customContainer);
+
+        const configUrlObserver = new MutationObserver(() => {
+          const resp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
+          if (!resp) return;
+          try {
+            const parsed = JSON.parse(resp);
+            fillCustomConfigParams(customConfigParams, parsed);
+          } catch (err) {
+            console.warn('githubActions custom config: could not parse data-json-response', err);
+          }
+        });
+        configUrlObserver.observe(githubActionsCustomConfigurationUrl, {
+          attributes: true,
+          attributeFilter: ['data-json-response'],
+        });
+
+        const initialResp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
+        if (initialResp) {
+          try {
+            fillCustomConfigParams(customConfigParams, JSON.parse(initialResp));
+          } catch (err) {
+            console.warn('githubActions custom config: could not parse initial data-json-response', err);
+          }
+        }
 
         const inputContainer = document.createElement('div');
         keys.forEach((k) => {
@@ -1200,10 +1274,11 @@ function stripMeiFileName() {
   }
 } // stripMeiFileName()
 
-function generateGithubActionsInputConfig(inputs, input) {
+function generateGithubActionsInputConfig(inputs, input, custom = false) {
+  const configType = custom ? 'CustomConfig' : 'InputConfig';
   const inputConfig = document.createElement('div');
-  inputConfig.classList.add('githubActionsInputConfig');
-  inputConfig.setAttribute('id', 'githubActionsInputConfig_' + input);
+  inputConfig.classList.add('githubActions' + configType);
+  inputConfig.setAttribute('id', 'githubActions' + configType + '_' + input);
   const inputName = document.createElement('span');
   inputName.innerText = input;
   if ('description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
