@@ -460,6 +460,29 @@ export const lang = {
   annotationListButton: { description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
   annotationToolDomainSelectorLegend: { text: 'Select annotation storage' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Target type', description: 'Select an annotation target type' },
+  annotationToolTargetTypeElements: {
+    description: 'Annotate selected MEI elements using @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Element enumeration',
+    description: 'Annotate selected MEI elements using @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Annotate the range of selected MEI elements using @startid and @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Element range',
+    description: 'Annotate the range of selected MEI elements using @startid and @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Metrical range',
+    description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
+  },
+
   insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation'
   insertStandoffAnnotationLegend: { text: 'Insert stand-off annotation' },
   annotationToolsIdentifyTitle: { text: 'Identify' },
@@ -503,9 +526,13 @@ export const lang = {
   annotationsOutsideScoreWarning: {
     text: 'Sorry, cannot currently write annotations placed outside &lt;score&gt;',
   },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Cannot write annotation as at least one element in the selection lacks an xml:id.',
+    text2: 'Please assign identifiers by selecting "Manipulate" -> "Add IDs to MEI" and try again.',
+  },
   annotationWithoutIdWarning: {
     text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
-    text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
+    text2: 'Please assign identifiers by selecting "Manipulate" -> "Add IDs to MEI" and try again.',
   },
   // MARKUP MENU
   respSelect: {
@@ -596,7 +623,15 @@ export const lang = {
     description:
       '(deletion) – Contains information deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, annotator, or corrector.',
   },
-
+  missingParentIdWarning: {
+    text: 'Action can only be performed if parent element has an xml:id. Please first add xml:ids to the document.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Cancel',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Add ids to MEI',
+  },
   // MIDI
   midiSpeedmodeIndicator: {
     text: 'Speed mode',
@@ -714,6 +749,14 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Show speed mode checkbox',
     description: 'Show speed mode checkbox in notation control menu',
+  },
+
+  notationControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
   },
 
   // MIDI Playback

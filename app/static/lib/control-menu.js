@@ -3,7 +3,73 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
-import { choiceOptions } from './markup.js';
+import { choiceOrigRegOptions, choiceSicCorrOptions, substOptions } from './markup.js';
+
+const overflowMenus = [];
+let overflowGlobalHandlersAttached = false;
+
+function hideOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'hidden';
+  overflowContent.style.opacity = '0';
+  overflowContent.style.pointerEvents = 'none';
+  overflowContent.dataset.open = 'false';
+  overflowContent.setAttribute('aria-hidden', 'true');
+}
+
+function showOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'visible';
+  overflowContent.style.opacity = '1';
+  overflowContent.style.pointerEvents = 'auto';
+  overflowContent.dataset.open = 'true';
+  overflowContent.setAttribute('aria-hidden', 'false');
+}
+
+export function hideAllOverflowContents(exceptContent = null) {
+  overflowMenus.forEach(({ content }) => {
+    if (content !== exceptContent) hideOverflowContent(content);
+  });
+}
+
+function attachOverflowGlobalHandlers() {
+  if (overflowGlobalHandlersAttached) return;
+
+  document.addEventListener('click', (event) => {
+    overflowMenus.forEach(({ icon, content }) => {
+      if (content.dataset.open !== 'true') return;
+      if (!content.contains(event.target) && !icon.contains(event.target)) {
+        hideOverflowContent(content);
+      }
+    });
+  });
+
+  overflowGlobalHandlersAttached = true;
+}
+
+function registerOverflowMenu(overflowMenu) {
+  const overflowIcon = overflowMenu.querySelector('.control-menu-overflow-icon');
+  const overflowContent = overflowMenu.querySelector('.control-menu-overflow-content');
+  if (!overflowIcon || !overflowContent) return;
+
+  hideOverflowContent(overflowContent);
+  overflowMenus.push({ icon: overflowIcon, content: overflowContent });
+
+  overflowIcon.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = overflowContent.dataset.open === 'true';
+    if (isOpen) {
+      hideOverflowContent(overflowContent);
+    } else {
+      hideAllOverflowContents(overflowContent);
+      showOverflowContent(overflowContent);
+    }
+  });
+
+  overflowContent.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  attachOverflowGlobalHandlers();
+}
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -11,7 +77,7 @@ export function createNotationDiv(parentElement, scale) {
   let verovioContainer = document.createElement('div');
   verovioContainer.id = 'verovioContainer';
 
-  createNotationControlBar(verovioContainer, scale);
+  createNotationControlMenu(verovioContainer, scale);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
@@ -28,7 +94,7 @@ export function createNotationDiv(parentElement, scale) {
   let facsimileContainer = document.createElement('div');
   facsimileContainer.id = 'facsimileContainer';
 
-  createFacsimileControlBar(facsimileContainer);
+  createFacsimileControlMenu(facsimileContainer);
 
   // Create container element for Facsimile Image
   let facsimilePanel = document.createElement('div');
@@ -62,12 +128,85 @@ export function createNotationDiv(parentElement, scale) {
   if (resizer) resizer.innerHTML = icon.kebab;
 } // createNotationDiv()
 
-export function createNotationControlBar(parentElement, scale) {
+/**
+ * Wraps a control menu in a wrapper div that contains an overflow menu
+ * @param {HTMLElement} controlMenu - The control menu to wrap
+ * @param {HTMLElement[]} fixedElementsLeft - Array of button(s) to add to the left corner of the control menu (e.g., Verovio logo, Facsimile icon, ...). These will not be part of the overflow menu.
+ * @param {HTMLElement[]} fixedElementsRight - Array of button(s) to add to the right corner of the control menu (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @return {HTMLElement} The wrapper div containing the control menu, overflow menu, and any fixed elements
+ */
+function wrapControlMenu(controlMenu, fixedElementsLeft, fixedElementsRight) {
+  // create wrapper div for control menu and overflow menu
+  let wrapper = document.createElement('div');
+  wrapper.classList.add('control-menu-wrapper');
+  wrapper.id = controlMenu.id + '-wrapper';
+  if (fixedElementsLeft && Array.isArray(fixedElementsLeft)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsLeft.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
+    });
+    fixedElementsDiv.classList.add('control-menu-fixed-left');
+    wrapper.appendChild(fixedElementsDiv);
+  }
+  controlMenu.parentElement.insertBefore(wrapper, controlMenu);
+  wrapper.appendChild(controlMenu);
+  let overflowMenu = document.createElement('div');
+  let overflowIcon = document.createElement('div');
+  overflowIcon.innerHTML = '&#9776;';
+  overflowIcon.id = controlMenu.id + 'OverflowIcon';
+  overflowIcon.classList.add('control-menu-overflow-icon');
+  let overflowContent = document.createElement('div');
+  overflowContent.classList.add('control-menu-overflow-content');
+  overflowContent.id = controlMenu.id + 'OverflowContent';
+  overflowMenu.appendChild(overflowIcon);
+  overflowMenu.appendChild(overflowContent);
+  overflowMenu.classList.add('control-menu-overflow');
+  overflowMenu.id = controlMenu.id + 'Overflow';
+  wrapper.appendChild(overflowMenu);
+  if (fixedElementsRight && Array.isArray(fixedElementsRight)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsRight.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
+    });
+    fixedElementsDiv.classList.add('control-menu-fixed-right');
+    wrapper.appendChild(fixedElementsDiv);
+  }
+  assignOrderKeys(controlMenu);
+  registerOverflowMenu(overflowMenu);
+  return wrapper;
+}
+
+function assignOrderKeys(controlMenu) {
+  Array.from(controlMenu.children).forEach((child, index) => {
+    if (!child.dataset.order) child.dataset.order = String(index);
+  });
+}
+
+function insertByOrder(container, child) {
+  const order = Number(child.dataset.order ?? Number.MAX_SAFE_INTEGER);
+  const siblings = Array.from(container.children);
+  const before = siblings.find((el) => Number(el.dataset.order ?? Number.MAX_SAFE_INTEGER) > order);
+  if (before) {
+    container.insertBefore(child, before);
+  } else {
+    container.appendChild(child);
+  }
+}
+
+function getVisibleWidth(el) {
+  const rect = el.getBoundingClientRect();
+  if (rect.width > 0) {
+    el.dataset.visWidth = String(rect.width);
+    return rect.width;
+  }
+  return Number(el.dataset.visWidth ?? 0);
+}
+
+export function createNotationControlMenu(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'notationControlBar';
-
+  vrvCtrlMenu.id = 'notationControlMenu';
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
@@ -75,7 +214,6 @@ export function createNotationControlBar(parentElement, scale) {
   verovioIcon.title = `mei-friend worker activity:
      clockwise rotation denotes Verovio activity,
      anticlockwise rotation speed worker activity`;
-  vrvCtrlMenu.appendChild(verovioIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -240,11 +378,23 @@ export function createNotationControlBar(parentElement, scale) {
   choiceCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(choiceCtrls);
 
-  let choiceSelector = document.createElement('select');
-  choiceSelector.id = 'choiceSelect';
-  choiceSelector.classList.add('btn', 'input-select');
-  choiceSelector.title = 'Choose displayed content for choice elements';
-  choiceCtrls.appendChild(choiceSelector);
+  let choiceOrigRegSelector = document.createElement('select');
+  choiceOrigRegSelector.id = 'choiceOrigRegSelect';
+  choiceOrigRegSelector.classList.add('btn', 'input-select');
+  choiceOrigRegSelector.title = 'Choose displayed content for choice elements: orig or reg';
+  choiceCtrls.appendChild(choiceOrigRegSelector);
+
+  let choiceSicCorrSelector = document.createElement('select');
+  choiceSicCorrSelector.id = 'choiceSicCorrSelect';
+  choiceSicCorrSelector.classList.add('btn', 'input-select');
+  choiceSicCorrSelector.title = 'Choose displayed content for choice elements: sic or corr';
+  choiceCtrls.appendChild(choiceSicCorrSelector);
+
+  let substSelector = document.createElement('select');
+  substSelector.id = 'substSelect';
+  substSelector.classList.add('btn', 'input-select');
+  substSelector.title = 'Choose displayed content for subst elements: add or del';
+  choiceCtrls.appendChild(substSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -367,19 +517,14 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  vrvCtrlMenu.appendChild(filler);
-
   // page range selector for PDF export
-  vrvCtrlMenu.appendChild(createPageRangeSelector('none'));
+  let pdfPageRange = createPageRangeSelector('none');
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
   pdfCtrlDiv.id = 'pdfControlsDiv';
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
-  vrvCtrlMenu.appendChild(pdfCtrlDiv);
 
   let savePdfButton = document.createElement('button');
   savePdfButton.id = 'pdfSaveButton';
@@ -387,6 +532,7 @@ export function createNotationControlBar(parentElement, scale) {
   // savePdfButton.classList.add('icon');
   savePdfButton.textContent = 'Save PDF'; // icon.pdfIcon;
   savePdfButton.classList.add('inline-block-tight');
+  savePdfButton.style.display = 'none';
   savePdfButton.title = 'Save as PDF';
   pdfCtrlDiv.appendChild(savePdfButton);
 
@@ -396,30 +542,29 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.style.display = 'none';
   pdfCloseButton.classList.add('topright');
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  vrvCtrlMenu.appendChild(pdfCloseButton);
 
   parentElement.appendChild(vrvCtrlMenu);
-} // createNotationControlBar()
+  wrapControlMenu(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, pdfCloseButton]);
+} // createNotationControlMenu()
 
-export function createFacsimileControlBar(parentElement) {
+export function createFacsimileControlMenu(parentElement) {
   // Create control form
-  let facsCtrlBar = document.createElement('div');
-  facsCtrlBar.classList.add('control-menu');
-  facsCtrlBar.id = 'facsimileControlBar';
-  parentElement.appendChild(facsCtrlBar);
+  let facsCtrlMenu = document.createElement('div');
+  facsCtrlMenu.classList.add('control-menu');
+  facsCtrlMenu.id = 'facsimileControlMenu';
+  parentElement.appendChild(facsCtrlMenu);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
   facsimileIcon.innerHTML = icon.log;
   facsimileIcon.id = 'facsimileIcon';
   facsimileIcon.title = 'Facsimile panel';
-  facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
   zoomCtrls.id = 'facsimileZoomControls';
   zoomCtrls.classList.add('controls');
-  facsCtrlBar.appendChild(zoomCtrls);
+  facsCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
   decreaseBtn.id = 'facsimileDecreaseZoomButton';
@@ -472,7 +617,7 @@ export function createFacsimileControlBar(parentElement) {
   fullPageCheckbox.disabled = false;
   fullPageDiv.appendChild(fullPageCheckbox);
 
-  facsCtrlBar.appendChild(fullPageDiv);
+  facsCtrlMenu.appendChild(fullPageDiv);
 
   // show zone rectangles
   let showZonesDiv = document.createElement('div');
@@ -496,7 +641,7 @@ export function createFacsimileControlBar(parentElement) {
   showZonesCheckbox.disabled = false;
   showZonesDiv.appendChild(showZonesCheckbox);
 
-  facsCtrlBar.appendChild(showZonesDiv);
+  facsCtrlMenu.appendChild(showZonesDiv);
 
   // edit zones
   let editZonesDiv = document.createElement('div');
@@ -520,19 +665,74 @@ export function createFacsimileControlBar(parentElement) {
   editZonesCheckbox.disabled = false;
   editZonesDiv.appendChild(editZonesCheckbox);
 
-  facsCtrlBar.appendChild(editZonesDiv);
-
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  facsCtrlBar.appendChild(filler);
+  facsCtrlMenu.appendChild(editZonesDiv);
 
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  facsCtrlBar.appendChild(facsimileCloseButton);
-} // createFacsimileControlBar()
+  wrapControlMenu(facsCtrlMenu, [facsimileIcon], [facsimileCloseButton]);
+} // createFacsimileControlMenu()
+
+export function adjustCtrlMenuOverflow(ctrlMenu) {
+  // adjust the overflow of the control menu
+  if (ctrlMenu) {
+    // We want to maintain the order of the items in the control menu
+    // If any of the children are overflowing, move the first overflowing child AND ALL SUBSEQUENT CHILDREN into the overflow menu
+    // If there is space in the control menu, move items back from the overflow menu in order.
+    const children = Array.from(ctrlMenu.children);
+    const ctrlMenuRect = ctrlMenu.getBoundingClientRect();
+    const padding = 25; // px padding to avoid edge issues
+
+    // determine first overflowing child using cumulative widths for consistency
+    let cumulative = 0;
+    let firstOverflowingIndex = children.findIndex((child) => {
+      const childWidth = getVisibleWidth(child);
+      const wouldOverflow = cumulative + childWidth + padding > ctrlMenuRect.width;
+      cumulative += childWidth;
+      return wouldOverflow;
+    });
+    const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
+    // move overflowing items into overflow menu
+    if (firstOverflowingIndex !== -1) {
+      let overflowing = children.slice(firstOverflowingIndex);
+      overflowing.forEach((child) => {
+        if (!child.dataset.order) assignOrderKeys(ctrlMenu);
+        getVisibleWidth(child); // cache width while visible
+        insertByOrder(overflowContent, child);
+      });
+    } else {
+      // move items back from overflow menu if there is space
+      // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
+      const currentlyOverflowing = Array.from(overflowContent.children).sort(
+        (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
+      );
+      for (let overflowingItem of currentlyOverflowing) {
+        // re-measure after every insertion to avoid stale rects
+        const currentRect = ctrlMenu.getBoundingClientRect();
+        const currentChildren = Array.from(ctrlMenu.children);
+        const usedWidth = currentChildren.reduce((acc, el) => acc + getVisibleWidth(el), 0);
+        let availableSpace = currentRect.width - padding - usedWidth;
+        const childWidth = getVisibleWidth(overflowingItem);
+        // check if there is space in the ctrlMenu to add this as the last child
+        if (childWidth <= availableSpace) {
+          ctrlMenu.appendChild(overflowingItem);
+        } else {
+          // if we can't fit this one, don't try to fit any more
+          break;
+        }
+      }
+    }
+    // show or hide the overflow menu button based on whether it has children
+    let overflow = document.getElementById(ctrlMenu.id + 'Overflow');
+    if (overflowContent.children.length > 0) {
+      overflow.style.display = 'inline-block';
+    } else {
+      overflow.style.display = 'none';
+    }
+  }
+}
 
 export function createEncodingPanel() {
   let codeCheckerResizer = document.getElementById('codeCheckerResizer');
@@ -545,6 +745,7 @@ export function createEncodingPanel() {
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
   document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdfSaveButton').style.display = show ? '' : 'none';
   document.getElementById('pdfCloseButton').style.display = show ? '' : 'none';
 } // showPdfButtons()
 
@@ -619,7 +820,9 @@ export function manualCurrentPage(v, cm, ev) {
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaksSelect');
-  while (breaksEl.hasChildNodes()) breaksEl.remove(0);
+  while (breaksEl.hasChildNodes()) {
+    breaksEl.remove(0);
+  }
   var breaksOpts = {
     none: translator.lang.breaksSelectNone.text,
     auto: translator.lang.breaksSelectAuto.text,
@@ -632,8 +835,11 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     let o = new Option(breaksOpts[key], key);
     // generate ids in the form of breaksSelectNone, breaksSelectAuto etc.
     o.id = 'breaksSelect' + key.charAt(0).toUpperCase() + key.slice(1);
+    o.title = 'breaks: ' + key; // tooltip with the Verovio option name
     breaksEl[breaksEl.options.length] = o;
-    if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+    if (key === 'smart') {
+      breaksEl[breaksEl.length - 1].disabled = true;
+    }
   }
 } // setBreaksOptions()
 
@@ -653,39 +859,54 @@ export function handleSmartBreaksOption(speedMode) {
 
 /**
  * Adds the options for choice to the choiceSelect in the
- * notation control bar.
+ * notation control menu.
  * @param {string} active value of currently active selection
+ * @param {string} selector id of the select element
  */
-export function setChoiceOptions(active) {
-  let choiceSelect = document.getElementById('choiceSelect');
+export function setChoiceOptions(active, selector) {
+  let choiceOptions;
+  switch (selector) {
+    case 'choiceOrigRegSelect':
+      choiceOptions = choiceOrigRegOptions;
+      break;
+    case 'choiceSicCorrSelect':
+      choiceOptions = choiceSicCorrOptions;
+      break;
+    case 'substSelect':
+      choiceOptions = substOptions;
+      break;
+    default:
+      console.error('setChoiceOptions: Unknown selector ', selector);
+      return;
+  }
+  let choiceSelect = document.getElementById(selector);
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
   }
   if (choiceOptions.length > 0) {
-    choiceOptions.forEach((groupEl) => {
-      let group = document.createElement('optgroup');
-      group.label = groupEl.label ? groupEl.label : groupEl.elName;
-      if (groupEl.id) group.id = groupEl.id;
+    let groupEl = choiceOptions[0]; // take first, because always same structure in this array
+    let group = document.createElement('optgroup');
+    group.label = groupEl.label ? groupEl.label : groupEl.elName;
+    if (groupEl.id) group.id = groupEl.id;
 
-      groupEl.options.forEach((el) => {
-        let option;
-        if (active && el.value === active) {
-          option = new Option(el.label, el.value, false, true);
-        } else {
-          option = new Option(el.label, el.value, false, false);
-        }
-        option.id = el.id;
-        option.dataset.prop = el.prop;
-        group.appendChild(option);
-      });
-      choiceSelect.appendChild(group);
+    groupEl.options.forEach((el) => {
+      let option;
+      if (active && el.value === active) {
+        option = new Option(el.label, el.value, false, true);
+      } else {
+        option = new Option(el.label, el.value, false, false);
+      }
+      option.id = el.id;
+      option.dataset.prop = el.prop;
+      group.appendChild(option);
     });
+    choiceSelect.appendChild(group);
   } else {
     let option = new Option(translator.lang.noChoice.text, '', false, false);
     option.id = 'noChoice';
     choiceSelect.appendChild(option);
   }
-}
+} // setChoiceOptions()
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {

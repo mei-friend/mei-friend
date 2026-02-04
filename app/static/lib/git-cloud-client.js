@@ -160,7 +160,8 @@ export default class GitCloudClient {
       path = path.slice(0, -1);
     }
     // encode the path
-    path = encodeURIComponent(path);
+    // but restore slashes as they are not encoded in the API
+    path = encodeURIComponent(path).replaceAll('%2F', '/');
 
     switch (this.providerType) {
       case 'github':

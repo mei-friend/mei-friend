@@ -23,7 +23,8 @@ import {
   refreshAnnotationsInNotation,
 } from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
-
+import { getMeasureDistanceBetweenElements, getStaffNumber, getTstampForElement } from './speed.js';
+import { writeMeasureBeat } from './utils.js';
 //#region functions to draw annotations
 
 /**
@@ -32,6 +33,7 @@ import * as att from './attribute-classes.js';
  * @param {Object} a annotation object
  */
 export async function drawIdentify(a) {
+  // n.b. standoff annotations are always of targetType 'elements', so we don't need to check for that
   if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
     els
@@ -48,22 +50,43 @@ export async function drawIdentify(a) {
  * @param {Object} a annotation object
  */
 export function drawHighlight(a) {
-  if ('selection' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
-    els
-      .filter((e) => e !== null) // (null if not on current page)
-      .forEach((e) => e.classList.add('annotationHighlight'));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel) {
+    // for all IDs in the selection, find any SVG elements
+    // that either have the ID or a class that starts with 'id-'
+    // (the latter is used by Verovio when the same annotation is rendered multiple times (e.g., across systems))
+
+    // get first annotation glyphs (share ID with the MEI xml:id)
+    const els = sel.map((s) => document.getElementById(s));
+    // get any further annotation glyphs that have a class 'id-' + <xml:id>
+    const furtherEls = sel.map((s) => Array.from(document.getElementsByClassName('id-' + s)));
+
+    // concatenate the two arrays and filter out nulls
+    const allEls = els.concat(furtherEls.flat()).filter((e) => e !== null);
+
+    allEls.forEach((e) => {
+      e.classList.add('annotationHighlight');
+    });
   } else {
     console.warn('failing to draw highlight annotation without selection: ', a);
   }
 }
 
 export function drawCircle(a) {
-  if ('selection' in a) {
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel) {
     // mission: draw an ellipse into the raSvg that encompasses a collection of selection objects
     let raSvg = document.querySelector('#renderedAnnotationsSvg');
     // find bounding boxes of all selected elements on page:
-    const bboxes = a.selection.map((s) => convertCoords(document.getElementById(s)));
+    const bboxes = sel.map((s) => convertCoords(document.getElementById(s)));
     // determine enveloping bbox
     const minX = Math.min(...bboxes.map((b) => b.x));
     const minY = Math.min(...bboxes.map((b) => b.y));
@@ -92,8 +115,13 @@ export function drawCircle(a) {
  * @param {Object} a annotation object
  */
 export function drawDescribe(a) {
-  if ('selection' in a && 'description' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel && 'description' in a) {
+    const els = sel.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
       .forEach((e) => {
@@ -116,8 +144,13 @@ export function drawDescribe(a) {
  * @param {Object} a annotation object
  */
 export function drawLink(a) {
-  if ('selection' in a && 'url' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel && 'url' in a) {
+    const els = sel.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
       .forEach((e) => {
@@ -297,7 +330,13 @@ export function readAnnots(flagLimit = false) {
       annotation.id = 'None';
     }
     annotation.isInline = true;
-
+    if (annot.hasAttribute('startid') && annot.hasAttribute('endid')) {
+      annotation.targetType = 'range';
+    } else if (annot.hasAttribute('tstamp') && annot.hasAttribute('tstamp2')) {
+      annotation.targetType = 'interval';
+    } else {
+      annotation.targetType = 'elements';
+    }
     addListItem(annotation);
   });
 } // readAnnots()
@@ -347,35 +386,43 @@ export async function situateAnnotations(a) {
  * with @xml:id, @plist and optional payload (string or ptr)
  * @param {Element} anchor anchor element
  * @param {string} xmlId xml:id for new annot element
- * @param {Array} plist selected elements
+ * @param {Array} selection selected elements
  * @param {object|string} payload possible content of annot element
  * @returns
  */
-export function writeAnnot(anchor, xmlId, plist, payload) {
+export function writeAnnot(anchor, xmlId, selection, payload) {
+  let targetType = document.querySelector('#annotationToolTargetTypeSelector :checked').getAttribute('value');
   // TODO: Place the annotation in the most sensible place according to the MEI schema
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-  if (anchor.closest(att.modelTranscriptionLike.join(','))) {
-    insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
-  } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
-    insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
-  } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
-  else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
-  else if (anchor.closest('section')) insertHere = anchor.closest('section');
-  else if (anchor.closest('score')) insertHere = anchor.closest('score');
-  else {
-    console.error('Sorry, cannot currently write annotations placed outside <score>');
-    v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
-    // remove from list
-    deleteListItem(xmlId);
-    return;
+  // Range annotations are always inserted above the staff level
+  if (targetType === 'range' || targetType === 'interval') {
+    let closestStaff = anchor.closest('staff');
+    insertHere = closestStaff ? anchor.closest('staff').parentElement : '';
   }
-  if (insertHere) {
+  if (!insertHere) {
+    if (anchor.closest(att.modelTranscriptionLike.join(','))) {
+      insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
+    } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
+      insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
+    } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
+    else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
+    else if (anchor.closest('section')) insertHere = anchor.closest('section');
+    else if (anchor.closest('score')) insertHere = anchor.closest('score');
+    else {
+      console.error('Sorry, cannot currently write annotations placed outside <score>');
+      v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
+      // remove from list
+      deleteListItem(xmlId);
+      return;
+    }
+  }
+  if (insertHere && checkSelectionElementsValid(selection)) {
     // disable cursor activity and block changes in CM
     v.allowCursorActivity = false;
     cm.blockChanges = true;
-    // trz to add our annotation at beginning of insertHere element's list of children.
+    // try to add our annotation at beginning of insertHere element's list of children.
     // in case of alternative encodings, add annotation at beginning of first child WRONG!!
     // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
@@ -386,7 +433,76 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       setCursorToId(cm, firstChildNode.getAttribute('xml:id'));
       let annot = document.createElementNS(meiNameSpace, 'annot');
       annot.setAttributeNS(xmlNameSpace, 'xml:id', xmlId);
-      annot.setAttribute('plist', plist.map((p) => '#' + p).join(' '));
+      // set targets according to user's chosen target type
+      if (targetType === 'range') {
+        // use @startid and @endid to identify the range of selected elements
+        // if any items in the selection don't have an ID, or have one that does not exist in the MEI (may have been invented for the SVG by Verovio), we have to warn user and refuse...
+        // (_any_ item, not just first and last which are anchoring the range, because we get our 'staff' information by investigating each item in turn)
+        // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
+        // n.b. they are already sorted in the selection array
+        annot.setAttribute('startid', '#' + selection[0]);
+        annot.setAttribute('endid', '#' + selection[selection.length - 1]);
+        let staffNumbers = selection
+          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+          .filter((s) => !!s); // filter out empty staff numbers
+        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+        annot.setAttribute('staff', staffNumbers.join(' '));
+        annot.setAttribute('type', 'score');
+      } else if (targetType === 'interval') {
+        let timedEls = selection
+          .map((s) => v.xmlDoc.querySelector(`[*|id="${s}"]`))
+          .filter((el) => {
+            if (el) {
+              let closestNote = el.closest('note');
+              if (closestNote) {
+                return true; // elements under a note (e.g., verse/syl...) are considered timed
+              } else {
+                return getTstampForElement(v.xmlDoc, el) > -1; // include all timed elements
+              }
+            } else {
+              return false;
+            }
+          });
+        // determine the tstamp values of the first and last timed elements
+        // and set @tstamp and @tstamp2 to those values
+        if (timedEls.length) {
+          let el1 = timedEls[0];
+          let el2 = timedEls[timedEls.length - 1];
+          console.log('Interval elements: ', el1, el2, selection);
+          let tstamp = getTstampForElement(v.xmlDoc, el1);
+          if (tstamp < 0) {
+            el1 = el1.closest('note'); // borrow tstamp from closest note
+            tstamp = getTstampForElement(v.xmlDoc, el1);
+          }
+          let tstamp2 = getTstampForElement(v.xmlDoc, el2);
+          if (tstamp2 < 0) {
+            el2 = el2.closest('note'); // borrow tstamp from closest note
+            tstamp2 = getTstampForElement(v.xmlDoc, el2);
+          }
+          let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
+          annot.setAttribute('tstamp', tstamp);
+          annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
+          let staffNumbers = selection
+            .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+            .filter((s) => !!s); // filter out empty staff numbers
+          staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+          annot.setAttribute('staff', staffNumbers.join(' '));
+          annot.setAttribute('type', 'score');
+        } else {
+          console.warn('writeAnnot(): No timed elements found for interval annotation: ', selection);
+          annot.setAttribute('tstamp', '0');
+          annot.setAttribute('tstamp2', '0');
+          annot.setAttribute('type', 'score');
+        }
+      } else if (targetType === 'elements') {
+        // use @plist to store the list of selected elements' xml:ids
+        annot.setAttribute('type', 'score');
+        annot.setAttribute('plist', selection.map((p) => '#' + p).join(' '));
+      } else {
+        console.error('Unknown annotation target type: ', targetType);
+        return false;
+      }
+
       if (payload) {
         if (typeof payload === 'string') {
           annot.textContent = payload;
@@ -427,6 +543,22 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     cm.blockChanges = false;
     // fire change event to update application state
     handleEditorChanges();
+  } else {
+    let errMsg =
+      '<p>' +
+      translator.lang.annotationWithoutIdWarning.text1 +
+      '</p>' +
+      '<p>' +
+      translator.lang.annotationWithoutIdWarning.text2 +
+      '</p>';
+    console.warn(errMsg);
+    v.showAlert(errMsg, 'warning', 5000);
+    // remove from list
+    deleteListItem(xmlId);
+    // reset drag selector
+    v.selectedElements = [document.querySelector('verovioContainer g.note')];
+    v.updateHighlight(cm);
+    return;
   }
 } // writeAnnot()
 
@@ -926,6 +1058,20 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
   } else {
     console.warn('Trying to draw selection for identified object but have no selection div to hook it into', obj, url);
   }
+}
+
+//#endregion
+
+//#region Utilities
+
+function checkSelectionElementsValid(selection) {
+  let valid = true;
+  selection.forEach((id) => {
+    if (!(id && v.xmlDoc.querySelector(`[*|id=${id}]`) !== null)) {
+      valid = false;
+    }
+  });
+  return valid;
 }
 
 //#endregion

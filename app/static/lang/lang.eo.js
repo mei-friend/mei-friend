@@ -692,6 +692,13 @@ export const lang = {
     text: 'Montri rapidan modan markobutonon',
     description: 'Montri rapidan modan markobutonon en la menuo de notacia kontrolado',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Montri pliajn regajn butonojn',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Montri pliajn regajn butonojn',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {

@@ -2,6 +2,15 @@ var tk;
 var tkOptions;
 var tkUrl;
 
+// music font list for PDF export
+let fontList = {
+  Leipzig: 'https://raw.githubusercontent.com/rism-digital/leipzig/main/Leipzig.otf',
+  Bravura: 'https://raw.githubusercontent.com/steinbergmedia/bravura/master/redist/otf/Bravura.otf',
+  Gootville: 'https://raw.githubusercontent.com/musescore/MuseScore/master/fonts/gootville/Gootville.otf',
+  Leland: 'https://raw.githubusercontent.com/musescore/MuseScore/master/fonts/leland/Leland.otf',
+  Petaluma: 'https://raw.githubusercontent.com/steinbergmedia/petaluma/master/redist/otf/Petaluma.otf',
+};
+
 loadVerovio = () => {
   /* create the worker toolkit instance */
   console.info('VerovioWorker: Loading toolkit...');
@@ -389,67 +398,81 @@ addEventListener(
           CreationDate: new Date(),
         };
 
-        // create stream
-        const stream = doc.pipe(blobStream());
+        // fetch font into a font buffer and await registration
+        fetch(fontList[tkOptions.font])
+          .then((response) => response.arrayBuffer())
+          .then((fontBuffer) => {
+            doc.registerFont(tkOptions.font, fontBuffer);
 
-        // Font callback and buffer for pdfkit
-        let fontCallback = function (family, bold, italic, fontOptions) {
-          if (family === 'VerovioText') {
-            return family;
-          }
-          if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
-            let font = 'Times'; // 'Edwin'; does not work, because pdfkit is using the fs package available in node.js only
-            if (bold && italic) {
-              return font + '-BoldItalic';
+            // create stream
+            const stream = doc.pipe(blobStream());
+
+            // Font callback and buffer for pdfkit
+            let fontCallback = function (family, bold, italic, fontOptions) {
+              if (
+                family === 'VerovioText' ||
+                family === 'Leipzig' ||
+                family === 'Petaluma' ||
+                family === 'Gootville' ||
+                family === 'Leland' ||
+                family === 'Bravura'
+              ) {
+                return family;
+              }
+              if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+                let font = 'Times'; // 'Edwin'; does not work, because pdfkit is using the fs package available in node.js only
+                if (bold && italic) {
+                  return font + '-BoldItalic';
+                }
+                if (bold && !italic) {
+                  return font + '-Bold';
+                }
+                if (!bold && italic) {
+                  return font + '-Italic';
+                }
+                if (!bold && !italic) {
+                  return font + '-Roman';
+                }
+              }
+            };
+            let options = {};
+            options.fontCallback = fontCallback;
+
+            try {
+              tk.setOptions(tkOptions);
+              let breaks = tkOptions.breaks;
+
+              if (result.speedMode) {
+                tk.setOptions({ breaks: 'encoded' });
+              }
+              tk.loadData(result.msg);
+              result.toolkitDataOutdated = true;
+
+              // add pages to the file
+              let c = 0;
+              for (p of result.pages) {
+                updateProgressbar((100 * ++c) / result.pages.length, 'PDF');
+                let svg = tk.renderToSVG(p);
+                doc.addPage();
+                SVGtoPDF(doc, svg, 0, 0, options);
+                console.log('vrvWorker adding page ' + p + '/' + result.pages.length + '.');
+              }
+              if (result.speedMode) {
+                tk.setOptions({ breaks: breaks });
+              }
+            } catch (err) {
+              log('saveAsPdf: ' + err);
             }
-            if (bold && !italic) {
-              return font + '-Bold';
-            }
-            if (!bold && italic) {
-              return font + '-Italic';
-            }
-            if (!bold && !italic) {
-              return font + '-Roman';
-            }
-          }
-        };
-        let options = {};
-        options.fontCallback = fontCallback;
+            doc.end();
+            result.cmd = '';
 
-        try {
-          tk.setOptions(tkOptions);
-          let breaks = tkOptions.breaks;
-
-          if (result.speedMode) {
-            tk.setOptions({ breaks: 'encoded' });
-          }
-          tk.loadData(result.msg);
-          result.toolkitDataOutdated = true;
-
-          // add pages to the file
-          let c = 0;
-          for (p of result.pages) {
-            updateProgressbar((100 * ++c) / result.pages.length, 'PDF');
-            let svg = tk.renderToSVG(p);
-            doc.addPage();
-            SVGtoPDF(doc, svg, 0, 0, options);
-            console.log('vrvWorker adding page ' + p + '/' + result.pages.length + '.');
-          }
-          if (result.speedMode) {
-            tk.setOptions({ breaks: breaks });
-          }
-        } catch (err) {
-          log('saveAsPdf: ' + err);
-        }
-        doc.end();
-        result.cmd = '';
-
-        stream.on('finish', function () {
-          // get a blob you can do whatever you like with
-          result.blob = stream.toBlob('application/pdf');
-          result.cmd = 'pdfBlob';
-          postMessage(result);
-        });
+            stream.on('finish', function () {
+              // get a blob you can do whatever you like with
+              result.blob = stream.toBlob('application/pdf');
+              result.cmd = 'pdfBlob';
+              postMessage(result);
+            });
+          });
         break;
       case 'getTimeForElement':
         console.log('worker: getTimeForElement: ', result.msg);

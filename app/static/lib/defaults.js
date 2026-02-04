@@ -339,8 +339,8 @@ export const commonSchemas = {
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
-    '5.1.': 'https://music-encoding.org/schema/5.1/mei-Neumes.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-Neumes.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
   All: {
@@ -362,8 +362,8 @@ export const commonSchemas = {
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
-export const defaultMeiVersion = '5.1';
-export const defaultMeiProfile = 'CMN';
+export const defaultMeiVersion = '5.1'; // '2.1.1', '3.0.0', '4.0.0', '4.0.1', '5.0', '5.1'
+export const defaultMeiProfile = 'CMN'; // 'Mensural', 'Neumes', 'All', 'Any', 'Basic'
 export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
@@ -375,10 +375,6 @@ if (env === environments.develop) {
     description: 'Locally compiled Verovio toolkit version for debugging',
   };
 }
-supportedVerovioVersions.annote = {
-  url: `${root.endsWith('/') ? root : root + '/'}vrv/verovio-toolkit-annote-64ea6180c.js`,
-  description: 'Annote version of Verovio toolkit (Experimental!)',
-};
 supportedVerovioVersions.develop = {
   url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
   description: 'Current Verovio develop version',
@@ -386,6 +382,41 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['6.0.0'] = {
+  url: 'https://www.verovio.org/javascript/6.0.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.0.0',
+  releaseDate: '28. January 2026',
+};
+supportedVerovioVersions['5.7.0'] = {
+  url: 'https://www.verovio.org/javascript/5.7.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.7.0',
+  releaseDate: '2. December 2025',
+};
+supportedVerovioVersions['5.6.0'] = {
+  url: 'https://www.verovio.org/javascript/5.6.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.6.0',
+  releaseDate: '9 September 2025',
+};
+supportedVerovioVersions['5.5.0'] = {
+  url: 'https://www.verovio.org/javascript/5.5.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.5.0',
+  releaseDate: '5 August 2025',
+};
+supportedVerovioVersions['5.4.0'] = {
+  url: 'https://www.verovio.org/javascript/5.4.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.4.0',
+  releaseDate: '15 July 2025',
+};
+supportedVerovioVersions['5.3.2'] = {
+  url: 'https://www.verovio.org/javascript/5.3.2/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.3.2',
+  releaseDate: '28 May 2025',
+};
+supportedVerovioVersions['5.2.0'] = {
+  url: 'https://www.verovio.org/javascript/5.2.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.2.0',
+  releaseDate: '23 Apr 2025',
 };
 supportedVerovioVersions['5.1.0'] = {
   url: 'https://www.verovio.org/javascript/5.1.0/verovio-toolkit-hum.js',

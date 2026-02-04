@@ -715,6 +715,13 @@ export const lang = {
     text: 'Afficher la case de mode rapide',
     description: 'Afficher la case de mode rapide dans le menu de contrôle de notation',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Afficher des boutons de contrôle supplémentaires',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Afficher des boutons de contrôle supplémentaires',
+  },
 
   // MIDI Playback / Lecture MIDI
   titleMidiPlayback: {

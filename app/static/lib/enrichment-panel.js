@@ -51,7 +51,7 @@ export function readListItemsFromXML(flagLimit = false) {
   clearInlineListItems();
   annot.readAnnots(flagLimit);
   markup.readMarkup();
-  situateAndRefreshAnnotationsList();
+  // situateAndRefreshAnnotationsList();
   refreshAnnotationsInNotation(true);
 } // readListItemsFromXML()
 
@@ -105,8 +105,8 @@ export function deleteListItem(uuid) {
       // remove only the annotation from the list that should be deleted
       listItems.splice(ix, 1);
     }
-    situateAndRefreshAnnotationsList(true);
-    refreshAnnotationsInNotation();
+    // situateAndRefreshAnnotationsList(true);
+    refreshAnnotationsInNotation(true);
   }
 } // deleteListItem()
 
@@ -164,6 +164,7 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
  *  @returns {Array} Sorted list items.
  */
 async function situateListItems() {
+  console.debug('SSSSSSSSSSSituating list items: ' + listItems.length + ' items');
   const asyncResults = await Promise.all(listItems.length > 0 ? listItems.map((item) => situateOneListItem(item)) : []);
   // when deleting the last item from the list, sometimes, asyncResults finds the item again after it should have been deleted
   // to make sure to abort, when itemList is empty, because nothings needs to be sorted
@@ -215,7 +216,7 @@ async function situateOneListItem(item) {
     }
 
     itemPromise.then((item) => {
-      console.log('Situated ', item);
+      console.debug('Situated ', item);
       const itemLocationLabel = document.querySelector(`.annotationLocationLabel[data-id=loc-${CSS.escape(item.id)}`);
       if (itemLocationLabel) {
         itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
@@ -511,6 +512,9 @@ function generateAnnotationButtons(a) {
   const addDescribe = generateListItemButton('describeMarkup', pencil, translator.lang.describeMarkup.description);
   if (a.isMarkup) {
     addDescribe.addEventListener('click', (e) => {
+      // ensure that element enumeration target type is selected
+      document.querySelector('#annotationToolTargetTypeElements').checked = true;
+      // create the describe annotation
       annot.createDescribe(e, a.selection);
     });
   }
@@ -638,8 +642,8 @@ export function addAnnotationHandlers() {
   // TODO extend this to allow app to consume (TROMPA-style) Annotation Toolkit descriptions
 
   const annotationHandler = (e) => {
-    console.log('annotation Handler: Clicked to make new annotation!', e);
-    console.log('annotation Handler: Selected elements: ', v.selectedElements);
+    console.debug('annotation Handler: Clicked to make new annotation!', e);
+    console.debug('annotation Handler: Selected elements: ', v.selectedElements);
     switch (e.target.closest('.annotationToolsIcon')?.getAttribute('id')) {
       case 'annotateIdentify':
         annot.createIdentify(e, v.selectedElements);
@@ -668,13 +672,13 @@ export function addAnnotationHandlers() {
   // disable 'identify music object' unless 'linked data' domain selected
   document
     .querySelectorAll('.annotationToolsDomainSelectionItem input')
-    .forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject));
+    .forEach((i) => i.removeEventListener('click', onAnnotationStorageSelected));
   document
     .querySelectorAll('.annotationToolsDomainSelectionItem input')
-    .forEach((i) => i.addEventListener('click', enableDisableIdentifyObject));
-  enableDisableIdentifyObject(); // set initial status
-  document.getElementById('annotationToolsButton').removeEventListener('click', enableDisableIdentifyObject);
-  document.getElementById('annotationToolsButton').addEventListener('click', enableDisableIdentifyObject);
+    .forEach((i) => i.addEventListener('click', onAnnotationStorageSelected));
+  onAnnotationStorageSelected(); // set initial status
+  document.getElementById('annotationToolsButton').removeEventListener('click', onAnnotationStorageSelected);
+  document.getElementById('annotationToolsButton').addEventListener('click', onAnnotationStorageSelected);
 } // addAnnotationHandlers()
 
 /**
@@ -694,7 +698,7 @@ export function addMarkupHandlers() {
     targetDisplay.removeChild(targetDisplay.firstElementChild);
     targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
     let dropdown = document.getElementById(`${elName}-content-options`);
-    console.log('Toggling content selector: ', currentElement, targetID, targetDisplay, elName, dropdown);
+    console.debug('Toggling content selector: ', currentElement, targetID, targetDisplay, elName, dropdown);
     if (dropdown) dropdown.style.display = 'none';
   };
 
@@ -708,7 +712,7 @@ export function addMarkupHandlers() {
     selector.addEventListener('click', (event) => {
       event.stopPropagation();
       let currentElement = event.currentTarget;
-      console.log('Clicked on ', currentElement, event);
+      console.debug('Clicked on ', currentElement, event);
       let targetType = currentElement.dataset.elName;
       let targetElement = document.getElementById(`${targetType}-content-options`);
 
@@ -810,15 +814,31 @@ function addSelectionSelect() {
 } // addSelectionSelect()
 
 /**
- * enables/disables the 'Identify' button based on selected mode of annotation.
+ * enables/disables the 'Identify' button and target types based on selected mode of annotation.
+ * 'Identify' allowed when 'RDF' (stand-off) selected and unavailable when 'inline' selected.
+ * 'Elements' target type enforced when 'RDF' (stand-off) selected, others available when 'inline' selected.
  * Reads writeAnnotationInline checkbox.
  */
-function enableDisableIdentifyObject() {
+function onAnnotationStorageSelected() {
   let identifyTool = document.getElementById('annotateIdentify');
+  let targetElements = document.getElementById('annotationToolTargetTypeElements');
+  let targetRange = document.getElementById('annotationToolTargetTypeRange');
+  let targetRangeLabel = document.getElementById('annotationToolTargetTypeRangeLabel');
+  let targetInterval = document.getElementById('annotationToolTargetTypeInterval');
+  let targetIntervalLabel = document.getElementById('annotationToolTargetTypeIntervalLabel');
   if (document.getElementById('writeAnnotationInline').checked) {
     identifyTool.classList.add('disabled');
+    targetRange.disabled = false;
+    targetRangeLabel.classList.remove('disabled');
+    targetInterval.disabled = false;
+    targetIntervalLabel.classList.remove('disabled');
   } else {
     identifyTool.classList.remove('disabled');
+    targetElements.checked = true;
+    targetRange.disabled = true;
+    targetRangeLabel.classList.add('disabled');
+    targetInterval.disabled = true;
+    targetIntervalLabel.classList.add('disabled');
   }
 } // enableDisableIdentifyObject()
 

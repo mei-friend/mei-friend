@@ -53,21 +53,21 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     // check that a note is visible in the notation
     await expect(page.locator('g.note').first()).toBeVisible();
   });
-  test('2.2 Test Speed mode checkbox updates control-bar and vice-versa', async ({ page }) => {
+  test('2.2 Test Speed mode checkbox updates control-menu and vice-versa', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
     await page.click('#meifriendOptionsTab');
     // ensure that speed mode checkbox in settings is checked (default behaviour)
     await expect(page.locator('#toggleSpeedMode')).toBeChecked();
-    // ensure that speed mode checkbox in control-bar is checked
+    // ensure that speed mode checkbox in control-menu is checked
     await expect(page.locator('#speedCheckbox')).toBeChecked();
     // click settings checkbox
     await page.click('#toggleSpeedMode');
     // ensure both boxes are now no longer checked
     await expect(page.locator('#toggleSpeedMode')).not.toBeChecked();
     await expect(page.locator('#speedCheckbox')).not.toBeChecked();
-    // click control-bar checkbox
+    // click control-menu checkbox
     await page.click('#speedCheckbox');
     // ensure both boxes are now checked again
     await expect(page.locator('#toggleSpeedMode')).toBeChecked();

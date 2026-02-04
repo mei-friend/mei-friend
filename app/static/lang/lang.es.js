@@ -708,6 +708,13 @@ export const lang = {
     text: 'Mostrar casilla de verificación de modo de velocidad',
     description: 'Mostrar casilla de verificación de modo de velocidad en el menú de control de notación',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Mostrar botones de control adicionales',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Mostrar botones de control adicionales',
+  },
   // MIDI Playback / Reproducción MIDI
   titleMidiPlayback: {
     text: 'Reproducción MIDI',

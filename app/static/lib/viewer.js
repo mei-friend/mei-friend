@@ -1,11 +1,17 @@
 import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
 import { selectItemInAnnotationList } from './enrichment-panel.js';
-import * as prs from './page-range-selector.js';
+import * as pageRagenSelector from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
-import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
+import {
+  getControlMenuState,
+  showPdfButtons,
+  setControlMenuState,
+  setCheckbox,
+  adjustCtrlMenuOverflow,
+} from './control-menu.js';
+import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
 import { codeCheckerHeight } from './resizer.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
@@ -27,7 +33,6 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
-  defaultCodeCheckerHeight,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
@@ -46,7 +51,9 @@ export default class Viewer {
     this.spdWorker = spdWorker;
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
-    this.currentSchema = '';
+    this.currentSchema = ''; // URL
+    this.currentMeiProfile = ''; // CMN, all, Basic, Mensural, Neume, anyStart, see defaults.js commonSchemas
+    // this.currentMeiVersion = ''; // MEI version, e.g. '5.1', '4.0.1', TODO: implement
     this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
@@ -74,7 +81,9 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
+    this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
+    this.choiceSicCorrSelect = document.getElementById('choiceSicCorrSelect'); //choice select control
+    this.substSelect = document.getElementById('substSelect'); //subst select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -261,15 +270,17 @@ export default class Viewer {
     this.loadXml(mei, forceReload);
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    // TODO: instead of cloning node, just work in this.xmlDoc and force reload when required
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
-    const choiceOption = this.choiceSelect.value;
-    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
-    if (markupResult?.changed === true) {
-      speedMeiDoc = markupResult.doc;
-      //this.xmlDocOutdated = true;
-      // unnecessary if this.xmlDoc is not touched
-    }
+    const choiceOrigRegOption = this.choiceOrigRegSelect.value;
+    const choiceSicCorrOption = this.choiceSicCorrSelect.value;
+    const substOption = this.substSelect.value;
+    // Check if any of the multilevel markup options have been changed:
+    selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
+    selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
+
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = speedMeiDoc.querySelector('music score');
@@ -398,18 +409,33 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let choiceSelect = this.choiceSelect;
-    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
-      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
-      if (selectedChoice.dataset.prop) {
-        if (selectedChoice.value != '') {
-          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
-        } else {
-          this.vrvOptions[selectedChoice.dataset.prop] = [];
-        }
+    let choiceOrigRegSelect = this.choiceOrigRegSelect;
+    let choiceSicCorrSelect = this.choiceSicCorrSelect;
+    let substSelect = this.substSelect;
+    // handle choice translation to Vervio options
+    let choiceSelections = [...choiceOrigRegSelect.selectedOptions, ...choiceSicCorrSelect.selectedOptions];
+    console.log('choiceSelections: ', choiceSelections);
+    let choiceXpath = [];
+    choiceSelections.forEach((opt) => {
+      if (opt.value != '') {
+        choiceXpath.push('./' + opt.value);
       }
+    });
+    if (choiceXpath.length > 0) {
+      this.vrvOptions.choiceXPathQuery = choiceXpath;
     }
-
+    // handle subst translation to Verovio options
+    let substXpath = [];
+    if (substSelect && substSelect.selectedOptions.length > 0) {
+      substXpath = ['./' + substSelect.value];
+    }
+    console.log('substXpath: ', substXpath);
+    console.log('substSelect value: ', substSelect.value);
+    console.log('substSelect.selectedOptions: ', substSelect.selectedOptions);
+    if (substXpath.length > 0) {
+      this.vrvOptions.substXPathQuery = substXpath;
+    }
+    console.log('!!!! ', this.vrvOptions);
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {
       let vpw = document.getElementById('vrv-pageWidth');
@@ -472,7 +498,7 @@ export default class Viewer {
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
     document.getElementById('pagination3').innerHTML = translator.lang.pagination3.html;
     document.getElementById('pagination4').innerHTML = `&nbsp;${pg}`;
-    prs.updatePageRangeSelector(this);
+    pageRagenSelector.updatePageRangeSelector(this);
   } // updatePageNumDisplay()
 
   // set cursor to first note id in page, taking st/ly of id, if possible
@@ -484,10 +510,13 @@ export default class Viewer {
     let sc;
     if (id === '') {
       let note = document.querySelector('.note');
-      if (note) id = note.getAttribute('id');
-      else return '';
+      if (note) {
+        id = note.getAttribute('id');
+      } else {
+        return '';
+      }
     } else {
-      sc = cm.getSearchCursor('xml:id="' + id + '"');
+      sc = cm.getSearchCursor(new RegExp(`xml:id=["']${id}["']`));
       if (sc.findNext()) {
         const p = sc.from();
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
@@ -496,6 +525,12 @@ export default class Viewer {
         // console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
+        } else {
+          id = document.querySelector('.note');
+          let staff = document.querySelector('.staff');
+          if (staff) {
+            id = dutils.getFirstInMeasure(staff, dutils.navElsSelector, stNo, lyNo);
+          }
         }
       }
     }
@@ -509,38 +544,44 @@ export default class Viewer {
   addNotationEventListeners(cm) {
     let vp = document.getElementById('verovio-panel');
     if (vp) {
-      let elements = vp.querySelectorAll('g[id],rect[id],text[id]');
+      // exclude g elements from the shape definition <defs>
+      let elements = vp.querySelector('.page-margin')?.querySelectorAll('g[id],rect[id],text[id]');
       elements.forEach((item) => {
         item.addEventListener('click', (event) => this.handleClickOnNotation(event, cm));
       });
     }
   } // addNotationEventListeners()
 
-  handleClickOnNotation(e, cm) {
+  /**
+   * Handles mouse click events on notation elements.
+   * @param {Event} event
+   * @param {CodeMirror} cm
+   * @returns nothing
+   */
+  handleClickOnNotation(event, cm) {
     if (!this.allowNotationInteraction) return;
-    e.stopImmediatePropagation();
+    event.stopImmediatePropagation();
     this.hideAlerts();
-    let point = {};
-    point.x = e.clientX;
-    point.y = e.clientY;
-    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
-    let r = {};
-    r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
-    r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
-    console.debug('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
-
     this.allowCursorActivity = false;
-    // console.info('click: ', e);
-    let itemId = String(e.currentTarget.id);
-    if (itemId === 'undefined') return;
+
+    // determine id of clicked element (i.e. the element that the click handler is attached to)
+    let itemId = String(event.currentTarget.id);
+    if (!itemId || itemId === 'undefined') {
+      console.warn('handleClickOnNotation() Cannot find id for clicked element ', event);
+      return;
+    }
     // take chord rather than note xml:id, when ALT is pressed
     let chordId = utils.insideParent(itemId);
-    if (e.altKey && chordId) itemId = chordId;
+    if (event.altKey && chordId) {
+      itemId = chordId;
+    }
     // select tuplet when clicking on tupletNum
-    if (e.currentTarget.getAttribute('class') === 'tupletNum') itemId = utils.insideParent(itemId, 'tuplet');
+    if (event.currentTarget.getAttribute('class') === 'tupletNum') {
+      itemId = utils.insideParent(itemId, 'tuplet');
+    }
 
     let msg = 'handleClickOnNotation() ';
-    if ((platform.startsWith('mac') && e.metaKey) || e.ctrlKey) {
+    if ((platform.startsWith('mac') && event.metaKey) || event.ctrlKey) {
       if (this.selectedElements.includes(itemId)) {
         this.selectedElements.splice(this.selectedElements.indexOf(itemId), 1);
         msg += 'removed: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -552,7 +593,7 @@ export default class Viewer {
       // set cursor position in buffer
       let found = utils.setCursorToId(cm, itemId);
       if (!found) {
-        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+        this.showMissingIdsWarning(event.currentTarget.classList.item(0));
       }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
@@ -566,7 +607,7 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
-    this.scrollSvgTo(cm, e);
+    this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
@@ -1018,6 +1059,13 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
+    // for each visible .control-menu, adjust overflow
+    let ctrlMenus = document.querySelectorAll('.control-menu');
+    ctrlMenus.forEach((ctrlMenu) => {
+      if (ctrlMenu.style.display !== 'none') {
+        adjustCtrlMenuOverflow(ctrlMenu);
+      }
+    });
   } // pageModeOn()
 
   // Switches back from pdfMode
@@ -1051,6 +1099,7 @@ export default class Viewer {
       this.allowNotationInteraction = true;
     }
     this.pdfMode = false;
+    adjustCtrlMenuOverflow();
   } // pageModeOff()
 
   saveAsPdf() {
@@ -1062,7 +1111,7 @@ export default class Viewer {
       versionDate: versionDate,
       options: this.vrvOptions,
       speedMode: this.speedMode,
-      pages: prs.getPages(),
+      pages: pageRagenSelector.getPages(),
     });
   } // saveAsPdf()
 
@@ -1272,7 +1321,7 @@ export default class Viewer {
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
-          document.getElementById('speedDiv').style.display = value ? 'inherit' : 'none';
+          document.getElementById('speedDiv').style.display = value ? 'flex' : 'none';
           break;
         case 'controlMenuNavigateArrows':
           document.getElementById('navigationControls').style.display = value ? 'inherit' : 'none';
@@ -1282,7 +1331,7 @@ export default class Viewer {
           document.getElementById('flipButton').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('updateControls').style.display = value ? 'flex' : 'none';
           break;
         case 'facsimileZoomInput':
           document.getElementById('facsimileZoom').value = value;
@@ -1541,7 +1590,7 @@ export default class Viewer {
           case 'controlMenuSpeedmodeCheckbox':
             document.getElementById('speedDiv').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
-              ? 'inherit'
+              ? 'flex'
               : 'none';
             break;
           case 'controlMenuNavigateArrows':
@@ -1558,7 +1607,7 @@ export default class Viewer {
             break;
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
-            document.getElementById('updateControls').style.display = u ? 'inherit' : 'none';
+            document.getElementById('updateControls').style.display = u ? 'flex' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
@@ -2369,22 +2418,22 @@ export default class Viewer {
     let alertOverlay = document.getElementById('alertOverlay');
     let alertIcon = document.getElementById('alertIcon');
     let alertMessage = document.getElementById('alertMessage');
-    alertIcon.innerHTML = xCircleFill; // error as default icon
+    alertIcon.innerHTML = icons.alertFill; // error as default icon
     alertOverlay.classList.remove('warning');
     alertOverlay.classList.remove('info');
     alertOverlay.classList.remove('success');
     switch (type) {
       case 'warning':
         alertOverlay.classList.add('warning');
-        alertIcon.innerHTML = alert;
+        alertIcon.innerHTML = icons.alert;
         break;
       case 'info':
         alertOverlay.classList.add('info');
-        alertIcon.innerHTML = info;
+        alertIcon.innerHTML = icons.info;
         break;
       case 'success':
         alertOverlay.classList.add('success');
-        alertIcon.innerHTML = success;
+        alertIcon.innerHTML = icons.success;
         break;
     }
     alertMessage.innerHTML = message;
@@ -2408,17 +2457,17 @@ export default class Viewer {
     let promptMessage = document.getElementById('promptMessage');
     let promptButtons = document.getElementById('promptButtons');
     promptButtons.textContent = '';
-    promptIcon.innerHTML = xCircleFill; // error as default icon
+    promptIcon.innerHTML = icons.alertFill; // error as default icon
     promptOverlay.classList.remove('warning');
     promptOverlay.classList.remove('info');
     switch (type) {
       case 'warning':
         promptOverlay.classList.add('warning');
-        promptIcon.innerHTML = alert;
+        promptIcon.innerHTML = icons.alert;
         break;
       case 'info':
         promptOverlay.classList.add('info');
-        promptIcon.innerHTML = info;
+        promptIcon.innerHTML = icons.info;
         break;
     }
     promptMessage.innerHTML = message;
@@ -2468,12 +2517,24 @@ export default class Viewer {
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    const hasNameSpacePattern = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+    const hasNameSpacePattern =
+      /<\?xml-model\b[^>]*schematypens\s*=\s*["']http:\/\/relaxng\.org\/ns\/structure\/1\.0["']/;
     const hasSchemaMatch = hasNameSpacePattern.exec(mei);
-    const meiVersionPattern = /<mei.*meiversion="([^"]*).*/;
-    const meiVersionMatch = meiVersionPattern.exec(mei);
-    if (!hasSchemaMatch) {
-      // if no schema namespace, but a version in the mei tag, load common schema
+    if (hasSchemaMatch) {
+      // schema namespace found, now extract schema file name and load it
+      const schemaUrlPattern = /<\?xml-model\b[^>]*href=["']([^"']*)["']/;
+      const schemaUrlMatch = schemaUrlPattern.exec(mei);
+      if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
+        this.currentSchema = schemaUrlMatch[1];
+        console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
+        if (await this.replaceSchema(this.currentSchema)) {
+          return;
+        }
+      }
+    } else {
+      // if no schema namespace, but an MEI version in the mei tag, load common schema
+      const meiVersionPattern = /<mei\b[^>]*meiversion=["']([^"']*)["']/;
+      const meiVersionMatch = meiVersionPattern.exec(mei);
       if (meiVersionMatch && meiVersionMatch[1]) {
         let sch = commonSchemas['All'][meiVersionMatch[1]];
         if (sch) {
@@ -2489,17 +2550,11 @@ export default class Viewer {
           return;
         }
       }
+      // nothing at all
       console.error('Viewer.checkSchema(): ' + translator.lang.noSchemaFound.text);
       this.currentSchema = '';
       this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
-    }
-    const schemaUrlPattern = /<\?xml-model.*href="([^"]*).*/;
-    const schemaUrlMatch = schemaUrlPattern.exec(mei);
-    if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
-      this.currentSchema = schemaUrlMatch[1];
-      console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
-      await this.replaceSchema(this.currentSchema);
     }
   } // checkSchema()
 
@@ -2507,12 +2562,24 @@ export default class Viewer {
    * Loads and replaces XML schema; throws errors if not found/CORS error,
    * update validation-status icon
    * @param {string*} schemaFileName
-   * @returns
+   * @returns {boolean} success
    */
   async replaceSchema(schemaFileName) {
-    if (!this.validatorInitialized) return;
+    if (!this.validatorInitialized) {
+      return false;
+    }
+
+    // determine current schema profile (e.g., all, CMN, basic, mensural, neumes, anystart)
+    let schemaTail = schemaFileName.split('/').pop();
+    Object.keys(commonSchemas).forEach((profile) => {
+      if (schemaTail.toLowerCase().includes(profile.toLowerCase())) {
+        this.currentMeiProfile = profile;
+        console.log('Viewer.replaceSchema(): Current MEI profile: ' + this.currentMeiProfile);
+      }
+    });
+
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = download;
+    vs.innerHTML = icons.download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
@@ -2528,7 +2595,7 @@ export default class Viewer {
           response: response,
           schemaFile: schemaFileName,
         });
-        return;
+        return false;
       }
       data = await response.text();
       const res = await validator.setRelaxNGSchema(data);
@@ -2537,11 +2604,11 @@ export default class Viewer {
         err: translator.lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFileName,
       });
-      return;
+      return false;
     }
     msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
     if (autoValidate && autoValidate.checked) {
@@ -2554,6 +2621,7 @@ export default class Viewer {
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
     console.log('New schema loaded for auto completion', schemaFileName);
     Viewer.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+    return true;
   } // replaceSchema()
 
   /**
@@ -2562,7 +2630,10 @@ export default class Viewer {
    */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      // clear validation error reports in CodeMirror
+      this.updateLinting(cm, []);
+    }
     // Remove schema from validator and hinting / code completion
     rngLoader.clearRelaxNGSchema();
     console.log('Schema removed from validator', this.currentSchema);
@@ -2577,7 +2648,7 @@ export default class Viewer {
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
     Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
@@ -2615,7 +2686,12 @@ export default class Viewer {
             let type = pathElements.pop();
             if (type.toLowerCase().includes('anystart')) type = 'any';
             let noChars = 3;
-            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) {
+              noChars = 4;
+            }
+            if (type.toLowerCase().includes('basic')) {
+              noChars = 5;
+            }
             let schemaVersion = pathElements.pop();
             el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
           } else {
@@ -2641,7 +2717,7 @@ export default class Viewer {
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.style.cursor = 'pointer';
     if (isSafari) {
       translator.handleBrowserExceptions('Safari');
@@ -2704,7 +2780,9 @@ export default class Viewer {
       });
       i += 1;
     }
-    this.updateLinting(cm, found);
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, found);
+    }
 
     // update overall status of validation
     let vs = document.getElementById('validation-status');
@@ -2718,11 +2796,11 @@ export default class Viewer {
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
       Viewer.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
-      vs.innerHTML = verified;
+      vs.innerHTML = icons.verified;
       msg = 'Everything ok, no errors.';
     } else {
       Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-      vs.innerHTML = alert;
+      vs.innerHTML = icons.alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
       messages.forEach((m) => (msg += '\nLine ' + m.line + ': ' + m.message));
@@ -3001,7 +3079,8 @@ export default class Viewer {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
       // decrement the first empty validation-item
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length - 1;
+      document.getElementById('codeCheckerInfoTotal').innerHTML =
+        document.querySelectorAll('.validation-item')?.length - 1;
     }
   } // finalizeCodeCheckerPanel()
 

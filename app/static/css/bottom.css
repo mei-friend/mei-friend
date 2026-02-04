@@ -40,6 +40,11 @@
   flex-direction: row;
 }
 
+#annotationToolTargetTypeSelector {
+  flex-direction: column !important;
+  width: fit-content;
+}
+
 #listAnnotations {
   flex-direction: column;
   overflow-y: auto;
@@ -47,4 +52,9 @@
 
 #markupToolsMenu {
   flex-direction: column;
+}
+
+#friendContainer:not(.pdfMode) .control-menu-overflow-content {
+  left: auto;
+  right: 0;
 }

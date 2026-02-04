@@ -692,6 +692,13 @@ export const lang = {
     text: 'Показувати прапорець режиму швидкості',
     description: 'Показувати прапорець режиму швидкості в панелі управління нотацією',
   },
+  notationControlMenuOverflowIcon: {
+    description: 'Показати додаткові кнопки керування',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Показати додаткові кнопки керування',
+  },
 
   // MIDI Playback
   titleMidiPlayback: {
