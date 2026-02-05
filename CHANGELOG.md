@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.2.11 patch
+### 1.3.0 Custom GitHub Action Configurations
 * Implement [#140](https://github.com/mei-friend/mei-friend/issues/140) to support custom GitHub Actions configurations
 
 ### 1.2.11 patch
