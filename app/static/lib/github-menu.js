@@ -896,7 +896,7 @@ async function handleClickGithubAction(e, gm) {
           // changes here should be reflected in the settings and vice versa
           githubActionsCustomConfigurationUrl.addEventListener('input', (ev) => {
             customConfigUrlSetting.value = ev.target.value;
-            customConfigUrlSetting.removeAttribute('data-json-response');
+            delete customConfigUrlSetting.dataset.jsonResponse;
             checkAndRetrieveJson(ev.target);
             // TODO potential race condition -- dataset will not be updated in the settings
           });
@@ -912,7 +912,7 @@ async function handleClickGithubAction(e, gm) {
         customTabPanel.insertAdjacentElement('beforeend', customContainer);
 
         const configUrlObserver = new MutationObserver(() => {
-          const resp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
+          const resp = githubActionsCustomConfigurationUrl.dataset.jsonResponse;
           if (!resp) {
             // clear all githubActionsCustomConfigParams
             customConfigParams.innerHTML = '';
@@ -931,12 +931,16 @@ async function handleClickGithubAction(e, gm) {
           attributeFilter: ['data-json-response'],
         });
 
-        const initialResp = githubActionsCustomConfigurationUrl.getAttribute('data-json-response');
-        let parsedInitialResp = initialResp in window ? JSON.parse(initialResp) : null;
+        const initialResp = githubActionsCustomConfigurationUrl.dataset.jsonResponse;
+        let parsedInitialResp;
+        try {
+          parsedInitialResp = JSON.parse(initialResp);
+        } catch (err) {
+          parsedInitialResp = null;
+        }
         if (parsedInitialResp) {
           try {
-            console.log('About to call fillCustom with initialResp ', parsedInitialResp);
-            fillCustomConfigParams(customConfigParams, parsedInitialResp);
+            fillCustomConfigParams(customConfigParams, JSON.parse(parsedInitialResp));
           } catch (err) {
             console.warn('githubActions custom config: could not parse initial data-json-response', err);
             // clear all githubActionsCustomConfigParams

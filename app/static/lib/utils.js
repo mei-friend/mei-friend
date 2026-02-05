@@ -94,19 +94,19 @@ export function checkAndRetrieveJson(el, delay = 600) {
       if (resolves) {
         try {
           const json = await resp.json();
-          el.dataset['jsonResponse'] = JSON.stringify(json);
-          console.log('Dataset jsonResponse set to: ', el.dataset['jsonResponse']);
+          el.dataset.jsonResponse = JSON.stringify(json);
+          console.log('Dataset jsonResponse set to: ', el.dataset.jsonResponse);
         } catch (err) {
           console.warn('checkAndRetrieveJson: could not parse JSON response', err, resp);
-          el.removeAttribute('data-json-response');
+          delete el.dataset.jsonResponse;
           el.classList.add('urlDoesNotResolve');
         }
       } else {
-        el.removeAttribute('data-json-response');
+        delete el.dataset.jsonResponse;
       }
     } catch (err) {
       resolves = false;
-      el.removeAttribute('data-json-response');
+      delete el.dataset.jsonResponse;
       el.classList.add('urlDoesNotResolve');
     }
     if (el.value) {
