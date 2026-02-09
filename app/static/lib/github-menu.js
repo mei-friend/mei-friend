@@ -1058,10 +1058,20 @@ async function handleClickGithubAction(e, gm) {
           progressInterval = null;
         }
       };
-      const renderWaitingStatus = (linkUrl = '', progressText = '') => {
+      const renderWaitingStatus = (linkUrl = '', progress = null) => {
         if (workflowFinished) return;
-        const linkHtml = linkUrl ? ` <a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
-        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}${progressText}</span>${linkHtml}`;
+        const progressHtml =
+          linkUrl && progress
+            ? `<a href="${linkUrl}" target="_blank" rel="noopener"><progress max="${progress.total}" value="${progress.completed}"></progress></a>`
+            : '';
+        const linkHtml = linkUrl ? `<a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
+        if (progressHtml) {
+          statusMsg.innerHTML += `<div class="githubActionsProgress">${progressHtml}</div>`;
+        }
+        if (linkHtml) {
+          statusMsg.innerHTML += `<div class="githubActionsProgressLink">${linkHtml}</div>`;
+        }
       };
       renderWaitingStatus();
       cancelBtn.setAttribute('disabled', true);
@@ -1095,7 +1105,10 @@ async function handleClickGithubAction(e, gm) {
                         }
                       });
                       if (totalSteps > 0) {
-                        renderWaitingStatus(workflowStartResp.html_url, ` (${completedSteps}/${totalSteps})`);
+                        renderWaitingStatus(workflowStartResp.html_url, {
+                          completed: completedSteps,
+                          total: totalSteps,
+                        });
                       }
                     }
                   } catch (err) {
