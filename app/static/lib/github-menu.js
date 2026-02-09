@@ -1049,7 +1049,18 @@ async function handleClickGithubAction(e, gm) {
         }
       }
       const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
-      statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
+      let progressInterval = null;
+      const clearProgressInterval = () => {
+        if (progressInterval) {
+          clearInterval(progressInterval);
+          progressInterval = null;
+        }
+      };
+      const renderWaitingStatus = (linkUrl = '', progressText = '') => {
+        const linkHtml = linkUrl ? ` <a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}${progressText}</span>${linkHtml}`;
+      };
+      renderWaitingStatus();
       cancelBtn.setAttribute('disabled', true);
       runBtn.setAttribute('disabled', true);
       ghLogo.classList.add('clockwise');
@@ -1066,12 +1077,35 @@ async function handleClickGithubAction(e, gm) {
           } else {
             gm.awaitActionWorkflowStart(workflowName.dataset.id, null, dispatchTime).then((workflowStartResp) => {
               if (workflowStartResp && workflowStartResp.html_url) {
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span> <a href="${workflowStartResp.html_url}" target="_blank" rel="noopener">${waitingLinkText}</a>`;
+                renderWaitingStatus(workflowStartResp.html_url);
+                const updateProgress = async () => {
+                  try {
+                    const jobsResp = await gm.getWorkflowJobs(workflowStartResp.id);
+                    if (jobsResp && Array.isArray(jobsResp.jobs)) {
+                      let totalSteps = 0;
+                      let completedSteps = 0;
+                      jobsResp.jobs.forEach((job) => {
+                        if (Array.isArray(job.steps)) {
+                          totalSteps += job.steps.length;
+                          completedSteps += job.steps.filter((s) => s.status === 'completed').length;
+                        }
+                      });
+                      if (totalSteps > 0) {
+                        renderWaitingStatus(workflowStartResp.html_url, ` (${completedSteps}/${totalSteps})`);
+                      }
+                    }
+                  } catch (err) {
+                    console.warn('Could not fetch workflow jobs for progress', err);
+                  }
+                };
+                updateProgress();
+                progressInterval = setInterval(updateProgress, 1000);
               }
               const runStartAt = workflowStartResp?.run_started_at || null;
               // poll on latest workflow run
               gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime).then(
                 (workflowCompletionResp) => {
+                  clearProgressInterval();
                   console.log('Got workflow completion resp: ', workflowCompletionResp);
                   if ('conclusion' in workflowCompletionResp) {
                     if (workflowCompletionResp.conclusion === 'success') {
@@ -1119,6 +1153,7 @@ async function handleClickGithubAction(e, gm) {
           cancelBtn.removeAttribute('disabled');
           runBtn.removeAttribute('disabled');
           ghLogo.classList.remove('clockwise');
+          clearProgressInterval();
         });
     }
   };

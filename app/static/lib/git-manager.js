@@ -627,6 +627,10 @@ export default class GitManager {
     return await this.cloud.getWorkflowRun(wfUri);
   }
 
+  async getWorkflowJobs(runId) {
+    return await this.cloud.getWorkflowJobs(runId);
+  }
+
   async getWorkflowInputs(path) {
     return await this.cloud.getWorkflowInputs(path);
   }

@@ -56,11 +56,34 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
+    this.githubRequestQueue = Promise.resolve();
+    this.githubLastRequestTime = 0;
+    this.githubMinIntervalMs = 500; // 2 requests per second
+  }
+
+  isGithubApiUrl(url) {
+    return this.providerType === 'github' && typeof url === 'string' && url.startsWith('https://api.github.com/');
+  }
+
+  githubFetch(url, options) {
+    if (!this.isGithubApiUrl(url)) return fetch(url, options);
+    const run = async () => {
+      const now = Date.now();
+      const waitMs = Math.max(0, this.githubMinIntervalMs - (now - this.githubLastRequestTime));
+      if (waitMs) {
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+      this.githubLastRequestTime = Date.now();
+      return fetch(url, options);
+    };
+    const queued = this.githubRequestQueue.then(run, run);
+    this.githubRequestQueue = queued.catch(() => {});
+    return queued;
   }
 
   async getOrgs() {
     // fetch all organizations the user belongs to from the cloud provider
-    return fetch(this.orgsUrl, {
+    return this.githubFetch(this.orgsUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -84,7 +107,7 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
-    return fetch(reposUrl, {
+    return this.githubFetch(reposUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -92,7 +115,7 @@ export default class GitCloudClient {
 
   async getRepos(per_page = 30, page = 1) {
     const reposUrl = `https://api.github.com/user/repos?per_page=${per_page}&page=${page}`;
-    return fetch(reposUrl, {
+    return this.githubFetch(reposUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -100,7 +123,7 @@ export default class GitCloudClient {
 
   async getRepoSize(repo) {
     const sizeUrl = `https://api.github.com/repos/${repo}`;
-    let size = await fetch(sizeUrl, {
+    let size = await this.githubFetch(sizeUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -110,7 +133,7 @@ export default class GitCloudClient {
   async getBranches(per_page = 30, page = 1, repo = this.repo) {
     // fetch all branches of the current repository from the cloud provider
     const branchesUrl = `https://api.github.com/repos/${repo}/branches?per_page=${per_page}&page=${page}`;
-    return fetch(branchesUrl, {
+    return this.githubFetch(branchesUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -126,10 +149,13 @@ export default class GitCloudClient {
     // this is a hack to get around the GitHub API caching (URL is unique every time)
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`, {
-          method: 'GET',
-          headers: this.apiHeaders,
-        }).then((res) => res.json());
+        return this.githubFetch(
+          `https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`,
+          {
+            method: 'GET',
+            headers: this.apiHeaders,
+          }
+        ).then((res) => res.json());
       case 'gitlab':
         return fetch(`https://gitlab.com/api/v4/projects/${repo}/repository/commits?ref_name=${branch}`, {
           method: 'GET',
@@ -166,7 +192,7 @@ export default class GitCloudClient {
     switch (this.providerType) {
       case 'github':
         // remove trailng slash from path
-        return fetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
+        return this.githubFetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());
@@ -203,7 +229,7 @@ export default class GitCloudClient {
     switch (this.providerType) {
       case 'github':
         // fetch the user's name and email from the GitHub API
-        return fetch('https://api.github.com/user', {
+        return this.githubFetch('https://api.github.com/user', {
           method: 'GET',
           headers: this.apiHeaders,
         })
@@ -315,7 +341,7 @@ export default class GitCloudClient {
     let body = 'This PR was automatically created using mei-friend';
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${this.gm.repo}/pulls`, {
+        return this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/pulls`, {
           method: 'POST',
           headers: this.apiHeaders,
           body: JSON.stringify({
@@ -380,7 +406,7 @@ export default class GitCloudClient {
       const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
       console.log('fetchFileContents: attempting to use fileContentsUrl ', fileContentsUrl);
       console.log('Using headers ', headers);
-      return await fetch(fileContentsUrl, {
+      return await this.githubFetch(fileContentsUrl, {
         method: 'GET',
         headers: headers,
       });
@@ -412,7 +438,7 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
-    await fetch(forksUrl, {
+    await this.githubFetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     })
@@ -438,7 +464,7 @@ export default class GitCloudClient {
               organization: forkTo,
             });
           }
-          await fetch(forksUrl, fetchRequestObject).then((res) => {
+          await this.githubFetch(forksUrl, fetchRequestObject).then((res) => {
             if (res.status <= 400) {
               res.json().then((userFork) => {
                 // switch to newly created fork
@@ -510,11 +536,20 @@ export default class GitCloudClient {
 
   // obtain details for a specified workflow run
   async getWorkflowRun(runUrl) {
-    return fetch(runUrl, {
+    return this.githubFetch(runUrl, {
       method: 'GET',
       headers: this.actionsHeaders,
     }).then((res) => res.json());
   } // getWorkflowRun()
+
+  async getWorkflowJobs(runId) {
+    const jobsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/runs/${runId}/jobs`;
+    return this.githubFetch(jobsUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+      cache: 'no-store',
+    }).then((res) => res.json());
+  } // getWorkflowJobs()
 
   async getActionWorkflowsList(per_page = 30, page = 1) {
     // TODO make this work for other git providers
@@ -523,7 +558,7 @@ export default class GitCloudClient {
       return;
     }
     const actionsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
-    return fetch(actionsUrl, {
+    return this.githubFetch(actionsUrl, {
       method: 'GET',
       headers: this.actionsHeaders,
     })
@@ -548,24 +583,27 @@ export default class GitCloudClient {
 
   async requestActionWorkflowRun(workflowId, inputs = {}) {
     const dispatchUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/dispatches`;
-    return fetch(dispatchUrl, {
+    return this.githubFetch(dispatchUrl, {
       method: 'POST',
       headers: this.actionsHeaders,
       body: JSON.stringify({
         ref: this.gm.branch,
         inputs: inputs,
       }),
-    }).then((res) => {
+    }).then(async (res) => {
       // return body as JSON object, but retain response status (for error detection)
       console.log('::::::', res);
       if (res.status === 204) {
         // no body on github 204 responses
         return res;
-      } else {
-        res.json().then((data) => {
-          return { status: res.status, body: data };
-        });
       }
+      let data;
+      try {
+        data = await res.json();
+      } catch (err) {
+        data = null;
+      }
+      return { status: res.status, body: data };
     });
   }
 
@@ -577,7 +615,7 @@ export default class GitCloudClient {
     const runsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/runs`;
     const author = await this.getAuthor();
     const head_sha = await this.gm.getLocalHeadSha();
-    return fetch(
+    return this.githubFetch(
       runsUrl +
         '?' +
         new URLSearchParams({
@@ -633,7 +671,7 @@ export default class GitCloudClient {
     const author = await this.getAuthor();
     const head_sha = await this.gm.getLocalHeadSha();
     console.log('head_sha: ', head_sha);
-    return fetch(
+    return this.githubFetch(
       runsUrl +
         '?' +
         new URLSearchParams({
