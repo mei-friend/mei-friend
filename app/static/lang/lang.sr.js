@@ -379,6 +379,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Копирај тренутну путању фајла у унос' },
   githubActionsInputSetterSelection: { text: 'Копирај тренутну MEI селекцију у унос' },
   githubActionsInputContainerHeader: { text: 'Конфигурација уноса' },
+  githubActionsWaitingOpenLink: { text: 'Пратите статус тока рада на GitHub-у' },
   githubActionsDisabledTooltip: {
     text: 'Отворите кодирање из овог репозиторијума да бисте покренули GitHub Actions токове рада.',
   },

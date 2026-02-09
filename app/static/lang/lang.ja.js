@@ -374,6 +374,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: '現在のファイルパスを入力にコピー' },
   githubActionsInputSetterSelection: { text: '現在のMEI選択範囲を入力にコピー' },
   githubActionsInputContainerHeader: { text: '入力設定' },
+  githubActionsWaitingOpenLink: { text: 'GitHub でワークフローの状態を確認' },
   githubActionsDisabledTooltip: {
     text: 'このリポジトリのエンコーディングを開いて GitHub Actions のワークフローを実行してください。',
   },

@@ -396,6 +396,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
+  githubActionsWaitingOpenLink: { text: 'Track workflow status on GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Open an encoding from this repository to run GitHub Actions workflows.',
   },

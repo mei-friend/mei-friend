@@ -395,6 +395,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
   githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
   githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
+  githubActionsWaitingOpenLink: { text: 'Fes seguiment de l’estat del flux de treball a GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Obriu una codificació d’aquest repositori per executar els fluxos de treball de GitHub Actions.',
   },

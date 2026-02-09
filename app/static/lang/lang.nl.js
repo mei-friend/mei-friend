@@ -383,6 +383,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Huidig bestandspad naar invoer kopiëren' },
   githubActionsInputSetterSelection: { text: 'Huidige MEI-selectie naar invoer kopiëren' },
   githubActionsInputContainerHeader: { text: 'Invoerconfiguratie' },
+  githubActionsWaitingOpenLink: { text: 'Workflowstatus volgen op GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Open een codering uit deze repository om GitHub Actions-workflows uit te voeren.',
   },

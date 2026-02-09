@@ -382,6 +382,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Kopii nunan dosieran vojon al enigo' },
   githubActionsInputSetterSelection: { text: 'Kopii nunan MEI-elekton al enigo' },
   githubActionsInputContainerHeader: { text: 'Eniga agordo' },
+  githubActionsWaitingOpenLink: { text: 'Sekvi la staton de la laborfluo en GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Malfermu kodigon el ĉi tiu deponejo por ruli GitHub Actions-laborfluojn.',
   },

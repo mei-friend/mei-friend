@@ -1048,10 +1048,13 @@ async function handleClickGithubAction(e, gm) {
           return;
         }
       }
+      const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
       statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
       cancelBtn.setAttribute('disabled', true);
       runBtn.setAttribute('disabled', true);
       ghLogo.classList.add('clockwise');
+      const dispatchTime = new Date().toISOString();
+      console.log('Dispatch time for workflow run:', dispatchTime);
       const actionInputs = repackagedInputs ? repackagedInputs : specifiedInputs;
       console.log('Requesting workflow run ' + workflowName.dataset.id + ' with inputs: ', actionInputs);
       gm.requestActionWorkflowRun(workflowName.dataset.id, actionInputs)
@@ -1061,42 +1064,50 @@ async function handleClickGithubAction(e, gm) {
             // error
             statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
           } else {
-            // poll on latest workflow run
-            gm.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
-              console.log('Got workflow completion resp: ', workflowCompletionResp);
-              if ('conclusion' in workflowCompletionResp) {
-                if (workflowCompletionResp.conclusion === 'success') {
-                  statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                  runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
-                  runBtn.removeAttribute('disabled');
-                  ghLogo.classList.remove('clockwise');
-                  runBtn.onclick = async () => {
-                    ghLogo.classList.add('clockwise');
-                    // do a pull to refresh the file
-                    await gm.pull();
-                    // redraw github menu to reflect changes in git log
-                    fillInCommitLog('withRefresh');
-                    console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
-                    loadFile();
-                    overlay.style.display = 'none';
-                    statusMsg.innerHTML = '';
-                    runBtn.innerText = translator.lang.githubActionsRunButton.text;
-                    cancelBtn.removeAttribute('disabled');
-                    ghLogo.classList.add('clockwise');
-                  };
-                } else {
-                  statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                  cancelBtn.removeAttribute('disabled');
-                  runBtn.removeAttribute('disabled');
-                  ghLogo.classList.remove('clockwise');
-                }
-              } else {
-                console.error('Invalid response received from GitHub API', workflowCompletionResp);
-                cancelBtn.removeAttribute('disabled');
-                runBtn.removeAttribute('disabled');
-                ghLogo.classList.remove('clockwise');
-                statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
+            gm.awaitActionWorkflowStart(workflowName.dataset.id, null, dispatchTime).then((workflowStartResp) => {
+              if (workflowStartResp && workflowStartResp.html_url) {
+                statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span> <a href="${workflowStartResp.html_url}" target="_blank" rel="noopener">${waitingLinkText}</a>`;
               }
+              const runStartAt = workflowStartResp?.run_started_at || null;
+              // poll on latest workflow run
+              gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime).then(
+                (workflowCompletionResp) => {
+                  console.log('Got workflow completion resp: ', workflowCompletionResp);
+                  if ('conclusion' in workflowCompletionResp) {
+                    if (workflowCompletionResp.conclusion === 'success') {
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                      runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
+                      runBtn.removeAttribute('disabled');
+                      ghLogo.classList.remove('clockwise');
+                      runBtn.onclick = async () => {
+                        ghLogo.classList.add('clockwise');
+                        // do a pull to refresh the file
+                        await gm.pull();
+                        // redraw github menu to reflect changes in git log
+                        fillInCommitLog('withRefresh');
+                        console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
+                        loadFile();
+                        overlay.style.display = 'none';
+                        statusMsg.innerHTML = '';
+                        runBtn.innerText = translator.lang.githubActionsRunButton.text;
+                        cancelBtn.removeAttribute('disabled');
+                        ghLogo.classList.add('clockwise');
+                      };
+                    } else {
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                      cancelBtn.removeAttribute('disabled');
+                      runBtn.removeAttribute('disabled');
+                      ghLogo.classList.remove('clockwise');
+                    }
+                  } else {
+                    console.error('Invalid response received from GitHub API', workflowCompletionResp);
+                    cancelBtn.removeAttribute('disabled');
+                    runBtn.removeAttribute('disabled');
+                    ghLogo.classList.remove('clockwise');
+                    statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
+                  }
+                }
+              );
             });
             //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
           }

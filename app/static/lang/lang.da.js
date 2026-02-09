@@ -387,6 +387,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Kopier nuværende filsti til input' },
   githubActionsInputSetterSelection: { text: 'Kopier nuværende MEI markering til input' },
   githubActionsInputContainerHeader: { text: 'Inputkonfiguration' },
+  githubActionsWaitingOpenLink: { text: 'Følg workflow-status på GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Åbn en kodning fra dette repository for at køre GitHub Actions-workflows.',
   },

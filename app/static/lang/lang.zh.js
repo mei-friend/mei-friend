@@ -368,6 +368,7 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: '复制当前文件路径到输入' },
   githubActionsInputSetterSelection: { text: '复制当前 MEI 选择到输入' },
   githubActionsInputContainerHeader: { text: '输入配置' },
+  githubActionsWaitingOpenLink: { text: '在 GitHub 上跟踪工作流状态' },
   githubActionsDisabledTooltip: {
     text: '请打开此仓库中的编码以运行 GitHub Actions 工作流。',
   },
