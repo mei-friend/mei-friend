@@ -388,6 +388,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Aktuellen Dateipfad in Eingabe kopieren' },
   githubActionsInputSetterSelection: { text: 'Aktuelle MEI-Auswahl in Eingabe kopieren' },
   githubActionsInputContainerHeader: { text: 'Eingabekonfiguration' },
+  githubActionsDisabledTooltip: {
+    text: 'Öffnen Sie eine Kodierung aus diesem Repository, um GitHub-Actions-Workflows auszuführen.',
+  },
 
   // fork modals
   forkRepoGithubText: { text: 'Github Repositorium Forken' },

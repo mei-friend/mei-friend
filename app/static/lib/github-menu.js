@@ -8,6 +8,7 @@ import {
   handleEncoding,
   isMEI,
   log,
+  meiFileLocation,
   meiFileName,
   openUrlFetch,
   setFileChangedState,
@@ -719,6 +720,10 @@ function showCloneErrorAlert(e) {
 
 function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById('actionsDividerStart');
+  const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
+  const disabledWorkflowTooltip =
+    translator?.lang?.githubActionsDisabledTooltip?.text ||
+    'Open an encoding from this repository to run GitHub Actions workflows.';
   if (actionsDivider) {
     resp.forEach((wf) => {
       if (wf.state === 'active') {
@@ -734,7 +739,19 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.innerText = 'GH Action: ' + wf.name;
         workflowSpan.classList.add('inline-block-tight', 'workflow');
         let workflowSpanContainer = document.createElement('a');
-        workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
+        if (hasMatchingGithubEncoding) {
+          workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
+        } else {
+          workflowSpanContainer.classList.add('workflow-disabled');
+          workflowSpan.classList.add('disabled');
+          workflowSpanContainer.setAttribute('aria-disabled', 'true');
+          workflowSpanContainer.title = disabledWorkflowTooltip;
+          workflowSpan.title = disabledWorkflowTooltip;
+          workflowSpanContainer.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          };
+        }
         workflowSpanContainer.insertAdjacentElement('beforeend', workflowSpan);
         actionsDivider.insertAdjacentElement('afterend', workflowSpanContainer);
       } else {

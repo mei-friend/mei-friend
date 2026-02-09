@@ -380,6 +380,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Скопіювати поточний шлях до файлу у вхідні дані' },
   githubActionsInputSetterSelection: { text: 'Скопіювати поточний вибір MEI до вхідних даних' },
   githubActionsInputContainerHeader: { text: 'Конфігурація вхідних даних' },
+  githubActionsDisabledTooltip: {
+    text: 'Відкрийте кодування з цього репозиторію, щоб запустити робочі процеси GitHub Actions.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Створити репозиторій на GitHub' },

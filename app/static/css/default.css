@@ -397,6 +397,10 @@ a:active {
   cursor: not-allowed;
 }
 
+.workflow-disabled {
+  cursor: not-allowed;
+}
+
 input.urlDoesNotResolve { 
   border: 3px solid var(--fileStatusWarnColor);
 }

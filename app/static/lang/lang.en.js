@@ -396,6 +396,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
+  githubActionsDisabledTooltip: {
+    text: 'Open an encoding from this repository to run GitHub Actions workflows.',
+  },
   githubActionsCustomContainerHeader: { text: 'Custom configuration' },
   githubActionsCustomContainerExplanation: {
     text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. ENTER DOCUMENTATION LINK HERE!',

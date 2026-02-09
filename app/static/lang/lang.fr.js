@@ -390,6 +390,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: "Copier le chemin du fichier actuel dans l'entrée" },
   githubActionsInputSetterSelection: { text: "Copier la sélection MEI actuelle dans l'entrée" },
   githubActionsInputContainerHeader: { text: "Configuration d'entrée" },
+  githubActionsDisabledTooltip: {
+    text: 'Ouvrez un encodage de ce dépôt pour exécuter des workflows GitHub Actions.',
+  },
 
   // fork modals / fenêtres modales de fork
   forkRepoGithubText: { text: 'Créer une copie du dépôt Github' },

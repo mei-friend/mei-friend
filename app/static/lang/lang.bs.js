@@ -390,6 +390,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: 'Kopiraj trenutnu putanju fajla u unos' },
   githubActionsInputSetterSelection: { text: 'Kopiraj trenutnu MEI selekciju u unos' },
   githubActionsInputContainerHeader: { text: 'Konfiguracija unosa' },
+  githubActionsDisabledTooltip: {
+    text: 'Otvorite kodiranje iz ovog repozitorija da biste pokrenuli GitHub Actions radne tokove.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Napravi kopiju GitHub repozitorijuma' },

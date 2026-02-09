@@ -398,6 +398,9 @@ export const lang = {
   githubActionsInputSetterFilepath: { text: "Copia il percorso del file corrente nell'input" },
   githubActionsInputSetterSelection: { text: "Copia la selezione MEI corrente nell'input" },
   githubActionsInputContainerHeader: { text: 'Configurazione input' },
+  githubActionsDisabledTooltip: {
+    text: 'Apri una codifica da questo repository per eseguire i workflow di GitHub Actions.',
+  },
 
   // fork modals / fork modals
   forkRepoGithubText: { text: 'Fork Repository Github' },
