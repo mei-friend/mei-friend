@@ -298,6 +298,10 @@ a:active {
   height: fit-content !important;
 }
 
+#githubActionsUI a {
+  color: var(--overlayLinkColor);
+}
+
 #githubActionsInputConfigContainer {
   width: 100%;
 }
