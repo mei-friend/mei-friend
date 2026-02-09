@@ -1040,16 +1040,13 @@ a:active {
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
-  border: 1px solid var(--dropdownBorderColor);
   border-radius: 4px;
   z-index: 20;
   font-style: bold;
-  align-items: center;
   width: fit-content;
-  height: 26px;
-  min-height: 26px;
-  max-height: 26px;
   margin: 0px 3px;
+  font-size: large;
+  padding-bottom: 4px;
 }
 
 .control-menu-fixed-right .topright {
@@ -1083,6 +1080,16 @@ a:active {
 n.b. if there are choices available, they are wrapped within an optgroup element*/
 #choiceControls select:has(> option:only-child) {
   display: none;
+}
+
+/* Hide the choice controls wrapper by default */
+#choiceControls {
+  display: none;
+}
+
+/* Show the wrapper when any optgroup exists in its descendants */
+#choiceControls:has(optgroup) {
+  display: flex;
 }
 
 .controls {
