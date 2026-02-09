@@ -86,7 +86,11 @@ export function findNotes(elId) {
 export function checkAndRetrieveJson(el, delay = 600) {
   if (!el) return null;
   return setTimeout(async () => {
-    el.classList.remove('urlResolves', 'urlDoesNotResolve');
+    if (!el.value) {
+      el.classList.remove('urlResolves', 'urlDoesNotResolve');
+      delete el.dataset.jsonResponse;
+      return;
+    }
     let resolves = false;
     try {
       const resp = await fetch(el.value);
