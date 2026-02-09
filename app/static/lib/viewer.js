@@ -1673,6 +1673,10 @@ export default class Viewer {
         }
       });
     }
+    const customConfigInput = document.getElementById('supplyCustomGithubActionsConfiguration');
+    if (customConfigInput && customConfigInput.value) {
+      utils.checkAndRetrieveJson(customConfigInput, 0);
+    }
   } // addMeiFriendOptionsToSettingsPanel()
 
   /**
@@ -2105,6 +2109,9 @@ export default class Viewer {
         input.setAttribute('value', normalizedStringValue);
         input.setAttribute('placeholder', o.placeholder ? o.placeholder : '');
         input.setAttribute('size', o.size ? o.size : '30');
+        if (opt === 'supplyCustomGithubActionsConfiguration' && normalizedStringValue) {
+          utils.checkAndRetrieveJson(input, 0);
+        }
         break;
       default:
         console.log(
