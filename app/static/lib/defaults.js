@@ -1051,7 +1051,7 @@ export const meiFriendSettingsOptions = {
     description: 'Use a custom GitHub Actions workflow configuration file',
     type: 'string',
     placeholder: 'https://...',
-    default: false,
+    default: '',
   },
 }; // meiFriendSettingsOptions object
 

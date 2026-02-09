@@ -905,9 +905,16 @@ async function handleClickGithubAction(e, gm) {
         const githubActionsCustomConfigurationUrl = document.createElement('input');
         githubActionsCustomConfigurationUrl.setAttribute('type', 'text');
         githubActionsCustomConfigurationUrl.setAttribute('id', 'githubActionsCustomConfigurationUrl');
+        githubActionsCustomConfigurationUrl.classList.add('preventKeyBindings');
         const customConfigUrlSetting = document.getElementById('supplyCustomGithubActionsConfiguration');
         if (customConfigUrlSetting) {
-          githubActionsCustomConfigurationUrl.setAttribute('value', customConfigUrlSetting.value);
+          const initialUrlValue =
+            customConfigUrlSetting.value === false ||
+            customConfigUrlSetting.value === 'false' ||
+            customConfigUrlSetting.value == null
+              ? ''
+              : customConfigUrlSetting.value;
+          githubActionsCustomConfigurationUrl.setAttribute('value', initialUrlValue);
           githubActionsCustomConfigurationUrl.setAttribute('placeholder', customConfigUrlSetting.placeholder);
           githubActionsCustomConfigurationUrl.dataset.jsonResponse = customConfigUrlSetting.dataset.jsonResponse;
           // changes here should be reflected in the settings and vice versa
@@ -1357,6 +1364,7 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   const inputField = document.createElement('input');
   inputField.setAttribute('type', 'text');
   inputField.classList.add('githubActionsInputField');
+  inputField.classList.add('preventKeyBindings');
   inputField.dataset.input = input;
   inputField.setAttribute('id', 'githubActionsInputField_' + input);
   if ('default' in inputs[input]) {

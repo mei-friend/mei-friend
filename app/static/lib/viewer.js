@@ -2097,7 +2097,12 @@ export default class Viewer {
         input.setAttribute('type', 'text');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        input.setAttribute('value', optDefault);
+        if (opt === 'supplyCustomGithubActionsConfiguration') {
+          input.classList.add('preventKeyBindings');
+        }
+        const normalizedStringValue =
+          optDefault === false || optDefault === 'false' || optDefault == null ? '' : optDefault;
+        input.setAttribute('value', normalizedStringValue);
         input.setAttribute('placeholder', o.placeholder ? o.placeholder : '');
         input.setAttribute('size', o.size ? o.size : '30');
         break;
