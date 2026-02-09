@@ -423,10 +423,12 @@ export default class Viewer {
     });
     if (choiceXpath.length > 0) {
       this.vrvOptions.choiceXPathQuery = choiceXpath;
+    } else {
+      delete this.vrvOptions.choiceXPathQuery;
     }
     // handle subst translation to Verovio options
     let substXpath = [];
-    if (substSelect && substSelect.selectedOptions.length > 0) {
+    if (substSelect && substSelect.selectedOptions.length > 0 && substSelect.value !== '') {
       substXpath = ['./' + substSelect.value];
     }
     console.log('substXpath: ', substXpath);
@@ -434,6 +436,8 @@ export default class Viewer {
     console.log('substSelect.selectedOptions: ', substSelect.selectedOptions);
     if (substXpath.length > 0) {
       this.vrvOptions.substXPathQuery = substXpath;
+    } else {
+      delete this.vrvOptions.substXPathQuery;
     }
     console.log('!!!! ', this.vrvOptions);
     // update page dimensions, only if not in pdf mode
