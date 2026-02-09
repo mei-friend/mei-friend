@@ -59,6 +59,7 @@ export default class GitCloudClient {
     this.githubRequestQueue = Promise.resolve();
     this.githubLastRequestTime = 0;
     this.githubMinIntervalMs = 500; // 2 requests per second
+    this.githubDispatchGraceMs = 60000; // allow 60s clock skew for dispatch filtering
   }
 
   isGithubApiUrl(url) {
@@ -593,9 +594,10 @@ export default class GitCloudClient {
     }).then(async (res) => {
       // return body as JSON object, but retain response status (for error detection)
       console.log('::::::', res);
+      const dispatchTime = res.headers?.get('Date') || new Date().toISOString();
       if (res.status === 204) {
         // no body on github 204 responses
-        return res;
+        return { status: res.status, dispatchTime };
       }
       let data;
       try {
@@ -603,7 +605,7 @@ export default class GitCloudClient {
       } catch (err) {
         data = null;
       }
-      return { status: res.status, body: data };
+      return { status: res.status, body: data, dispatchTime };
     });
   }
 
@@ -636,7 +638,13 @@ export default class GitCloudClient {
           let runs = resJson.workflow_runs.filter((w) => w.event === 'workflow_dispatch');
           if (dispatchTime) {
             const dispatchMs = new Date(dispatchTime).getTime();
-            runs = runs.filter((w) => new Date(w.created_at).getTime() >= dispatchMs);
+            if (!Number.isNaN(dispatchMs)) {
+              const lowerBound = dispatchMs - this.githubDispatchGraceMs;
+              const filtered = runs.filter((w) => new Date(w.created_at).getTime() >= lowerBound);
+              if (filtered.length) {
+                runs = filtered;
+              }
+            }
           }
           if (runStartAt) {
             let runsAt = runs.filter((w) => w.run_started_at === runStartAt);
@@ -655,11 +663,25 @@ export default class GitCloudClient {
       });
   }
 
-  async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null) {
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null, runUrl = null) {
     // TODO make this work for other git providers
     if (!this.providerType === 'github') {
       console.warn('awaitActionWorkflowCompletion() only works for GitHub');
       return;
+    }
+    if (runUrl) {
+      return this.githubFetch(runUrl, {
+        method: 'GET',
+        headers: this.actionsHeaders,
+        cache: 'no-store',
+      })
+        .then((res) => res.json())
+        .then((run) => {
+          if (run && 'status' in run && run.status === 'completed') {
+            return run;
+          }
+          return this.awaitActionWorkflowCompletion(workflowId, runStartAt, dispatchTime, runUrl);
+        });
     }
     // Wait until the created workflow has completed or failed
     // n.b.: unfortunately, because workflow dispatch is implemented as a Web Hook on the GitHub side,
@@ -692,7 +714,13 @@ export default class GitCloudClient {
           let runs = resJson.workflow_runs.filter((w) => w.event === 'workflow_dispatch');
           if (dispatchTime) {
             const dispatchMs = new Date(dispatchTime).getTime();
-            runs = runs.filter((w) => new Date(w.created_at).getTime() >= dispatchMs);
+            if (!Number.isNaN(dispatchMs)) {
+              const lowerBound = dispatchMs - this.githubDispatchGraceMs;
+              const filtered = runs.filter((w) => new Date(w.created_at).getTime() >= lowerBound);
+              if (filtered.length) {
+                runs = filtered;
+              }
+            }
           }
           if (runStartAt) {
             // start time specified -- use it to find our run of interest
@@ -713,10 +741,10 @@ export default class GitCloudClient {
             return run; // done
           } else if (run && 'status' in run) {
             // recur
-            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at, dispatchTime);
+            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at, dispatchTime, null);
           } else {
             console.error('Received unexpected response to workflow runs request, retrying:', resJson);
-            return this.awaitActionWorkflowCompletion(workflowId, null, dispatchTime);
+            return this.awaitActionWorkflowCompletion(workflowId, null, dispatchTime, null);
           }
         } else {
           console.error('Received unexpected response to workflow runs request:', resJson);

@@ -865,6 +865,7 @@ async function handleClickGithubAction(e, gm) {
         return;
       }
       const keys = Object.keys(inputs);
+      workflowName.dataset.inputKeys = JSON.stringify(keys);
       if (keys.length) {
         const tabsWrapper = document.createElement('div');
         tabsWrapper.classList.add('githubActionsTabs');
@@ -1050,6 +1051,7 @@ async function handleClickGithubAction(e, gm) {
       }
       const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
       let progressInterval = null;
+      let workflowFinished = false;
       const clearProgressInterval = () => {
         if (progressInterval) {
           clearInterval(progressInterval);
@@ -1057,6 +1059,7 @@ async function handleClickGithubAction(e, gm) {
         }
       };
       const renderWaitingStatus = (linkUrl = '', progressText = '') => {
+        if (workflowFinished) return;
         const linkHtml = linkUrl ? ` <a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
         statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}${progressText}</span>${linkHtml}`;
       };
@@ -1064,13 +1067,13 @@ async function handleClickGithubAction(e, gm) {
       cancelBtn.setAttribute('disabled', true);
       runBtn.setAttribute('disabled', true);
       ghLogo.classList.add('clockwise');
-      const dispatchTime = new Date().toISOString();
-      console.log('Dispatch time for workflow run:', dispatchTime);
       const actionInputs = repackagedInputs ? repackagedInputs : specifiedInputs;
       console.log('Requesting workflow run ' + workflowName.dataset.id + ' with inputs: ', actionInputs);
       gm.requestActionWorkflowRun(workflowName.dataset.id, actionInputs)
         .then((workflowRunResp) => {
           console.log('Got workflow run response: ', workflowRunResp);
+          const dispatchTime = workflowRunResp?.dispatchTime || new Date().toISOString();
+          console.log('Dispatch time for workflow run:', dispatchTime);
           if (workflowRunResp.status >= 400) {
             // error
             statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
@@ -1080,6 +1083,7 @@ async function handleClickGithubAction(e, gm) {
                 renderWaitingStatus(workflowStartResp.html_url);
                 const updateProgress = async () => {
                   try {
+                    if (workflowFinished) return;
                     const jobsResp = await gm.getWorkflowJobs(workflowStartResp.id);
                     if (jobsResp && Array.isArray(jobsResp.jobs)) {
                       let totalSteps = 0;
@@ -1102,13 +1106,15 @@ async function handleClickGithubAction(e, gm) {
                 progressInterval = setInterval(updateProgress, 1000);
               }
               const runStartAt = workflowStartResp?.run_started_at || null;
+              const runUrl = workflowStartResp?.url || null;
               // poll on latest workflow run
-              gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime).then(
+              gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime, runUrl).then(
                 (workflowCompletionResp) => {
                   clearProgressInterval();
                   console.log('Got workflow completion resp: ', workflowCompletionResp);
                   if ('conclusion' in workflowCompletionResp) {
                     if (workflowCompletionResp.conclusion === 'success') {
+                      workflowFinished = true;
                       statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
                       runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                       runBtn.removeAttribute('disabled');
@@ -1128,12 +1134,14 @@ async function handleClickGithubAction(e, gm) {
                         ghLogo.classList.add('clockwise');
                       };
                     } else {
+                      workflowFinished = true;
                       statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
                       cancelBtn.removeAttribute('disabled');
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');
                     }
                   } else {
+                    workflowFinished = true;
                     console.error('Invalid response received from GitHub API', workflowCompletionResp);
                     cancelBtn.removeAttribute('disabled');
                     runBtn.removeAttribute('disabled');
