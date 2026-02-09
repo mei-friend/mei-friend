@@ -402,11 +402,11 @@ a:active {
 }
 
 input.urlDoesNotResolve { 
-  border: 3px solid var(--fileStatusWarnColor);
+  border: 3px solid #c62828;
 }
 
 input.urlResolves {
-  border: 3px solid var(--fileStatusColor);
+  border: 3px solid #2e7d32;
 }
 
 .openUrlOverlay a,
