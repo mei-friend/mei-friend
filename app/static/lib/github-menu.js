@@ -718,12 +718,19 @@ function showCloneErrorAlert(e) {
   ]);*/
 }
 
-function handleWorkflowsListReceived(resp) {
+async function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById('actionsDividerStart');
   const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
   const disabledWorkflowTooltip =
     translator?.lang?.githubActionsDisabledTooltip?.text ||
     'Open an encoding from this repository to run GitHub Actions workflows.';
+  const dirtyWorkflowTooltip =
+    translator?.lang?.githubActionsDisabledDirtyTooltip?.text ||
+    'Commit or discard your local changes to run GitHub Actions workflows.';
+  const hasUncommittedChanges =
+    typeof gm.hasUncommittedChanges === 'function' ? await gm.hasUncommittedChanges() : await gm.fileChanged();
+  const disableForRepo = !hasMatchingGithubEncoding;
+  const disableForDirty = hasMatchingGithubEncoding && hasUncommittedChanges;
   if (actionsDivider) {
     resp.forEach((wf) => {
       if (wf.state === 'active') {
@@ -739,18 +746,24 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.innerText = 'GH Action: ' + wf.name;
         workflowSpan.classList.add('inline-block-tight', 'workflow');
         let workflowSpanContainer = document.createElement('a');
-        if (hasMatchingGithubEncoding) {
-          workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
-        } else {
+        workflowSpanContainer.onclick = (e) => {
+          if (
+            workflowSpanContainer.classList.contains('workflow-disabled') ||
+            workflowSpanContainer.getAttribute('aria-disabled') === 'true'
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          handleClickGithubAction(e, gm);
+        };
+        if (disableForRepo || disableForDirty) {
+          const tooltipText = disableForRepo ? disabledWorkflowTooltip : dirtyWorkflowTooltip;
           workflowSpanContainer.classList.add('workflow-disabled');
           workflowSpan.classList.add('disabled');
           workflowSpanContainer.setAttribute('aria-disabled', 'true');
-          workflowSpanContainer.title = disabledWorkflowTooltip;
-          workflowSpan.title = disabledWorkflowTooltip;
-          workflowSpanContainer.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          };
+          workflowSpanContainer.title = tooltipText;
+          workflowSpan.title = tooltipText;
         }
         workflowSpanContainer.insertAdjacentElement('beforeend', workflowSpan);
         actionsDivider.insertAdjacentElement('afterend', workflowSpanContainer);
@@ -767,6 +780,10 @@ function handleWorkflowsListReceived(resp) {
         actionsContentDivider.classList.add('actionsDivider');
         firstBranchContents.insertAdjacentElement('beforebegin', actionsContentDivider);
       }
+    }
+    const actionsContainer = actionsDivider.parentElement;
+    if (actionsContainer) {
+      actionsContainer.classList.toggle('notAllowed', disableForRepo || disableForDirty);
     }
   }
   // show or hide GitHub actions depending on user preference

@@ -399,6 +399,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Obriu una codificació d’aquest repositori per executar els fluxos de treball de GitHub Actions.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Confirmeu els canvis locals per executar els fluxos de treball de GitHub Actions.',
+  },
 
   // fork modals // forquilles modals
   forkRepoGithubText: { text: 'Fer una forquilla del repositori de Github' },

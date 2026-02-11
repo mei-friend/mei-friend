@@ -427,6 +427,20 @@ export default class GitManager {
     });
   }
 
+  async hasUncommittedChanges() {
+    try {
+      const matrix = await git.statusMatrix({
+        fs,
+        dir: this.directory,
+        ref: this.branch,
+      });
+      return matrix.some(([, head, workdir, stage]) => head !== workdir || workdir !== stage);
+    } catch (err) {
+      console.warn('git-manager: could not determine uncommitted changes', err);
+      return false;
+    }
+  }
+
   async fileChanged(path = this.filepath, status) {
     let fileChanged;
     if (!status) {

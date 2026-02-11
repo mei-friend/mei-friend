@@ -386,6 +386,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Malfermu kodigon el ĉi tiu deponejo por ruli GitHub Actions-laborfluojn.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Enmetu viajn lokajn ŝanĝojn por ruli GitHub Actions-laborfluojn.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Branĉi GitHub deponejon' },

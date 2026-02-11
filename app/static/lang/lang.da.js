@@ -391,6 +391,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Åbn en kodning fra dette repository for at køre GitHub Actions-workflows.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commit dine lokale ændringer for at køre GitHub Actions-workflows.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github repository' },

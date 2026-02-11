@@ -378,6 +378,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'このリポジトリのエンコーディングを開いて GitHub Actions のワークフローを実行してください。',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'GitHub Actions のワークフローを実行するにはローカルの変更をコミットしてください。',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'GitHubリポジトリをフォーク' },

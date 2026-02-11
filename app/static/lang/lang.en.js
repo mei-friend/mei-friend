@@ -400,6 +400,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Open an encoding from this repository to run GitHub Actions workflows.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commit your local changes to run GitHub Actions workflows.',
+  },
   githubActionsCustomContainerHeader: { text: 'Custom configuration' },
   githubActionsCustomContainerExplanation: {
     text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. ENTER DOCUMENTATION LINK HERE!',

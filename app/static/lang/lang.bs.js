@@ -394,6 +394,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Otvorite kodiranje iz ovog repozitorija da biste pokrenuli GitHub Actions radne tokove.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commitajte lokalne promjene da biste pokrenuli GitHub Actions radne tokove.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Napravi kopiju GitHub repozitorijuma' },

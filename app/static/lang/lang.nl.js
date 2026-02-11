@@ -387,6 +387,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Open een codering uit deze repository om GitHub Actions-workflows uit te voeren.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commit uw lokale wijzigingen om GitHub Actions-workflows uit te voeren.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github-repository' },

@@ -372,6 +372,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: '请打开此仓库中的编码以运行 GitHub Actions 工作流。',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: '请提交本地更改以运行 GitHub Actions 工作流。',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github 仓库' },

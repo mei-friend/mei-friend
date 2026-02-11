@@ -384,6 +384,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Відкрийте кодування з цього репозиторію, щоб запустити робочі процеси GitHub Actions.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Зафіксуйте локальні зміни, щоб запускати робочі процеси GitHub Actions.',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Створити репозиторій на GitHub' },

@@ -394,6 +394,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Ouvrez un encodage de ce dépôt pour exécuter des workflows GitHub Actions.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Validez vos modifications locales pour exécuter des workflows GitHub Actions.',
+  },
 
   // fork modals / fenêtres modales de fork
   forkRepoGithubText: { text: 'Créer une copie du dépôt Github' },

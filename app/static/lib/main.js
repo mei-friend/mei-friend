@@ -201,13 +201,43 @@ export async function setFileChangedState(fileChangedState) {
     let actionsWorkflows = document.querySelectorAll('.workflow');
     if (commitUI) setCommitUIEnabledStatus();
     if (actionsWorkflows) {
-      if (await gm.fileChanged()) {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
-      } else {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.remove('notAllowed'));
-      }
+      const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
+      const disabledWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledTooltip?.text ||
+        'Open an encoding from this repository to run GitHub Actions workflows.';
+      const dirtyWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledDirtyTooltip?.text ||
+        'Commit your local changes to run GitHub Actions workflows.';
+      const hasUncommittedChanges =
+        typeof gm.hasUncommittedChanges === 'function' ? await gm.hasUncommittedChanges() : await gm.fileChanged();
+      const disableForRepo = !hasMatchingGithubEncoding;
+      const disableForDirty = hasMatchingGithubEncoding && hasUncommittedChanges;
+      const disableActions = disableForRepo || disableForDirty;
+      actionsWorkflows.forEach((el) => {
+        const container = el.parentElement;
+        const actionsContainer = container?.parentElement;
+        if (disableActions) {
+          const tooltipText = disableForRepo ? disabledWorkflowTooltip : dirtyWorkflowTooltip;
+          if (container) {
+            container.classList.add('workflow-disabled');
+            container.classList.remove('disabled');
+            container.setAttribute('aria-disabled', 'true');
+            container.title = tooltipText;
+          }
+          el.classList.add('disabled');
+          el.title = tooltipText;
+        } else {
+          if (container) {
+            container.classList.remove('workflow-disabled');
+            container.classList.remove('disabled');
+            container.removeAttribute('aria-disabled');
+            container.removeAttribute('title');
+          }
+          el.classList.remove('disabled');
+          el.title = el.dataset?.url || '';
+        }
+        if (actionsContainer) actionsContainer.classList.toggle('notAllowed', disableActions);
+      });
     }
   }
   if (storage.supported) {

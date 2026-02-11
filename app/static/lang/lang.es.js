@@ -392,6 +392,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Abra una codificación de este repositorio para ejecutar flujos de trabajo de GitHub Actions.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Confirme sus cambios locales para ejecutar los flujos de trabajo de GitHub Actions.',
+  },
 
   // modales de fork
   forkRepoGithubText: { text: 'Hacer un fork del repositorio de Github' },

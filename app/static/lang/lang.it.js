@@ -402,6 +402,9 @@ export const lang = {
   githubActionsDisabledTooltip: {
     text: 'Apri una codifica da questo repository per eseguire i workflow di GitHub Actions.',
   },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Esegui il commit delle modifiche locali per eseguire i workflow di GitHub Actions.',
+  },
 
   // fork modals / fork modals
   forkRepoGithubText: { text: 'Fork Repository Github' },
