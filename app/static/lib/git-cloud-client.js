@@ -568,6 +568,14 @@ export default class GitCloudClient {
     });
   } // getWorkflowJobLogs()
 
+  async cancelWorkflowRun(runId) {
+    const cancelUrl = `https://api.github.com/repos/${this.gm.repo}/actions/runs/${runId}/cancel`;
+    return this.githubFetch(cancelUrl, {
+      method: 'POST',
+      headers: this.actionsHeaders,
+    }).then((res) => res);
+  } // cancelWorkflowRun()
+
   async getActionWorkflowsList(per_page = 30, page = 1) {
     // TODO make this work for other git providers
     if (!this.providerType === 'github') {

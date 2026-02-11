@@ -1052,6 +1052,7 @@ async function handleClickGithubAction(e, gm) {
       const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
       let progressInterval = null;
       let workflowFinished = false;
+      let cancelRequested = false;
       const escapeHtml = (value) =>
         String(value)
           .replace(/&/g, '&amp;')
@@ -1114,19 +1115,28 @@ async function handleClickGithubAction(e, gm) {
           progressInterval = null;
         }
       };
-      const renderWaitingStatus = (linkUrl = '', progress = null) => {
+      const renderWaitingStatus = (linkUrl = '', progress = null, onCancel = null) => {
         if (workflowFinished) return;
-        const progressHtml =
-          linkUrl && progress
-            ? `<a href="${linkUrl}" target="_blank" rel="noopener"><progress max="${progress.total}" value="${progress.completed}"></progress></a>`
+        const showProgress = linkUrl && progress && !cancelRequested;
+        const progressHtml = showProgress
+          ? `<a href="${linkUrl}" target="_blank" rel="noopener"><progress max="${progress.total}" value="${progress.completed}"></progress></a>`
+          : '';
+        const cancelHtml =
+          linkUrl && onCancel && !cancelRequested
+            ? `<button id="githubActionsCancelRun" type="button">${translator.lang.githubActionsCancelButton.text}</button>`
             : '';
+        const cancelingHtml = linkUrl && cancelRequested ? `<div class="githubActionsSummaryLoading"></div>` : '';
         const linkHtml = linkUrl ? `<a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
         statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
-        if (progressHtml) {
-          statusMsg.innerHTML += `<div class="githubActionsProgress">${progressHtml}</div>`;
+        if (showProgress || cancelingHtml) {
+          statusMsg.innerHTML += `<div class="githubActionsProgress">${progressHtml}${cancelHtml}${cancelingHtml}</div>`;
         }
         if (linkHtml) {
           statusMsg.innerHTML += `<div class="githubActionsProgressLink">${linkHtml}</div>`;
+        }
+        if (onCancel) {
+          const cancelRunBtn = document.getElementById('githubActionsCancelRun');
+          if (cancelRunBtn) cancelRunBtn.onclick = onCancel;
         }
       };
       renderWaitingStatus();
@@ -1149,7 +1159,7 @@ async function handleClickGithubAction(e, gm) {
                 renderWaitingStatus(workflowStartResp.html_url);
                 const updateProgress = async () => {
                   try {
-                    if (workflowFinished) return;
+                    if (workflowFinished || cancelRequested) return;
                     const jobsResp = await gm.getWorkflowJobs(workflowStartResp.id);
                     if (jobsResp && Array.isArray(jobsResp.jobs)) {
                       let totalSteps = 0;
@@ -1161,10 +1171,29 @@ async function handleClickGithubAction(e, gm) {
                         }
                       });
                       if (totalSteps > 0) {
-                        renderWaitingStatus(workflowStartResp.html_url, {
-                          completed: completedSteps,
-                          total: totalSteps,
-                        });
+                        renderWaitingStatus(
+                          workflowStartResp.html_url,
+                          {
+                            completed: completedSteps,
+                            total: totalSteps,
+                          },
+                          async () => {
+                            try {
+                              const cancelResp = await gm.cancelWorkflowRun(workflowStartResp.id);
+                              if (cancelResp && cancelResp.status >= 400) {
+                                statusMsg.innerHTML += `<div class="githubActionsCancelError">Cancel failed</div>`;
+                              } else {
+                                cancelRequested = true;
+                                renderWaitingStatus(workflowStartResp.html_url, {
+                                  completed: completedSteps,
+                                  total: totalSteps,
+                                });
+                              }
+                            } catch (err) {
+                              console.warn('Could not cancel workflow run', err);
+                            }
+                          }
+                        );
                       }
                     }
                   } catch (err) {

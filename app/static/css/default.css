@@ -414,20 +414,42 @@ a:active {
   line-height: 1.2;
 }
 
+.githubActionsProgress {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.githubActionsProgress progress {
+  flex: 1 1 auto;
+}
+
+#githubActionsCancelRun {
+  flex: 0 0 auto;
+}
+
 .githubActionsSummaryLoading::after {
-  content: '…';
+  content: '.';
   display: inline-block;
-  animation: githubActionsEllipsis 1s steps(3, end) infinite;
+  animation: githubActionsEllipsis 3s steps(3, end) infinite;
   color: var(--textColor);
   opacity: 0.7;
   margin-top: 0.25em;
 }
 
 @keyframes githubActionsEllipsis {
-  0% { content: '…'; }
-  33% { content: '……'; }
-  66% { content: '………'; }
-  100% { content: '…'; }
+  0% { content: '...'; }
+  30% { content: '·..'; }
+  35% { content: '...'; }
+  40% { content: '.·.';} 
+  45% { content: '...'; }
+  50% { content: '..·'; }
+  55% { content: '...';}
+  70% { content: '..·'; }
+  75% { content: '...'; }
+  80% { content: '.·.'; }
+  85% { content: '...'; }
+  90% { content: '·..'; }
 }
 
 .dropdownContent a.disabled {
