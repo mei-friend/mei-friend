@@ -1053,6 +1053,7 @@ async function handleClickGithubAction(e, gm) {
       let progressInterval = null;
       let workflowFinished = false;
       let cancelRequested = false;
+      let cancelInFlight = false;
       const escapeHtml = (value) =>
         String(value)
           .replace(/&/g, '&amp;')
@@ -1136,7 +1137,17 @@ async function handleClickGithubAction(e, gm) {
         }
         if (onCancel) {
           const cancelRunBtn = document.getElementById('githubActionsCancelRun');
-          if (cancelRunBtn) cancelRunBtn.onclick = onCancel;
+          if (cancelRunBtn) {
+            cancelRunBtn.onclick = async (ev) => {
+              if (!ev?.isTrusted || cancelInFlight || cancelRequested) return;
+              cancelInFlight = true;
+              try {
+                await onCancel();
+              } finally {
+                cancelInFlight = false;
+              }
+            };
+          }
         }
       };
       renderWaitingStatus();
@@ -1180,14 +1191,16 @@ async function handleClickGithubAction(e, gm) {
                           async () => {
                             try {
                               const cancelResp = await gm.cancelWorkflowRun(workflowStartResp.id);
-                              if (cancelResp && cancelResp.status >= 400) {
+                              if (!cancelResp || cancelResp.status >= 400) {
                                 statusMsg.innerHTML += `<div class="githubActionsCancelError">Cancel failed</div>`;
                               } else {
-                                cancelRequested = true;
-                                renderWaitingStatus(workflowStartResp.html_url, {
-                                  completed: completedSteps,
-                                  total: totalSteps,
-                                });
+                                if (cancelResp.status === 202 || cancelResp.status === 204) {
+                                  cancelRequested = true;
+                                  renderWaitingStatus(workflowStartResp.html_url, {
+                                    completed: completedSteps,
+                                    total: totalSteps,
+                                  });
+                                }
                               }
                             } catch (err) {
                               console.warn('Could not cancel workflow run', err);
