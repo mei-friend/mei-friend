@@ -552,6 +552,22 @@ export default class GitCloudClient {
     }).then((res) => res.json());
   } // getWorkflowJobs()
 
+  async getWorkflowJobLogs(jobId) {
+    const logsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/jobs/${jobId}/logs`;
+    return this.githubFetch(logsUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+      cache: 'no-store',
+    }).then(async (res) => {
+      const contentType = res.headers?.get('content-type') || '';
+      if (contentType.includes('zip') || contentType.includes('octet-stream')) {
+        return { type: 'binary', text: null };
+      }
+      const text = await res.text();
+      return { type: 'text', text };
+    });
+  } // getWorkflowJobLogs()
+
   async getActionWorkflowsList(per_page = 30, page = 1) {
     // TODO make this work for other git providers
     if (!this.providerType === 'github') {

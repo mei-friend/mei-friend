@@ -298,6 +298,11 @@ a:active {
   height: fit-content !important;
 }
 
+#githubActionsUI.githubActionsCentered {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 #githubActionsUI a {
   color: var(--overlayLinkColor);
 }
@@ -391,6 +396,38 @@ a:active {
 
 .githubActionsInputField {
   width: 95%;
+}
+
+.githubActionsJobSummary {
+  max-height: 10em;
+  overflow-y: auto;
+  margin-top: 0.5em;
+  padding: 0.25em 0.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 6px;
+  background-color: var(--dropdownBackgroundColor);
+}
+
+.githubActionsJobSummary pre {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.2;
+}
+
+.githubActionsSummaryLoading::after {
+  content: '…';
+  display: inline-block;
+  animation: githubActionsEllipsis 1s steps(3, end) infinite;
+  color: var(--textColor);
+  opacity: 0.7;
+  margin-top: 0.25em;
+}
+
+@keyframes githubActionsEllipsis {
+  0% { content: '…'; }
+  33% { content: '……'; }
+  66% { content: '………'; }
+  100% { content: '…'; }
 }
 
 .dropdownContent a.disabled {

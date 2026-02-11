@@ -1052,6 +1052,62 @@ async function handleClickGithubAction(e, gm) {
       const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
       let progressInterval = null;
       let workflowFinished = false;
+      const escapeHtml = (value) =>
+        String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      const extractJobSummary = (logText) => {
+        if (!logText) return '';
+        const markers = ['##[summary]', 'Job Summary', 'Summary'];
+        for (let i = 0; i < markers.length; i++) {
+          const idx = logText.lastIndexOf(markers[i]);
+          if (idx !== -1) {
+            return logText.slice(idx).trim();
+          }
+        }
+        return logText.slice(-2000).trim();
+      };
+      const buildStepsSummary = (job) => {
+        if (!job || !Array.isArray(job.steps)) return '';
+        const lines = job.steps.map((s) => `${s.name}: ${s.conclusion || s.status || 'unknown'}`);
+        return lines.join('\n');
+      };
+      const appendJobSummary = async (runId, loadingElementId = '') => {
+        if (!runId) return;
+        try {
+          const jobsResp = await gm.getWorkflowJobs(runId);
+          if (!jobsResp || !Array.isArray(jobsResp.jobs) || jobsResp.jobs.length === 0) return;
+          const jobsSorted = jobsResp.jobs
+            .slice()
+            .sort(
+              (a, b) => new Date(b.completed_at || b.started_at || 0) - new Date(a.completed_at || a.started_at || 0)
+            );
+          const job = jobsSorted[0];
+          let summaryText = '';
+          const logsResp = await gm.getWorkflowJobLogs(job.id);
+          if (logsResp && logsResp.type === 'text') {
+            summaryText = extractJobSummary(logsResp.text);
+          }
+          if (!summaryText) {
+            summaryText = buildStepsSummary(job);
+          }
+          if (summaryText) {
+            statusMsg.innerHTML += `<div class="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
+            const githubActionsUI = document.getElementById('githubActionsUI');
+            if (githubActionsUI) githubActionsUI.classList.add('githubActionsCentered');
+          }
+        } catch (err) {
+          console.warn('Could not retrieve job summary', err);
+        } finally {
+          if (loadingElementId) {
+            const loadingEl = document.getElementById(loadingElementId);
+            if (loadingEl) loadingEl.remove();
+          }
+        }
+      };
       const clearProgressInterval = () => {
         if (progressInterval) {
           clearInterval(progressInterval);
@@ -1120,6 +1176,7 @@ async function handleClickGithubAction(e, gm) {
               }
               const runStartAt = workflowStartResp?.run_started_at || null;
               const runUrl = workflowStartResp?.url || null;
+              const runId = workflowStartResp?.id || null;
               // poll on latest workflow run
               gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime, runUrl).then(
                 (workflowCompletionResp) => {
@@ -1128,7 +1185,8 @@ async function handleClickGithubAction(e, gm) {
                   if ('conclusion' in workflowCompletionResp) {
                     if (workflowCompletionResp.conclusion === 'success') {
                       workflowFinished = true;
-                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                      appendJobSummary(runId, 'githubActionsSummaryLoading');
                       runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');
@@ -1148,7 +1206,8 @@ async function handleClickGithubAction(e, gm) {
                       };
                     } else {
                       workflowFinished = true;
-                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                      appendJobSummary(runId, 'githubActionsSummaryLoading');
                       cancelBtn.removeAttribute('disabled');
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');
@@ -1159,7 +1218,8 @@ async function handleClickGithubAction(e, gm) {
                     cancelBtn.removeAttribute('disabled');
                     runBtn.removeAttribute('disabled');
                     ghLogo.classList.remove('clockwise');
-                    statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
+                    statusMsg.innerHTML = `Error - invalid response received from GitHub API (see console)<div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                    appendJobSummary(runId, 'githubActionsSummaryLoading');
                   }
                 }
               );

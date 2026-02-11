@@ -1921,6 +1921,10 @@ export let cmd = {
     // hide overlays
     // TODO refactor logic for all overlays below. For now only splash overlay...
     document.getElementById('splashOverlay').style.display = 'none';
+    const githubActionsOverlay = document.getElementById('githubActionsOverlay');
+    if (githubActionsOverlay && githubActionsOverlay.style.display !== 'none') {
+      githubActionsOverlay.style.display = 'none';
+    }
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
