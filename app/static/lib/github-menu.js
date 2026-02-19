@@ -1121,7 +1121,7 @@ async function handleClickGithubAction(e, gm) {
             summaryText = buildStepsSummary(job);
           }
           if (summaryText) {
-            statusMsg.innerHTML += `<div class="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
+            statusMsg.innerHTML += `<div id="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
             const githubActionsUI = document.getElementById('githubActionsUI');
             if (githubActionsUI) githubActionsUI.classList.add('githubActionsCentered');
           }

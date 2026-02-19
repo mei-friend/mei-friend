@@ -370,7 +370,7 @@ a:active {
   margin-bottom: 0.5em;
 }
 
-#githubActionsCustomContainer { 
+#githubActionsCustomContainer, #githubActionsJobSummary { 
   color: var(--textColor);
 }
 .githubActionsInputConfig span, .githubActionsCustomConfig span  {
@@ -398,7 +398,7 @@ a:active {
   width: 95%;
 }
 
-.githubActionsJobSummary {
+#githubActionsJobSummary {
   max-height: 10em;
   overflow-y: auto;
   margin-top: 0.5em;
@@ -408,7 +408,7 @@ a:active {
   background-color: var(--dropdownBackgroundColor);
 }
 
-.githubActionsJobSummary pre {
+#githubActionsJobSummary pre {
   margin: 0;
   white-space: pre-wrap;
   line-height: 1.2;
