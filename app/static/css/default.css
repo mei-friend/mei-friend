@@ -1,3 +1,7 @@
+/* Hide initial contents of GitHub Actions modal when running */
+.githubActionsInitialContentsHidden {
+  display: none !important;
+}
 :root {
   /* DEFAULT COLORS */
   /* almost black */

@@ -890,6 +890,10 @@ async function handleClickGithubAction(e, gm) {
         const tabsWrapper = document.createElement('div');
         tabsWrapper.classList.add('githubActionsTabs');
 
+        // --- BEGIN PATCH: Wrap initial contents for easy show/hide ---
+        const initialContentsWrapper = document.createElement('div');
+        initialContentsWrapper.setAttribute('id', 'githubActionsInitialContents');
+
         const tabList = document.createElement('div');
         tabList.classList.add('githubActionsTabList');
 
@@ -1006,7 +1010,10 @@ async function handleClickGithubAction(e, gm) {
 
         tabPanels.append(inputTabPanel, customTabPanel);
         tabsWrapper.append(tabList, tabPanels);
-        inputContainerWrapper.insertAdjacentElement('beforeend', tabsWrapper);
+        initialContentsWrapper.appendChild(tabsWrapper);
+        inputContainerWrapper.insertAdjacentElement('beforeend', initialContentsWrapper);
+
+        // --- END PATCH: Wrap initial contents ---
 
         const tabs = [
           { button: inputTab, panel: inputTabPanel },
@@ -1041,6 +1048,9 @@ async function handleClickGithubAction(e, gm) {
     statusMsg.innerHTML = '';
   };
   runBtn.onclick = () => {
+    // Hide initial contents when workflow starts
+    const initialContents = document.getElementById('githubActionsInitialContents');
+    if (initialContents) initialContents.style.display = 'none';
     let activeTab = document.querySelector('.githubActionsTabPanel.active');
     if (activeTab) {
       let isCustom = activeTab.dataset.tab === 'custom';
@@ -1256,6 +1266,7 @@ async function handleClickGithubAction(e, gm) {
                       runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');
+                      // Keep initial contents hidden on success
                       runBtn.onclick = async () => {
                         ghLogo.classList.add('clockwise');
                         // do a pull to refresh the file
@@ -1277,6 +1288,9 @@ async function handleClickGithubAction(e, gm) {
                       cancelBtn.removeAttribute('disabled');
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');
+                      // Show initial contents again on failure
+                      const initialContents = document.getElementById('githubActionsInitialContents');
+                      if (initialContents) initialContents.style.display = '';
                     }
                   } else {
                     workflowFinished = true;
