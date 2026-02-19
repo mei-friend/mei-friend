@@ -378,16 +378,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Haz clic en "Ejecutar flujo de trabajo" para solicitar a la API de GitHub que ejecute el flujo de trabajo mencionado arriba para ti, utilizando la configuración de entrada especificada a continuación. Tu codificación se recargará en su versión más reciente una vez que se complete la ejecución del flujo de trabajo.',
   },
-  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo: GitHub dice' },
+  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub: ' },
   githubActionStatusMsgWaiting: { text: 'Por favor, ten paciencia mientras GitHub procesa tu flujo de trabajo...' },
-  githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo: GitHub dice' },
-  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada: GitHub dice' },
+  githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub: ' },
+  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada - Estado de GitHub: ' },
   githubActionsRunButton: { text: 'Ejecutar flujo de trabajo' },
   githubActionsRunButtonReload: { text: 'Recargar archivo MEI' },
   githubActionsCancelButton: { text: 'Cancelar' },
   githubActionsInputSetterFilepath: { text: 'Copiar la ruta actual del archivo a la entrada' },
   githubActionsInputSetterSelection: { text: 'Copiar la selección actual de MEI a la entrada' },
   githubActionsInputContainerHeader: { text: 'Configuración de entrada' },
+  githubActionsNoSummaryProvided: {
+    text: 'No se proporcionó resumen. Consulte el enlace de estado de GitHub arriba para más detalles.',
+  },
   githubActionsWaitingOpenLink: { text: 'Seguir el estado del workflow en GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Abra una codificación de este repositorio para ejecutar flujos de trabajo de GitHub Actions.',

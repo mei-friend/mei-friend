@@ -9,6 +9,8 @@ export default class GitCloudClient {
     this.token = conf.token;
     this.provider = conf.provider; // e.g. 'github'
     this.providerType = conf.providerType; // e.g. 'github'
+    this.githubDispatchGraceMs = 1000;
+    this.MAX_RUN_FETCH_ATTEMPTS = 10;
     if (!(this.token && this.provider && this.providerType)) {
       throw new Error('Missing required configuration');
     }
@@ -59,7 +61,6 @@ export default class GitCloudClient {
     this.githubRequestQueue = Promise.resolve();
     this.githubLastRequestTime = 0;
     this.githubMinIntervalMs = 500; // 2 requests per second
-    this.githubDispatchGraceMs = 60000; // allow 60s clock skew for dispatch filtering
   }
 
   isGithubApiUrl(url) {
@@ -633,7 +634,7 @@ export default class GitCloudClient {
     });
   }
 
-  async awaitActionWorkflowStart(workflowId, runStartAt = null, dispatchTime = null) {
+  async awaitActionWorkflowStart(workflowId, dispatchTime) {
     if (!this.providerType === 'github') {
       console.warn('awaitActionWorkflowStart() only works for GitHub');
       return;
@@ -641,50 +642,62 @@ export default class GitCloudClient {
     const runsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/runs`;
     const author = await this.getAuthor();
     const head_sha = await this.gm.getLocalHeadSha();
-    return this.githubFetch(
-      runsUrl +
-        '?' +
-        new URLSearchParams({
-          actor: author.username,
-          branch: this.gm.branch,
-          head_sha,
-        }),
-      {
-        method: 'GET',
-        headers: this.actionsHeaders,
-        cache: 'no-store',
-      }
-    )
-      .then((res) => res.json())
-      .then((resJson) => {
-        let run;
-        if ('workflow_runs' in resJson) {
-          let runs = resJson.workflow_runs.filter((w) => w.event === 'workflow_dispatch');
-          if (dispatchTime) {
-            const dispatchMs = new Date(dispatchTime).getTime();
-            if (!Number.isNaN(dispatchMs)) {
-              const lowerBound = dispatchMs - this.githubDispatchGraceMs;
-              const filtered = runs.filter((w) => new Date(w.created_at).getTime() >= lowerBound);
-              if (filtered.length) {
-                runs = filtered;
-              }
-            }
-          }
-          if (runStartAt) {
-            let runsAt = runs.filter((w) => w.run_started_at === runStartAt);
-            if (runsAt.length) run = runsAt[0];
-          } else {
-            let runsSorted = runs.sort((a, b) => b.run_number - a.run_number);
-            if (runsSorted.length) run = runsSorted[0];
-          }
-          if (run && 'status' in run) {
-            return run;
-          }
-          return this.awaitActionWorkflowStart(workflowId, null, dispatchTime);
+    // Fetch the current runs.
+    // If any run exists with the current head_sha, branch and user, and was created after the dispatchTime, we assume the earliest one was the one created by our dispatch, and return it.
+    // If not, we wait for a short delay and try again, until we find it (or encounter an error).
+    let numTries = 0;
+    let currentRuns = [];
+    while (currentRuns.length === 0 && numTries < this.MAX_RUN_FETCH_ATTEMPTS) {
+      let runs = await this.githubFetch(
+        runsUrl +
+          '?' +
+          new URLSearchParams({
+            actor: author.username,
+            branch: this.gm.branch,
+            head_sha,
+          }),
+        {
+          method: 'GET',
+          headers: this.actionsHeaders,
+          cache: 'no-store',
         }
-        console.error('Received unexpected response to workflow runs request:', resJson);
-        return { status: 406 };
-      });
+      );
+      let resJson = await runs.json();
+      if ('workflow_runs' in resJson) {
+        currentRuns = resJson.workflow_runs.filter((w) => {
+          if (w.event === 'workflow_dispatch' && dispatchTime) {
+            // convert dispatchTime to timestamp, stripping ms:
+            const dispatchTimestamp = new Date(
+              new Date(dispatchTime).getTime() - (new Date(dispatchTime).getTime() % 1000)
+            );
+            const dispatchTimeMs = dispatchTimestamp.getTime();
+            const runTimestamp = new Date(w.run_started_at);
+            const runTimeMs = runTimestamp.getTime();
+            const runTimePlusGrace = runTimeMs + this.githubDispatchGraceMs;
+
+            let decision = runTimePlusGrace >= dispatchTimeMs;
+            console.log(
+              'Decision: runTimeMs + grace >= dispatchTimeMs? ',
+              runTimePlusGrace,
+              ' >= ',
+              dispatchTimeMs,
+              ' decision: ',
+              decision
+            );
+            return decision;
+          }
+          return false;
+        });
+      }
+      numTries++;
+    }
+    if (currentRuns.length) {
+      console.log('Found candidate runs created after dispatch: ', currentRuns, 'dispatchTime: ', dispatchTime);
+      return currentRuns.sort((a, b) => new Date(a.run_started_at).getTime() - new Date(b.run_started_at).getTime())[0];
+    } else {
+      console.warn('Failed to find workflow run after dispatch after ' + this.MAX_RUN_FETCH_ATTEMPTS + ' tries');
+      return false;
+    }
   }
 
   async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null, runUrl = null) {

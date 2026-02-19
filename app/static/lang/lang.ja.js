@@ -364,16 +364,19 @@ export const lang = {
   githubActionsDescription: {
     text: '上記の設定を使用してGitHub APIにワークフローを実行するために「ワークフローを実行」をクリックしてください。ワークフロー実行が完了すると、エンコーディングが最新バージョンにリロードされます。',
   },
-  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubの応答:' },
+  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubステータス: ' },
   githubActionStatusMsgWaiting: { text: 'GitHubがワークフローを処理している間お待ちください...' },
-  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubの応答:' },
-  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubの応答:' },
+  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubステータス: ' },
+  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubステータス: ' },
   githubActionsRunButton: { text: 'ワークフローを実行' },
   githubActionsRunButtonReload: { text: 'MEIファイルを再読み込み' },
   githubActionsCancelButton: { text: 'キャンセル' },
   githubActionsInputSetterFilepath: { text: '現在のファイルパスを入力にコピー' },
   githubActionsInputSetterSelection: { text: '現在のMEI選択範囲を入力にコピー' },
   githubActionsInputContainerHeader: { text: '入力設定' },
+  githubActionsNoSummaryProvided: {
+    text: '要約はありません。詳細については上記の GitHub ステータスリンクを参照してください。',
+  },
   githubActionsWaitingOpenLink: { text: 'GitHub でワークフローの状態を確認' },
   githubActionsDisabledTooltip: {
     text: 'このリポジトリのエンコーディングを開いて GitHub Actions のワークフローを実行してください。',

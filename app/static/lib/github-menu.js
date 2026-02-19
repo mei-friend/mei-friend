@@ -1104,7 +1104,7 @@ async function handleClickGithubAction(e, gm) {
             .join('\n');
           return extractedText;
         }
-        return 'No summary provided. Please refer to GitHub Action link above for details.';
+        return translator.lang.githubActionsNoSummaryProvided.text;
       };
       const buildStepsSummary = (job) => {
         if (!job || !Array.isArray(job.steps)) return '';
@@ -1199,7 +1199,7 @@ async function handleClickGithubAction(e, gm) {
             // error
             statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
           } else {
-            gm.awaitActionWorkflowStart(workflowName.dataset.id, null, dispatchTime).then((workflowStartResp) => {
+            gm.awaitActionWorkflowStart(workflowName.dataset.id, dispatchTime).then((workflowStartResp) => {
               if (workflowStartResp && workflowStartResp.html_url) {
                 renderWaitingStatus(workflowStartResp.html_url);
                 const updateProgress = async () => {

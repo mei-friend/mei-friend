@@ -372,16 +372,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Alklaku "Ruli fluon" por peti de la GitHub API ruli la supran fluon por vi, uzante la enigan konfiguradon indikitaj sube. Via kodo estos reŝutita en ĝia plej lasta versio post la kompletigo de la fluo.',
   },
-  githubActionStatusMsgPrompt: { text: 'Ne povis ruli la fluon - GitHub diras' },
+  githubActionStatusMsgPrompt: { text: 'Ne povis ruli la fluon - GitHub-stato: ' },
   githubActionStatusMsgWaiting: { text: 'Bonvolu esti pacienca dum GitHub pritraktas vian fluon...' },
-  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub diras' },
-  githubActionStatusMsgSuccess: { text: 'Fluo estas kompletigita - GitHub diras' },
+  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub-stato: ' },
+  githubActionStatusMsgSuccess: { text: 'Fluo estas kompletigita - GitHub-stato: ' },
   githubActionsRunButton: { text: 'Ruli fluon' },
   githubActionsRunButtonReload: { text: 'Reŝargi MEI-dosieron' },
   githubActionsCancelButton: { text: 'Malfari' },
   githubActionsInputSetterFilepath: { text: 'Kopii nunan dosieran vojon al enigo' },
   githubActionsInputSetterSelection: { text: 'Kopii nunan MEI-elekton al enigo' },
   githubActionsInputContainerHeader: { text: 'Eniga agordo' },
+  githubActionsNoSummaryProvided: {
+    text: 'Neniu resumo provizita. Bonvolu vidi la supre GitHub-statan ligilon por detaloj.',
+  },
   githubActionsWaitingOpenLink: { text: 'Sekvi la staton de la laborfluo en GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Malfermu kodigon el ĉi tiu deponejo por ruli GitHub Actions-laborfluojn.',

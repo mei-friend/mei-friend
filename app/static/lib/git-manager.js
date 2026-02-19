@@ -665,8 +665,8 @@ export default class GitManager {
     return await this.cloud.requestActionWorkflowRun(wfId, inputs);
   }
 
-  async awaitActionWorkflowStart(workflowId, runStartAt = null, dispatchTime = null) {
-    return await this.cloud.awaitActionWorkflowStart(workflowId, runStartAt, dispatchTime);
+  async awaitActionWorkflowStart(workflowId, dispatchTime) {
+    return await this.cloud.awaitActionWorkflowStart(workflowId, dispatchTime);
   }
 
   async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null, runUrl = null) {

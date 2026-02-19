@@ -371,16 +371,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Kliknite na "Pokreni tok" da biste zatražili da GitHub API izvrši tok iznad za vas, koristeći konfiguraciju unetu ispod. Vaša enkodiranja će se ponovo učitati u svojoj najnovijoj verziji nakon završetka izvršenja toka.',
   },
-  githubActionStatusMsgPrompt: { text: 'Tok se nije mogao izvršiti - GitHub javlja' },
+  githubActionStatusMsgPrompt: { text: 'Tok se nije mogao izvršiti - GitHub status: ' },
   githubActionStatusMsgWaiting: { text: 'Molimo vas da budete strpljivi dok GitHub obradi vaš tok...' },
-  githubActionStatusMsgFailure: { text: 'Tok se nije mogao izvršiti - GitHub javlja' },
-  githubActionStatusMsgSuccess: { text: 'Izvršen je tok - GitHub javlja' },
+  githubActionStatusMsgFailure: { text: 'Tok se nije mogao izvršiti - GitHub status: ' },
+  githubActionStatusMsgSuccess: { text: 'Izvršen je tok - GitHub status: ' },
   githubActionsRunButton: { text: 'Pokreni tok' },
   githubActionsRunButtonReload: { text: 'Učitaj MEI fajl ponovo' },
   githubActionsCancelButton: { text: 'Otkaži' },
   githubActionsInputSetterFilepath: { text: 'Kopiraj trenutnu putanju fajla u unos' },
   githubActionsInputSetterSelection: { text: 'Kopiraj trenutnu MEI selekciju u unos' },
   githubActionsInputContainerHeader: { text: 'Konfiguracija unosa' },
+  githubActionsNoSummaryProvided: {
+    text: 'Nije dostavljen sažetak. Pogledajte gornju GitHub statusnu poveznicu za detalje.',
+  },
   githubActionsWaitingOpenLink: { text: 'Prati status tijeka rada na GitHubu' },
   githubActionsDisabledTooltip: {
     text: 'Otvorite kodiranje iz ovog repozitorija kako biste pokrenuli GitHub Actions tijekove rada.',

@@ -386,16 +386,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes. ',
   },
-  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status: ' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
-  githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
-  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
+  githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub status: ' },
+  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub status: ' },
   githubActionsRunButton: { text: 'Run workflow' },
   githubActionsRunButtonReload: { text: 'Reload MEI file' },
   githubActionsCancelButton: { text: 'Cancel' },
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
+  githubActionsNoSummaryProvided: {
+    text: 'No summary provided. Please refer to GitHub Status link above for details.',
+  },
   githubActionsWaitingOpenLink: { text: 'Track workflow status on GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Open an encoding from this repository to run GitHub Actions workflows.',

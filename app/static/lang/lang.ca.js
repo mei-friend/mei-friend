@@ -383,19 +383,21 @@ export const lang = {
   githubActionsDescription: {
     text: "Feu clic a \"Executa el flux de treball\" per demanar a l'API de GitHub que executi el flux de treball anterior, utilitzant la configuració d'entrada especificada a continuació. El vostre codi es recarregarà a la seva darrera versió una vegada que s'hagi completat la execució del flux de treball.",
   },
-  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
+  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub: " },
   githubActionStatusMsgWaiting: {
     text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...',
   },
-  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
-  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada: GitHub diu' },
+  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub: " },
+  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada - Estat de GitHub: ' },
   githubActionsRunButton: { text: 'Executa el flux de treball' },
   githubActionsRunButtonReload: { text: "Torna a carregar l'arxiu MEI" },
   githubActionsCancelButton: { text: 'Cancel·la' },
   githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
   githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
   githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
-  githubActionsWaitingOpenLink: { text: 'Fes seguiment de l’estat del flux de treball a GitHub' },
+  githubActionsNoSummaryProvided: {
+    text: 'No s’ha proporcionat cap resum. Consulteu l’enllaç d’estat de GitHub anterior per a més detalls.',
+  },
   githubActionsDisabledTooltip: {
     text: 'Obriu una codificació d’aquest repositori per executar els fluxos de treball de GitHub Actions.',
   },

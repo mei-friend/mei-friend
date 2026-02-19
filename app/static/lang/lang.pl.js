@@ -382,16 +382,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.',
   },
-  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
+  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - Status GitHub: ' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
-  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
-  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - GitHub mówi' },
+  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - Status GitHub: ' },
+  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - Status GitHub: ' },
   githubActionsRunButton: { text: 'Uruchom zadanie' },
   githubActionsRunButtonReload: { text: 'Przeładuj plik MEI' },
   githubActionsCancelButton: { text: 'Anuluj' },
   githubActionsInputSetterFilepath: { text: 'Kopiuj bieżącą ścieżkę pliku do wejścia' },
   githubActionsInputSetterSelection: { text: 'Kopiuj bieżący wybór MEI do wejścia' },
   githubActionsInputContainerHeader: { text: 'Konfiguracja wejścia' },
+  githubActionsNoSummaryProvided: {
+    text: 'Nie podano podsumowania. Zobacz powyższy link do statusu GitHub, aby uzyskać szczegóły.',
+  },
   githubActionsWaitingOpenLink: { text: 'Śledź status workflow na GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Otwórz kodowanie z tego repozytorium, aby uruchomić workflowy GitHub Actions.',

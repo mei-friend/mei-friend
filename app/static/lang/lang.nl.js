@@ -373,16 +373,19 @@ export const lang = {
   githubActionsDescription: {
     text: 'Klik op "Workflow uitvoeren" om de GitHub API te vragen de bovenstaande workflow voor u uit te voeren, met gebruik van de hieronder gespecificeerde invoerconfiguratie. Uw codering wordt opnieuw geladen in de nieuwste versie zodra de workflow is voltooid.',
   },
-  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub zegt' },
+  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub-status: ' },
   githubActionStatusMsgWaiting: { text: 'Even geduld terwijl GitHub uw workflow verwerkt...' },
-  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub zegt' },
-  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub zegt' },
+  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub-status: ' },
+  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub-status: ' },
   githubActionsRunButton: { text: 'Workflow uitvoeren' },
   githubActionsRunButtonReload: { text: 'MEI-bestand opnieuw laden' },
   githubActionsCancelButton: { text: 'Annuleren' },
   githubActionsInputSetterFilepath: { text: 'Huidig bestandspad naar invoer kopiëren' },
   githubActionsInputSetterSelection: { text: 'Huidige MEI-selectie naar invoer kopiëren' },
   githubActionsInputContainerHeader: { text: 'Invoerconfiguratie' },
+  githubActionsNoSummaryProvided: {
+    text: 'Geen samenvatting beschikbaar. Raadpleeg de GitHub-statuslink hierboven voor details.',
+  },
   githubActionsWaitingOpenLink: { text: 'Workflowstatus volgen op GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Open een codering uit deze repository om GitHub Actions-workflows uit te voeren.',
