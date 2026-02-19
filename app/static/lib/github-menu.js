@@ -24,6 +24,9 @@ import {
 import { checkAndRetrieveJson } from './utils.js';
 import * as icon from './../css/icons.js';
 
+const GHAStartMarker = '---START_USER_MESSAGE---';
+const GHAEndMarker = '---END_USER_MESSAGE---';
+
 const ghActionsInputSetters = [
   {
     id: 'githubActionsInputSetterFilepath',
@@ -1080,14 +1083,18 @@ async function handleClickGithubAction(e, gm) {
           .replace(/'/g, '&#039;');
       const extractJobSummary = (logText) => {
         if (!logText) return '';
-        const markers = ['##[summary]', 'Job Summary', 'Summary'];
-        for (let i = 0; i < markers.length; i++) {
-          const idx = logText.lastIndexOf(markers[i]);
-          if (idx !== -1) {
-            return logText.slice(idx).trim();
-          }
+        let startMarkerIx = logText.lastIndexOf(GHAStartMarker);
+        let endMarkerIx = logText.lastIndexOf(GHAEndMarker);
+        if (startMarkerIx !== -1 && endMarkerIx !== -1 && endMarkerIx > startMarkerIx) {
+          let extractedText = logText.slice(startMarkerIx + GHAStartMarker.length, endMarkerIx).trim();
+          // On each new line in extracted text, remove the first 29 characters (timestamp and space)
+          extractedText = extractedText
+            .split('\n')
+            .map((line) => line.slice(29))
+            .join('\n');
+          return extractedText;
         }
-        return logText.slice(-2000).trim();
+        return 'No summary provided. Please refer to GitHub Action link above for details.';
       };
       const buildStepsSummary = (job) => {
         if (!job || !Array.isArray(job.steps)) return '';
