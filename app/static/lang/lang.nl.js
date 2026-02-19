@@ -373,10 +373,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Klik op "Workflow uitvoeren" om de GitHub API te vragen de bovenstaande workflow voor u uit te voeren, met gebruik van de hieronder gespecificeerde invoerconfiguratie. Uw codering wordt opnieuw geladen in de nieuwste versie zodra de workflow is voltooid.',
   },
-  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub-status: ' },
+  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub-status' },
   githubActionStatusMsgWaiting: { text: 'Even geduld terwijl GitHub uw workflow verwerkt...' },
-  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub-status: ' },
-  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub-status: ' },
+  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub-status' },
+  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub-status' },
   githubActionsRunButton: { text: 'Workflow uitvoeren' },
   githubActionsRunButtonReload: { text: 'MEI-bestand opnieuw laden' },
   githubActionsCancelButton: { text: 'Annuleren' },

@@ -369,10 +369,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Кликните на "Покрени радни ток" како бисте затражили од GitHub API-ја да изврши радни ток за вас, користећи конфигурацију уноса наведену испод. Ваше енкодирање ће се учитати у својој најновијој верзији након што се радни ток заврши.',
   },
-  githubActionStatusMsgPrompt: { text: 'Ток се није могао извршити - GitHub статус: ' },
+  githubActionStatusMsgPrompt: { text: 'Ток се није могао извршити - GitHub статус' },
   githubActionStatusMsgWaiting: { text: 'Молимо вас да будете стрпљиви док GitHub обрађује ваш ток...' },
-  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub статус: ' },
-  githubActionStatusMsgSuccess: { text: 'Извршен је ток - GitHub статус: ' },
+  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub статус' },
+  githubActionStatusMsgSuccess: { text: 'Извршен је ток - GitHub статус' },
   githubActionsRunButton: { text: 'Покрени радни ток' },
   githubActionsRunButtonReload: { text: 'Учитај MEI фајл поново' },
   githubActionsCancelButton: { text: 'Откажи' },

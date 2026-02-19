@@ -378,10 +378,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
   },
-  githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status: ' },
+  githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
-  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status: ' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-Lauf abgeschlossen - GitHub-Status: ' },
+  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status' },
+  githubActionStatusMsgSuccess: { text: 'Workflow-Lauf abgeschlossen - GitHub-Status' },
   githubActionsRunButton: { text: 'Workflow ausführen' },
   githubActionsRunButtonReload: { text: 'MEI-Datei neu laden' },
   githubActionsCancelButton: { text: 'Abbrechen' },

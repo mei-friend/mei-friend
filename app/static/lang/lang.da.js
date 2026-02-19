@@ -377,10 +377,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Klik på "Kør workflow" for at bede GitHub API om at køre ovenstående workflow for dig, ved hjælp af den specificerede inputkonfiguration nedenfor. Din kodning vil blive genindlæst i sin seneste version, når workflow-kørslen er færdig. ',
   },
-  githubActionStatusMsgPrompt: { text: 'Kunne ikke køre workflow - GitHub-status: ' },
+  githubActionStatusMsgPrompt: { text: 'Kunne ikke køre workflow - GitHub-status' },
   githubActionStatusMsgWaiting: { text: 'Vær tålmodig, mens GitHub behandler din workflow...' },
-  githubActionStatusMsgFailure: { text: 'Kunne ikke køre workflow - GitHub-status: ' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-kørsel færdig - GitHub-status: ' },
+  githubActionStatusMsgFailure: { text: 'Kunne ikke køre workflow - GitHub-status' },
+  githubActionStatusMsgSuccess: { text: 'Workflow-kørsel færdig - GitHub-status' },
   githubActionsRunButton: { text: 'Kør workflow' },
   githubActionsRunButtonReload: { text: 'Genindlæs MEI fil' },
   githubActionsCancelButton: { text: 'Annuller' },

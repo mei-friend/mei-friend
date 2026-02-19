@@ -358,10 +358,10 @@ export const lang = {
   githubActionsDescription: {
     text: '点击“运行工作流”以请求 GitHub API 为您运行上述工作流，使用下面指定的输入配置。工作流运行完成后，您的编码将重新加载为最新版本。',
   },
-  githubActionStatusMsgPrompt: { text: '无法运行工作流 - GitHub 状态：' },
+  githubActionStatusMsgPrompt: { text: '无法运行工作流 - GitHub 状态' },
   githubActionStatusMsgWaiting: { text: '请耐心等待 GitHub 处理您的工作流...' },
-  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 状态：' },
-  githubActionStatusMsgSuccess: { text: '工作流运行完成 - GitHub 状态：' },
+  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 状态' },
+  githubActionStatusMsgSuccess: { text: '工作流运行完成 - GitHub 状态' },
   githubActionsRunButton: { text: '运行工作流' },
   githubActionsRunButtonReload: { text: '重新加载 MEI 文件' },
   githubActionsCancelButton: { text: '取消' },

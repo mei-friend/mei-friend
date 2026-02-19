@@ -364,10 +364,10 @@ export const lang = {
   githubActionsDescription: {
     text: '上記の設定を使用してGitHub APIにワークフローを実行するために「ワークフローを実行」をクリックしてください。ワークフロー実行が完了すると、エンコーディングが最新バージョンにリロードされます。',
   },
-  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubステータス: ' },
+  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubステータス' },
   githubActionStatusMsgWaiting: { text: 'GitHubがワークフローを処理している間お待ちください...' },
-  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubステータス: ' },
-  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubステータス: ' },
+  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubステータス' },
+  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubステータス' },
   githubActionsRunButton: { text: 'ワークフローを実行' },
   githubActionsRunButtonReload: { text: 'MEIファイルを再読み込み' },
   githubActionsCancelButton: { text: 'キャンセル' },

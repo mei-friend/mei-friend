@@ -382,10 +382,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.',
   },
-  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - Status GitHub: ' },
+  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - Status GitHub' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
-  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - Status GitHub: ' },
-  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - Status GitHub: ' },
+  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - Status GitHub' },
+  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - Status GitHub' },
   githubActionsRunButton: { text: 'Uruchom zadanie' },
   githubActionsRunButtonReload: { text: 'Przeładuj plik MEI' },
   githubActionsCancelButton: { text: 'Anuluj' },

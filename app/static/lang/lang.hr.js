@@ -371,10 +371,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Kliknite na "Pokreni tok" da biste zatražili da GitHub API izvrši tok iznad za vas, koristeći konfiguraciju unetu ispod. Vaša enkodiranja će se ponovo učitati u svojoj najnovijoj verziji nakon završetka izvršenja toka.',
   },
-  githubActionStatusMsgPrompt: { text: 'Tok se nije mogao izvršiti - GitHub status: ' },
+  githubActionStatusMsgPrompt: { text: 'Tok se nije mogao izvršiti - GitHub status' },
   githubActionStatusMsgWaiting: { text: 'Molimo vas da budete strpljivi dok GitHub obradi vaš tok...' },
-  githubActionStatusMsgFailure: { text: 'Tok se nije mogao izvršiti - GitHub status: ' },
-  githubActionStatusMsgSuccess: { text: 'Izvršen je tok - GitHub status: ' },
+  githubActionStatusMsgFailure: { text: 'Tok se nije mogao izvršiti - GitHub status' },
+  githubActionStatusMsgSuccess: { text: 'Izvršen je tok - GitHub status' },
   githubActionsRunButton: { text: 'Pokreni tok' },
   githubActionsRunButtonReload: { text: 'Učitaj MEI fajl ponovo' },
   githubActionsCancelButton: { text: 'Otkaži' },

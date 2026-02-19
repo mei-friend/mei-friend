@@ -370,10 +370,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Клацніть "Виконати дію" для запиту API GitHub на виконання вищезазначеної дії з використанням конфігурації введеної нижче. Ваше кодування буде перезавантажено в останній версії після завершення виконання дії.',
   },
-  githubActionStatusMsgPrompt: { text: 'Не вдалося виконати дію - Статус GitHub: ' },
+  githubActionStatusMsgPrompt: { text: 'Не вдалося виконати дію - Статус GitHub' },
   githubActionStatusMsgWaiting: { text: 'Будь ласка, будьте терплячими, поки GitHub обробляє вашу дію...' },
-  githubActionStatusMsgFailure: { text: 'Не вдалося виконати дію - Статус GitHub: ' },
-  githubActionStatusMsgSuccess: { text: 'Виконання дії завершено - Статус GitHub: ' },
+  githubActionStatusMsgFailure: { text: 'Не вдалося виконати дію - Статус GitHub' },
+  githubActionStatusMsgSuccess: { text: 'Виконання дії завершено - Статус GitHub' },
   githubActionsRunButton: { text: 'Виконати дію' },
   githubActionsRunButtonReload: { text: 'Перезавантажити файл MEI' },
   githubActionsCancelButton: { text: 'Скасувати' },

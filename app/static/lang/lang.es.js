@@ -378,10 +378,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Haz clic en "Ejecutar flujo de trabajo" para solicitar a la API de GitHub que ejecute el flujo de trabajo mencionado arriba para ti, utilizando la configuración de entrada especificada a continuación. Tu codificación se recargará en su versión más reciente una vez que se complete la ejecución del flujo de trabajo.',
   },
-  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub: ' },
+  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub' },
   githubActionStatusMsgWaiting: { text: 'Por favor, ten paciencia mientras GitHub procesa tu flujo de trabajo...' },
-  githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub: ' },
-  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada - Estado de GitHub: ' },
+  githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub' },
+  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada - Estado de GitHub' },
   githubActionsRunButton: { text: 'Ejecutar flujo de trabajo' },
   githubActionsRunButtonReload: { text: 'Recargar archivo MEI' },
   githubActionsCancelButton: { text: 'Cancelar' },

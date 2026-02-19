@@ -380,10 +380,10 @@ export const lang = {
   githubActionsDescription: {
     text: "Cliquez sur \"Exécuter le flux de travail\" pour demander à l'API GitHub d'exécuter le flux de travail ci-dessus pour vous, en utilisant la configuration d'entrée spécifiée ci-dessous. Votre encodage sera rechargé dans sa dernière version une fois que l'exécution du flux de travail sera terminée.",
   },
-  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - Statut GitHub : " },
+  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - Statut GitHub" },
   githubActionStatusMsgWaiting: { text: 'Veuillez patienter pendant que GitHub traite votre flux de travail...' },
-  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - Statut GitHub : " },
-  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - Statut GitHub : ' },
+  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - Statut GitHub" },
+  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - Statut GitHub' },
   githubActionsRunButton: { text: 'Exécuter le flux de travail' },
   githubActionsRunButtonReload: { text: 'Recharger le fichier MEI' },
   githubActionsCancelButton: { text: 'Annuler' },

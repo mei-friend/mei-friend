@@ -372,10 +372,10 @@ export const lang = {
   githubActionsDescription: {
     text: 'Alklaku "Ruli fluon" por peti de la GitHub API ruli la supran fluon por vi, uzante la enigan konfiguradon indikitaj sube. Via kodo estos reŝutita en ĝia plej lasta versio post la kompletigo de la fluo.',
   },
-  githubActionStatusMsgPrompt: { text: 'Ne povis ruli la fluon - GitHub-stato: ' },
+  githubActionStatusMsgPrompt: { text: 'Ne povis ruli la fluon - GitHub-stato' },
   githubActionStatusMsgWaiting: { text: 'Bonvolu esti pacienca dum GitHub pritraktas vian fluon...' },
-  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub-stato: ' },
-  githubActionStatusMsgSuccess: { text: 'Fluo estas kompletigita - GitHub-stato: ' },
+  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub-stato' },
+  githubActionStatusMsgSuccess: { text: 'Fluo estas kompletigita - GitHub-stato' },
   githubActionsRunButton: { text: 'Ruli fluon' },
   githubActionsRunButtonReload: { text: 'Reŝargi MEI-dosieron' },
   githubActionsCancelButton: { text: 'Malfari' },
