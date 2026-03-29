@@ -1,0 +1,97 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    # On the latest ubuntu-24.04, Playwright cannot resolve package 'libasound2' during installation. 
+    # Upgrading @playwright/test to v1.44 or later should make it work on ubuntu-24.04 as well.
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Required to clone CodeMirror which is included as a git submodule
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Node.js dependencies
+        run: |
+          npm install
+
+      - name: Build CodeMirror
+        run: |
+          cd app/static/CodeMirror
+          npm install
+          npm run build
+
+      - name: Prepare environment
+        run: |
+          cp env-template .env
+          echo "FLASK_SECRET=dummy_secret" >> .env
+          echo "TEST_URL=http://localhost:5001" >> .env
+
+      - name: Install Playwright
+        run: |
+          npx playwright install chromium --with-deps
+
+      - name: Output Playwright Version
+        run: |
+          npx playwright --version
+
+      - name: Start Flask server
+        run: |
+          export FLASK_APP=app
+          python -m flask run --port=5001 &
+        env:
+          FLASK_ENV: development
+
+      - name: Wait for server to be ready
+        run: |
+          echo "Waiting for server to be ready..."
+          timeout 60s bash -c 'until curl -s http://localhost:5001 > /dev/null; do sleep 1; done'
+          echo "Server is ready! Response from server:"
+          curl -i http://localhost:5001
+
+      - name: Run the first E2E test to verify the setup
+        # Run a single test first to verify that the CI playwright setup and server connection are working correctly
+        run: |
+          cd e2e
+          npx playwright test --config=../playwright.config.js --project=chromium -g "1 Test settings panel" --retries=3 --reporter=github,html
+        env:
+          TEST_URL: http://localhost:5001
+
+      - name: Run All E2E Tests
+        run: |
+          cd e2e
+          npx playwright test --config=../playwright.config.js --project=chromium --retries=3 --reporter=github,html
+        env:
+          TEST_URL: http://localhost:5001
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
