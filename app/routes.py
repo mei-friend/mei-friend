@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, render_template, request, session, jsonify
+from flask import Flask, url_for, redirect, render_template, request, session, jsonify, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from base64 import b64encode
@@ -47,7 +47,10 @@ gitlab = oauth.register(
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Serving index.html doesn't strictly need the Flask application,
+    # but it is kept here for now as a fallback to avoid requiring 
+    # infrastructure changes (e.g., Nginx routing configuration).
+    return send_from_directory('static', 'index.html')
 
 @app.route('/auth_status')
 def auth_status():
