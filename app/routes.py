@@ -47,19 +47,24 @@ gitlab = oauth.register(
 
 @app.route('/')
 def index():
-    haveGHConfig = getenv("CLIENT_ID");
+    return render_template('index.html')
+
+@app.route('/auth_status')
+def auth_status():
+    haveGHConfig = getenv("CLIENT_ID")
     if 'githubToken' in session:
-        return render_template('index.html', 
-                isLoggedIn = "true", # for Javascript, not Python...
-                githubToken = session['githubToken'],
-                userLogin = session['userLogin'],
-                userName = session['userName'] if session['userName'] else session['userLogin'],
-                userEmail = session['userEmail'], 
-                gitEnabled = haveGHConfig)
-    return render_template('index.html',
-        isLoggedIn = False,
-        gitEnabled = haveGHConfig
-    )
+        return jsonify({
+            'isLoggedIn': True,
+            'githubToken': session['githubToken'],
+            'userLogin': session['userLogin'],
+            'userName': session['userName'] if session['userName'] else session['userLogin'],
+            'userEmail': session['userEmail'],
+            'gitEnabled': bool(haveGHConfig)
+        })
+    return jsonify({
+        'isLoggedIn': False,
+        'gitEnabled': bool(haveGHConfig)
+    })
 
 @app.route("/login")
 def login():
