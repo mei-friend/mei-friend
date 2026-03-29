@@ -16,7 +16,7 @@
   The application is available online at https://mei-friend.mdw.ac.at."
     />
 
-    <meta property="og:image" content="{{ url_for('static', filename='svg/menu-logo.svg') }}" />
+    <meta property="og:image" content="/static/svg/menu-logo.svg" />
     <meta property="og:description" content="mei-friend is a ‘last mile’ editor for MEI music encodings." />
     <meta property="og:title" content="mei-friend online editor" />
 
@@ -26,26 +26,26 @@
   music notation, music editing software, Verovio"
     />
 
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" />
+    <link rel="shortcut icon" href="/static/img/favicon.png" />
     <!-- TODO: FIX IMPORT OF ICONS -->
-    <!-- <script src="{{ url_for('static', filename='css/icons.js') }}"></script> -->
-    <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
+    <!-- <script src="/static/css/icons.js"></script> -->
+    <link rel="stylesheet" id="orientationCSS" href="/static/css/bottom.css" />
     <link
       rel="stylesheet"
       id="facsimileOrientationCSS"
-      href="{{ url_for('static', filename='css/facsimile-bottom.css') }}"
+      href="/static/css/facsimile-bottom.css"
     />
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
 
-    <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
+    <script src="/static/deps/solid-client-authn.bundle.js"></script>
+    <script src="/static/lib/env.js"></script>
+    <script src="/static/lib/solid.js" type="module"></script>
     <script>
       let isLoggedIn;
       let gitEnabled = true;
-      let root = "{{ url_for('static', filename='') }}";
+      let root = "/static/";
     </script>
     <!-- disable GitHub integration if server configuration not available -->
     {% if not gitEnabled %}
@@ -63,85 +63,85 @@
       const userEmail = '{{ userEmail }}';
     </script>
     {% endif %}
-    <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/theme/abbott.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/base16-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/base16-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/cobalt.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/darcula.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/dracula.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/eclipse.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/elegant.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/monokai.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/idea.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/juejin.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/mdn-like.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/neo.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/pastel-on-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/solarized.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/xq-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/xq-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/yeti.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/yonce.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/zenburn.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closetag.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closebrackets.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/matchtags.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/trailingspace.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/xml-fold.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldcode.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldgutter.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/search.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/searchcursor.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/jump-to-line.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/addon/lint/lint.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/lint/lint.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='CodeMirror/keymap/emacs.js') }}"></script>
-  <script src="{{ url_for('static', filename='CodeMirror/keymap/vim.js') }}"></script> -->
+    <script src="/static/CodeMirror/lib/codemirror.js"></script>
+    <link href="/static/CodeMirror/lib/codemirror.css" rel="stylesheet" />
+    <script src="/static/CodeMirror/mode/xml/xml.js"></script>
+    <link href="/static/CodeMirror/theme/abbott.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/base16-dark.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/base16-light.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/cobalt.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/darcula.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/dracula.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/eclipse.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/elegant.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/monokai.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/idea.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/juejin.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/mdn-like.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/neo.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/paraiso-dark.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/paraiso-light.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/pastel-on-dark.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/solarized.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/xq-dark.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/xq-light.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/yeti.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/yonce.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/theme/zenburn.css" rel="stylesheet" />
+    <script src="/static/CodeMirror/addon/edit/closetag.js"></script>
+    <script src="/static/CodeMirror/addon/edit/closebrackets.js"></script>
+    <script src="/static/CodeMirror/addon/edit/matchtags.js"></script>
+    <script src="/static/CodeMirror/addon/edit/trailingspace.js"></script>
+    <script src="/static/CodeMirror/addon/fold/xml-fold.js"></script>
+    <script src="/static/CodeMirror/addon/fold/foldcode.js"></script>
+    <script src="/static/CodeMirror/addon/fold/foldgutter.js"></script>
+    <script src="/static/CodeMirror/addon/search/search.js"></script>
+    <script src="/static/CodeMirror/addon/search/searchcursor.js"></script>
+    <script src="/static/CodeMirror/addon/search/jump-to-line.js"></script>
+    <script src="/static/CodeMirror/addon/dialog/dialog.js"></script>
+    <link href="/static/CodeMirror/addon/dialog/dialog.css" rel="stylesheet" />
+    <script src="/static/CodeMirror/addon/hint/show-hint.js"></script>
+    <script src="/static/CodeMirror/addon/hint/xml-hint.js"></script>
+    <link href="/static/CodeMirror/addon/hint/show-hint.css" rel="stylesheet" />
+    <link href="/static/CodeMirror/addon/lint/lint.css" rel="stylesheet" />
+    <script src="/static/CodeMirror/addon/lint/lint.js"></script>
+    <!-- <script src="/static/CodeMirror/keymap/emacs.js"></script>
+  <script src="/static/CodeMirror/keymap/vim.js"></script> -->
 
     <script
-      src="{{ url_for('static', filename='deps/CodeMirror_emacs.min.js') }}"
+      src="/static/deps/CodeMirror_emacs.min.js"
       integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
     <script
-      src="{{ url_for('static', filename='deps/CodeMirror_vim.min.js') }}"
+      src="/static/deps/CodeMirror_vim.min.js"
       integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
 
     <!-- Load Google Magenta html MIDI player  -->
-    <script src="{{ url_for('static', filename='deps/html-midi-player.bundle.js') }}"></script>
+    <script src="/static/deps/html-midi-player.bundle.js"></script>
     <script type="text/javascript">
       // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
       var midiCore = core;
     </script>
 
-    <script src="{{ url_for('static', filename='deps/js-yaml.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='deps/jsonld.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='deps/fast-json-patch.min.js') }}"></script>
+    <script src="/static/deps/js-yaml.min.js"></script>
+    <script src="/static/deps/jsonld.min.js"></script>
+    <script src="/static/deps/fast-json-patch.min.js"></script>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
-    <script src="{{ url_for('static', filename='deps/lightning-fs.js') }}"></script>
-    <script src="{{ url_for('static', filename='deps/isomorphic-git.umd.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
+    <link rel="stylesheet" href="/static/css/default.css" />
+    <link rel="stylesheet" href="/static/css/navbar.css" />
+    <link rel="stylesheet" href="/static/css/annotationPanel.css" />
+    <link rel="stylesheet" href="/static/css/icons.css" />
+    <script src="/static/deps/lightning-fs.js"></script>
+    <script src="/static/deps/isomorphic-git.umd.min.js"></script>
+    <script type="module" src="/static/lib/main.js"></script>
 
-    <script type="module" src="{{ url_for('static', filename='lib/git-cloud-client.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='lib/git-manager.js') }}"></script>
+    <script type="module" src="/static/lib/git-cloud-client.js"></script>
+    <script type="module" src="/static/lib/git-manager.js"></script>
 
     <!-- Load Matomo@mdw.ac.at -->
     <script type="text/javascript">
@@ -187,7 +187,7 @@
     <div class="header" id="meiFriendHeader">
       <div class="title">
         <a href="https://mei-friend.mdw.ac.at/"
-          ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
+          ><img src="/static/owl/menu-logo.svg" alt="mei-friend" id="mei-friend-logo"
         /></a>
       </div>
       <div class="navbar" id="menuBar">
@@ -708,7 +708,7 @@
       <div id="splashOverlay">
         <div id="splash">
           <div id="splashHeader">
-            <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
+            <img src="/static/owl/menu-logo.svg" alt="mei-friend" id="splashLogo" />
           </div>
           <hr class="dropdownLine" />
           <div id="splashBodyContainer">
@@ -856,7 +856,7 @@
               <img
                 id="forkRepoGithubLogo"
                 class="forkRepoGithubLogo"
-                src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"
+                src="/static/img/GitHub-Mark-32px.png"
               />
               <span id="forkRepoGithubText">Fork Github Repository</span>
             </h3>
@@ -880,7 +880,7 @@
         <div class="forkRepositoryUI">
           <div class="forkRepositoryUIGrouping">
             <h3>
-              <img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+              <img class="forkRepoGithubLogo" src="/static/img/GitHub-Mark-32px.png" />
               <span id="forkRepositoryGithubText">Fork Github Repository</span>
             </h3>
             <p id="forkRepositoryInstructions">
