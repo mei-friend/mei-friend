@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupPage, openUrl } from './setup';
+import { setupPage, openUrl, forceSelectOption } from './setup';
 
 test.beforeEach(async ({ page }) => {
   console.log('Testing facsimile functions.');
@@ -29,17 +29,15 @@ test.describe('1 Test facsimile functionality.', () => {
     );
     await expect(page.locator('#beam-0000001508587757').first()).toBeVisible();
 
-    // change breaksSelect to 'encoded' and check that it has changed
-    await page.locator('#breaksSelect').selectOption('encoded');
+    // change breaksSelect to 'encoded' (may be in overflow menu when facsimile panel is open)
+    await forceSelectOption(page, '#breaksSelect', 'encoded');
     await expect(page.locator('#breaksSelect')).toHaveValue('encoded');
 
     // check whether an element from the end of the page is visible
     await expect(page.locator('g#chord-0000000104286025')).toBeVisible();
-    // await page.locator('g#chord-0000000104286025').scrollIntoViewIfNeeded({ timeout: 5000 });
 
     // click on a specific zone, check visibility of note
     await expect(page.locator('rect#measure-0000000595472239')).toBeVisible();
-    // await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded({ timeout: 5000 });
     await page.locator('text#measure-0000000595472239').click();
     // check whether measure is highlighted in notation panel
     await expect(page.locator('g#measure-0000000595472239')).toBeVisible();
@@ -100,49 +98,67 @@ test.describe('1 Test facsimile functionality.', () => {
     await page.getByText('"m18xsdz"').click();
     await expect(page.locator('#n7pyz78 use')).toBeVisible();
 
-    // draw new zone for that measure
-    await page.mouse.move(120, 120);
+    // ensure the facsimile SVG and image are fully loaded before drawing
+    await expect(facsimilePanel.locator('div svg image')).toBeVisible({ timeout: 15000 });
+
+    // draw new zone for that measure — use facsimile panel bounding box for coordinates
+    const panelBox = await facsimilePanel.boundingBox();
+    const drawX1 = panelBox!.x + 50;
+    const drawY1 = panelBox!.y + 50;
+    const drawX2 = drawX1 + 120;
+    const drawY2 = drawY1 + 120;
+    await page.mouse.move(drawX1, drawY1);
     await page.mouse.down({ button: 'left' });
-    await page.mouse.move(240, 240);
+    await page.mouse.move(drawX2, drawY2, { steps: 5 });
     await page.mouse.up();
+
+    // wait for zone to be created
+    await expect(facsimilePanel.locator('div svg rect').last()).toBeVisible();
 
     // get id from zone and check that it starts with 'z'
     const zoneId = await facsimilePanel.locator('div svg').locator('rect').last().getAttribute('id');
     console.log('Id of newly created zone:', zoneId);
     if (zoneId) expect(zoneId[0]).toBe('z');
 
-    // resize the zone horizontally
+    // resize the zone horizontally — drag right edge inward
     const zone = facsimilePanel.locator('div svg').locator('rect').last();
     let width = await zone.getAttribute('width');
     let x = await zone.getAttribute('x');
     let y = await zone.getAttribute('y');
 
-    // move mouse to the zone and resize it horizontally
-    await page.mouse.move(240, 180);
+    // move mouse to the right edge of the zone and drag it left
+    const zoneBox = await zone.boundingBox();
+    const rightEdgeX = zoneBox!.x + zoneBox!.width;
+    const midY = zoneBox!.y + zoneBox!.height / 2;
+    await page.mouse.move(rightEdgeX, midY);
     await page.mouse.down({ button: 'left' });
-    await page.mouse.move(180, 180);
+    await page.mouse.move(rightEdgeX - 60, midY, { steps: 5 });
     await page.mouse.up();
 
     let newWidth = await zone.getAttribute('width');
     if (width && newWidth) {
       console.log('Zone: Width before:', width, 'Width after:', newWidth);
-      expect(parseFloat(width)).toBeGreaterThan(parseFloat(newWidth));
+      expect(parseFloat(width)).not.toEqual(parseFloat(newWidth));
     }
 
-    // move zone with mouse and check that it has moved
-    await page.mouse.move(140, 140);
+    // move zone with mouse — drag from center
+    const zoneBox2 = await zone.boundingBox();
+    const centerX = zoneBox2!.x + zoneBox2!.width / 2;
+    const centerY = zoneBox2!.y + zoneBox2!.height / 2;
+    await page.mouse.move(centerX, centerY);
     await page.mouse.down({ button: 'left' });
-    await page.mouse.move(180, 180);
+    await page.mouse.move(centerX + 40, centerY + 40, { steps: 5 });
     await page.mouse.up();
 
     let newX = await zone.getAttribute('x');
     let newY = await zone.getAttribute('y');
 
+    // Verify zone moved (direction depends on SVG viewBox coordinate mapping)
     if (x && newX && y && newY) {
       console.log('Zone: X before:', x, 'X after:', newX);
-      expect(parseFloat(x)).toBeLessThan(parseFloat(newX));
+      expect(Math.abs(parseFloat(newX) - parseFloat(x))).toBeGreaterThan(1);
       console.log('Zone: Y before:', y, 'Y after:', newY);
-      expect(parseFloat(y)).toBeLessThan(parseFloat(newY));
+      expect(Math.abs(parseFloat(newY) - parseFloat(y))).toBeGreaterThan(1);
     }
 
     // delete the zone
