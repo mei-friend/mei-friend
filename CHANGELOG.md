@@ -2,6 +2,7 @@
 
 ### 1.2.12 patch
 * Fix issue with GitHub-resource-URIs posted to Solid missing their branch 
+* Include Verovio version 6.1.0
 
 ### 1.2.11 patch
 * Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
