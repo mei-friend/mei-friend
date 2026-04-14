@@ -368,7 +368,7 @@ export function selectChoiceSubst(xmlDoc, elName, childElName, possibleChildElNa
       }
       // ensure that we only process if there are "possible" child elements
       // "possible" meaning, e.g., EITHER 'sic' and 'corr' OR 'orig' and 'reg'
-      if (new Set(childNames).intersection(new Set(possibleChildElNames)).size > 0) {
+      if (childNames.some((name) => possibleChildElNames.includes(name))) {
         if (childElName === '' || !childNames.includes(childElName)) {
           // delete currently everything but the first child
           for (let i = 1; i < children.length; i++) {

@@ -14,9 +14,9 @@ test.describe('1 Test translation functions', () => {
   });
   test('1.2 Test translations work and persist across page reloads', async ({ page }) => {
     // open the page
-    page.goto('/');
+    await page.goto('/');
     // wait for splash screen to appear
-    await page.waitForSelector('#splashConfirmButton');
+    await page.locator('#splashConfirmButton').waitFor({ state: 'visible' });
     // click on the "always show splash screen" button (#splashAlwaysShow)
     await page.locator('#splashAlwaysShow').click();
     // click on the confirm button (#splashConfirmButton)
@@ -25,10 +25,12 @@ test.describe('1 Test translation functions', () => {
     await page.locator('#showLanguageSelectionButton').click();
     // select a language
     await page.locator('#row_eo').click();
+    // wait for language change to take effect
+    await expect(page.locator('#helpMenuTitle')).toHaveText('Helpo');
     // reload page to check splash screen has been translated, i.e., translation is persistent across page reloads
-    page.reload();
+    await page.reload();
     // wait for the splash screen to appear
-    await page.waitForSelector('#splashConfirmButton');
+    await page.locator('#splashConfirmButton').waitFor({ state: 'visible' });
     // Confirmation button should have translated text
     await expect(page.locator('#splashConfirmButton')).toHaveText('Mi komprenas!');
   });

@@ -158,7 +158,7 @@ test.describe('1 Insert notes, rests, and accidentals.', () => {
 
     await test.step('Convert new note to rest', async () => {
       // convert the new note to a rest
-      console.log('Converting note to rest: ', uuid);
+      console.log('Converting note to rest: ', noteId);
       await clickManipulate(page, 'convertNoteToRest');
 
       // find the new rest
@@ -237,32 +237,23 @@ test.describe('1 Insert notes, rests, and accidentals.', () => {
 
     await test.step('Insert and delete accidentals', async () => {
       for (let i = 0; i < ids.length; i++) {
-        // select #note-0000000417567361
+        // select note
         await selectElementsByClicking(page, ids.slice(i, i + 1));
 
-        // find 'g#' + ids[0] and check whether it has an accid as child
-        await expect(async () => {
-          expect(page.locator('g#' + ids[i])).toBeVisible();
-        }).toPass({ timeout: 5000 });
+        // check element is visible and highlighted
+        await expect(page.locator('g#' + ids[i])).toBeVisible();
+        await expect(page.locator('g#' + ids[i])).toHaveClass('note highlighted');
 
-        // check whether notes are highlighted
-        await expect(async () => {
-          expect(page.locator('g#' + ids[i])).toHaveClass('note highlighted');
-        }).toPass({ timeout: 5000 });
-
-        // insert double sharp
+        // insert accidental
         await clickInsert(page, accids[i]);
         console.log('Accidental inserted: ', accids[i]);
 
-        // check whether note has an accid as child (not working in Firefox)
+        // check whether note has an accid as child
         const note = page.locator('g#' + ids[i]);
         await expect(note.locator('g.accid.highlighted')).toBeVisible();
 
         let uuid = await note.locator('g.accid.highlighted').getAttribute('id');
         if (uuid) uuids.push(uuid);
-
-        // 3 seconds delay
-        await page.waitForTimeout(30);
 
         // delete the accidental
         await deleteElements(page, [uuid!]);
@@ -293,9 +284,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
       await page.locator('#lastPageButton').click();
 
       // check whether first note on last page 'note-0000000604712286' is visible
-      await expect(async () => {
-        expect(page.locator('#note-0000000604712286')).toBeVisible();
-      }).toPass({ intervals: [1000, 1500, 2000, 3500], timeout: 5000 });
+      await expect(page.locator('#note-0000000604712286')).toBeVisible();
 
       // retrieve width from svg inside verovio-panel
       const height = await page.locator('#verovio-panel svg').first().getAttribute('height');
@@ -336,7 +325,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
 
       // press X to flip slur direction
       await page.keyboard.press('x');
-      // check encoding whether slur has curvedir="above"
+      // check encoding whether slur has curvedir="below"
       currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
       await expect(currentLine).toBeVisible();
       await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
@@ -377,12 +366,12 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
         clickCount: 1,
       });
 
-      // poll until width attribute in svg is smaller than width before
+      // poll until height attribute in svg is smaller than height before
       await expect(async () => {
         const newHeight = await page.locator('#verovio-panel svg').first().getAttribute('height');
         expect(newHeight).not.toEqual(height);
         console.log('Height after: ', newHeight);
-      }).toPass({ timeout: 5000 });
+      }).toPass({ timeout: 10000 });
     });
 
     await test.step('Select two elements and add slur to selected elements', async () => {
@@ -419,7 +408,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
 
       // press X to flip slur direction
       await page.keyboard.press('x');
-      // check encoding whether slur has curvedir="above"
+      // check encoding whether slur has curvedir="below"
       currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
       await expect(currentLine).toBeVisible();
       await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
@@ -454,7 +443,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
       // click on #nextPageButton
       await page.locator('#nextPageButton').click();
 
-      // check whether first note on third page 'note-0000001568544877' is visible
+      // check whether first note on third page is visible
       await expect(page.locator('#note-0000000973543454')).toBeVisible();
     });
 
@@ -492,7 +481,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
 
       // press X to flip slur direction
       await page.keyboard.press('x');
-      // check encoding whether slur has curvedir="above"
+      // check encoding whether slur has curvedir="below"
       currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
       await expect(currentLine).toBeVisible();
       await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
@@ -559,7 +548,7 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
 
       // press X to flip curve direction
       await page.keyboard.press('x');
-      // check encoding whether slur has curvedir="above"
+      // check encoding whether slur has curvedir="below"
       currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
       await expect(currentLine).toBeVisible();
       await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
@@ -574,31 +563,55 @@ test.describe('2 Insert, modify, and delete control elements.', () => {
 });
 
 /**
- * Selects the elements with the given string array of   ids
+ * Selects the elements with the given string array of ids.
+ * Uses platform-aware modifier key (Meta on Mac, Control on others) for multi-select.
  * @param {Page} page
  * @param {string[]} ids
  */
 async function selectElementsByClicking(page: Page, ids: string[]) {
   console.log('Selecting elements: ', ids);
-  let i = 0;
-  for (let id of ids) {
-    // ids.forEach(async (id, i) => {
-    let mod = { delay: 12, force: true };
-    if (i > 0) {
-      mod['modifiers'] = ['Meta'];
-    }
-    console.log(i + ': Selecting element with id: ', id + ' with mod: ', mod);
 
-    // await expect(async () => {
+  // Wait for all target elements to be visible
+  for (const id of ids) {
     await expect(page.locator('g#' + id)).toBeVisible();
-    // }).toPass({ timeout: 5000 });
-    await page
-      .locator('g#' + id)
-      .locator('*')
-      .first()
-      .click(mod); // need to click on any child element to select the parent
-    i++;
   }
+
+  // Retry the entire selection sequence. The first (non-modifier) click calls
+  // setCursorToId which may cause a deferred CodeMirror cursorActivity callback
+  // that resets selectedElements. We handle this by:
+  // 1. Clicking the first element and waiting for highlight + cursorActivity to settle
+  // 2. Then dispatching modifier clicks for additional elements
+  await expect(async () => {
+    // Click first element (replaces selection via non-modifier path)
+    await page.locator('g#' + ids[0]).dispatchEvent('click', { bubbles: true });
+    await expect(page.locator('g#' + ids[0])).toHaveClass(/highlighted/, { timeout: 1000 });
+
+    if (ids.length > 1) {
+      // Wait for any deferred cursorActivity to fire and settle before
+      // dispatching modifier clicks.
+      await page.waitForTimeout(500);
+
+      // Dispatch modifier clicks for remaining elements.
+      // Send BOTH ctrlKey and metaKey because Playwright's bundled Chromium
+      // reports userAgentData.platform as "Windows" even on macOS, and the
+      // app's platform detection uses userAgentData first. Sending both
+      // ensures the modifier branch is taken regardless of platform detection:
+      //   if ((platform.startsWith('mac') && event.metaKey) || event.ctrlKey)
+      for (let i = 1; i < ids.length; i++) {
+        await page.locator('g#' + ids[i]).dispatchEvent('click', {
+          bubbles: true,
+          ctrlKey: true,
+          metaKey: true,
+        });
+      }
+
+      // Verify all elements are highlighted
+      for (const id of ids) {
+        await expect(page.locator('g#' + id)).toHaveClass(/highlighted/, { timeout: 1000 });
+      }
+    }
+  }).toPass({ timeout: 15000 });
+
   return true;
 } // selectElements()
 
@@ -619,30 +632,20 @@ async function selectElementsByDragging(page: Page, ids: string[]) {
     const bbox = await el.boundingBox();
     console.log('Bounding box of element: ', bbox);
 
-    // get the element through javascript and get screenCTM coordinates
-    const ctm = await page.evaluate((id) => {
-      let el = document.querySelector('g#' + id);
-      // if (el) return el.getScreenCTM(); // TODO: this does not work.
-      // else return null;
-    });
-
-    console.log('Screen CTM of element: ', ctm);
-
     // move mouse to top-left corner of element and click
     await page.mouse.move(bbox!.x, bbox!.y);
     await page.mouse.down();
     // move mouse to element's bottom right corner and release
     await page.mouse.move(bbox!.x + bbox!.width, bbox!.y + bbox!.height);
     await page.mouse.up();
-    // wait for 2 seconds
-    await page.waitForTimeout(2000);
     i++;
   }
   return true;
 } // selectElementsByDragging()
 
 /**
- * Inserts the given element to the selected elements, using the INSERT menu item
+ * Inserts the given element to the selected elements, using the INSERT menu item.
+ * Waits for the element to appear in the DOM after insertion.
  * @param {Page} page
  * @param {string[]} ids
  * @param {string} elementName
@@ -658,16 +661,10 @@ async function insertElement(page: Page, ids: string[], elementName: string = 's
   const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
   await expect(measure).toBeVisible();
 
-  // wait for the element to be inserted (necessary for Firefox)
-  await page.waitForTimeout(2000);
-
-  // check that element is visible (not working in Firefox)
+  // wait for the inserted element to appear with retries (handles async rendering in all browsers)
   await expect(async () => {
-    // exipect(measure.locator('g.' + elementName + '.highlighted')).toBeAttached();
-    page.waitForSelector('g.' + elementName + '.highlighted', { state: 'attached' });
-    // expect(measure.locator('g.' + elementName + '.highlighted')).toBeVisible();
-    // expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
-  }).toPass({ timeout: 5000 });
+    await expect(measure.locator('g.' + elementName + '.highlighted')).toBeAttached();
+  }).toPass({ timeout: 10000 });
 
   let newId = await measure.locator('g.' + elementName + '.highlighted').getAttribute('id');
   console.log('new element ' + elementName + ': ' + newId + ' inserted.');
@@ -690,7 +687,6 @@ async function deleteElements(page: Page, ids: string[]) {
 
   // check that the element(s) have been deleted
   for (let id of ids) {
-    // ids.forEach(async (id) => {
     const element = page.locator('g#' + id);
     console.log('Checking deleted element ' + id + ': ' + element);
     // check whether the element is not visible
