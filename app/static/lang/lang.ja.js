@@ -572,6 +572,29 @@ export const lang = {
       'スピードモードがアクティブです。現在のページのMIDIのみ再生します。スピードモードを無効にすると、エンコーディング全体が再生されます。',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI再生コントロールバーを非表示' },
+  controlbarExpansionModeLegend: {
+    text: 'Expansion',
+    description: 'Controls whether Verovio applies <expansion> elements (repeats/alternates).',
+  },
+  controlbarExpansionModeDefaultLabel: {
+    text: 'Default',
+    description:
+      'Verovio default: MIDI playback follows the expansion, but the notation panel stays unexpanded. Neither expandAlways nor expandNever is set.',
+  },
+  controlbarExpansionModeAlwaysLabel: {
+    text: 'Always expand',
+    description: 'expandAlways: true — expand in all renderings (both notation and MIDI).',
+  },
+  controlbarExpansionModeNeverLabel: {
+    text: 'Never expand',
+    description: 'expandNever: true — suppress expansions in all renderings (notation and MIDI).',
+  },
+  controlbarMidiExpansionSelector: {
+    description: 'Select expansion element for MIDI playback',
+  },
+  controlbarMidiExpansionSelectorDisabled: {
+    description: 'Expansion selection is disabled because "Never expand" is active.',
+  },
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend設定',

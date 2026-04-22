@@ -59,3 +59,21 @@ export async function forceSetCheckbox(page: Page, selector: string, checked: bo
     }
   }, checked);
 }
+
+/**
+ * Loads a local MEI file by intercepting the hidden file-chooser dialog that
+ * `File → Open` opens. Use this when a test fixture needs to be self-contained
+ * (not reachable over the network).
+ */
+export async function openLocalMei(page: Page, name: string, contents: string) {
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  await page.locator('#fileMenuTitle').click();
+  await page.locator('#openMei').waitFor({ state: 'visible' });
+  await page.locator('#openMei').click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name,
+    mimeType: 'application/xml',
+    buffer: Buffer.from(contents, 'utf-8'),
+  });
+}

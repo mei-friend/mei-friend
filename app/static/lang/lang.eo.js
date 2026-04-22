@@ -586,6 +586,29 @@ export const lang = {
       'La rapida reĝimo estas aktiva; nur ludante MIDI-on por la nuntempa paĝo. Por ludi la tutan kodon, malŝaltu la rapidan reĝimon.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Kaŝi la MIDI Ludado-Kontrolobaron' },
+  controlbarExpansionModeLegend: {
+    text: 'Expansion',
+    description: 'Controls whether Verovio applies <expansion> elements (repeats/alternates).',
+  },
+  controlbarExpansionModeDefaultLabel: {
+    text: 'Default',
+    description:
+      'Verovio default: MIDI playback follows the expansion, but the notation panel stays unexpanded. Neither expandAlways nor expandNever is set.',
+  },
+  controlbarExpansionModeAlwaysLabel: {
+    text: 'Always expand',
+    description: 'expandAlways: true — expand in all renderings (both notation and MIDI).',
+  },
+  controlbarExpansionModeNeverLabel: {
+    text: 'Never expand',
+    description: 'expandNever: true — suppress expansions in all renderings (notation and MIDI).',
+  },
+  controlbarMidiExpansionSelector: {
+    description: 'Select expansion element for MIDI playback',
+  },
+  controlbarMidiExpansionSelectorDisabled: {
+    description: 'Expansion selection is disabled because "Never expand" is active.',
+  },
 
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {

@@ -1009,6 +1009,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.applyExpansionModeVisibility();
 
       translator.translateGui();
       translateLanguageSelection(translator.langCode);
@@ -1169,16 +1170,19 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
-      if (ev.data.expansionMap) {
-        setExpansionMap(ev.data.expansionMap);
-      }
+      // Feed the expansion map through unconditionally so the midi player
+      // can resolve expanded timemap ids back to notated ids in the SVG.
+      setExpansionMap(ev.data.expansionMap || null);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
         midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
-        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
-          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        // Pre-v6 only: re-render notation to match the selected expansion.
+        // On v6+ the vrvOptions pipeline (expandAlways) handles SVG expansion,
+        // so no extra re-render from here.
+        if (tkVersionNumber < 6.0 && 'expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm);
         }
       }
       break;
@@ -1540,20 +1544,7 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let meiString;
-  // if (v.expansionId) {
-  //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
-  //   let existingList = [];
-  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
-  //   if (v.speedMode) {
-  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
-  //   } else {
-  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
-  //   }
-  // } else {
-  // }
-  meiString = v.speedFilter(cm.getValue(), false);
+  let meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
@@ -1562,6 +1553,7 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
+    tkVersionNumber: tkVersionNumber,
   };
   vrvWorker.postMessage(message);
 } // requestMidiFromVrvWorker()
@@ -2423,6 +2415,14 @@ function addEventListeners(v, cm) {
       startMidiTimeout(true);
     }
     console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
+  });
+
+  // v6+ expansion-mode radio group (hidden pre-v6) — mirrors to settings-tab
+  // expandAlways/expandNever checkboxes via v.setExpansionMode.
+  document.querySelectorAll('input[name="controlbar-expansion-mode"]').forEach((radio) => {
+    radio.addEventListener('change', (ev) => {
+      if (ev.target.checked) v.setExpansionMode(ev.target.value);
+    });
   });
 } // addEventListeners()
 
