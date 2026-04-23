@@ -364,9 +364,9 @@ a:active {
 }
 
 .githubActionsInputConfig, .githubActionsCustomConfig {
-  display: flex;
-  flex-direction: row;
-  align-items: end;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-rows: auto auto;
   background-color: var(--dropdownBackgroundColor);
   border-radius: 1em;
   width: 90%;
@@ -379,6 +379,42 @@ a:active {
 }
 .githubActionsInputConfig span, .githubActionsCustomConfig span  {
   color: var(--textColor);
+}
+
+.githubActionsWorkpackageDescription {
+  font-size: 0.85em;
+  color: var(--textColor);
+  opacity: 0.8;
+  margin: 0.25em 0 0.5em 0;
+}
+
+.githubActionsWorkpackageDescription:empty {
+  display: none;
+}
+
+.githubActionsParamName {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+}
+
+.githubActionsParamInfo {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  cursor: help;
+  margin-left: 0.3em;
+  opacity: 0.6;
+}
+
+.githubActionsParamInfo:hover {
+  opacity: 1;
+}
+
+.githubActionsParamInfo svg {
+  width: 13px;
+  height: 13px;
+  fill: var(--textColor);
 }
 
 .githubActionsInputSetter {
@@ -395,7 +431,10 @@ a:active {
 }
 
 .githubActionsInputFieldWrapper {
-  flex: 1;
+  grid-column: 3;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
 }
 
 .githubActionsInputField {

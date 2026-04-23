@@ -64,6 +64,10 @@ export function fillCustomConfigParams(container, jsonResponse) {
   });
   container.appendChild(select);
 
+  const workpackageDescription = document.createElement('p');
+  workpackageDescription.classList.add('githubActionsWorkpackageDescription');
+  container.appendChild(workpackageDescription);
+
   const customParamList = document.createElement('div');
   container.appendChild(customParamList);
 
@@ -75,8 +79,10 @@ export function fillCustomConfigParams(container, jsonResponse) {
       console.log('Problem with selected custom config workpackage: ', selected, jsonResponse, wp_id);
       customParamList.innerHTML =
         '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
+      workpackageDescription.innerText = '';
       return;
     }
+    workpackageDescription.innerText = selected.description || '';
     Object.keys(selected.params).forEach((p) => {
       const cfg = generateGithubActionsInputConfig(selected.params, p, true);
       customParamList.appendChild(cfg);
@@ -84,7 +90,7 @@ export function fillCustomConfigParams(container, jsonResponse) {
   };
 
   select.addEventListener('change', () => renderParamList(select.value));
-  renderParamList(select.value || 0);
+  renderParamList(select.value);
 }
 
 const REPO_SIZE_WARNING_THRESHOLD = 100 * 1024; // 100MB; consider making this a user setting
@@ -1561,11 +1567,13 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputConfig.classList.add('githubActions' + configType);
   inputConfig.setAttribute('id', 'githubActions' + configType + '_' + input);
   const inputName = document.createElement('span');
+  inputName.classList.add('githubActionsParamName');
   inputName.innerText = input;
   if (!custom && 'description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
   if (custom && inputs[input] && inputs[input].type) {
     inputName.setAttribute('title', `type: ${inputs[input].type}`);
   }
+  const inputDescription = custom && inputs[input]?.description;
   const inputFieldWrapper = document.createElement('div');
   inputFieldWrapper.classList.add('githubActionsInputFieldWrapper');
   const inputField = document.createElement('input');
@@ -1603,6 +1611,13 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputFieldWrapper.insertAdjacentElement('beforeend', inputSetters);
   inputFieldWrapper.insertAdjacentElement('beforeend', inputField);
   inputConfig.insertAdjacentElement('beforeend', inputName);
+  if (inputDescription) {
+    const inputInfoIcon = document.createElement('span');
+    inputInfoIcon.classList.add('githubActionsParamInfo');
+    inputInfoIcon.innerHTML = icon.info;
+    inputInfoIcon.setAttribute('title', inputDescription);
+    inputConfig.insertAdjacentElement('beforeend', inputInfoIcon);
+  }
   inputConfig.insertAdjacentElement('beforeend', inputFieldWrapper);
   return inputConfig;
 }
