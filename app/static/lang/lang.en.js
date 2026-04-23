@@ -22,24 +22,24 @@ export const lang = {
     html: `
       <p>
         mei-friend is an editor for <a href="https://music-encoding.org">music encodings</a>, hosted at the
-        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a>. 
-        Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for 
+        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a>.
+        Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for
         further information.
       </p>
       <p>
         Though mei-friend is a browser-based application, your personal data (including the encoding you
         are editing, your application settings, and current login details if any) are stored in your browser's
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">local storage</a> 
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">local storage</a>
         and are not stored on our servers.
       </p>
       <p>
         Data is transmitted to GitHub only when you explicitly request it (e.g., when you log in to GitHub, load
         your encoding from or commit to a GitHub repository, or when you request a GitHub Action workflow to be
         run for you). Similarly, data is transmitted to your chosen Solid provider only when you explicitly
-        request it (e.g., when you log in to Solid, or load or save stand-off annotations).  For technical reasons, 
-        certain interactions with GitHub (cloning a repository to your browser when first opening an encoding, 
-        or committing changes to a repository) require data to be transmitted to a proxy server hosted by the 
-        mdw &ndash; University of Music and Performing Arts Vienna. This server acts as an intermediary between your 
+        request it (e.g., when you log in to Solid, or load or save stand-off annotations).  For technical reasons,
+        certain interactions with GitHub (cloning a repository to your browser when first opening an encoding,
+        or committing changes to a repository) require data to be transmitted to a proxy server hosted by the
+        mdw &ndash; University of Music and Performing Arts Vienna. This server acts as an intermediary between your
         browser and GitHub, and does not store any data transmitted through it.
       </p>
       <p>
@@ -51,23 +51,23 @@ export const lang = {
         Performing Arts Vienna, and is not shared with any third party.
       </p>
       <p>
-        Lute tablatures are converted to MEI using 
-        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> developed by Paul Overell, 
-        via the <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui service</a> 
-        developed by Stefan Szepe and <a href="https://luteconv.mdw.ac.at" target="_blank">hosted by the mdw</a>. 
-        This service creates Web-accessible copies of your encodings as part of the conversion process, but these are 
-        accessible only via a unique link hash value, and are periodically deleted. 
+        Lute tablatures are converted to MEI using
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> developed by Paul Overell,
+        via the <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui service</a>
+        developed by Stefan Szepe and <a href="https://luteconv.mdw.ac.at" target="_blank">hosted by the mdw</a>.
+        This service creates Web-accessible copies of your encodings as part of the conversion process, but these are
+        accessible only via a unique link hash value, and are periodically deleted.
       </p>
       <p>
         The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
-        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>.
         This allows mei-friend to stay up-to-date with the latest toolkit version and
-        to provide the choice of all supported versions through the settings panel. 
+        to provide the choice of all supported versions through the settings panel.
         When using mei-friend, your IP address is therefore visible by RISM Digital.
       </p>
       <p>
         Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served
-        via googleapis.com. Your IP address is therefore visible to Google when initiating MIDI playback. If you 
+        via googleapis.com. Your IP address is therefore visible to Google when initiating MIDI playback. If you
         do not wish for this to happen, please refrain from using the MIDI playback feature.
       </p>
       <p>
@@ -408,7 +408,7 @@ export const lang = {
   },
   githubActionsCustomContainerHeader: { text: 'Custom configuration' },
   githubActionsCustomContainerExplanation: {
-    text: 'If your project uses custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. ENTER DOCUMENTATION LINK HERE!',
+    text: 'If you want to use custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. More information can be found in the documentation, available here: <a href="https://mei-friend.github.io/docs/advanced/automation" target="_blank">https://mei-friend.github.io/docs/advanced/automation</a>.',
   },
   githubActionsCustomConfigInvalidResponse: {
     text: 'The JSON configuration file you have specified does not conform to the expected schema. Please check the documentation for details.',

@@ -954,7 +954,7 @@ async function handleClickGithubAction(e, gm) {
         }
         customContainer.appendChild(githubActionsCustomConfigurationUrl);
         const githubActionsCustomContainerExplanation = document.createElement('p');
-        githubActionsCustomContainerExplanation.innerText =
+        githubActionsCustomContainerExplanation.innerHTML =
           translator.lang.githubActionsCustomContainerExplanation.text;
         customContainer.appendChild(githubActionsCustomContainerExplanation);
         customContainer.appendChild(customConfigParams);
