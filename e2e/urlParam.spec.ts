@@ -12,7 +12,8 @@ test('2 Test url param: page', async ({ page }) => {
     let param = '&page=';
     let paramValue = '3';
     await setupPage(page, clara + param + paramValue);
-    await expect(page.locator('div#pagination2')).toHaveText(paramValue);
+    // pagination text may contain surrounding whitespace
+    await expect(page.locator('div#pagination2')).toContainText(paramValue);
 });
 
 test('3 Test url param: breaks', async ({ page }) => {
@@ -28,4 +29,3 @@ test('4 Test url param: speed', async ({ page }) => {
     await setupPage(page, clara + param + paramValue);
     await expect(page.locator('input#speedCheckbox')).not.toBeChecked();
 });
-

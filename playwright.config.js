@@ -11,8 +11,10 @@ require('dotenv').config();
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
+  /* Per-test timeout: Verovio toolkit loading takes 10-15s in headless browsers */
+  timeout: 90000,
   expect: {
-    timeout: 10000,
+    timeout: 15000,
   },
   testDir: './e2e',
   /* Run tests in files in parallel */
@@ -21,8 +23,8 @@ module.exports = defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Limit parallel workers to avoid CPU contention during Verovio rendering */
+  workers: process.env.CI ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -38,7 +40,13 @@ module.exports = defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // allow autoplay so MIDI playback tests work in headless mode
+        launchOptions: {
+          args: ['--autoplay-policy=no-user-gesture-required'],
+        },
+      },
     },
 
     {
