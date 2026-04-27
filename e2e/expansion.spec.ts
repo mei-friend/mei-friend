@@ -102,18 +102,19 @@ test.describe('Expansion behaviour under Verovio 6+', () => {
     await expect(page.locator('#vrv-expandNever')).not.toBeChecked();
 
     // Picking "No expansion" in the dropdown ticks the settings-tab checkbox.
+    // The dropdown stays enabled — the user can pick any expansion to
+    // re-engage it (which will clear expandNever automatically).
     await page.locator('#controlbar-midi-expansion-selector').selectOption('');
     await expect(page.locator('#vrv-expandNever')).toBeChecked();
-    await expect(page.locator('#controlbar-midi-expansion-selector')).toBeDisabled();
-
-    // Reverse direction: unchecking expandNever in Settings re-enables the
-    // dropdown and auto-picks the first expansion again.
-    await forceSetCheckbox(page, '#vrv-expandNever', false);
     await expect(page.locator('#controlbar-midi-expansion-selector')).toBeEnabled();
+
+    // Reverse direction: unchecking expandNever in Settings auto-picks the
+    // first expansion again.
+    await forceSetCheckbox(page, '#vrv-expandNever', false);
     await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
   });
 
-  test('picking "No expansion" from the dropdown disables it and sets expandNever', async ({ page }) => {
+  test('picking "No expansion" from the dropdown sets expandNever (without disabling the dropdown)', async ({ page }) => {
     if (!(await isV6OrLater(page))) test.skip(true, 'Verovio <6: expandNever is not exposed');
 
     await loadFixture(page);
@@ -123,10 +124,15 @@ test.describe('Expansion behaviour under Verovio 6+', () => {
     // On load: dropdown auto-populated with the fixture's first real expansion.
     await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
 
-    // Pick the empty "No expansion" placeholder: dropdown disables, expandNever sets.
+    // Pick "No expansion": expandNever sets, dropdown stays enabled so the
+    // user can pivot back into an expansion in a single click.
     await page.locator('#controlbar-midi-expansion-selector').selectOption('');
-    await expect(page.locator('#controlbar-midi-expansion-selector')).toBeDisabled();
     await expect(page.locator('#vrv-expandNever')).toBeChecked();
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toBeEnabled();
+
+    // Picking an expansion from the still-enabled dropdown clears expandNever.
+    await page.locator('#controlbar-midi-expansion-selector').selectOption('expRepeatA');
+    await expect(page.locator('#vrv-expandNever')).not.toBeChecked();
   });
 
   test('selecting a non-default expansion actually drives MIDI (regression)', async ({ page }, testInfo) => {
