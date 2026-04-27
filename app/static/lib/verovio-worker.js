@@ -59,6 +59,7 @@ addEventListener(
           if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') {
             tkOptions.breaks = 'encoded';
           }
+          console.log('OPTIONS: ', tkOptions);
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
@@ -310,34 +311,33 @@ addEventListener(
         break;
       case 'exportMidi': // re-load data and export MIDI base-64 string
         try {
-          //
+          const isV6 = result.tkVersionNumber >= 6.0;
           tkOptions = result.options;
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode || result.expand) {
             let bOpt = tkOptions.breaks;
-            console.log(
-              '!!! 1 Verovio Worker ' + result.cmd + ': breaks to none, expand to: "' + result.expand + '"!!!'
-            );
             tk.setOptions({ breaks: 'none', expand: result.expand }); // if reloading data, skip rendering layout
-            console.log('!!! 2 Verovio Worker ' + result.cmd + ': loading data!!!', result.mei);
             tk.loadData(result.mei);
-            console.log('!!! 3 Verovio Worker ' + result.cmd + ': setting breaks back to ' + bOpt + '!!!');
-            tk.setOptions({ breaks: bOpt, expand: '' }); // ... and re-set breaks option
+            // Restore breaks but keep `expand` set — renderToMIDI consults
+            // current options, so clearing it here would make Verovio fall
+            // back to the first/default expansion regardless of selection.
+            tk.setOptions({ breaks: bOpt });
             result.toolkitDataOutdated = result.speedMode ? true : result.expand ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
-          console.log('!!! 4 Verovio Worker: renderToExpansionMap()');
-          if (result.expand) {
-            // TODO: only, if PR #3360 gets merged on Verovio (2. April 2023)
+          // v6+: MIDI/timemap may contain expanded ids even without an explicit
+          // expand option, because Verovio auto-generates a default <expansion>.
+          // Always surface the map so the midi player can resolve expanded ids
+          // back to notated ids for highlighting/page-follow in the unexpanded SVG.
+          if (isV6 || result.expand) {
             result.expansionMap = tk.renderToExpansionMap();
-            console.log('!!! 5 Verovio Worker: expansionMap: ', result.expansionMap);
-
-            const tmp = tk.getExpansionIdsForElement('');
-            console.log('!!! 6 Verovio Worker: expansionId: ', tmp);
           }
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
+          // Clear `expand` now that MIDI/timemap have been rendered, so the
+          // selection doesn't leak into subsequent layout renders.
+          tk.setOptions({ expand: '' });
           if (result.toolkitDataOutdated || result.speedMode) {
             tk.setOptions(tkOptions); // ... and re-set breaks option
           }

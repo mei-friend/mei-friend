@@ -497,7 +497,6 @@ export const lang = {
       'Hastigheds mode er aktiv; kun afspilning af MIDI for nuværende side. For at afspille hele kodningen, deaktiver hastigheds mode.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Skjul MIDI afspilnings kontrolbar' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend indstillinger',

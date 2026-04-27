@@ -584,7 +584,6 @@ export const lang = {
       'Активовано режим швидкості; грається лише MIDI для поточної сторінки. Щоб відтворити весь кодування, вимкніть режим швидкості.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Сховати панель управління відтворенням MIDI' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Налаштування mei-friend',

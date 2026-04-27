@@ -597,7 +597,6 @@ export const lang = {
   closeMidiPlaybackControlBarButton: {
     description: 'Masquer la barre de contrôle de lecture MIDI',
   },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Paramètres mei-friend',

@@ -606,7 +606,6 @@ export const lang = {
       'Um die gesamte Kodierung abzuspielen, bitte Speed Mode deaktivieren.',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Einstellungen',

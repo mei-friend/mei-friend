@@ -602,7 +602,6 @@ export const lang = {
       'El mode de velocitat està actiu; només es reprodueix el MIDI per a la pàgina actual. Per reproduir tota la codificació, desactiveu el mode de velocitat.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Amaga la barra de control de reproducció MIDI' },
-
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
     text: 'Configuració de mei-friend',

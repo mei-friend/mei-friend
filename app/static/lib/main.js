@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.12';
-export const versionDate = '07 April 2026'; // use full or 3-character english months, will be translated
+export const version = '1.2.13';
+export const versionDate = '27 April 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -278,6 +278,13 @@ export function updateFileStatusDisplay() {
 export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
+  }
+  // Close the MIDI playback control bar whenever a new encoding is loaded.
+  // The previous file's MIDI/timemap is now stale and the bar will re-render
+  // fresh next time the user opens it. This covers Open file, Open URL,
+  // public repertoire, and the GitHub integration since they all funnel here.
+  if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
+    cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
   v.hideCodeCheckerPanel();
@@ -1009,6 +1016,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.applyExpansionModeVisibility();
 
       translator.translateGui();
       translateLanguageSelection(translator.langCode);
@@ -1169,16 +1177,19 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
-      if (ev.data.expansionMap) {
-        setExpansionMap(ev.data.expansionMap);
-      }
+      // Feed the expansion map through unconditionally so the midi player
+      // can resolve expanded timemap ids back to notated ids in the SVG.
+      setExpansionMap(ev.data.expansionMap || null);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
         midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
-        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
-          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        // Pre-v6 only: re-render notation to match the selected expansion.
+        // On v6+ the vrvOptions pipeline (expandAlways) handles SVG expansion,
+        // so no extra re-render from here.
+        if (tkVersionNumber < 6.0 && 'expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm);
         }
       }
       break;
@@ -1540,20 +1551,7 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let meiString;
-  // if (v.expansionId) {
-  //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
-  //   let existingList = [];
-  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
-  //   if (v.speedMode) {
-  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
-  //   } else {
-  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
-  //   }
-  // } else {
-  // }
-  meiString = v.speedFilter(cm.getValue(), false);
+  let meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
@@ -1562,6 +1560,7 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
+    tkVersionNumber: tkVersionNumber,
   };
   vrvWorker.postMessage(message);
 } // requestMidiFromVrvWorker()
@@ -2415,14 +2414,25 @@ function addEventListeners(v, cm) {
 
   addZoneDrawer();
 
-  // MIDI control bar expansion selector change listener
+  // MIDI control bar expansion selector change listener.
+  // v6+: the dropdown is the sole UI for the bar — empty value means
+  // expandNever, anything else means "use this expansion for MIDI".
   document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
-    v.expansionId = ev.target.value;
-    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    const value = ev.target.value;
+    if (!value && tkVersionNumber >= 6.0) {
+      v.setExpansionMode('never');
+      return;
+    }
+    if (tkVersionNumber >= 6.0 && v.getExpansionMode() === 'never') {
+      // Coming back out of expandNever via picking a real expansion: clear the
+      // expandNever flag so MIDI actually follows the new selection.
+      v.setExpansionMode('default', { reRender: false });
+    }
+    v.expansionId = value;
+    document.getElementById('selectMidiExpansion').value = value;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
     }
-    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
   });
 } // addEventListeners()
 

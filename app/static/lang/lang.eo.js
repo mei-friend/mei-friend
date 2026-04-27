@@ -586,7 +586,6 @@ export const lang = {
       'La rapida reĝimo estas aktiva; nur ludante MIDI-on por la nuntempa paĝo. Por ludi la tutan kodon, malŝaltu la rapidan reĝimon.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Kaŝi la MIDI Ludado-Kontrolobaron' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Agordoj',
