@@ -4,6 +4,13 @@
 
 - Implement [#140](https://github.com/mei-friend/mei-friend/issues/140) to support custom GitHub Actions configurations
 
+### 1.2.13 patch
+* Adjust expansion behaviour for Verovio 6+: MIDI follows the expansion while the SVG remains unexpanded by default; renditions ≥ 2 now highlight and page-follow correctly via the expansion map. Fixes [#187](https://github.com/mei-friend/mei-friend/issues/187).
+* Selecting "No expansion" in MIDI player dropdown sets `expandNever`; selecting any expansion sets `expand` to that id and clears `expandNever`
+* Settings-tab `expandAlways` / `expandNever` checkboxes now mutually deactivate each other so users can flip freely between them
+* Auto-close the MIDI playback control bar when a new encoding is opened (Open file.
+* Add Playwright e2e coverage for v6 expansion behaviour
+
 ### 1.2.12 patch
 
 - Fix issue with GitHub-resource-URIs posted to Solid missing their branch

@@ -502,7 +502,6 @@ export const lang = {
       'Aktivan je režim brzine; reprodukcija MIDI-ja je moguća samo za trenutnu stranicu. Da biste reprodukovali ceo zapis, onemogućite režim brzine.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Sakrij traku za kontrolu reprodukcije MIDI-ja' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Postavke',

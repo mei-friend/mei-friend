@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Expansion playback fixture</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" key.sig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="topSection">
+            <expansion xml:id="expRepeatA" plist="#sectionA #sectionB #sectionA"/>
+            <expansion xml:id="expBOnly" plist="#sectionB"/>
+            <section xml:id="sectionA">
+              <measure xml:id="mA1" n="1">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="noteA1" dur="4" oct="4" pname="c"/>
+                    <note xml:id="noteA2" dur="4" oct="4" pname="d"/>
+                    <note xml:id="noteA3" dur="4" oct="4" pname="e"/>
+                    <note xml:id="noteA4" dur="4" oct="4" pname="f"/>
+                  </layer>
+                </staff>
+              </measure>
+              <pb xml:id="pbInsideA"/>
+              <measure xml:id="mA2" n="2">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="noteA5" dur="4" oct="4" pname="g"/>
+                    <note xml:id="noteA6" dur="4" oct="4" pname="a"/>
+                    <note xml:id="noteA7" dur="4" oct="4" pname="b"/>
+                    <note xml:id="noteA8" dur="4" oct="5" pname="c"/>
+                  </layer>
+                </staff>
+              </measure>
+            </section>
+            <section xml:id="sectionB">
+              <measure xml:id="mB1" n="3">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="noteB1" dur="4" oct="4" pname="d"/>
+                    <note xml:id="noteB2" dur="4" oct="4" pname="d"/>
+                    <note xml:id="noteB3" dur="4" oct="4" pname="d"/>
+                    <note xml:id="noteB4" dur="4" oct="4" pname="d"/>
+                  </layer>
+                </staff>
+              </measure>
+            </section>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

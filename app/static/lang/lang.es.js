@@ -607,7 +607,6 @@ export const lang = {
       'Modo de velocidad activado; solo se está reproduciendo MIDI para la página actual. Para reproducir todo el archivo, desactivar el modo de velocidad.',
   },
   closeMidiPlaybackControlBarButton: { description: 'Ocultar la barra de control de reproducción de MIDI' },
-
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
   meiFriendSettingsHeader: {
     text: 'Configuración',

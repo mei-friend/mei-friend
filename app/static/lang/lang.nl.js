@@ -505,7 +505,6 @@ export const lang = {
       'Snelheidsmodus is actief; alleen MIDI voor huidige pagina wordt afgespeeld. Om de hele codering af te spelen, schakelt u de snelheidsmodus uit.',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-afspeelbedieningsbalk verbergen' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend instellingen',

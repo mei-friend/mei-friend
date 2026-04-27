@@ -479,7 +479,6 @@ export const lang = {
     description: '速度模式已激活；仅播放当前页面的 MIDI。要播放整个编码，请禁用速度模式。',
   },
   closeMidiPlaybackControlBarButton: { description: '隐藏 MIDI 播放控制栏' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend 设置',
