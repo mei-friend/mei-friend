@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.12';
-export const versionDate = '08 April 2026'; // use full or 3-character english months, will be translated
+export const version = '1.2.13';
+export const versionDate = '27 April 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -278,6 +278,13 @@ export function updateFileStatusDisplay() {
 export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
+  }
+  // Close the MIDI playback control bar whenever a new encoding is loaded.
+  // The previous file's MIDI/timemap is now stale and the bar will re-render
+  // fresh next time the user opens it. This covers Open file, Open URL,
+  // public repertoire, and the GitHub integration since they all funnel here.
+  if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
+    cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
   v.hideCodeCheckerPanel();
@@ -2407,22 +2414,25 @@ function addEventListeners(v, cm) {
 
   addZoneDrawer();
 
-  // MIDI control bar expansion selector change listener
+  // MIDI control bar expansion selector change listener.
+  // v6+: the dropdown is the sole UI for the bar — empty value means
+  // expandNever, anything else means "use this expansion for MIDI".
   document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
-    v.expansionId = ev.target.value;
-    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    const value = ev.target.value;
+    if (!value && tkVersionNumber >= 6.0) {
+      v.setExpansionMode('never');
+      return;
+    }
+    if (tkVersionNumber >= 6.0 && v.getExpansionMode() === 'never') {
+      // Coming back out of expandNever via picking a real expansion: clear the
+      // expandNever flag so MIDI actually follows the new selection.
+      v.setExpansionMode('default', { reRender: false });
+    }
+    v.expansionId = value;
+    document.getElementById('selectMidiExpansion').value = value;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
     }
-    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
-  });
-
-  // v6+ expansion-mode radio group (hidden pre-v6) — mirrors to settings-tab
-  // expandAlways/expandNever checkboxes via v.setExpansionMode.
-  document.querySelectorAll('input[name="controlbar-expansion-mode"]').forEach((radio) => {
-    radio.addEventListener('change', (ev) => {
-      if (ev.target.checked) v.setExpansionMode(ev.target.value);
-    });
   });
 } // addEventListeners()
 

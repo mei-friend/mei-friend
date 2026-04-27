@@ -24,6 +24,7 @@
           </scoreDef>
           <section xml:id="topSection">
             <expansion xml:id="expRepeatA" plist="#sectionA #sectionB #sectionA"/>
+            <expansion xml:id="expBOnly" plist="#sectionB"/>
             <section xml:id="sectionA">
               <measure xml:id="mA1" n="1">
                 <staff n="1">

@@ -1466,6 +1466,16 @@ export default class Viewer {
             cmd.toggleMidiPlaybackControlBar(false);
             break;
           case 'selectMidiExpansion':
+            // v6+: the dropdown is the canonical expandNever switch.
+            // Empty value → set expandNever. Real value while in expandNever →
+            // exit it so MIDI follows the new selection.
+            if (!value && tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+              this.setExpansionMode('never');
+              break;
+            }
+            if (value && tkVersionNumber >= 6.0 && this.getExpansionMode() === 'never') {
+              this.setExpansionMode('default', { reRender: false });
+            }
             this.updateSelectMidiExpansion();
             if (document.getElementById('showMidiPlaybackControlBar').checked) {
               startMidiTimeout(true);
@@ -2168,6 +2178,11 @@ export default class Viewer {
         vrvOption.add(new Option(str[0], str[1]));
       }
     });
+    // v6+: auto-pick the first real expansion when in default/always mode so
+    // the user doesn't have to manually select one. No-op on <v6 or 'never'.
+    if (tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+      this.setExpansionMode(this.getExpansionMode(), { reRender: false });
+    }
   } // setMidiExpansionOptions()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
@@ -2363,7 +2378,6 @@ export default class Viewer {
     this.expansionId = document.getElementById('selectMidiExpansion').value;
     let mes = document.getElementById('controlbar-midi-expansion-selector');
     if (mes) mes.value = this.expansionId;
-    console.log('EEEEExpansion selector set to: ' + this.expansionId);
   }
 
   /**
@@ -2377,9 +2391,9 @@ export default class Viewer {
   }
 
   /**
-   * Set the Verovio expansion mode across vrvOptions, localStorage, and all
-   * bound UI surfaces (midi-bar radio, settings-tab checkboxes, expansion
-   * dropdowns). No-op on Verovio <6.0 since expandAlways/expandNever are v6+.
+   * Set the Verovio expansion mode across vrvOptions, localStorage, and the
+   * settings-tab checkboxes / MIDI-bar dropdown. No-op on Verovio <6.0 since
+   * expandAlways/expandNever are v6+.
    * @param {'default'|'always'|'never'} mode
    * @param {{reRender?: boolean}} [opts]
    */
@@ -2394,40 +2408,42 @@ export default class Viewer {
     else delete ls['vrv-expandAlways'];
     if (expandNever) ls['vrv-expandNever'] = true;
     else delete ls['vrv-expandNever'];
-    // radio group
-    document.querySelectorAll('input[name="controlbar-expansion-mode"]').forEach((r) => {
-      r.checked = r.value === mode;
-    });
-    // settings-tab checkboxes (may be absent before first render)
+    // settings-tab checkboxes (may be absent before first render). Mutual
+    // exclusion is enforced by clearing the opposing checkbox when one is
+    // turned on — both remain clickable so the user can toggle freely.
     const alwaysCb = document.getElementById('vrv-expandAlways');
     const neverCb = document.getElementById('vrv-expandNever');
-    if (alwaysCb) {
-      alwaysCb.checked = expandAlways;
-      alwaysCb.disabled = expandNever;
-    }
-    if (neverCb) {
-      neverCb.checked = expandNever;
-      neverCb.disabled = expandAlways;
-    }
-    // expansion dropdowns: disabled + cleared when 'never'
+    if (alwaysCb) alwaysCb.checked = expandAlways;
+    if (neverCb) neverCb.checked = expandNever;
+    // MIDI-bar dropdown is the canonical expansion picker. On 'never' it
+    // is cleared and disabled; on default/always it auto-picks the first
+    // real option if nothing is currently selected.
     const barSel = document.getElementById('controlbar-midi-expansion-selector');
     const settingsSel = document.getElementById('selectMidiExpansion');
-    const disabledTitle =
-      translator?.lang?.controlbarMidiExpansionSelectorDisabled?.description ||
-      'Expansion selection is disabled because "Never expand" is active.';
-    const normalTitle =
-      translator?.lang?.controlbarMidiExpansionSelector?.description ||
-      'Select expansion element for MIDI playback';
     if (barSel) {
       barSel.disabled = expandNever;
-      barSel.title = expandNever ? disabledTitle : normalTitle;
       if (expandNever) barSel.value = '';
     }
     if (settingsSel) {
       settingsSel.disabled = expandNever;
       if (expandNever) settingsSel.value = '';
     }
-    if (expandNever) this.expansionId = '';
+    if (expandNever) {
+      this.expansionId = '';
+    } else {
+      const current = settingsSel?.value ?? barSel?.value ?? this.expansionId ?? '';
+      if (!current) {
+        const pickFrom = settingsSel || barSel;
+        const firstReal = pickFrom
+          ? Array.from(pickFrom.options).find((o) => o.value)
+          : null;
+        if (firstReal) {
+          this.expansionId = firstReal.value;
+          if (settingsSel) settingsSel.value = firstReal.value;
+          if (barSel) barSel.value = firstReal.value;
+        }
+      }
+    }
     if (reRender) {
       window.clearTimeout(this.vrvTimeout);
       this.vrvTimeout = window.setTimeout(() => this.updateLayout(this.vrvOptions), this.timeoutDelay);
@@ -2438,15 +2454,12 @@ export default class Viewer {
   } // setExpansionMode()
 
   /**
-   * Show/hide the v6+ expansion-mode radio group on the midi bar based on
-   * the currently loaded toolkit version, and seed its state from vrvOptions.
+   * Reconcile expansion-mode UI state on toolkit (re)load. No-op pre-v6.
    */
   applyExpansionModeVisibility() {
-    const fs = document.getElementById('controlbarExpansionMode');
-    if (!fs) return;
-    const isV6 = tkVersionNumber >= 6.0;
-    fs.style.display = isV6 ? '' : 'none';
-    if (isV6) this.setExpansionMode(this.getExpansionMode(), { reRender: false });
+    if (tkVersionNumber >= 6.0) {
+      this.setExpansionMode(this.getExpansionMode(), { reRender: false });
+    }
   } // applyExpansionModeVisibility()
 
   busy(active = true, speedWorker = false) {

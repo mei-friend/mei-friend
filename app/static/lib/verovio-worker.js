@@ -319,7 +319,10 @@ addEventListener(
             let bOpt = tkOptions.breaks;
             tk.setOptions({ breaks: 'none', expand: result.expand }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
-            tk.setOptions({ breaks: bOpt, expand: '' }); // ... and re-set breaks option
+            // Restore breaks but keep `expand` set — renderToMIDI consults
+            // current options, so clearing it here would make Verovio fall
+            // back to the first/default expansion regardless of selection.
+            tk.setOptions({ breaks: bOpt });
             result.toolkitDataOutdated = result.speedMode ? true : result.expand ? true : false;
           }
           result.midi = tk.renderToMIDI();
@@ -332,6 +335,9 @@ addEventListener(
             result.expansionMap = tk.renderToExpansionMap();
           }
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
+          // Clear `expand` now that MIDI/timemap have been rendered, so the
+          // selection doesn't leak into subsequent layout renders.
+          tk.setOptions({ expand: '' });
           if (result.toolkitDataOutdated || result.speedMode) {
             tk.setOptions(tkOptions); // ... and re-set breaks option
           }

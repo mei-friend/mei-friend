@@ -6,9 +6,10 @@ import { setupPage, openLocalMei, forceSelectOption, forceSetCheckbox } from './
 // These tests exercise the v6+ expansion behaviour. `<expansion>` semantics
 // changed in Verovio 6.0: by default, MIDI/timemap contain the expanded
 // playback ids while the SVG stays unexpanded. mei-friend maps expanded ids
-// back to the notated ids at highlight/page-follow time, and exposes a
-// three-way radio (default / always / never) on the midi control bar.
-// On Verovio <6 the radio group is hidden and we skip.
+// back to the notated ids at highlight/page-follow time. The MIDI control
+// bar's expansion dropdown is the sole UI for choosing which expansion drives
+// playback — selecting "No expansion" sets `expandNever`. On Verovio <6
+// these semantics do not apply and the affected tests skip.
 
 const fixturePath = join(__dirname, 'fixtures', 'expansion-repeat.mei');
 
@@ -20,11 +21,11 @@ async function loadFixture(page: Page) {
 }
 
 async function isV6OrLater(page: Page): Promise<boolean> {
-  // The radio group is only shown on v6+. Use that as the version gate so we
-  // don't couple these tests to string formatting of the status bar.
-  const fs = page.locator('#controlbarExpansionMode');
-  // visibility is driven by inline style; read it directly
-  return await fs.evaluate((el) => (el as HTMLElement).style.display !== 'none');
+  // Parse the toolkit version out of the status bar, which always begins
+  // "Verovio X.Y.Z" regardless of the active language.
+  const text = (await page.locator('#statusBar').textContent()) || '';
+  const m = text.match(/Verovio (\d+)\./);
+  return m ? parseInt(m[1], 10) >= 6 : false;
 }
 
 test.beforeEach(async ({ page }) => {
@@ -89,48 +90,83 @@ test.describe('Expansion behaviour under Verovio 6+', () => {
     await expect(page.locator('#pagination2')).toHaveText(' 1 ', { timeout: 30000 });
   });
 
-  test('radio ↔ settings-tab checkboxes stay mutually in sync', async ({ page }) => {
-    if (!(await isV6OrLater(page))) test.skip(true, 'Verovio <6: expandAlways/expandNever are not exposed');
-
-    // Pick "Always expand" via the midi-bar radio.
-    await page.locator('#midiPlayerContextual').click();
-    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
-    await page.locator('#controlbarExpansionModeAlways').check({ force: true });
-
-    // The settings-tab expandAlways checkbox must follow; expandNever must be
-    // disabled (mutual-exclusion hack).
-    await expect(page.locator('#vrv-expandAlways')).toBeChecked();
-    await expect(page.locator('#vrv-expandNever')).not.toBeChecked();
-    await expect(page.locator('#vrv-expandNever')).toBeDisabled();
-
-    // Flip direction: untick expandAlways from the settings tab, then tick
-    // expandNever. The radio must follow.
-    await forceSetCheckbox(page, '#vrv-expandAlways', false);
-    await expect(page.locator('#controlbarExpansionModeDefault')).toBeChecked();
-    await expect(page.locator('#vrv-expandNever')).not.toBeDisabled();
-
-    await forceSetCheckbox(page, '#vrv-expandNever', true);
-    await expect(page.locator('#controlbarExpansionModeNever')).toBeChecked();
-    await expect(page.locator('#vrv-expandAlways')).toBeDisabled();
-  });
-
-  test('selecting "Never expand" disables the expansion dropdown', async ({ page }) => {
+  test('dropdown ↔ settings-tab expandNever stay mutually in sync', async ({ page }) => {
     if (!(await isV6OrLater(page))) test.skip(true, 'Verovio <6: expandNever is not exposed');
 
+    await loadFixture(page);
     await page.locator('#midiPlayerContextual').click();
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
 
-    // Sanity: dropdown is enabled under the default mode.
-    await expect(page.locator('#controlbar-midi-expansion-selector')).toBeEnabled();
+    // On load: dropdown auto-picked the first real expansion; expandNever off.
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
+    await expect(page.locator('#vrv-expandNever')).not.toBeChecked();
 
-    // Switch to Never expand; dropdown becomes disabled and reverts to "" ('No expansion').
-    await page.locator('#controlbarExpansionModeNever').check({ force: true });
+    // Picking "No expansion" in the dropdown ticks the settings-tab checkbox.
+    await page.locator('#controlbar-midi-expansion-selector').selectOption('');
+    await expect(page.locator('#vrv-expandNever')).toBeChecked();
     await expect(page.locator('#controlbar-midi-expansion-selector')).toBeDisabled();
-    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('');
 
-    // Back to default: dropdown re-enables.
-    await page.locator('#controlbarExpansionModeDefault').check({ force: true });
+    // Reverse direction: unchecking expandNever in Settings re-enables the
+    // dropdown and auto-picks the first expansion again.
+    await forceSetCheckbox(page, '#vrv-expandNever', false);
     await expect(page.locator('#controlbar-midi-expansion-selector')).toBeEnabled();
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
+  });
+
+  test('picking "No expansion" from the dropdown disables it and sets expandNever', async ({ page }) => {
+    if (!(await isV6OrLater(page))) test.skip(true, 'Verovio <6: expandNever is not exposed');
+
+    await loadFixture(page);
+    await page.locator('#midiPlayerContextual').click();
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
+
+    // On load: dropdown auto-populated with the fixture's first real expansion.
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
+
+    // Pick the empty "No expansion" placeholder: dropdown disables, expandNever sets.
+    await page.locator('#controlbar-midi-expansion-selector').selectOption('');
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toBeDisabled();
+    await expect(page.locator('#vrv-expandNever')).toBeChecked();
+  });
+
+  test('selecting a non-default expansion actually drives MIDI (regression)', async ({ page }, testInfo) => {
+    // Guards the bug where the worker cleared `expand` before tk.renderToMIDI(),
+    // making MIDI always play Verovio's default (first) expansion regardless
+    // of the user's dropdown selection. The fixture has two expansions:
+    // expRepeatA (A,B,A) — the auto-pick default — and expBOnly (B only).
+    // If the bug is back, switching to expBOnly will still play sectionA first.
+    test.skip(testInfo.project.name === 'firefox', 'Firefox headless: MIDI playback timing unreliable');
+    if (!(await isV6OrLater(page))) test.skip(true, 'Verovio <6: this scenario does not apply');
+
+    await loadFixture(page);
+    await page.locator('#midiPlayerContextual').click();
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
+
+    // Sanity: auto-pick selected the first expansion (expRepeatA).
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expRepeatA');
+
+    // Switch to the B-only expansion.
+    await page.locator('#controlbar-midi-expansion-selector').selectOption('expBOnly');
+    await expect(page.locator('#controlbar-midi-expansion-selector')).toHaveValue('expBOnly');
+
+    // Start playback from a sectionB note (sectionA wouldn't be in the
+    // playback timeline at all under expBOnly, so a sectionA-anchored start
+    // would be moot).
+    await page.locator('#noteB1 use').first().click({ force: true });
+    await page.keyboard.press('Space');
+
+    // Wait for the first highlight, then assert it resolves to a sectionB note.
+    // Under the bug, expRepeatA would have played and the first note would
+    // have been a sectionA note (noteA1 etc).
+    await expect(page.locator('.currently-playing').first()).toBeVisible({ timeout: 15000 });
+    const firstHighlightId = await page.evaluate(() => {
+      const el = document.querySelector('g.note.currently-playing');
+      // Prefer data-highlight (carries -rend suffixed id under expansion);
+      // fall back to the dom id.
+      return el?.getAttribute('data-highlight') || el?.id || '';
+    });
+    // Strip any -rendN suffix to compare against the notated id.
+    expect(firstHighlightId.replace(/-rend\d+$/, '')).toMatch(/^noteB/);
   });
 
   test('speed mode with cross-page expansion does not error out during MIDI export', async ({ page }, testInfo) => {
