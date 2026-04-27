@@ -2415,19 +2415,14 @@ export default class Viewer {
     const neverCb = document.getElementById('vrv-expandNever');
     if (alwaysCb) alwaysCb.checked = expandAlways;
     if (neverCb) neverCb.checked = expandNever;
-    // MIDI-bar dropdown is the canonical expansion picker. On 'never' it
-    // is cleared and disabled; on default/always it auto-picks the first
-    // real option if nothing is currently selected.
+    // MIDI-bar dropdown is the canonical expansion picker. On 'never' the
+    // value is cleared (so it shows "No expansion") but the dropdown stays
+    // enabled — picking any other option clears expandNever automatically,
+    // so disabling here would needlessly trap the user.
     const barSel = document.getElementById('controlbar-midi-expansion-selector');
     const settingsSel = document.getElementById('selectMidiExpansion');
-    if (barSel) {
-      barSel.disabled = expandNever;
-      if (expandNever) barSel.value = '';
-    }
-    if (settingsSel) {
-      settingsSel.disabled = expandNever;
-      if (expandNever) settingsSel.value = '';
-    }
+    if (barSel && expandNever) barSel.value = '';
+    if (settingsSel && expandNever) settingsSel.value = '';
     if (expandNever) {
       this.expansionId = '';
     } else {
