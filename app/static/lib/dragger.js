@@ -1,6 +1,13 @@
 import { calcSizeOfContainer } from './resizer.js';
 import { openFile } from './main.js';
 
+// Returns true only when the drag originates from the filesystem (i.e. the user is
+// dragging a file from outside the browser).  Internal element drags (menu items,
+// selections, …) carry text/* types but never 'Files'.
+function isFileDrag(ev) {
+  return ev.dataTransfer != null && Array.from(ev.dataTransfer.types).includes('Files');
+}
+
 export function dropHandler(ev) {
   ev.stopPropagation();
   ev.preventDefault();
@@ -34,22 +41,21 @@ export function dropHandler(ev) {
 }
 
 export function dragOverHandler(ev) {
+  if (!isFileDrag(ev)) return;
   ev.stopPropagation();
   ev.preventDefault();
-  // console.log('dragOverHandler(): File(s) in drop zone', ev);
   on();
 }
 
 export function dragEnter(ev) {
+  if (!isFileDrag(ev)) return;
   ev.stopPropagation();
   ev.preventDefault();
-  if (ev.target.closest('.dragOverlay') || document.querySelector('.dragOverlay')) {
-    // console.log('dragEnter()');
-    on();
-  }
+  on();
 }
 
 export function dragLeave(ev) {
+  if (!isFileDrag(ev)) return;
   ev.stopPropagation();
   ev.preventDefault();
   off();
