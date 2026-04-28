@@ -130,6 +130,11 @@ addEventListener(
         break;
       case 'updatePage':
         try {
+          if (result.toolkitDataOutdated) {
+            console.log('!!!Verovio Worker ' + result.cmd + ': re-loading MEI because toolkitDataOutdated!!!');
+            tk.loadData(result.mei);
+            result.toolkitDataOutdated = false;
+          }
           result.setCursorToPageBeginning = true;
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
