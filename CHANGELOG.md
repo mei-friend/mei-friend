@@ -7,6 +7,9 @@
 * Auto-close the MIDI playback control bar when a new encoding is opened (Open file).
 * Add Playwright e2e coverage for v6 expansion behaviour
 * Fix [#188](https://github.com/mei-friend/mei-friend/issues/188) that prevented page turning and sometimes showed mangled notation
+* Fix control menu overflow behavior for both the notation and the facsimile panels
+* Prevent dragging overlay to appear when dragging other elements than files into or within the editor
+* Surface error when Verovio encounters an error during rendering, instead of silently failing and showing a blank screen (fixes [#186](https://github.com/mei-friend/mei-friend/issues/186))
 
 ### 1.2.12 patch
 * Fix issue with GitHub-resource-URIs posted to Solid missing their branch 
