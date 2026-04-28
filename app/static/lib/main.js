@@ -1224,9 +1224,9 @@ async function vrvWorkerEventsHandler(ev) {
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
-      document.getElementById('verovio-panel').innerHTML =
-        '<h3>Invalid MEI in ' + meiFileName + ' (' + ev.data.msg + ')</h3>';
       v.busy(false);
+      v.showAlert(ev.data.msg, 'warning', 10000);
+      document.getElementById('statusBar').innerHTML = 'Verovio error: ' + ev.data.msg;
       break;
   }
   // cm.blockChanges = false;

@@ -26,7 +26,9 @@ loadVerovio = () => {
     console.info('Verovio Toolkit ' + message.version + ' loaded.');
     postMessage(message);
   } catch (err) {
-    log('loadVerovio(): ' + err);
+    const msg = 'loadVerovio: ' + err;
+    console.error('VerovioWorker:', msg);
+    postMessage({ cmd: 'error', msg });
   }
 };
 
@@ -88,7 +90,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log('updateAll: ' + err);
+          postError(result, 'updateAll', err);
         }
         break;
       case 'updateData':
@@ -125,7 +127,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log('updateData: ' + err);
+          postError(result, 'updateData', err);
         }
         break;
       case 'updatePage':
@@ -148,7 +150,7 @@ addEventListener(
           result.svg = tk.renderToSVG(result.pageNo);
           result.cmd = 'updated';
         } catch (err) {
-          log('updatePage: ' + err);
+          postError(result, 'updatePage', err);
         }
         break;
       // updateOption, updateLayout
@@ -187,7 +189,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log(result.cmd + ': ' + err);
+          postError(result, result.cmd, err);
         }
         break;
       case 'importData': // all non-MEI formats
@@ -211,7 +213,7 @@ addEventListener(
             tk.setOptions(tkOptions);
           }
         } catch (err) {
-          log('importData: ' + err);
+          postError(result, 'importData', err);
         }
         break;
       case 'importBinaryData': // compressed XML format
@@ -236,7 +238,7 @@ addEventListener(
             tk.setOptions(tkOptions);
           }
         } catch (err) {
-          log('importBinaryData: ' + err);
+          postError(result, 'importBinaryData', err);
         }
         break;
       case 'reRenderMei':
@@ -262,7 +264,7 @@ addEventListener(
           result.cmd = 'updated';
           result.toolkitDataOutdated = false;
         } catch (err) {
-          log('reRenderMei: ' + err);
+          postError(result, 'reRenderMei', err);
         }
         break;
       case 'navigatePage': // for a page turn during navigation
@@ -279,7 +281,7 @@ addEventListener(
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
         } catch (err) {
-          log('navigatePage: ' + err);
+          postError(result, 'navigatePage', err);
         }
         break;
       case 'computePageBreaks': // compute page breaks
@@ -310,7 +312,7 @@ addEventListener(
           }
           // console.log('Worker computePageBreaks: ', result.pageBreaks);
         } catch (err) {
-          log('computePageBreaks: ' + err);
+          postError(result, 'computePageBreaks', err);
         }
         break;
       case 'exportMidi': // re-load data and export MIDI base-64 string
@@ -351,7 +353,7 @@ addEventListener(
             result.toolkitDataOutdated = false;
           }
         } catch (err) {
-          log('exportMidi: ' + err);
+          postError(result, 'exportMidi', err);
         }
         break;
       case 'exportMeiBasic':
@@ -470,7 +472,9 @@ addEventListener(
                 tk.setOptions({ breaks: breaks });
               }
             } catch (err) {
-              log('saveAsPdf: ' + err);
+              const msg = 'renderPdf: ' + err;
+              console.error('VerovioWorker:', msg);
+              postMessage({ cmd: 'error', msg });
             }
             doc.end();
             result.cmd = '';
@@ -493,7 +497,7 @@ addEventListener(
             triggerMidiSeekTo: result.triggerMidiSeekTo,
           };
         } catch (err) {
-          log('getTimeForElement: ' + err);
+          postError(result, 'getTimeForElement', err);
         }
         break;
       case 'getPageWithElement':
@@ -507,7 +511,7 @@ addEventListener(
             type: result.type,
           };
         } catch (err) {
-          log('getPageWithElement: ' + err);
+          postError(result, 'getPageWithElement', err);
         }
         break;
       case 'getElementAttr':
@@ -517,7 +521,7 @@ addEventListener(
             msg: tk.getElementAttr(result.mei),
           };
         } catch (err) {
-          log('getElementAttr: ' + err);
+          postError(result, 'getElementAttr', err);
         }
         break;
       case 'stop':
@@ -540,9 +544,11 @@ addEventListener(
   false
 );
 
-function log(e) {
-  console.log('ERROR in VerovioWorker ', e);
-  return;
+function postError(result, context, err) {
+  const msg = context + ': ' + err;
+  console.error('VerovioWorker:', msg);
+  result.cmd = 'error';
+  result.msg = msg;
 }
 
 function updateProgressbar(percentage, fileFormat) {
