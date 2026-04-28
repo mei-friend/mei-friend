@@ -59,7 +59,6 @@ addEventListener(
           if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') {
             tkOptions.breaks = 'encoded';
           }
-          console.log('OPTIONS: ', tkOptions);
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
@@ -314,16 +313,16 @@ addEventListener(
           const isV6 = result.tkVersionNumber >= 6.0;
           tkOptions = result.options;
           tk.setOptions(tkOptions);
-          // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode || result.expand) {
+            // "Dirty" load: parse the MEI with breaks='none' + the requested
+            // expansion so renderToMIDI sees the right structure cheaply.
             let bOpt = tkOptions.breaks;
-            tk.setOptions({ breaks: 'none', expand: result.expand }); // if reloading data, skip rendering layout
+            tk.setOptions({ breaks: 'none', expand: result.expand });
             tk.loadData(result.mei);
             // Restore breaks but keep `expand` set — renderToMIDI consults
             // current options, so clearing it here would make Verovio fall
             // back to the first/default expansion regardless of selection.
             tk.setOptions({ breaks: bOpt });
-            result.toolkitDataOutdated = result.speedMode ? true : result.expand ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
@@ -335,11 +334,16 @@ addEventListener(
             result.expansionMap = tk.renderToExpansionMap();
           }
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
-          // Clear `expand` now that MIDI/timemap have been rendered, so the
-          // selection doesn't leak into subsequent layout renders.
-          tk.setOptions({ expand: '' });
-          if (result.toolkitDataOutdated || result.speedMode) {
-            tk.setOptions(tkOptions); // ... and re-set breaks option
+          if (result.toolkitDataOutdated || result.speedMode || result.expand) {
+            // Mirror of the entry condition: if we did the dirty load above,
+            // restore the toolkit's data with the user's actual options so
+            // subsequent updatePage / getPageWithElement calls run against
+            // the user's intended layout. Otherwise the breaks='none' /
+            // expand=<id> state lingers and surfaces as "entire piece on one
+            // system" plus broken auto-page-turn during playback (#188).
+            tk.setOptions({ ...tkOptions, expand: '' });
+            tk.loadData(result.mei);
+            result.toolkitDataOutdated = false;
           }
         } catch (err) {
           log('exportMidi: ' + err);
