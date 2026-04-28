@@ -676,61 +676,70 @@ export function createFacsimileControlMenu(parentElement) {
 } // createFacsimileControlMenu()
 
 export function adjustCtrlMenuOverflow(ctrlMenu) {
-  // adjust the overflow of the control menu
-  if (ctrlMenu) {
-    // We want to maintain the order of the items in the control menu
-    // If any of the children are overflowing, move the first overflowing child AND ALL SUBSEQUENT CHILDREN into the overflow menu
-    // If there is space in the control menu, move items back from the overflow menu in order.
-    const children = Array.from(ctrlMenu.children);
-    const ctrlMenuRect = ctrlMenu.getBoundingClientRect();
-    const padding = 25; // px padding to avoid edge issues
+  if (!ctrlMenu) return;
 
-    // determine first overflowing child using cumulative widths for consistency
-    let cumulative = 0;
-    let firstOverflowingIndex = children.findIndex((child) => {
-      const childWidth = getVisibleWidth(child);
-      const wouldOverflow = cumulative + childWidth + padding > ctrlMenuRect.width;
-      cumulative += childWidth;
-      return wouldOverflow;
+  const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
+  const overflowMenu = document.getElementById(ctrlMenu.id + 'Overflow');
+
+  // Move any children whose right edge genuinely exceeds ctrlMenu's right edge into the
+  // overflow menu.  No width is pre-reserved for the icon: an item that fits should stay
+  // in the menu even if item.width + icon.width would be tight.  Returns true if any
+  // items were moved (so the caller can run a second pass — the icon appearing narrows
+  // ctrlMenu and may expose additional overflowing items).
+  //
+  // A 1 px tolerance prevents oscillation caused by sub-pixel rounding: getBoundingClientRect()
+  // returns fractional CSS-pixel values, and when an item sits exactly at the right edge the
+  // reported position can straddle ctrlMenu.right by a fraction of a pixel between calls
+  // (e.g. because setOrientation uses Math.floor on the panel width).  Items that overflow
+  // by ≤ 1 px are treated as fitting; items that genuinely overflow by > 1 px are moved.
+  const OVERFLOW_TOLERANCE = 1; // px
+  const moveOverflowingItems = () => {
+    const children = Array.from(ctrlMenu.children);
+    const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+    const firstOverflowingIndex = children.findIndex(
+      (child) => child.getBoundingClientRect().right > ctrlMenuRight + OVERFLOW_TOLERANCE
+    );
+    if (firstOverflowingIndex === -1) return false;
+    children.slice(firstOverflowingIndex).forEach((child) => {
+      if (!child.dataset.order) assignOrderKeys(ctrlMenu);
+      getVisibleWidth(child); // cache width while still visible
+      insertByOrder(overflowContent, child);
     });
-    const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
-    // move overflowing items into overflow menu
-    if (firstOverflowingIndex !== -1) {
-      let overflowing = children.slice(firstOverflowingIndex);
-      overflowing.forEach((child) => {
-        if (!child.dataset.order) assignOrderKeys(ctrlMenu);
-        getVisibleWidth(child); // cache width while visible
-        insertByOrder(overflowContent, child);
-      });
-    } else {
-      // move items back from overflow menu if there is space
-      // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
-      const currentlyOverflowing = Array.from(overflowContent.children).sort(
-        (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
-      );
-      for (let overflowingItem of currentlyOverflowing) {
-        // re-measure after every insertion to avoid stale rects
-        const currentRect = ctrlMenu.getBoundingClientRect();
-        const currentChildren = Array.from(ctrlMenu.children);
-        const usedWidth = currentChildren.reduce((acc, el) => acc + getVisibleWidth(el), 0);
-        let availableSpace = currentRect.width - padding - usedWidth;
-        const childWidth = getVisibleWidth(overflowingItem);
-        // check if there is space in the ctrlMenu to add this as the last child
-        if (childWidth <= availableSpace) {
-          ctrlMenu.appendChild(overflowingItem);
-        } else {
-          // if we can't fit this one, don't try to fit any more
-          break;
-        }
+    overflowMenu.style.display = 'inline-block';
+    return true;
+  };
+
+  if (moveOverflowingItems()) {
+    // Second pass: showing the icon narrowed ctrlMenu — catch any newly overflowing items
+    moveOverflowingItems();
+  } else {
+    // No overflow in the main menu — try moving items back from the overflow menu.
+    // Only in order: if the first item doesn't fit, don't try subsequent ones.
+    // No bonus is added for the icon width that would be freed when the last item returns;
+    // adding it causes oscillation because the item would immediately re-overflow on the
+    // next call when the icon is hidden and effectiveRight shrinks again.
+    const currentlyOverflowing = Array.from(overflowContent.children).sort(
+      (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
+    );
+    for (const overflowingItem of currentlyOverflowing) {
+      // Re-measure after every insertion to get accurate layout info
+      const currentRect = ctrlMenu.getBoundingClientRect();
+      const usedWidth = Array.from(ctrlMenu.children).reduce((acc, el) => acc + getVisibleWidth(el), 0);
+      const availableSpace = currentRect.width - usedWidth;
+      const childWidth = getVisibleWidth(overflowingItem);
+      if (childWidth <= availableSpace) {
+        ctrlMenu.appendChild(overflowingItem);
+      } else {
+        break;
       }
     }
-    // show or hide the overflow menu button based on whether it has children
-    let overflow = document.getElementById(ctrlMenu.id + 'Overflow');
-    if (overflowContent.children.length > 0) {
-      overflow.style.display = 'inline-block';
-    } else {
-      overflow.style.display = 'none';
-    }
+  }
+
+  // Show or hide the overflow menu button based on whether it has children
+  if (overflowContent.children.length > 0) {
+    overflowMenu.style.display = 'inline-block';
+  } else {
+    overflowMenu.style.display = 'none';
   }
 }
 
