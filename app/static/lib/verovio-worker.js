@@ -64,8 +64,7 @@ addEventListener(
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'updateAll', 'Cannot load MEI data.');
             break;
           }
           result.mei = '';
@@ -104,8 +103,7 @@ addEventListener(
           });
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'updateData', 'Cannot load MEI data.');
             break;
           }
           result.mei = '';
@@ -199,8 +197,7 @@ addEventListener(
           });
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot import data.';
+            postError(result, 'importData', 'Cannot import data.');
             break;
           }
           result = {
@@ -225,8 +222,7 @@ addEventListener(
           // tk.loadZipDataBase64(result.mei);
           let r = tk.loadZipDataBuffer(result.mei, result.mei.byteLength);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot import compressed data.';
+            postError(result, 'importBinaryData', 'Cannot import compressed data.');
             break;
           }
           result = {
@@ -245,8 +241,7 @@ addEventListener(
         try {
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'reRenderMei', 'Cannot load MEI data.');
             break;
           }
           result.setCursorToPageBeginning = true;
