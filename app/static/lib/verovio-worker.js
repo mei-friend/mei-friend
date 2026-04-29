@@ -545,7 +545,7 @@ addEventListener(
 );
 
 function postError(result, context, err) {
-  const msg = context + ': ' + err;
+  const msg = 'Verovio error: ' + context + ': ' + err;
   console.error('VerovioWorker:', msg);
   result.cmd = 'error';
   result.msg = msg;

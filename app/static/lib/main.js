@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.13';
-export const versionDate = '28 April 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '29 April 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -1226,7 +1226,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'error':
       v.busy(false);
       v.showAlert(ev.data.msg, 'warning', 10000);
-      document.getElementById('statusBar').innerHTML = 'Verovio error: ' + ev.data.msg;
+      document.getElementById('statusBar').innerHTML = ev.data.msg;
       break;
   }
   // cm.blockChanges = false;
