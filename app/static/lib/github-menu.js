@@ -84,6 +84,7 @@ export function fillCustomConfigParams(container, jsonResponse) {
       return;
     }
     workpackageDescription.innerText = selected.description || '';
+    select.dataset.workpackageJson = JSON.stringify(selected);
     Object.keys(selected.params).forEach((p) => {
       const cfg = generateGithubActionsInputConfig(selected.params, p, true);
       customParamList.appendChild(cfg);
@@ -1071,11 +1072,12 @@ async function handleClickGithubAction(e, gm) {
       if (isCustom) {
         try {
           repackagedInputs = {};
-          repackagedInputs.addargs = JSON.stringify(specifiedInputs);
+          repackagedInputs.parameters = JSON.stringify(specifiedInputs);
           let select = activeTab.querySelector('#githubActionsCustomConfigParams select');
           let selectId = select.value;
           let selectText = select.options[select.selectedIndex].text;
           repackagedInputs.workpackage_id = selectId;
+          repackagedInputs.workpackage_json = select.dataset.workpackageJson || '';
           let strippedPath = gm.filepath.startsWith('/') ? gm.filepath.substring(1) : gm.filepath;
           repackagedInputs.filepath = strippedPath;
           repackagedInputs.commit_message =
