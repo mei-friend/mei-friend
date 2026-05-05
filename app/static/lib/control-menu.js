@@ -193,15 +193,6 @@ function insertByOrder(container, child) {
   }
 }
 
-function getVisibleWidth(el) {
-  const rect = el.getBoundingClientRect();
-  if (rect.width > 0) {
-    el.dataset.visWidth = String(rect.width);
-    return rect.width;
-  }
-  return Number(el.dataset.visWidth ?? 0);
-}
-
 export function createNotationControlMenu(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
@@ -680,67 +671,65 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
 
   const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
   const overflowMenu = document.getElementById(ctrlMenu.id + 'Overflow');
+  if (!overflowContent || !overflowMenu) return;
 
-  // Move any children whose right edge genuinely exceeds ctrlMenu's right edge into the
-  // overflow menu.  No width is pre-reserved for the icon: an item that fits should stay
-  // in the menu even if item.width + icon.width would be tight.  Returns true if any
-  // items were moved (so the caller can run a second pass — the icon appearing narrows
-  // ctrlMenu and may expose additional overflowing items).
-  //
-  // A 1 px tolerance prevents oscillation caused by sub-pixel rounding: getBoundingClientRect()
-  // returns fractional CSS-pixel values, and when an item sits exactly at the right edge the
-  // reported position can straddle ctrlMenu.right by a fraction of a pixel between calls
-  // (e.g. because setOrientation uses Math.floor on the panel width).  Items that overflow
-  // by ≤ 1 px are treated as fitting; items that genuinely overflow by > 1 px are moved.
-  const OVERFLOW_TOLERANCE = 1; // px
+  // Both directions of the algorithm use the same rule: a child "fits" only when there is
+  // at least 1 px of gap between its right edge and ctrlMenu's right edge.  Any overlap
+  // (gap ≤ 0) means the child must move into overflow.  Using a single criterion for both
+  // move-to and move-back prevents oscillation that arose from disagreement between the
+  // two paths (e.g. cached width sums that ignored inter-element margins).
+  const FIT_GAP = 1; // px — required gap between child's right edge and ctrlMenu's right
+  const overflows = (child, ctrlMenuRight) =>
+    child.getBoundingClientRect().right > ctrlMenuRight - FIT_GAP;
+
+  // Move any overflowing children (and all later siblings, to preserve order) into the
+  // overflow menu.  Returns true if any items were moved, so the caller can run a second
+  // pass — showing the icon narrows ctrlMenu and may expose additional overflows.
   const moveOverflowingItems = () => {
     const children = Array.from(ctrlMenu.children);
     const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
-    const firstOverflowingIndex = children.findIndex(
-      (child) => child.getBoundingClientRect().right > ctrlMenuRight + OVERFLOW_TOLERANCE
-    );
+    const firstOverflowingIndex = children.findIndex((child) => overflows(child, ctrlMenuRight));
     if (firstOverflowingIndex === -1) return false;
     children.slice(firstOverflowingIndex).forEach((child) => {
       if (!child.dataset.order) assignOrderKeys(ctrlMenu);
-      getVisibleWidth(child); // cache width while still visible
       insertByOrder(overflowContent, child);
     });
     overflowMenu.style.display = 'inline-block';
     return true;
   };
 
-  if (moveOverflowingItems()) {
-    // Second pass: showing the icon narrowed ctrlMenu — catch any newly overflowing items
-    moveOverflowingItems();
-  } else {
-    // No overflow in the main menu — try moving items back from the overflow menu.
-    // Only in order: if the first item doesn't fit, don't try subsequent ones.
-    // No bonus is added for the icon width that would be freed when the last item returns;
-    // adding it causes oscillation because the item would immediately re-overflow on the
-    // next call when the icon is hidden and effectiveRight shrinks again.
-    const currentlyOverflowing = Array.from(overflowContent.children).sort(
+  // Try to restore overflow items back into the main menu.  Trial-and-rollback: each
+  // candidate is optimistically inserted, ctrlMenu is re-measured, and the candidate is
+  // moved back to overflow if it doesn't actually fit.  This avoids the margin/border
+  // accounting errors that a precomputed-width approach is prone to, and guarantees the
+  // result is consistent with moveOverflowingItems'.  Iteration stops at the first item
+  // that doesn't fit: subsequent items have larger order keys and would be placed
+  // further right, where they cannot fit either.
+  const tryRestoreFromOverflow = () => {
+    const candidates = Array.from(overflowContent.children).sort(
       (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
     );
-    for (const overflowingItem of currentlyOverflowing) {
-      // Re-measure after every insertion to get accurate layout info
-      const currentRect = ctrlMenu.getBoundingClientRect();
-      const usedWidth = Array.from(ctrlMenu.children).reduce((acc, el) => acc + getVisibleWidth(el), 0);
-      const availableSpace = currentRect.width - usedWidth;
-      const childWidth = getVisibleWidth(overflowingItem);
-      if (childWidth <= availableSpace) {
-        ctrlMenu.appendChild(overflowingItem);
-      } else {
+    for (const item of candidates) {
+      insertByOrder(ctrlMenu, item);
+      // If overflow just emptied, hide the burger so ctrlMenu's measured right edge
+      // reflects the icon being gone.
+      if (overflowContent.children.length === 0) overflowMenu.style.display = 'none';
+      const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+      if (overflows(item, ctrlMenuRight)) {
+        insertByOrder(overflowContent, item);
+        overflowMenu.style.display = 'inline-block';
         break;
       }
     }
+  };
+
+  if (moveOverflowingItems()) {
+    moveOverflowingItems();
+  } else {
+    tryRestoreFromOverflow();
   }
 
-  // Show or hide the overflow menu button based on whether it has children
-  if (overflowContent.children.length > 0) {
-    overflowMenu.style.display = 'inline-block';
-  } else {
-    overflowMenu.style.display = 'none';
-  }
+  overflowMenu.style.display = overflowContent.children.length > 0 ? 'inline-block' : 'none';
 }
 
 export function createEncodingPanel() {
