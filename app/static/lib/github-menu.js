@@ -1077,7 +1077,7 @@ async function handleClickGithubAction(e, gm) {
           let selectId = select.value;
           let selectText = select.options[select.selectedIndex].text;
           repackagedInputs.workpackage_id = selectId;
-          repackagedInputs.workpackage_json = select.dataset.workpackageJson || '';
+          repackagedInputs.workpackage_json = JSON.stringify(select.dataset.workpackageJson || '');
           let strippedPath = gm.filepath.startsWith('/') ? gm.filepath.substring(1) : gm.filepath;
           repackagedInputs.filepath = strippedPath;
           repackagedInputs.commit_message =
