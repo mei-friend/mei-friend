@@ -77,9 +77,9 @@ export function findNotes(elId) {
 } // findNotes()
 
 /**
- * Check whether a URL resolves, update an input element's state classes, and send JSON response to a callback.
+ * Check whether a URL resolves to a JSON resource, update an input element's state classes,
+ * and store the parsed JSON in el.dataset.jsonResponse.
  * @param {HTMLInputElement} el
- * @param {(json: any) => void} onResolve
  * @param {number} delay
  * @returns {number|null} timeout id
  */
@@ -93,6 +93,14 @@ export function checkAndRetrieveJson(el, delay = 600) {
     }
     let resolves = false;
     try {
+      let url;
+      try {
+        url = new URL(el.value);
+      } catch {
+        el.classList.add('urlDoesNotResolve');
+        delete el.dataset.jsonResponse;
+        return;
+      }
       const resp = await fetch(el.value);
       resolves = resp.ok;
       if (resolves) {
@@ -104,6 +112,7 @@ export function checkAndRetrieveJson(el, delay = 600) {
           console.warn('checkAndRetrieveJson: could not parse JSON response', err, resp);
           delete el.dataset.jsonResponse;
           el.classList.add('urlDoesNotResolve');
+          resolves = false;
         }
       } else {
         delete el.dataset.jsonResponse;
