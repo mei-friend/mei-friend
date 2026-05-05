@@ -272,6 +272,7 @@ export const lang = {
   verovioLoaded: { text: 'loaded' },
   convertedToPdf: { text: 'converted to PDF' },
   statusBarCompute: { text: 'Compute' },
+  notationStaleXmlInvalid: { text: 'Rendering paused — waiting for valid XML' },
   middleFooterPage: { text: 'page' },
   middleFooterOf: { text: 'of' },
   middleFooterLoaded: { text: 'loaded' },

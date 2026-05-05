@@ -577,6 +577,51 @@ a:active {
   flex-direction: column;
 }
 
+#verovioContainer {
+  position: relative;
+}
+
+#verovio-panel.notation-stale {
+  opacity: 0.55;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#notation-error-badge,
+#notation-warning-badge {
+  position: absolute;
+  /* Stacked under the control bar (min-height 28px + 2px*2 wrapper padding ~ 32px),
+     horizontally aligned with the Verovio logo (#verovioIcon margin-left: 3px). */
+  left: 3px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  cursor: help;
+  pointer-events: auto;
+}
+
+#notation-error-badge {
+  top: 36px;
+  background-color: #f44336;
+}
+
+#notation-warning-badge {
+  top: 70px; /* sits below the error badge: 36 + 28 + 6 */
+  background-color: #ff9800;
+}
+
+#notation-error-badge svg,
+#notation-warning-badge svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
 #facsimile-panel {
   overflow: auto;
   width: 100%;

@@ -84,6 +84,27 @@ export function createNotationDiv(parentElement, scale) {
   verovioPanel.id = 'verovio-panel';
   verovioContainer.appendChild(verovioPanel);
 
+  // Subtle stale-notation badge: surfaces rendering errors without blanking the SVG.
+  // Sibling of #verovio-panel so it survives innerHTML overwrites.
+  // Icon-only; full message exposed via title attribute and aria-label.
+  let notationBadge = document.createElement('div');
+  notationBadge.id = 'notation-error-badge';
+  notationBadge.style.display = 'none';
+  notationBadge.setAttribute('role', 'status');
+  notationBadge.setAttribute('aria-live', 'polite');
+  notationBadge.innerHTML = icon.alert;
+  verovioContainer.appendChild(notationBadge);
+
+  // Companion orange badge for Verovio-emitted warnings (render succeeded
+  // but Verovio flagged something).
+  let notationWarningBadge = document.createElement('div');
+  notationWarningBadge.id = 'notation-warning-badge';
+  notationWarningBadge.style.display = 'none';
+  notationWarningBadge.setAttribute('role', 'status');
+  notationWarningBadge.setAttribute('aria-live', 'polite');
+  notationWarningBadge.innerHTML = icon.alert;
+  verovioContainer.appendChild(notationWarningBadge);
+
   // container for Verovio
   let facsimileDragger = document.createElement('div');
   facsimileDragger.id = 'facsimile-dragger';

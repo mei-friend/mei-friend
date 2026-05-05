@@ -36,6 +36,7 @@ import {
   commonSchemas,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
+  defaultNotationUpdateDelay,
   defaultSpeedMode,
   defaultViewerTimeoutDelay,
   fontList,
@@ -80,6 +81,8 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.vrvTimeout; // time out task for updating verovio settings
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
+    this.notationUpdateTimeout = null; // debounce timer for editor-driven re-rendering
+    this.notationUpdateDelay = defaultNotationUpdateDelay;
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
     this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
@@ -729,20 +732,109 @@ export default class Viewer {
   } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
+  // Editor-driven calls (forceUpdate=false) are debounced so that rapid
+  // mid-typing edits don't trigger Verovio on every keystroke. Force-update
+  // calls (manual button, live-update toggle) bypass the debounce and the
+  // well-formedness pre-check so the user always gets immediate feedback.
   notationUpdated(cm, forceUpdate = false) {
+    if (this.notationUpdateTimeout) {
+      clearTimeout(this.notationUpdateTimeout);
+      this.notationUpdateTimeout = null;
+    }
+    if (forceUpdate) {
+      this._performNotationUpdate(cm, true);
+    } else {
+      this.notationUpdateTimeout = setTimeout(() => {
+        this.notationUpdateTimeout = null;
+        this._performNotationUpdate(cm, false);
+      }, this.notationUpdateDelay);
+    }
+  } // notationUpdated()
+
+  _performNotationUpdate(cm, forceUpdate) {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       cmd.toggleMidiPlaybackControlBar();
     }
-    // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
-    if (!isSafari) this.checkSchema(cm.getValue());
+    const mei = cm.getValue();
+    if (!isSafari) this.checkSchema(mei);
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      // For non-forced renders, cheaply check XML well-formedness first.
+      // Skipping malformed input avoids a Verovio "Cannot load MEI data"
+      // round-trip and the badge that goes with it during normal typing.
+      if (!forceUpdate && !this.isWellFormedXml(mei)) {
+        const msg = (translator?.lang?.notationStaleXmlInvalid?.text) || 'Rendering paused — waiting for valid XML';
+        this.setNotationStale(msg);
+        return;
+      }
       this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
-  } // notationUpdated()
+  } // _performNotationUpdate()
+
+  // Quick well-formedness check using DOMParser. Different browsers wrap
+  // syntax errors in differently-namespaced <parsererror> elements, so
+  // search across the known variants.
+  isWellFormedXml(mei) {
+    try {
+      const doc = this.parser.parseFromString(mei, 'text/xml');
+      if (!doc) return false;
+      if (doc.getElementsByTagName('parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.mozilla.org/newlayout/xml/parsererror.xml', 'parsererror').length)
+        return false;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  } // isWellFormedXml()
+
+  // Mark the notation pane as stale: dim the SVG and surface a small badge
+  // with the given message. Preserves the previously-rendered SVG.
+  setNotationStale(reason) {
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.add('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) {
+      badge.style.display = '';
+      badge.title = reason;
+      badge.setAttribute('aria-label', reason);
+    }
+    const sb = document.getElementById('statusBar');
+    if (sb) sb.innerHTML = reason;
+    this.busy(false);
+  } // setNotationStale()
+
+  // Clear the stale state — but only if the current editor content is
+  // actually well-formed. Operations like updateLayout (triggered by the
+  // resizer) make the worker emit 'updated' using its cached MEI even when
+  // the editor has since become malformed; without this guard the badge
+  // would clear despite the user's current XML still being broken.
+  clearNotationStale() {
+    if (cm && !this.isWellFormedXml(cm.getValue())) return;
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.remove('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) badge.style.display = 'none';
+  } // clearNotationStale()
+
+  // Verovio render-time warnings (e.g. structural advisories). Shown as a
+  // small orange badge that does NOT dim the SVG — the render succeeded.
+  setNotationWarning(reason) {
+    const badge = document.getElementById('notation-warning-badge');
+    if (badge) {
+      badge.style.display = '';
+      badge.title = reason;
+      badge.setAttribute('aria-label', reason);
+    }
+  } // setNotationWarning()
+
+  clearNotationWarning() {
+    const badge = document.getElementById('notation-warning-badge');
+    if (badge) badge.style.display = 'none';
+  } // clearNotationWarning()
 
   /**
    * Highlights currently selected elements or the element at cursor in CodeMirror.

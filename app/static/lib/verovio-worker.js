@@ -2,6 +2,42 @@ var tk;
 var tkOptions;
 var tkUrl;
 
+// Capture Verovio's emscripten log output so warnings (e.g. "scoreDef
+// missing key signature") can be surfaced to the user. Verovio routes its
+// internal log lines through console.warn/console.error in the JS bundle;
+// the worker's own diagnostic messages all carry a "VerovioWorker:" prefix
+// so they can be filtered out.
+let pendingVerovioWarnings = [];
+let captureActive = false;
+const _origConsoleWarn = console.warn;
+const _origConsoleError = console.error;
+function _formatConsoleArgs(args) {
+  return Array.prototype.map
+    .call(args, (a) => {
+      if (a instanceof Error) return a.toString();
+      if (typeof a === 'object' && a !== null) {
+        try {
+          return JSON.stringify(a);
+        } catch (e) {
+          return String(a);
+        }
+      }
+      return String(a);
+    })
+    .join(' ');
+}
+console.warn = function () {
+  if (captureActive) pendingVerovioWarnings.push(_formatConsoleArgs(arguments));
+  _origConsoleWarn.apply(console, arguments);
+};
+console.error = function () {
+  const msg = _formatConsoleArgs(arguments);
+  if (captureActive && msg.indexOf('VerovioWorker:') === -1) {
+    pendingVerovioWarnings.push(msg);
+  }
+  _origConsoleError.apply(console, arguments);
+};
+
 // music font list for PDF export
 let fontList = {
   Leipzig: 'https://raw.githubusercontent.com/rism-digital/leipzig/main/Leipzig.otf',
@@ -35,10 +71,15 @@ loadVerovio = () => {
 addEventListener(
   'message',
   function (e) {
+    pendingVerovioWarnings = [];
+    captureActive = true;
     let result = e.data;
     // console.log('verovio-worker: result: ', result);
     result.forceUpdate = false;
-    if (!tk && e.data.cmd !== 'loadVerovio') return result;
+    if (!tk && e.data.cmd !== 'loadVerovio') {
+      captureActive = false;
+      return result;
+    }
     console.log('VerovioWorker received: "' + result.cmd + '" (' + Math.random() + ').');
     switch (result.cmd) {
       case 'loadVerovio':
@@ -534,6 +575,11 @@ addEventListener(
     }
     if (result) {
       postMessage(result);
+    }
+    captureActive = false;
+    if (pendingVerovioWarnings.length > 0) {
+      postMessage({ cmd: 'warning', msg: pendingVerovioWarnings.join('\n') });
+      pendingVerovioWarnings = [];
     }
   },
   false

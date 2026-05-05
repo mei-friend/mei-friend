@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.13';
-export const versionDate = '29 April 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '05 May 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -1101,6 +1101,8 @@ async function vrvWorkerEventsHandler(ev) {
         pageInfoToStatusBar();
         setProgressBar(0);
         updateHtmlTitle();
+        v.clearNotationStale();
+        v.clearNotationWarning();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
           // loadFacsimile(v.xmlDoc);
@@ -1133,6 +1135,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'navigatePage': // resolve navigation with page turning
       pageInfoToStatusBar();
       setProgressBar(0);
+      v.clearNotationStale();
       document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -1225,8 +1228,16 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'error':
       v.busy(false);
-      v.showAlert(ev.data.msg, 'warning', 10000);
-      document.getElementById('statusBar').innerHTML = ev.data.msg;
+      // Soft notification: dim the previously-rendered SVG and show a small
+      // badge in the notation pane instead of a full-pane orange overlay.
+      // See issues #157 and #186 for context.
+      v.setNotationStale(ev.data.msg);
+      break;
+    case 'warning':
+      // Verovio emitted log output during the last render (e.g. "scoreDef
+      // missing key signature"). Surface in an orange badge alongside the
+      // SVG without dimming, since the render itself succeeded.
+      v.setNotationWarning(ev.data.msg);
       break;
   }
   // cm.blockChanges = false;
