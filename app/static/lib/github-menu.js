@@ -69,6 +69,7 @@ export function fillCustomConfigParams(container, jsonResponse) {
   container.appendChild(workpackageDescription);
 
   const customParamList = document.createElement('div');
+  customParamList.classList.add('githubActionsCustomParamList');
   container.appendChild(customParamList);
 
   const renderParamList = (wp_id) => {

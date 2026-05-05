@@ -291,7 +291,7 @@ a:active {
   width: 200px;
 }
 
-#githubActionsCustomConfigurationUrl, #supplyCustomGithubActionsConfiguration { 
+#githubActionsCustomConfigurationUrl, #supplyCustomGithubActionsConfiguration {
   width: 100%;
 }
 
@@ -340,7 +340,7 @@ a:active {
   border:0px;
 }
 
-.githubActionsTab:not(.active):hover { 
+.githubActionsTab:not(.active):hover {
   background-color: var(--settingsLinkHoverColor);
 }
 
@@ -363,18 +363,24 @@ a:active {
   display: flex;
 }
 
+.githubActionsCustomParamList {
+  display: grid;
+  grid-template-columns: max-content max-content 1fr;
+}
+
 .githubActionsInputConfig, .githubActionsCustomConfig {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   grid-template-rows: auto auto;
   background-color: var(--dropdownBackgroundColor);
   border-radius: 1em;
   width: 90%;
   padding: 0.5em;
-  margin-bottom: 0.5em;
+  /* margin-bottom: 0.5em; */
 }
 
-#githubActionsCustomContainer, #githubActionsJobSummary { 
+#githubActionsCustomContainer, #githubActionsJobSummary {
   color: var(--textColor);
 }
 .githubActionsInputConfig span, .githubActionsCustomConfig span  {
@@ -385,7 +391,7 @@ a:active {
   font-size: 0.85em;
   color: var(--textColor);
   opacity: 0.8;
-  margin: 0.25em 0 0.5em 0;
+  margin: 0.25em 0.25em 0.25em ;
 }
 
 .githubActionsWorkpackageDescription:empty {
@@ -396,6 +402,7 @@ a:active {
   grid-column: 1;
   grid-row: 2;
   align-self: center;
+  margin-bottom: 0.15em;
 }
 
 .githubActionsParamInfo {
@@ -405,6 +412,7 @@ a:active {
   cursor: help;
   margin-left: 0.3em;
   opacity: 0.6;
+  margin-bottom: 0.15em;
 }
 
 .githubActionsParamInfo:hover {
@@ -426,8 +434,9 @@ a:active {
 }
 
 .githubActionsInputConfig div, .githubActionsCustomConfig div {
-  padding-left: 0.5em;
+  padding-left: 0.25em;
   padding-right: 0.5em;
+  padding-bottom: 0.1em;
 }
 
 .githubActionsInputFieldWrapper {
@@ -484,7 +493,7 @@ a:active {
   0% { content: '...'; }
   30% { content: '·..'; }
   35% { content: '...'; }
-  40% { content: '.·.';} 
+  40% { content: '.·.';}
   45% { content: '...'; }
   50% { content: '..·'; }
   55% { content: '...';}
@@ -507,7 +516,7 @@ a:active {
   cursor: not-allowed;
 }
 
-input.urlDoesNotResolve { 
+input.urlDoesNotResolve {
   border: 3px solid #c62828;
 }
 
@@ -569,8 +578,8 @@ input.urlResolves {
 }
 
 /** start loading animation for splash screen text (not used for now) */
-/* 
-#splashBodyLoading { 
+/*
+#splashBodyLoading {
   position:relative;
   left: calc(50% - 1em);
   top: 50%;
@@ -594,7 +603,7 @@ input.urlResolves {
     75% {
         content: '...';
     }
-} 
+}
 */
 /** end loading animation for splash screen text **/
 
@@ -1200,8 +1209,8 @@ input.urlResolves {
   justify-content: center;
 }
 
-.control-menu-overflow-content { 
-  position: fixed; 
+.control-menu-overflow-content {
+  position: fixed;
   top: calc(inherit + 1.5em);
   left: inherit;
   display:inline;
@@ -1212,7 +1221,7 @@ input.urlResolves {
   width: calc(fit-content + 20px);
 }
 
-.control-menu-overflow-icon { 
+.control-menu-overflow-icon {
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
@@ -1239,7 +1248,7 @@ input.urlResolves {
   margin-bottom: .25em;
 }
 
-.control-menu-fixed-left, .control-menu-fixed-right { 
+.control-menu-fixed-left, .control-menu-fixed-right {
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
@@ -1619,8 +1628,8 @@ svg text {
   color: unset;
 }
 
-/** 
-  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes 
+/**
+  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes
   see https://github.com/rism-digital/verovio/pull/4201
 */
 #verovio-panel g.bounding-box rect,
