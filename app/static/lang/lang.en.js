@@ -384,7 +384,7 @@ export const lang = {
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
   githubActionsDescription: {
-    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes. ',
+    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Once the workflow run completes , you can reload your MEI file to see the results of the workflow run.',
   },
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
