@@ -955,6 +955,9 @@ async function handleClickGithubAction(e, gm) {
             customConfigUrlSetting.value = ev.target.value;
             delete customConfigUrlSetting.dataset.jsonResponse;
             checkAndRetrieveJson(ev.target);
+            // Programmatic .value assignment does not fire 'input', so dispatch one
+            // to trigger the settings-panel handler that mirrors the value to localStorage.
+            customConfigUrlSetting.dispatchEvent(new Event('input', { bubbles: true }));
             // TODO potential race condition -- dataset will not be updated in the settings
           });
           // launch checkAndRetrieveJson on first load

@@ -86,8 +86,11 @@ export function findNotes(elId) {
 export function checkAndRetrieveJson(el, delay = 600) {
   if (!el) return null;
   return setTimeout(async () => {
+    // Clear prior state: classList.add is not exclusive, and the CSS rules
+    // for these classes have equal specificity, so a stale 'urlResolves'
+    // would otherwise mask a freshly added 'urlDoesNotResolve'.
+    el.classList.remove('urlResolves', 'urlDoesNotResolve');
     if (!el.value) {
-      el.classList.remove('urlResolves', 'urlDoesNotResolve');
       delete el.dataset.jsonResponse;
       return;
     }

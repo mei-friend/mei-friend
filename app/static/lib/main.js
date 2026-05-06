@@ -563,6 +563,17 @@ async function completeInitialLoad() {
     selectParam = selectParam.map((e) => e.split(',')).reduce((a1, a2) => a1.concat(a2));
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
+  let automationParam = searchParams.get('automation');
+
+  // Must be written before addMeiFriendOptionsToSettingsPanel() reads storage to populate the input.
+  if (automationParam !== null) {
+    try {
+      window.localStorage['mf-supplyCustomGithubActionsConfiguration'] = automationParam;
+      window.localStorage['mf-enableGithubActions'] = 'true';
+    } catch (err) {
+      console.warn('Could not save automation URL to localStorage: ', err);
+    }
+  }
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
   createEncodingPanel();
