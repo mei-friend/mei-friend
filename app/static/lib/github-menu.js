@@ -980,8 +980,19 @@ async function handleClickGithubAction(e, gm) {
           }
           try {
             const parsed = JSON.parse(resp);
-            console.log('About to call fillCustom with parsed ', parsed);
-            fillCustomConfigParams(customConfigParams, parsed);
+            let workPackages = parsed;
+            if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.work_packages)) {
+              workPackages = parsed.work_packages;
+              githubActionsCustomConfigurationUrl.dataset.centralRepository = parsed.central_repository || '';
+              githubActionsCustomConfigurationUrl.dataset.branch = parsed.branch || '';
+              githubActionsCustomConfigurationUrl.dataset.automation = parsed.automation || '';
+            } else {
+              delete githubActionsCustomConfigurationUrl.dataset.centralRepository;
+              delete githubActionsCustomConfigurationUrl.dataset.branch;
+              delete githubActionsCustomConfigurationUrl.dataset.automation;
+            }
+            console.log('About to call fillCustom with parsed ', workPackages);
+            fillCustomConfigParams(customConfigParams, workPackages);
           } catch (err) {
             console.warn('githubActions custom config: could not parse data-json-response', err);
           }
@@ -1000,7 +1011,18 @@ async function handleClickGithubAction(e, gm) {
         }
         if (parsedInitialResp) {
           try {
-            fillCustomConfigParams(customConfigParams, JSON.parse(parsedInitialResp));
+            let workPackagesInitial = parsedInitialResp;
+            if (parsedInitialResp && !Array.isArray(parsedInitialResp) && Array.isArray(parsedInitialResp.work_packages)) {
+              workPackagesInitial = parsedInitialResp.work_packages;
+              githubActionsCustomConfigurationUrl.dataset.centralRepository = parsedInitialResp.central_repository || '';
+              githubActionsCustomConfigurationUrl.dataset.branch = parsedInitialResp.branch || '';
+              githubActionsCustomConfigurationUrl.dataset.automation = parsedInitialResp.automation || '';
+            } else {
+              delete githubActionsCustomConfigurationUrl.dataset.centralRepository;
+              delete githubActionsCustomConfigurationUrl.dataset.branch;
+              delete githubActionsCustomConfigurationUrl.dataset.automation;
+            }
+            fillCustomConfigParams(customConfigParams, workPackagesInitial);
           } catch (err) {
             console.warn('githubActions custom config: could not parse initial data-json-response', err);
             // clear all githubActionsCustomConfigParams
@@ -1080,11 +1102,23 @@ async function handleClickGithubAction(e, gm) {
           let selectId = select.value;
           let selectText = select.options[select.selectedIndex].text;
           repackagedInputs.workpackage_id = selectId;
-          repackagedInputs.workpackage_json = JSON.stringify(select.dataset.workpackageJson || '');
+          repackagedInputs.workpackage_json = select.dataset.workpackageJson || '';
           let strippedPath = gm.filepath.startsWith('/') ? gm.filepath.substring(1) : gm.filepath;
           repackagedInputs.filepath = strippedPath;
           repackagedInputs.commit_message =
             'mei-friend: Used GitHub Action to apply ' + selectText + ' to ' + strippedPath;
+          const customConfigUrlEl = document.getElementById('githubActionsCustomConfigurationUrl');
+          if (customConfigUrlEl) {
+            if (customConfigUrlEl.dataset.centralRepository) {
+              repackagedInputs.central_repository = customConfigUrlEl.dataset.centralRepository;
+            }
+            if (customConfigUrlEl.dataset.branch) {
+              repackagedInputs.branch = customConfigUrlEl.dataset.branch;
+            }
+            if (customConfigUrlEl.dataset.automation) {
+              repackagedInputs.automation = customConfigUrlEl.dataset.automation;
+            }
+          }
         } catch (err) {
           console.error('Could not repackage custom GitHub Actions inputs: ', err);
           statusMsg.innerHTML = 'Error - could not repackage custom inputs (see console)';

@@ -561,7 +561,8 @@ export default class GitCloudClient {
       cache: 'no-store',
     }).then(async (res) => {
       const contentType = res.headers?.get('content-type') || '';
-      if (contentType.includes('zip') || contentType.includes('octet-stream')) {
+      // if (contentType.includes('zip') || contentType.includes('octet-stream')) // apparently the octet-stream causes logs to not show up
+      if (contentType.includes('zip')) {
         return { type: 'binary', text: null };
       }
       const text = await res.text();
@@ -648,6 +649,9 @@ export default class GitCloudClient {
     let numTries = 0;
     let currentRuns = [];
     while (currentRuns.length === 0 && numTries < this.MAX_RUN_FETCH_ATTEMPTS) {
+      if (numTries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
       let runs = await this.githubFetch(
         runsUrl +
           '?' +
