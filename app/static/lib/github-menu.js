@@ -21,7 +21,6 @@ import {
   updateGithubInLocalStorage,
   v,
 } from './main.js';
-import { checkAndRetrieveJson } from './utils.js';
 import * as icon from './../css/icons.js';
 
 const GHAStartMarker = '---START_USER_MESSAGE---';
@@ -44,14 +43,15 @@ const ghActionsInputSetters = [
   },
 ];
 
-export function fillCustomConfigParams(container, jsonResponse) {
-  if (!container) return;
-  container.innerHTML = '';
+export function fillCustomConfigParams(selectContainer, paramsContainer, jsonResponse) {
+  if (!selectContainer || !paramsContainer) return;
+  selectContainer.innerHTML = '';
+  paramsContainer.innerHTML = '';
   console.log('Filling custom config params with: ', jsonResponse);
   if (!jsonResponse) return;
   if (!Array.isArray(jsonResponse) || jsonResponse.length === 0) {
-    container.innerHTML =
-      '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
+    paramsContainer.innerHTML =
+      '<div class="warn">' + translator.lang.githubActionsWorkpackageConfigInvalidResponse.text + '</div>';
   }
   // build a workpackage selection dropdown, using 'label' property of each item
   const select = document.createElement('select');
@@ -62,15 +62,15 @@ export function fillCustomConfigParams(container, jsonResponse) {
     option.innerText = param.label ? param.label : `Workpackage ${ix + 1}`;
     select.appendChild(option);
   });
-  container.appendChild(select);
+  selectContainer.appendChild(select);
 
   const workpackageDescription = document.createElement('p');
   workpackageDescription.classList.add('githubActionsWorkpackageDescription');
-  container.appendChild(workpackageDescription);
+  paramsContainer.appendChild(workpackageDescription);
 
   const customParamList = document.createElement('div');
-  customParamList.classList.add('githubActionsCustomParamList');
-  container.appendChild(customParamList);
+  customParamList.classList.add('githubActionsWorkpackageParamList');
+  paramsContainer.appendChild(customParamList);
 
   const renderParamList = (wp_id) => {
     console.log('Selected custom config workpackage index: ', wp_id);
@@ -79,7 +79,7 @@ export function fillCustomConfigParams(container, jsonResponse) {
     if (!selected || !('params' in selected)) {
       console.log('Problem with selected custom config workpackage: ', selected, jsonResponse, wp_id);
       customParamList.innerHTML =
-        '<div class="warn">' + translator.lang.githubActionsCustomConfigInvalidResponse.text + '</div>';
+        '<div class="warn">' + translator.lang.githubActionsWorkpackageConfigInvalidResponse.text + '</div>';
       workpackageDescription.innerText = '';
       return;
     }
@@ -881,101 +881,48 @@ async function handleClickGithubAction(e, gm) {
   }
   ghLogo.classList.add('clockwise');
   console.log('dataset: ', target.dataset);
+  const initialContents = document.getElementById('githubActionsInitialContents');
+  const selectWrapper = document.getElementById('githubActionsWorkpackageConfigSelectWrapper');
   const inputContainerWrapper = document.getElementById('githubActionsInputConfigContainer');
+  initialContents.style.display = '';
+  delete inputContainerWrapper.dataset.mode;
+  if (inputContainerWrapper._configUrlObserver) {
+    inputContainerWrapper._configUrlObserver.disconnect();
+    delete inputContainerWrapper._configUrlObserver;
+  }
+  // clear children of both containers (don't just reset innerHTML, so we also clear event handlers)
+  while (selectWrapper.firstChild) {
+    selectWrapper.removeChild(selectWrapper.firstChild);
+  }
   while (inputContainerWrapper.firstChild) {
-    // clear content of input container
-    // (don't just reset innerHTML, so that we also clear event handlers)
     inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
   }
   gm.getWorkflowInputs(target.dataset.path)
-    .then((inputs) => {
-      if (!inputs) {
+    .then((wfInputsObj) => {
+      if (!wfInputsObj || !wfInputsObj.inputs) {
         return;
       }
+      const showWorkPackageUI = wfInputsObj.showWorkPackageUI;
+      const inputs = wfInputsObj.inputs;
       const keys = Object.keys(inputs);
       workflowName.dataset.inputKeys = JSON.stringify(keys);
-      if (keys.length) {
-        const tabsWrapper = document.createElement('div');
-        tabsWrapper.classList.add('githubActionsTabs');
+      if (!keys.length) return;
 
-        // --- BEGIN PATCH: Wrap initial contents for easy show/hide ---
-        const initialContentsWrapper = document.createElement('div');
-        initialContentsWrapper.setAttribute('id', 'githubActionsInitialContents');
+      inputContainerWrapper.dataset.mode = showWorkPackageUI ? 'workpackage' : 'generic';
 
-        const tabList = document.createElement('div');
-        tabList.classList.add('githubActionsTabList');
+      if (showWorkPackageUI) {
+        const workpackageContainer = document.createElement('div');
+        workpackageContainer.setAttribute('id', 'githubActionsWorkpackageContainer');
+        const workpackageConfigParams = document.createElement('div');
+        workpackageConfigParams.setAttribute('id', 'githubActionsWorkpackageConfigParams');
+        workpackageContainer.appendChild(workpackageConfigParams);
+        inputContainerWrapper.appendChild(workpackageContainer);
 
-        const inputTab = document.createElement('button');
-        inputTab.setAttribute('type', 'button');
-        inputTab.setAttribute('id', 'githubActionsInputContainerHeader');
-        inputTab.classList.add('githubActionsTab');
-        inputTab.innerText = translator.lang.githubActionsInputContainerHeader.text;
-
-        const customTab = document.createElement('button');
-        customTab.setAttribute('type', 'button');
-        customTab.setAttribute('id', 'githubActionsCustomContainerHeader');
-        customTab.classList.add('githubActionsTab');
-        customTab.innerText = translator.lang.githubActionsCustomContainerHeader.text;
-
-        tabList.append(inputTab, customTab);
-
-        const tabPanels = document.createElement('div');
-        tabPanels.classList.add('githubActionsTabPanels');
-
-        const inputTabPanel = document.createElement('div');
-        inputTabPanel.classList.add('githubActionsTabPanel');
-        inputTabPanel.dataset.tab = 'input';
-
-        const customTabPanel = document.createElement('div');
-        customTabPanel.classList.add('githubActionsTabPanel');
-        customTabPanel.dataset.tab = 'custom';
-
-        const customContainer = document.createElement('div');
-        customContainer.setAttribute('id', 'githubActionsCustomContainer');
-        let customConfigParams = document.createElement('div');
-        customConfigParams.setAttribute('id', 'githubActionsCustomConfigParams');
-        // the URL box takes the value, placeholder, and jsonResponse from supplyCustomGithubActionsConfiguration in the settings.
-        const githubActionsCustomConfigurationUrl = document.createElement('input');
-        githubActionsCustomConfigurationUrl.setAttribute('type', 'text');
-        githubActionsCustomConfigurationUrl.setAttribute('id', 'githubActionsCustomConfigurationUrl');
-        githubActionsCustomConfigurationUrl.classList.add('preventKeyBindings');
-        const customConfigUrlSetting = document.getElementById('supplyCustomGithubActionsConfiguration');
-        if (customConfigUrlSetting) {
-          const initialUrlValue =
-            customConfigUrlSetting.value === false ||
-            customConfigUrlSetting.value === 'false' ||
-            customConfigUrlSetting.value == null
-              ? ''
-              : customConfigUrlSetting.value;
-          githubActionsCustomConfigurationUrl.setAttribute('value', initialUrlValue);
-          githubActionsCustomConfigurationUrl.setAttribute('placeholder', customConfigUrlSetting.placeholder);
-          githubActionsCustomConfigurationUrl.dataset.jsonResponse = customConfigUrlSetting.dataset.jsonResponse;
-          // changes here should be reflected in the settings and vice versa
-          githubActionsCustomConfigurationUrl.addEventListener('input', (ev) => {
-            customConfigUrlSetting.value = ev.target.value;
-            delete customConfigUrlSetting.dataset.jsonResponse;
-            checkAndRetrieveJson(ev.target);
-            // Programmatic .value assignment does not fire 'input', so dispatch one
-            // to trigger the settings-panel handler that mirrors the value to localStorage.
-            customConfigUrlSetting.dispatchEvent(new Event('input', { bubbles: true }));
-            // TODO potential race condition -- dataset will not be updated in the settings
-          });
-          // launch checkAndRetrieveJson on first load
-          checkAndRetrieveJson(githubActionsCustomConfigurationUrl);
-        }
-        customContainer.appendChild(githubActionsCustomConfigurationUrl);
-        const githubActionsCustomContainerExplanation = document.createElement('p');
-        githubActionsCustomContainerExplanation.innerHTML =
-          translator.lang.githubActionsCustomContainerExplanation.text;
-        customContainer.appendChild(githubActionsCustomContainerExplanation);
-        customContainer.appendChild(customConfigParams);
-        customTabPanel.insertAdjacentElement('beforeend', customContainer);
-
-        const configUrlObserver = new MutationObserver(() => {
-          const resp = githubActionsCustomConfigurationUrl.dataset.jsonResponse;
+        const workpackageConfigUrlSetting = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+        const renderWorkPackages = (resp) => {
           if (!resp) {
-            // clear all githubActionsCustomConfigParams
-            customConfigParams.innerHTML = '';
+            selectWrapper.innerHTML = '';
+            workpackageConfigParams.innerHTML = '';
             return;
           }
           try {
@@ -983,91 +930,79 @@ async function handleClickGithubAction(e, gm) {
             let workPackages = parsed;
             if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.work_packages)) {
               workPackages = parsed.work_packages;
-              githubActionsCustomConfigurationUrl.dataset.centralRepository = parsed.central_repository || '';
-              githubActionsCustomConfigurationUrl.dataset.branch = parsed.branch || '';
-              githubActionsCustomConfigurationUrl.dataset.automation = parsed.automation || '';
+              workpackageConfigUrlSetting.dataset.centralRepository = parsed.central_repository || '';
+              workpackageConfigUrlSetting.dataset.branch = parsed.branch || '';
+              workpackageConfigUrlSetting.dataset.automation = parsed.automation || '';
             } else {
-              delete githubActionsCustomConfigurationUrl.dataset.centralRepository;
-              delete githubActionsCustomConfigurationUrl.dataset.branch;
-              delete githubActionsCustomConfigurationUrl.dataset.automation;
+              delete workpackageConfigUrlSetting.dataset.centralRepository;
+              delete workpackageConfigUrlSetting.dataset.branch;
+              delete workpackageConfigUrlSetting.dataset.automation;
             }
-            console.log('About to call fillCustom with parsed ', workPackages);
-            fillCustomConfigParams(customConfigParams, workPackages);
+            fillCustomConfigParams(selectWrapper, workpackageConfigParams, workPackages);
           } catch (err) {
             console.warn('githubActions custom config: could not parse data-json-response', err);
+            selectWrapper.innerHTML = '';
+            workpackageConfigParams.innerHTML = '';
           }
-        });
-        configUrlObserver.observe(githubActionsCustomConfigurationUrl, {
-          attributes: true,
-          attributeFilter: ['data-json-response'],
-        });
+        };
 
-        const initialResp = githubActionsCustomConfigurationUrl.dataset.jsonResponse;
-        let parsedInitialResp;
-        try {
-          parsedInitialResp = JSON.parse(initialResp);
-        } catch (err) {
-          parsedInitialResp = null;
-        }
-        if (parsedInitialResp) {
-          try {
-            let workPackagesInitial = parsedInitialResp;
-            if (parsedInitialResp && !Array.isArray(parsedInitialResp) && Array.isArray(parsedInitialResp.work_packages)) {
-              workPackagesInitial = parsedInitialResp.work_packages;
-              githubActionsCustomConfigurationUrl.dataset.centralRepository = parsedInitialResp.central_repository || '';
-              githubActionsCustomConfigurationUrl.dataset.branch = parsedInitialResp.branch || '';
-              githubActionsCustomConfigurationUrl.dataset.automation = parsedInitialResp.automation || '';
-            } else {
-              delete githubActionsCustomConfigurationUrl.dataset.centralRepository;
-              delete githubActionsCustomConfigurationUrl.dataset.branch;
-              delete githubActionsCustomConfigurationUrl.dataset.automation;
+        const evaluateWorkpackageState = () => {
+          if (!workpackageConfigUrlSetting || !workpackageConfigUrlSetting.value) return 'invalid';
+          const resp = workpackageConfigUrlSetting.dataset.jsonResponse;
+          if (resp) {
+            try {
+              const parsed = JSON.parse(resp);
+              let workPackages = parsed;
+              if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.work_packages)) {
+                workPackages = parsed.work_packages;
+              }
+              if (Array.isArray(workPackages) && workPackages.some((item) => item && item.userFacing == true)) {
+                return 'valid';
+              }
+            } catch {
+              // fall through
             }
-            fillCustomConfigParams(customConfigParams, workPackagesInitial);
-          } catch (err) {
-            console.warn('githubActions custom config: could not parse initial data-json-response', err);
-            // clear all githubActionsCustomConfigParams
-            customConfigParams.innerHTML = '';
           }
-        } else {
-          console.log('githubActions custom config: no initial data-json-response');
-          // clear all githubActionsCustomConfigParams
-          customConfigParams.innerHTML = '';
-        }
+          if (workpackageConfigUrlSetting.classList.contains('urlDoesNotResolve')) return 'invalid';
+          return 'loading';
+        };
 
+        const updateUI = () => {
+          const state = evaluateWorkpackageState();
+          if (state === 'valid') {
+            renderWorkPackages(workpackageConfigUrlSetting.dataset.jsonResponse);
+          } else {
+            selectWrapper.innerHTML = '';
+            workpackageConfigParams.innerHTML =
+              state === 'invalid'
+                ? '<p class="githubActionsRequiresWorkpackageMessage">' +
+                  translator.lang.githubActionsRequiresWorkpackageDefinition.text +
+                  '</p>'
+                : '';
+            if (workpackageConfigUrlSetting) {
+              delete workpackageConfigUrlSetting.dataset.centralRepository;
+              delete workpackageConfigUrlSetting.dataset.branch;
+              delete workpackageConfigUrlSetting.dataset.automation;
+            }
+          }
+          setRunButtonMode(state);
+        };
+        updateUI();
+        if (workpackageConfigUrlSetting) {
+          const configUrlObserver = new MutationObserver(updateUI);
+          configUrlObserver.observe(workpackageConfigUrlSetting, {
+            attributes: true,
+            attributeFilter: ['data-json-response', 'class'],
+          });
+          inputContainerWrapper._configUrlObserver = configUrlObserver;
+        }
+      } else {
         const inputContainer = document.createElement('div');
         keys.forEach((k) => {
           const inputConfig = generateGithubActionsInputConfig(inputs, k);
           inputContainer.insertAdjacentElement('beforeend', inputConfig);
         });
-        inputTabPanel.insertAdjacentElement('beforeend', inputContainer);
-
-        tabPanels.append(inputTabPanel, customTabPanel);
-        tabsWrapper.append(tabList, tabPanels);
-        initialContentsWrapper.appendChild(tabsWrapper);
-        inputContainerWrapper.insertAdjacentElement('beforeend', initialContentsWrapper);
-
-        // --- END PATCH: Wrap initial contents ---
-
-        const tabs = [
-          { button: inputTab, panel: inputTabPanel },
-          { button: customTab, panel: customTabPanel },
-        ];
-        const activateTab = (tabKey) => {
-          tabs.forEach(({ button, panel }) => {
-            const isActive = panel.dataset.tab === tabKey;
-            button.classList.toggle('active', isActive);
-            panel.classList.toggle('active', isActive);
-          });
-        };
-        inputTab.addEventListener('click', () => activateTab('input'));
-        customTab.addEventListener('click', () => activateTab('custom'));
-        // if there is a custom configuration URL already specified,
-        // start on the custom tab
-        if (githubActionsCustomConfigurationUrl.value) {
-          activateTab('custom');
-        } else {
-          activateTab('input');
-        }
+        inputContainerWrapper.appendChild(inputContainer);
       }
     })
     .finally(() => {
@@ -1080,25 +1015,24 @@ async function handleClickGithubAction(e, gm) {
     overlay.style.display = 'none';
     statusMsg.innerHTML = '';
   };
-  runBtn.onclick = () => {
+  const runWorkflow = () => {
     // Hide initial contents when workflow starts
     const initialContents = document.getElementById('githubActionsInitialContents');
     if (initialContents) initialContents.style.display = 'none';
-    let activeTab = document.querySelector('.githubActionsTabPanel.active');
-    if (activeTab) {
-      let isCustom = activeTab.dataset.tab === 'custom';
+    if (inputContainerWrapper.dataset.mode) {
+      const isWorkpackage = inputContainerWrapper.dataset.mode === 'workpackage';
       // gather inputs:
       const specifiedInputs = {};
-      activeTab.querySelectorAll('.githubActionsInputField').forEach((i) => {
+      inputContainerWrapper.querySelectorAll('.githubActionsInputField').forEach((i) => {
         specifiedInputs[i.dataset.input] = i.value;
       });
-      // if we are in custom mode, we must repackage the inputs to the expected format
+      // if we are in workpackage mode, we must repackage the inputs to the expected format
       let repackagedInputs;
-      if (isCustom) {
+      if (isWorkpackage) {
         try {
           repackagedInputs = {};
           repackagedInputs.parameters = JSON.stringify(specifiedInputs);
-          let select = activeTab.querySelector('#githubActionsCustomConfigParams select');
+          let select = document.querySelector('#githubActionsWorkpackageConfigSelectWrapper select');
           let selectId = select.value;
           let selectText = select.options[select.selectedIndex].text;
           repackagedInputs.workpackage_id = selectId;
@@ -1107,7 +1041,7 @@ async function handleClickGithubAction(e, gm) {
           repackagedInputs.filepath = strippedPath;
           repackagedInputs.commit_message =
             'mei-friend: Used GitHub Action to apply ' + selectText + ' to ' + strippedPath;
-          const customConfigUrlEl = document.getElementById('githubActionsCustomConfigurationUrl');
+          const customConfigUrlEl = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
           if (customConfigUrlEl) {
             if (customConfigUrlEl.dataset.centralRepository) {
               repackagedInputs.central_repository = customConfigUrlEl.dataset.centralRepository;
@@ -1361,6 +1295,42 @@ async function handleClickGithubAction(e, gm) {
           ghLogo.classList.remove('clockwise');
           clearProgressInterval();
         });
+    }
+  };
+  runBtn.innerText = translator.lang.githubActionsRunButton.text;
+  runBtn.removeAttribute('disabled');
+  runBtn.onclick = runWorkflow;
+
+  const supplyWorkpackageDefinition = () => {
+    overlay.style.display = 'none';
+    statusMsg.innerHTML = '';
+    v.showSettingsPanel();
+    document.getElementById('meifriendOptionsTab').click();
+    const input = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+    if (!input) return;
+    const details = input.closest('details');
+    if (details) details.open = true;
+    const optionsItem = input.closest('.optionsItem');
+    if (optionsItem) optionsItem.scrollIntoView({ block: 'center' });
+    input.focus({ preventScroll: true });
+    if (!optionsItem) return;
+    optionsItem.classList.remove('githubActionsFlashAlert');
+    void optionsItem.offsetWidth; // restart animation
+    optionsItem.classList.add('githubActionsFlashAlert');
+  };
+  const setRunButtonMode = (mode) => {
+    if (mode === 'loading') {
+      runBtn.innerText = '...';
+      runBtn.setAttribute('disabled', '');
+      runBtn.onclick = null;
+    } else if (mode === 'invalid') {
+      runBtn.innerText = translator.lang.githubActionsSupplyWorkpackageDefinition.text;
+      runBtn.removeAttribute('disabled');
+      runBtn.onclick = supplyWorkpackageDefinition;
+    } else {
+      runBtn.innerText = translator.lang.githubActionsRunButton.text;
+      runBtn.removeAttribute('disabled');
+      runBtn.onclick = runWorkflow;
     }
   };
 } // handleClickGithubAction()

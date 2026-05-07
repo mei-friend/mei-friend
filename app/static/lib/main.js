@@ -568,7 +568,7 @@ async function completeInitialLoad() {
   // Must be written before addMeiFriendOptionsToSettingsPanel() reads storage to populate the input.
   if (automationParam !== null) {
     try {
-      window.localStorage['mf-supplyCustomGithubActionsConfiguration'] = automationParam;
+      window.localStorage['mf-supplyWorkpackageGithubActionsConfiguration'] = automationParam;
       window.localStorage['mf-enableGithubActions'] = 'true';
     } catch (err) {
       console.warn('Could not save automation URL to localStorage: ', err);

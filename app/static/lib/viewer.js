@@ -1636,10 +1636,10 @@ export default class Viewer {
               'renumberMeasuresUseSuffixAtMeasures'
             );
             break;
-          case 'supplyCustomGithubActionsConfiguration':
+          case 'supplyWorkpackageGithubActionsConfiguration':
             console.log('Update to GitHub Actions configuration URL');
             if (this.urlResolveTimeout) clearTimeout(this.urlResolveTimeout);
-            const customParams = 'githubActionsCustomConfigParams';
+            const workpackageParams = 'githubActionsWorkpackageConfigParams';
             this.urlResolveTimeout = utils.checkAndRetrieveJson(ev.target);
             break;
         }
@@ -1684,7 +1684,7 @@ export default class Viewer {
         }
       });
     }
-    const customConfigInput = document.getElementById('supplyCustomGithubActionsConfiguration');
+    const customConfigInput = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
     if (customConfigInput && customConfigInput.value) {
       utils.checkAndRetrieveJson(customConfigInput, 0);
     }
@@ -2123,7 +2123,7 @@ export default class Viewer {
         input.setAttribute('type', 'text');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        if (opt === 'supplyCustomGithubActionsConfiguration') {
+        if (opt === 'supplyWorkpackageGithubActionsConfiguration') {
           input.classList.add('preventKeyBindings');
         }
         const normalizedStringValue =
@@ -2131,7 +2131,7 @@ export default class Viewer {
         input.setAttribute('value', normalizedStringValue);
         input.setAttribute('placeholder', o.placeholder ? o.placeholder : '');
         input.setAttribute('size', o.size ? o.size : '30');
-        if (opt === 'supplyCustomGithubActionsConfiguration' && normalizedStringValue) {
+        if (opt === 'supplyWorkpackageGithubActionsConfiguration' && normalizedStringValue) {
           utils.checkAndRetrieveJson(input, 0);
         }
         break;
@@ -2461,9 +2461,7 @@ export default class Viewer {
       const current = settingsSel?.value ?? barSel?.value ?? this.expansionId ?? '';
       if (!current) {
         const pickFrom = settingsSel || barSel;
-        const firstReal = pickFrom
-          ? Array.from(pickFrom.options).find((o) => o.value)
-          : null;
+        const firstReal = pickFrom ? Array.from(pickFrom.options).find((o) => o.value) : null;
         if (firstReal) {
           this.expansionId = firstReal.value;
           if (settingsSel) settingsSel.value = firstReal.value;

@@ -383,9 +383,6 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
-  githubActionsDescription: {
-    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Once the workflow run completes , you can reload your MEI file to see the results of the workflow run.',
-  },
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status' }, // DEPRECATED: unused in code; remove in a future cleanup
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub status' },
@@ -394,11 +391,14 @@ export const lang = {
   githubActionsRunFailedMsg: { text: 'Could not complete workflow run:' },
   githubActionsGitHubStatusLink: { text: 'GitHub status' },
   githubActionsRunButton: { text: 'Run workflow' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Supply work package definition' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'This GitHub Action requires a work package definition. Please supply one (URL of a definition JSON object) in the mei-friend settings.',
+  },
   githubActionsRunButtonReload: { text: 'Reload MEI file' },
   githubActionsCancelButton: { text: 'Cancel' },
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
-  githubActionsInputContainerHeader: { text: 'Input configuration' },
   githubActionsNoSummaryProvided: {
     text: 'No summary provided. Please refer to GitHub Status link above for details.',
   },
@@ -409,11 +409,7 @@ export const lang = {
   githubActionsDisabledDirtyTooltip: {
     text: 'Commit your local changes to run GitHub Actions workflows.',
   },
-  githubActionsCustomContainerHeader: { text: 'Custom configuration' },
-  githubActionsCustomContainerExplanation: {
-    text: 'If you want to use custom automation scripts that should be triggered using GitHub Actions, please enter the URL of a CORS-accessible JSON configuration file above. More information can be found in the documentation, available here: <a href="https://mei-friend.github.io/docs/advanced/automation" target="_blank">https://mei-friend.github.io/docs/advanced/automation</a>.',
-  },
-  githubActionsCustomConfigInvalidResponse: {
+  githubActionsWorkpackageConfigInvalidResponse: {
     text: 'The JSON configuration file you have specified does not conform to the expected schema. Please check the documentation for details.',
   },
   // Fork modals

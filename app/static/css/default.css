@@ -291,7 +291,7 @@ a:active {
   width: 200px;
 }
 
-#githubActionsCustomConfigurationUrl, #supplyCustomGithubActionsConfiguration {
+#supplyWorkpackageGithubActionsConfiguration {
   width: 100%;
 }
 
@@ -313,62 +313,49 @@ a:active {
 
 #githubActionsInputConfigContainer {
   width: 100%;
-}
-
-.githubActionsTabs {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.githubActionsTabList {
-  display: flex;
-  flex-direction: row;
-}
-
-.githubActionsTab {
-  border: 1px solid var(--dropdownBorderColor);
-  background-color: var(--settingsLinkBackgroundColor);
-  color: var(--textColor);
-  padding: 0.4em 0.75em;
-  border-radius: 0.5em 0.5em 0 0;
-  cursor: pointer;
-}
-
-.githubActionsTab.active {
-  background-color: var(--navbarBackgroundColor);
-  border:0px;
-}
-
-.githubActionsTab:not(.active):hover {
-  background-color: var(--settingsLinkHoverColor);
-}
-
-.githubActionsTabPanels {
-  border: 1px solid var(--navbarBorderColor);
-  border-bottom-right-radius: 0.5em;
-  border-bottom-left-radius: 0.5em;
-  border-top-right-radius: 0.5em;
+  box-sizing: border-box;
   background-color: var(--dropdownBackgroundColor);
-  padding: 0.75em;
+  border-radius: 1em;
+  padding: 0.5em 1em;
 }
 
-.githubActionsTabPanel {
-  display: none;
-  flex-direction: column;
-  gap: 0.5em;
+#githubActionsWorkpackageConfigSelectWrapper:not(:empty) {
+  margin-bottom: 0.5em;
 }
 
-.githubActionsTabPanel.active {
-  display: flex;
+@keyframes githubActionsFlashAlert {
+  0%, 100% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+  8%, 33%, 58% {
+    box-shadow: 0 0 0 8px var(--fileStatusWarnColor);
+    transform: scale(1.04);
+  }
+  17%, 42%, 67% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
 }
 
-.githubActionsCustomParamList {
+.githubActionsFlashAlert {
+  animation: githubActionsFlashAlert 2.4s ease-in-out;
+}
+
+.githubActionsRequiresWorkpackageMessage {
+  color: var(--fileStatusWarnColor);
+  text-align: center;
+  margin: 0;
+  padding: 1em;
+  font-style: italic;
+}
+
+.githubActionsWorkpackageParamList {
   display: grid;
   grid-template-columns: max-content max-content 1fr;
 }
 
-.githubActionsInputConfig, .githubActionsCustomConfig {
+.githubActionsInputConfig, .githubActionsWorkpackageConfig {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
@@ -380,10 +367,10 @@ a:active {
   /* margin-bottom: 0.5em; */
 }
 
-#githubActionsCustomContainer, #githubActionsJobSummary {
+#githubActionsWorkpackageContainer, #githubActionsJobSummary {
   color: var(--textColor);
 }
-.githubActionsInputConfig span, .githubActionsCustomConfig span  {
+.githubActionsInputConfig span, .githubActionsWorkpackageConfig span  {
   color: var(--textColor);
 }
 
@@ -437,7 +424,7 @@ a:active {
   fill: var(--textColor);
 }
 
-.githubActionsInputConfig div, .githubActionsCustomConfig div {
+.githubActionsInputConfig div, .githubActionsWorkpackageConfig div {
   padding-left: 0.25em;
   padding-right: 0.5em;
   padding-bottom: 0.1em;

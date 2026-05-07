@@ -531,7 +531,14 @@ export default class GitCloudClient {
           'inputs' in asJson.on.workflow_dispatch &&
           asJson.on.workflow_dispatch.inputs
         ) {
-          return asJson.on.workflow_dispatch.inputs;
+          let showWorkPackageUI = false;
+          if ('env' in asJson && 'mei-friend' in asJson.env) {
+            showWorkPackageUI = true;
+          }
+          return {
+            inputs: asJson.on.workflow_dispatch.inputs,
+            showWorkPackageUI,
+          };
         } else return null;
       });
   }

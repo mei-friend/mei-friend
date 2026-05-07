@@ -384,7 +384,7 @@ supportedVerovioVersions.latest = {
   description: 'Current Verovio release',
 };
 supportedVerovioVersions['6.1.0'] = {
-  // Verovio 6.1.1 does not provide JS toolkit files, so we keep 6.1.0 
+  // Verovio 6.1.1 does not provide JS toolkit files, so we keep 6.1.0
   url: 'https://www.verovio.org/javascript/6.1.0/verovio-toolkit-hum.js',
   description: 'Verovio release 6.1.0',
   releaseDate: '12 March 2026',
@@ -1052,7 +1052,7 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: false,
   },
-  supplyCustomGithubActionsConfiguration: {
+  supplyWorkpackageGithubActionsConfiguration: {
     title: 'Custom configuration',
     description: 'Use a custom GitHub Actions workflow configuration file',
     type: 'string',
