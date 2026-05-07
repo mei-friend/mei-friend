@@ -1307,7 +1307,7 @@ async function handleClickGithubAction(e, gm) {
                   if ('conclusion' in workflowCompletionResp) {
                     if (workflowCompletionResp.conclusion === 'success') {
                       workflowFinished = true;
-                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionsRunCompletedMsg.text}</span> <a href="${workflowCompletionResp.html_url}" target="_blank">${translator.lang.githubActionsGitHubStatusLink.text}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
                       appendJobSummary(runId, 'githubActionsSummaryLoading');
                       runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                       runBtn.removeAttribute('disabled');
@@ -1329,8 +1329,7 @@ async function handleClickGithubAction(e, gm) {
                       };
                     } else {
                       workflowFinished = true;
-                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
-                      appendJobSummary(runId, 'githubActionsSummaryLoading');
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionsRunFailedMsg.text}</span> <a href="${workflowCompletionResp.html_url}" target="_blank">${translator.lang.githubActionsGitHubStatusLink.text}</a>`;
                       cancelBtn.removeAttribute('disabled');
                       runBtn.removeAttribute('disabled');
                       ghLogo.classList.remove('clockwise');

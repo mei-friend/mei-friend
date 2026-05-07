@@ -386,10 +386,13 @@ export const lang = {
   githubActionsDescription: {
     text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Once the workflow run completes , you can reload your MEI file to see the results of the workflow run.',
   },
-  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status' },
+  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status' }, // DEPRECATED: unused in code; remove in a future cleanup
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub status' },
-  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub status' },
+  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub status' }, // DEPRECATED: superseded by githubActionsRunCompletedMsg + githubActionsGitHubStatusLink; remove in a future cleanup
+  githubActionsRunCompletedMsg: { text: 'Workflow run completed:' },
+  githubActionsRunFailedMsg: { text: 'Could not complete workflow run:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub status' },
   githubActionsRunButton: { text: 'Run workflow' },
   githubActionsRunButtonReload: { text: 'Reload MEI file' },
   githubActionsCancelButton: { text: 'Cancel' },
