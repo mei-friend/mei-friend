@@ -1610,10 +1610,9 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputName.classList.add('githubActionsParamName');
   inputName.innerText = input;
   if (!custom && 'description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
-  if (custom && inputs[input] && inputs[input].type) {
-    inputName.setAttribute('title', `type: ${inputs[input].type}`);
+  if (custom && inputs[input] && inputs[input].description) {
+    inputName.setAttribute('title', inputs[input].description);
   }
-  const inputDescription = custom && inputs[input]?.description;
   const inputFieldWrapper = document.createElement('div');
   inputFieldWrapper.classList.add('githubActionsInputFieldWrapper');
   const inputField = document.createElement('input');
@@ -1651,13 +1650,6 @@ function generateGithubActionsInputConfig(inputs, input, custom = false) {
   inputFieldWrapper.insertAdjacentElement('beforeend', inputSetters);
   inputFieldWrapper.insertAdjacentElement('beforeend', inputField);
   inputConfig.insertAdjacentElement('beforeend', inputName);
-  if (inputDescription) {
-    const inputInfoIcon = document.createElement('span');
-    inputInfoIcon.classList.add('githubActionsParamInfo');
-    inputInfoIcon.innerHTML = icon.info;
-    inputInfoIcon.setAttribute('title', inputDescription);
-    inputConfig.insertAdjacentElement('beforeend', inputInfoIcon);
-  }
   inputConfig.insertAdjacentElement('beforeend', inputFieldWrapper);
   return inputConfig;
 }

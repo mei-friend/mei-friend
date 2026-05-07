@@ -405,6 +405,10 @@ a:active {
   margin-bottom: 0.15em;
 }
 
+.githubActionsParamName[title] {
+  cursor: help;
+}
+
 .githubActionsParamInfo {
   grid-column: 2;
   grid-row: 2;
