@@ -103,18 +103,19 @@ export function createNotationDiv(parentElement, scale) {
     `<ul class="badge-details"></ul>` +
     `</div>`;
 
-  // Compute the hover tooltip for a badge's click zones (prefix, count,
-  // chevron). The badge itself keeps its full-message tooltip; the click
-  // zones get a state-aware action hint instead.
+  // Compute the hover tooltip for a badge's summary line. The badge
+  // itself keeps its full-message tooltip; the summary gets a
+  // state-aware action hint that overrides it.
   //   - Singular: "Verovio warning" (no colon, no hint — there's nothing
   //     to expand).
   //   - Plural collapsed: "30 Verovio warnings: click to expand".
   //   - Plural expanded:  "30 Verovio warnings: click to contract".
   const refreshBadgeExpansionTooltip = (badge) => {
+    const summaryEl = badge.querySelector('.badge-summary');
+    const messageFirstEl = badge.querySelector('.badge-message-first');
     const countEl = badge.querySelector('.badge-count');
     const prefixEl = badge.querySelector('.badge-prefix');
-    const chevronEl = badge.querySelector('.badge-chevron');
-    if (!prefixEl) return;
+    if (!summaryEl || !prefixEl) return;
     const hasMultiple = badge.classList.contains('has-multiple');
     let tooltip;
     if (!hasMultiple) {
@@ -128,9 +129,10 @@ export function createNotationDiv(parentElement, scale) {
       const prefix = prefixEl.textContent || '';
       tooltip = `${count}${prefix} ${hint}`.trim();
     }
-    for (const el of [countEl, prefixEl, chevronEl]) {
-      if (el) el.title = tooltip;
-    }
+    summaryEl.title = tooltip;
+    // Suppress the inherited tooltip on the message text so users can
+    // read/select the warning content without an overlay popping up.
+    if (messageFirstEl) messageFirstEl.title = '';
   };
 
   // When a badge is expanded its details panel needs an explicit max-height

@@ -785,6 +785,9 @@ a:active {
   margin: 4px 0 0 0;
   padding: 4px 0 0 18px;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
+  /* Opaque so the long warning/error list stays readable over busy
+     notation; the summary above keeps its translucent look. */
+  background-color: #ffffff;
   overflow-y: auto;
   list-style: disc;
   flex: 1 1 auto;

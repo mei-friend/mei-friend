@@ -801,7 +801,10 @@ export default class Viewer {
     const prev = badge.dataset.currentMessage || '';
     const textChanged = prev !== reason;
     badge.style.display = '';
-    badge.title = reason;
+    // Only the round icon shows the full message listing on hover; the
+    // summary/details get the click-to-expand hint via refreshExpansionTooltip().
+    const iconEl = badge.querySelector('.badge-icon');
+    if (iconEl) iconEl.title = reason;
     badge.setAttribute('aria-label', reason);
     const lines = (reason || '').split('\n').filter((l) => l.trim().length > 0);
     const first = lines[0] || '';
