@@ -932,11 +932,11 @@ async function handleClickGithubAction(e, gm) {
               workPackages = parsed.work_packages;
               workpackageConfigUrlSetting.dataset.centralRepository = parsed.central_repository || '';
               workpackageConfigUrlSetting.dataset.branch = parsed.branch || '';
-              workpackageConfigUrlSetting.dataset.automation = parsed.automation || '';
+              workpackageConfigUrlSetting.dataset.automation_path = parsed.automation_path || '';
             } else {
               delete workpackageConfigUrlSetting.dataset.centralRepository;
               delete workpackageConfigUrlSetting.dataset.branch;
-              delete workpackageConfigUrlSetting.dataset.automation;
+              delete workpackageConfigUrlSetting.dataset.automation_path;
             }
             fillCustomConfigParams(selectWrapper, workpackageConfigParams, workPackages);
           } catch (err) {
@@ -982,7 +982,7 @@ async function handleClickGithubAction(e, gm) {
             if (workpackageConfigUrlSetting) {
               delete workpackageConfigUrlSetting.dataset.centralRepository;
               delete workpackageConfigUrlSetting.dataset.branch;
-              delete workpackageConfigUrlSetting.dataset.automation;
+              delete workpackageConfigUrlSetting.dataset.automation_path;
             }
           }
           setRunButtonMode(state);
@@ -1049,8 +1049,8 @@ async function handleClickGithubAction(e, gm) {
             if (customConfigUrlEl.dataset.branch) {
               repackagedInputs.branch = customConfigUrlEl.dataset.branch;
             }
-            if (customConfigUrlEl.dataset.automation) {
-              repackagedInputs.automation = customConfigUrlEl.dataset.automation;
+            if (customConfigUrlEl.dataset.automation_path) {
+              repackagedInputs.automation_path = customConfigUrlEl.dataset.automation_path;
             }
           }
         } catch (err) {
