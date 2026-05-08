@@ -791,17 +791,71 @@ export default class Viewer {
     }
   } // isWellFormedXml()
 
+  // Populate a notation badge (error or warning) with one or more messages.
+  // Splits `reason` on newlines, switches the prefix between singular and
+  // plural forms, prepends the count when more than one, and fills the
+  // expandable details list. Auto-reveals a previously hidden label only
+  // when the message set has actually changed.
+  _populateNotationBadge(badge, reason, singularKey, pluralKey) {
+    const wasVisible = badge.style.display !== 'none';
+    const prev = badge.dataset.currentMessage || '';
+    const textChanged = prev !== reason;
+    badge.style.display = '';
+    badge.title = reason;
+    badge.setAttribute('aria-label', reason);
+    const lines = (reason || '').split('\n').filter((l) => l.trim().length > 0);
+    const first = lines[0] || '';
+    const firstEl = badge.querySelector('.badge-message-first');
+    if (firstEl) firstEl.textContent = first;
+    const countEl = badge.querySelector('.badge-count');
+    if (countEl) countEl.textContent = lines.length > 1 ? `${lines.length} ` : '';
+    const prefixEl = badge.querySelector('.badge-prefix');
+    if (prefixEl) {
+      const key = lines.length > 1 ? pluralKey : singularKey;
+      prefixEl.textContent = (translator.lang[key] && translator.lang[key].text) || '';
+    }
+    const details = badge.querySelector('.badge-details');
+    if (details) {
+      details.innerHTML = '';
+      if (lines.length > 1) {
+        for (const line of lines) {
+          const li = document.createElement('li');
+          li.textContent = line;
+          details.appendChild(li);
+        }
+      }
+    }
+    if (lines.length > 1) {
+      badge.classList.add('has-multiple');
+    } else {
+      badge.classList.remove('has-multiple');
+      badge.classList.remove('expanded');
+    }
+    badge.dataset.currentMessage = reason;
+    if (!wasVisible || textChanged) badge.classList.remove('label-hidden');
+    // Refresh the click-zone tooltip ("X Verovio warnings: click to expand"
+    // etc.) now that count / prefix / has-multiple reflect the new state.
+    if (typeof badge.refreshExpansionTooltip === 'function') badge.refreshExpansionTooltip();
+  } // _populateNotationBadge()
+
   // Mark the notation pane as stale: dim the SVG and surface a small badge
-  // with the given message. Preserves the previously-rendered SVG.
+  // with the given message(s). Preserves the previously-rendered SVG.
+  // `reason` may contain multiple errors joined by '\n'.
   setNotationStale(reason) {
     const panel = document.getElementById('verovio-panel');
     if (panel) panel.classList.add('notation-stale');
     const badge = document.getElementById('notation-error-badge');
     if (badge) {
-      badge.style.display = '';
-      badge.title = reason;
-      badge.setAttribute('aria-label', reason);
+      this._populateNotationBadge(
+        badge,
+        reason,
+        'notationErrorBadgeLabel',
+        'notationErrorBadgeLabelPlural'
+      );
     }
+    // Error visible — warning (if any) drops back below it.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge) warningBadge.classList.remove('float-up');
     const sb = document.getElementById('statusBar');
     if (sb) sb.innerHTML = reason;
     this.busy(false);
@@ -817,23 +871,43 @@ export default class Viewer {
     const panel = document.getElementById('verovio-panel');
     if (panel) panel.classList.remove('notation-stale');
     const badge = document.getElementById('notation-error-badge');
-    if (badge) badge.style.display = 'none';
+    if (badge) {
+      badge.style.display = 'none';
+      badge.classList.remove('expanded');
+      delete badge.dataset.currentMessage;
+    }
+    // No error showing — let a visible warning float up under the logo.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge && warningBadge.style.display !== 'none') {
+      warningBadge.classList.add('float-up');
+    }
   } // clearNotationStale()
 
   // Verovio render-time warnings (e.g. structural advisories). Shown as a
   // small orange badge that does NOT dim the SVG — the render succeeded.
+  // `reason` may contain multiple warnings joined by '\n'.
   setNotationWarning(reason) {
     const badge = document.getElementById('notation-warning-badge');
-    if (badge) {
-      badge.style.display = '';
-      badge.title = reason;
-      badge.setAttribute('aria-label', reason);
-    }
+    if (!badge) return;
+    this._populateNotationBadge(
+      badge,
+      reason,
+      'notationWarningBadgeLabel',
+      'notationWarningBadgeLabelPlural'
+    );
+    // Float up under the Verovio logo when no error badge is shown.
+    const errorBadge = document.getElementById('notation-error-badge');
+    const errorVisible = errorBadge && errorBadge.style.display !== 'none';
+    badge.classList.toggle('float-up', !errorVisible);
   } // setNotationWarning()
 
   clearNotationWarning() {
     const badge = document.getElementById('notation-warning-badge');
-    if (badge) badge.style.display = 'none';
+    if (!badge) return;
+    badge.style.display = 'none';
+    badge.classList.remove('expanded');
+    badge.classList.remove('float-up');
+    delete badge.dataset.currentMessage;
   } // clearNotationWarning()
 
   /**

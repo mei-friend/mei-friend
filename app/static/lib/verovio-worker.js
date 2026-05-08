@@ -2,13 +2,20 @@ var tk;
 var tkOptions;
 var tkUrl;
 
-// Capture Verovio's emscripten log output so warnings (e.g. "scoreDef
-// missing key signature") can be surfaced to the user. Verovio routes its
-// internal log lines through console.warn/console.error in the JS bundle;
-// the worker's own diagnostic messages all carry a "VerovioWorker:" prefix
-// so they can be filtered out.
+// Capture Verovio's emscripten log output so warnings/errors (e.g.
+// "scoreDef missing key signature" or "[Error] The tree of the MEI data
+// cannot be parsed") can be surfaced to the user. Verovio routes its
+// internal log lines through console.warn (warnings) and console.error
+// (errors) in the JS bundle; the worker's own diagnostic messages all
+// carry a "VerovioWorker:" prefix so they can be filtered out.
 let pendingVerovioWarnings = [];
+let pendingVerovioErrors = [];
 let captureActive = false;
+// Tracks whether the current command actually re-parsed MEI via tk.loadData().
+// Only operations that re-load data can produce a fresh, authoritative warning
+// list — layout-only operations (e.g. resizer-driven updateLayout) must not
+// be allowed to clear the previous warning state.
+let loadDataInvoked = false;
 const _origConsoleWarn = console.warn;
 const _origConsoleError = console.error;
 function _formatConsoleArgs(args) {
@@ -33,7 +40,7 @@ console.warn = function () {
 console.error = function () {
   const msg = _formatConsoleArgs(arguments);
   if (captureActive && msg.indexOf('VerovioWorker:') === -1) {
-    pendingVerovioWarnings.push(msg);
+    pendingVerovioErrors.push(msg);
   }
   _origConsoleError.apply(console, arguments);
 };
@@ -52,6 +59,13 @@ loadVerovio = () => {
   console.info('VerovioWorker: Loading toolkit...');
   try {
     tk = new verovio.toolkit();
+    // Wrap loadData so we can distinguish data-reloading commands from
+    // layout-only ones in the message dispatcher below.
+    const _origLoadData = tk.loadData.bind(tk);
+    tk.loadData = function (...args) {
+      loadDataInvoked = true;
+      return _origLoadData(...args);
+    };
     tkOptions = {};
     let message = {
       cmd: 'vrvLoaded',
@@ -72,7 +86,9 @@ addEventListener(
   'message',
   function (e) {
     pendingVerovioWarnings = [];
+    pendingVerovioErrors = [];
     captureActive = true;
+    loadDataInvoked = false;
     let result = e.data;
     // console.log('verovio-worker: result: ', result);
     result.forceUpdate = false;
@@ -573,11 +589,27 @@ addEventListener(
           msg: 'Unknown command: ' + result.msg,
         };
     }
+    // Verovio's own [Error] log lines went via console.error and are
+    // distinct from our wrapper's postError. Merge them into the outgoing
+    // result so they reach the error badge instead of the warning badge.
+    if (pendingVerovioErrors.length > 0 && result) {
+      const captured = pendingVerovioErrors.join('\n');
+      if (result.cmd === 'error') {
+        result.msg = result.msg ? result.msg + '\n' + captured : captured;
+      } else {
+        result.cmd = 'error';
+        result.msg = captured;
+      }
+      pendingVerovioErrors = [];
+    }
     if (result) {
       postMessage(result);
     }
     captureActive = false;
-    if (pendingVerovioWarnings.length > 0) {
+    // Only emit warning state when MEI was actually re-parsed; otherwise we
+    // would erroneously clear warnings on layout-only operations like the
+    // resizer's updateLayout. An empty msg signals "no warnings — clear".
+    if (loadDataInvoked) {
       postMessage({ cmd: 'warning', msg: pendingVerovioWarnings.join('\n') });
       pendingVerovioWarnings = [];
     }
@@ -586,7 +618,7 @@ addEventListener(
 );
 
 function postError(result, context, err) {
-  const msg = 'Verovio error: ' + context + ': ' + err;
+  const msg = context + ': ' + err;
   console.error('VerovioWorker:', msg);
   result.cmd = 'error';
   result.msg = msg;

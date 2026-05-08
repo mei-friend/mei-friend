@@ -1102,7 +1102,10 @@ async function vrvWorkerEventsHandler(ev) {
         setProgressBar(0);
         updateHtmlTitle();
         v.clearNotationStale();
-        v.clearNotationWarning();
+        // Note: do NOT eagerly clear the warning badge here — the worker
+        // will follow up with a 'warning' message (possibly empty) only
+        // when MEI was re-parsed. Layout-only updates (e.g. resizer drags)
+        // must preserve any existing warning state.
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
           // loadFacsimile(v.xmlDoc);
@@ -1237,7 +1240,12 @@ async function vrvWorkerEventsHandler(ev) {
       // Verovio emitted log output during the last render (e.g. "scoreDef
       // missing key signature"). Surface in an orange badge alongside the
       // SVG without dimming, since the render itself succeeded.
-      v.setNotationWarning(ev.data.msg);
+      // Empty msg means MEI was re-parsed and produced no warnings — clear.
+      if (ev.data.msg && ev.data.msg.length > 0) {
+        v.setNotationWarning(ev.data.msg);
+      } else {
+        v.clearNotationWarning();
+      }
       break;
   }
   // cm.blockChanges = false;

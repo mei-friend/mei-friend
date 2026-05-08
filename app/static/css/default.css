@@ -582,7 +582,7 @@ a:active {
 }
 
 #verovio-panel.notation-stale {
-  opacity: 0.55;
+  opacity: 0.45;
   transition: opacity 0.2s ease-in-out;
 }
 
@@ -594,6 +594,32 @@ a:active {
   left: 3px;
   z-index: 5;
   display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: calc(100% - 6px);
+  pointer-events: auto;
+}
+
+#notation-error-badge {
+  top: 36px;
+  max-height: calc(100% - 42px);
+}
+
+#notation-warning-badge {
+  top: 70px; /* sits below the error badge: 36 + 28 + 6 */
+  max-height: calc(100% - 76px);
+}
+
+/* When error is hidden, warning floats up under the Verovio logo. */
+#notation-warning-badge.float-up {
+  top: 36px;
+  max-height: calc(100% - 42px);
+}
+
+#notation-error-badge .badge-icon,
+#notation-warning-badge .badge-icon {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 28px;
@@ -601,25 +627,180 @@ a:active {
   color: white;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-  cursor: help;
-  pointer-events: auto;
+  cursor: pointer;
 }
 
-#notation-error-badge {
-  top: 36px;
+#notation-error-badge .badge-icon {
   background-color: #f44336;
 }
 
-#notation-warning-badge {
-  top: 70px; /* sits below the error badge: 36 + 28 + 6 */
+#notation-warning-badge .badge-icon {
   background-color: #ff9800;
 }
 
-#notation-error-badge svg,
-#notation-warning-badge svg {
+#notation-error-badge .badge-icon svg,
+#notation-warning-badge .badge-icon svg {
   width: 16px;
   height: 16px;
   fill: currentColor;
+}
+
+#notation-error-badge .badge-label,
+#notation-warning-badge .badge-label {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.78);
+  color: #222;
+  padding: 4px 22px 4px 8px; /* extra right padding for close button */
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+/* Both labels need a vertical stack so the summary sits above the
+   collapsible details list. The label itself shows a text cursor so
+   users can select and copy message content (e.g. xml:IDs). */
+#notation-error-badge .badge-label,
+#notation-warning-badge .badge-label {
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+}
+
+/* The prefix (e.g. "3 Verovio warnings:"), count, and chevron are the
+   actual expand/collapse controls — show a pointer there and suppress
+   text selection so a quick click toggles cleanly. Only meaningful when
+   there is more than one message. */
+#notation-error-badge.has-multiple .badge-prefix,
+#notation-error-badge.has-multiple .badge-count,
+#notation-error-badge.has-multiple .badge-chevron,
+#notation-warning-badge.has-multiple .badge-prefix,
+#notation-warning-badge.has-multiple .badge-count,
+#notation-warning-badge.has-multiple .badge-chevron {
+  cursor: pointer;
+  user-select: none;
+}
+
+#notation-error-badge .badge-close,
+#notation-warning-badge .badge-close {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 1px 4px;
+  color: #555;
+  border-radius: 2px;
+}
+
+#notation-error-badge .badge-close:hover,
+#notation-warning-badge .badge-close:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+#notation-error-badge.label-hidden .badge-label,
+#notation-warning-badge.label-hidden .badge-label {
+  display: none;
+}
+
+#notation-error-badge .badge-prefix,
+#notation-warning-badge .badge-prefix {
+  font-weight: 600;
+}
+
+#notation-error-badge .badge-summary,
+#notation-warning-badge .badge-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+#notation-error-badge .badge-prefix,
+#notation-error-badge .badge-count,
+#notation-warning-badge .badge-prefix,
+#notation-warning-badge .badge-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+#notation-error-badge .badge-count:empty,
+#notation-warning-badge .badge-count:empty {
+  display: none;
+}
+
+#notation-error-badge .badge-message-first,
+#notation-warning-badge .badge-message-first {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* When expanded, the full message list is in .badge-details, so suppress
+   the first-message text in the summary to avoid duplication. */
+#notation-error-badge.expanded .badge-message-first,
+#notation-warning-badge.expanded .badge-message-first {
+  display: none;
+}
+
+#notation-error-badge .badge-chevron,
+#notation-warning-badge .badge-chevron {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+
+#notation-error-badge .badge-chevron svg,
+#notation-warning-badge .badge-chevron svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+#notation-error-badge.has-multiple .badge-chevron,
+#notation-warning-badge.has-multiple .badge-chevron {
+  display: inline-flex;
+}
+
+#notation-error-badge.expanded .badge-chevron,
+#notation-warning-badge.expanded .badge-chevron {
+  transform: rotate(180deg);
+}
+
+#notation-error-badge .badge-details,
+#notation-warning-badge .badge-details {
+  display: none;
+  margin: 4px 0 0 0;
+  padding: 4px 0 0 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  list-style: disc;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#notation-error-badge.expanded .badge-details,
+#notation-warning-badge.expanded .badge-details {
+  display: block;
+}
+
+#notation-error-badge .badge-details li,
+#notation-warning-badge .badge-details li {
+  margin-bottom: 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 #facsimile-panel {

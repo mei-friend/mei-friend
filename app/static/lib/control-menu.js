@@ -84,26 +84,152 @@ export function createNotationDiv(parentElement, scale) {
   verovioPanel.id = 'verovio-panel';
   verovioContainer.appendChild(verovioPanel);
 
-  // Subtle stale-notation badge: surfaces rendering errors without blanking the SVG.
-  // Sibling of #verovio-panel so it survives innerHTML overwrites.
-  // Icon-only; full message exposed via title attribute and aria-label.
+  // Both notation badges share the same DOM shape: a round icon + a
+  // translucent label containing a one-line summary (count, prefix, first
+  // message, chevron) and an expandable list of all messages. Click the
+  // icon (or ×) to hide the label; click the label to expand when there
+  // are multiple messages. The error badge dims the SVG via the
+  // .notation-stale class on #verovio-panel; the warning badge does not.
+  const buildBadgeHtml = () =>
+    `<div class="badge-icon" role="button" tabindex="0">${icon.alert}</div>` +
+    `<div class="badge-label">` +
+    `<button type="button" class="badge-close" aria-label="Hide">×</button>` +
+    `<div class="badge-summary">` +
+    `<span class="badge-count" aria-hidden="true"></span>` +
+    `<span class="badge-prefix"></span>` +
+    `<span class="badge-message-first"></span>` +
+    `<span class="badge-chevron" aria-hidden="true">${icon.arrowDown}</span>` +
+    `</div>` +
+    `<ul class="badge-details"></ul>` +
+    `</div>`;
+
+  // Compute the hover tooltip for a badge's click zones (prefix, count,
+  // chevron). The badge itself keeps its full-message tooltip; the click
+  // zones get a state-aware action hint instead.
+  //   - Singular: "Verovio warning" (no colon, no hint — there's nothing
+  //     to expand).
+  //   - Plural collapsed: "30 Verovio warnings: click to expand".
+  //   - Plural expanded:  "30 Verovio warnings: click to contract".
+  const refreshBadgeExpansionTooltip = (badge) => {
+    const countEl = badge.querySelector('.badge-count');
+    const prefixEl = badge.querySelector('.badge-prefix');
+    const chevronEl = badge.querySelector('.badge-chevron');
+    if (!prefixEl) return;
+    const hasMultiple = badge.classList.contains('has-multiple');
+    let tooltip;
+    if (!hasMultiple) {
+      tooltip = (prefixEl.textContent || '').replace(/[:\s]+$/, '');
+    } else {
+      const hintKey = badge.classList.contains('expanded')
+        ? 'notationBadgeClickToContract'
+        : 'notationBadgeClickToExpand';
+      const hint = (translator.lang[hintKey] && translator.lang[hintKey].text) || '';
+      const count = countEl ? countEl.textContent : '';
+      const prefix = prefixEl.textContent || '';
+      tooltip = `${count}${prefix} ${hint}`.trim();
+    }
+    for (const el of [countEl, prefixEl, chevronEl]) {
+      if (el) el.title = tooltip;
+    }
+  };
+
+  // When a badge is expanded its details panel needs an explicit max-height
+  // so the inner scrollbar engages instead of the badge overflowing the
+  // notation pane. Recomputed whenever the badge moves or the container
+  // resizes.
+  const recomputeBadgeDetailsHeight = (badge) => {
+    if (!badge.classList.contains('expanded')) return;
+    const details = badge.querySelector('.badge-details');
+    const summary = badge.querySelector('.badge-summary');
+    if (!details) return;
+    const containerHeight = verovioContainer.clientHeight;
+    const top = badge.offsetTop;
+    const summaryHeight = summary ? summary.offsetHeight : 0;
+    const available = Math.max(60, containerHeight - top - summaryHeight - 24);
+    details.style.maxHeight = available + 'px';
+  };
+
+  const wireBadge = (badge) => {
+    badge.querySelector('.badge-icon').addEventListener('click', () => {
+      badge.classList.toggle('label-hidden');
+    });
+    badge.querySelector('.badge-close').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      badge.classList.add('label-hidden');
+    });
+    badge.querySelector('.badge-label').addEventListener('click', (ev) => {
+      if (ev.target.closest('.badge-close')) return;
+      if (!badge.classList.contains('has-multiple')) return;
+      // Restrict expand/collapse to the prefix ("X Verovio warnings:"),
+      // the count, and the chevron, so the message text remains
+      // selectable for copy/paste (e.g., to grab xml:IDs).
+      if (!ev.target.closest('.badge-prefix, .badge-count, .badge-chevron')) return;
+      badge.classList.toggle('expanded');
+      recomputeBadgeDetailsHeight(badge);
+      refreshBadgeExpansionTooltip(badge);
+    });
+  };
+
+  // Expose the tooltip refresher on the badge itself so callers that
+  // change the message set (e.g. viewer.setNotationStale) can keep the
+  // click-zone hint in sync without importing this module.
+  const attachTooltipApi = (badge) => {
+    badge.refreshExpansionTooltip = () => refreshBadgeExpansionTooltip(badge);
+  };
+
   let notationBadge = document.createElement('div');
   notationBadge.id = 'notation-error-badge';
   notationBadge.style.display = 'none';
   notationBadge.setAttribute('role', 'status');
   notationBadge.setAttribute('aria-live', 'polite');
-  notationBadge.innerHTML = icon.alert;
+  notationBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationBadge);
+  attachTooltipApi(notationBadge);
   verovioContainer.appendChild(notationBadge);
 
-  // Companion orange badge for Verovio-emitted warnings (render succeeded
-  // but Verovio flagged something).
   let notationWarningBadge = document.createElement('div');
   notationWarningBadge.id = 'notation-warning-badge';
   notationWarningBadge.style.display = 'none';
   notationWarningBadge.setAttribute('role', 'status');
   notationWarningBadge.setAttribute('aria-live', 'polite');
-  notationWarningBadge.innerHTML = icon.alert;
+  notationWarningBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationWarningBadge);
+  attachTooltipApi(notationWarningBadge);
   verovioContainer.appendChild(notationWarningBadge);
+
+  // When the error badge is expanded with multiple errors it grows
+  // downward and would occlude the warning badge below it. Watch its
+  // size and slide the warning badge down to sit just under the expanded
+  // error block, sizing its max-height so it still fits in the pane.
+  const repositionWarningBadge = () => {
+    const errorVisible = notationBadge.style.display !== 'none';
+    const errorExpanded = notationBadge.classList.contains('expanded');
+    if (errorVisible && errorExpanded) {
+      const errorBottom = notationBadge.offsetTop + notationBadge.offsetHeight;
+      const containerH = verovioContainer.clientHeight;
+      notationWarningBadge.style.top = errorBottom + 6 + 'px';
+      notationWarningBadge.style.maxHeight = Math.max(40, containerH - errorBottom - 12) + 'px';
+    } else {
+      // Clear inline overrides so the CSS-driven default/float-up positions apply.
+      notationWarningBadge.style.top = '';
+      notationWarningBadge.style.maxHeight = '';
+    }
+    // The warning may have moved; if its details panel is open, resize it
+    // so the scrollable region stays inside the notation pane.
+    recomputeBadgeDetailsHeight(notationWarningBadge);
+  };
+
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => {
+      repositionWarningBadge();
+      // The container may have changed size too — keep the error's open
+      // details panel sized correctly.
+      recomputeBadgeDetailsHeight(notationBadge);
+    });
+    ro.observe(notationBadge);
+    ro.observe(notationWarningBadge);
+    ro.observe(verovioContainer);
+  }
 
   // container for Verovio
   let facsimileDragger = document.createElement('div');
