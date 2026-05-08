@@ -532,7 +532,7 @@ export default class GitCloudClient {
           asJson.on.workflow_dispatch.inputs
         ) {
           let showWorkPackageUI = false;
-          if ('env' in asJson && 'mei-friend' in asJson.env) {
+          if ('env' in asJson && 'mei-friend' in asJson.env && asJson.env['mei-friend'] === true) {
             showWorkPackageUI = true;
           }
           return {
