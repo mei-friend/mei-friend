@@ -84,6 +84,155 @@ export function createNotationDiv(parentElement, scale) {
   verovioPanel.id = 'verovio-panel';
   verovioContainer.appendChild(verovioPanel);
 
+  // Both notation badges share the same DOM shape: a round icon + a
+  // translucent label containing a one-line summary (count, prefix, first
+  // message, chevron) and an expandable list of all messages. Click the
+  // icon (or ×) to hide the label; click the label to expand when there
+  // are multiple messages. The error badge dims the SVG via the
+  // .notation-stale class on #verovio-panel; the warning badge does not.
+  const buildBadgeHtml = () =>
+    `<div class="badge-icon" role="button" tabindex="0">${icon.alert}</div>` +
+    `<div class="badge-label">` +
+    `<button type="button" class="badge-close" aria-label="Hide">×</button>` +
+    `<div class="badge-summary">` +
+    `<span class="badge-count" aria-hidden="true"></span>` +
+    `<span class="badge-prefix"></span>` +
+    `<span class="badge-message-first"></span>` +
+    `<span class="badge-chevron" aria-hidden="true">${icon.arrowDown}</span>` +
+    `</div>` +
+    `<ul class="badge-details"></ul>` +
+    `</div>`;
+
+  // Compute the hover tooltip for a badge's summary line. The badge
+  // itself keeps its full-message tooltip; the summary gets a
+  // state-aware action hint that overrides it.
+  //   - Singular: "Verovio warning" (no colon, no hint — there's nothing
+  //     to expand).
+  //   - Plural collapsed: "30 Verovio warnings: click to expand".
+  //   - Plural expanded:  "30 Verovio warnings: click to contract".
+  const refreshBadgeExpansionTooltip = (badge) => {
+    const summaryEl = badge.querySelector('.badge-summary');
+    const messageFirstEl = badge.querySelector('.badge-message-first');
+    const countEl = badge.querySelector('.badge-count');
+    const prefixEl = badge.querySelector('.badge-prefix');
+    if (!summaryEl || !prefixEl) return;
+    const hasMultiple = badge.classList.contains('has-multiple');
+    let tooltip;
+    if (!hasMultiple) {
+      tooltip = (prefixEl.textContent || '').replace(/[:\s]+$/, '');
+    } else {
+      const hintKey = badge.classList.contains('expanded')
+        ? 'notationBadgeClickToContract'
+        : 'notationBadgeClickToExpand';
+      const hint = (translator.lang[hintKey] && translator.lang[hintKey].text) || '';
+      const count = countEl ? countEl.textContent : '';
+      const prefix = prefixEl.textContent || '';
+      tooltip = `${count}${prefix} ${hint}`.trim();
+    }
+    summaryEl.title = tooltip;
+    // Suppress the inherited tooltip on the message text so users can
+    // read/select the warning content without an overlay popping up.
+    if (messageFirstEl) messageFirstEl.title = '';
+  };
+
+  // When a badge is expanded its details panel needs an explicit max-height
+  // so the inner scrollbar engages instead of the badge overflowing the
+  // notation pane. Recomputed whenever the badge moves or the container
+  // resizes.
+  const recomputeBadgeDetailsHeight = (badge) => {
+    if (!badge.classList.contains('expanded')) return;
+    const details = badge.querySelector('.badge-details');
+    const summary = badge.querySelector('.badge-summary');
+    if (!details) return;
+    const containerHeight = verovioContainer.clientHeight;
+    const top = badge.offsetTop;
+    const summaryHeight = summary ? summary.offsetHeight : 0;
+    const available = Math.max(60, containerHeight - top - summaryHeight - 24);
+    details.style.maxHeight = available + 'px';
+  };
+
+  const wireBadge = (badge) => {
+    badge.querySelector('.badge-icon').addEventListener('click', () => {
+      badge.classList.toggle('label-hidden');
+    });
+    badge.querySelector('.badge-close').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      badge.classList.add('label-hidden');
+    });
+    badge.querySelector('.badge-label').addEventListener('click', (ev) => {
+      if (ev.target.closest('.badge-close')) return;
+      if (!badge.classList.contains('has-multiple')) return;
+      // Restrict expand/collapse to the prefix ("X Verovio warnings:"),
+      // the count, and the chevron, so the message text remains
+      // selectable for copy/paste (e.g., to grab xml:IDs).
+      if (!ev.target.closest('.badge-prefix, .badge-count, .badge-chevron')) return;
+      badge.classList.toggle('expanded');
+      recomputeBadgeDetailsHeight(badge);
+      refreshBadgeExpansionTooltip(badge);
+    });
+  };
+
+  // Expose the tooltip refresher on the badge itself so callers that
+  // change the message set (e.g. viewer.setNotationStale) can keep the
+  // click-zone hint in sync without importing this module.
+  const attachTooltipApi = (badge) => {
+    badge.refreshExpansionTooltip = () => refreshBadgeExpansionTooltip(badge);
+  };
+
+  let notationBadge = document.createElement('div');
+  notationBadge.id = 'notation-error-badge';
+  notationBadge.style.display = 'none';
+  notationBadge.setAttribute('role', 'status');
+  notationBadge.setAttribute('aria-live', 'polite');
+  notationBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationBadge);
+  attachTooltipApi(notationBadge);
+  verovioContainer.appendChild(notationBadge);
+
+  let notationWarningBadge = document.createElement('div');
+  notationWarningBadge.id = 'notation-warning-badge';
+  notationWarningBadge.style.display = 'none';
+  notationWarningBadge.setAttribute('role', 'status');
+  notationWarningBadge.setAttribute('aria-live', 'polite');
+  notationWarningBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationWarningBadge);
+  attachTooltipApi(notationWarningBadge);
+  verovioContainer.appendChild(notationWarningBadge);
+
+  // When the error badge is expanded with multiple errors it grows
+  // downward and would occlude the warning badge below it. Watch its
+  // size and slide the warning badge down to sit just under the expanded
+  // error block, sizing its max-height so it still fits in the pane.
+  const repositionWarningBadge = () => {
+    const errorVisible = notationBadge.style.display !== 'none';
+    const errorExpanded = notationBadge.classList.contains('expanded');
+    if (errorVisible && errorExpanded) {
+      const errorBottom = notationBadge.offsetTop + notationBadge.offsetHeight;
+      const containerH = verovioContainer.clientHeight;
+      notationWarningBadge.style.top = errorBottom + 6 + 'px';
+      notationWarningBadge.style.maxHeight = Math.max(40, containerH - errorBottom - 12) + 'px';
+    } else {
+      // Clear inline overrides so the CSS-driven default/float-up positions apply.
+      notationWarningBadge.style.top = '';
+      notationWarningBadge.style.maxHeight = '';
+    }
+    // The warning may have moved; if its details panel is open, resize it
+    // so the scrollable region stays inside the notation pane.
+    recomputeBadgeDetailsHeight(notationWarningBadge);
+  };
+
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => {
+      repositionWarningBadge();
+      // The container may have changed size too — keep the error's open
+      // details panel sized correctly.
+      recomputeBadgeDetailsHeight(notationBadge);
+    });
+    ro.observe(notationBadge);
+    ro.observe(notationWarningBadge);
+    ro.observe(verovioContainer);
+  }
+
   // container for Verovio
   let facsimileDragger = document.createElement('div');
   facsimileDragger.id = 'facsimile-dragger';
@@ -191,15 +340,6 @@ function insertByOrder(container, child) {
   } else {
     container.appendChild(child);
   }
-}
-
-function getVisibleWidth(el) {
-  const rect = el.getBoundingClientRect();
-  if (rect.width > 0) {
-    el.dataset.visWidth = String(rect.width);
-    return rect.width;
-  }
-  return Number(el.dataset.visWidth ?? 0);
 }
 
 export function createNotationControlMenu(parentElement, scale) {
@@ -676,62 +816,69 @@ export function createFacsimileControlMenu(parentElement) {
 } // createFacsimileControlMenu()
 
 export function adjustCtrlMenuOverflow(ctrlMenu) {
-  // adjust the overflow of the control menu
-  if (ctrlMenu) {
-    // We want to maintain the order of the items in the control menu
-    // If any of the children are overflowing, move the first overflowing child AND ALL SUBSEQUENT CHILDREN into the overflow menu
-    // If there is space in the control menu, move items back from the overflow menu in order.
-    const children = Array.from(ctrlMenu.children);
-    const ctrlMenuRect = ctrlMenu.getBoundingClientRect();
-    const padding = 25; // px padding to avoid edge issues
+  if (!ctrlMenu) return;
 
-    // determine first overflowing child using cumulative widths for consistency
-    let cumulative = 0;
-    let firstOverflowingIndex = children.findIndex((child) => {
-      const childWidth = getVisibleWidth(child);
-      const wouldOverflow = cumulative + childWidth + padding > ctrlMenuRect.width;
-      cumulative += childWidth;
-      return wouldOverflow;
+  const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
+  const overflowMenu = document.getElementById(ctrlMenu.id + 'Overflow');
+  if (!overflowContent || !overflowMenu) return;
+
+  // Both directions of the algorithm use the same rule: a child "fits" only when there is
+  // at least 1 px of gap between its right edge and ctrlMenu's right edge.  Any overlap
+  // (gap ≤ 0) means the child must move into overflow.  Using a single criterion for both
+  // move-to and move-back prevents oscillation that arose from disagreement between the
+  // two paths (e.g. cached width sums that ignored inter-element margins).
+  const FIT_GAP = 1; // px — required gap between child's right edge and ctrlMenu's right
+  const overflows = (child, ctrlMenuRight) =>
+    child.getBoundingClientRect().right > ctrlMenuRight - FIT_GAP;
+
+  // Move any overflowing children (and all later siblings, to preserve order) into the
+  // overflow menu.  Returns true if any items were moved, so the caller can run a second
+  // pass — showing the icon narrows ctrlMenu and may expose additional overflows.
+  const moveOverflowingItems = () => {
+    const children = Array.from(ctrlMenu.children);
+    const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+    const firstOverflowingIndex = children.findIndex((child) => overflows(child, ctrlMenuRight));
+    if (firstOverflowingIndex === -1) return false;
+    children.slice(firstOverflowingIndex).forEach((child) => {
+      if (!child.dataset.order) assignOrderKeys(ctrlMenu);
+      insertByOrder(overflowContent, child);
     });
-    const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
-    // move overflowing items into overflow menu
-    if (firstOverflowingIndex !== -1) {
-      let overflowing = children.slice(firstOverflowingIndex);
-      overflowing.forEach((child) => {
-        if (!child.dataset.order) assignOrderKeys(ctrlMenu);
-        getVisibleWidth(child); // cache width while visible
-        insertByOrder(overflowContent, child);
-      });
-    } else {
-      // move items back from overflow menu if there is space
-      // ... but only in order, i.e. if there is no space for the first item, don't try the second etc.
-      const currentlyOverflowing = Array.from(overflowContent.children).sort(
-        (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
-      );
-      for (let overflowingItem of currentlyOverflowing) {
-        // re-measure after every insertion to avoid stale rects
-        const currentRect = ctrlMenu.getBoundingClientRect();
-        const currentChildren = Array.from(ctrlMenu.children);
-        const usedWidth = currentChildren.reduce((acc, el) => acc + getVisibleWidth(el), 0);
-        let availableSpace = currentRect.width - padding - usedWidth;
-        const childWidth = getVisibleWidth(overflowingItem);
-        // check if there is space in the ctrlMenu to add this as the last child
-        if (childWidth <= availableSpace) {
-          ctrlMenu.appendChild(overflowingItem);
-        } else {
-          // if we can't fit this one, don't try to fit any more
-          break;
-        }
+    overflowMenu.style.display = 'inline-block';
+    return true;
+  };
+
+  // Try to restore overflow items back into the main menu.  Trial-and-rollback: each
+  // candidate is optimistically inserted, ctrlMenu is re-measured, and the candidate is
+  // moved back to overflow if it doesn't actually fit.  This avoids the margin/border
+  // accounting errors that a precomputed-width approach is prone to, and guarantees the
+  // result is consistent with moveOverflowingItems'.  Iteration stops at the first item
+  // that doesn't fit: subsequent items have larger order keys and would be placed
+  // further right, where they cannot fit either.
+  const tryRestoreFromOverflow = () => {
+    const candidates = Array.from(overflowContent.children).sort(
+      (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
+    );
+    for (const item of candidates) {
+      insertByOrder(ctrlMenu, item);
+      // If overflow just emptied, hide the burger so ctrlMenu's measured right edge
+      // reflects the icon being gone.
+      if (overflowContent.children.length === 0) overflowMenu.style.display = 'none';
+      const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+      if (overflows(item, ctrlMenuRight)) {
+        insertByOrder(overflowContent, item);
+        overflowMenu.style.display = 'inline-block';
+        break;
       }
     }
-    // show or hide the overflow menu button based on whether it has children
-    let overflow = document.getElementById(ctrlMenu.id + 'Overflow');
-    if (overflowContent.children.length > 0) {
-      overflow.style.display = 'inline-block';
-    } else {
-      overflow.style.display = 'none';
-    }
+  };
+
+  if (moveOverflowingItems()) {
+    moveOverflowingItems();
+  } else {
+    tryRestoreFromOverflow();
   }
+
+  overflowMenu.style.display = overflowContent.children.length > 0 ? 'inline-block' : 'none';
 }
 
 export function createEncodingPanel() {

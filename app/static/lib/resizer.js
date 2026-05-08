@@ -1,4 +1,4 @@
-import { adjustCtrlMenuOverflow } from './control-menu.js';
+import { adjustCtrlMenuOverflow, hideAllOverflowContents } from './control-menu.js';
 import {
   annotationPanelExtent,
   defaultNotationResizerWidth,
@@ -237,10 +237,7 @@ export function addNotationResizerHandlers(v, cm) {
   let notationSize = 0;
 
   const mouseDownHandler = function (e) {
-    // hide control menu overflow
-    Array.from(document.getElementsByClassName('control-menu-overflow')).forEach((content) => {
-      content.style.display = 'none';
-    });
+    hideAllOverflowContents(); // close any open overflow dropdown without hiding the burger icon
     x = e.clientX;
     y = e.clientY;
     if (notationOrientation === 'top' || notationOrientation === 'bottom') {
@@ -351,6 +348,7 @@ export function addNotationResizerHandlers(v, cm) {
     notationPanel.style.pointerEvents = 'none';
     encodingPanel.style.userSelect = 'none';
     encodingPanel.style.pointerEvents = 'none';
+    scheduleAdjustOverflows();
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
@@ -387,6 +385,17 @@ function adjustOverflows() {
   if (facsimileControlMenu && facsimileContainer.style.display !== 'none') {
     adjustCtrlMenuOverflow(facsimileControlMenu);
   }
+}
+
+// Coalesces adjustOverflows() calls into one per animation frame so high-rate mousemove
+// events (e.g. 1000 Hz pointers) don't trigger redundant layout work mid-drag.
+let adjustOverflowsRafId = null;
+function scheduleAdjustOverflows() {
+  if (adjustOverflowsRafId !== null) return;
+  adjustOverflowsRafId = requestAnimationFrame(() => {
+    adjustOverflowsRafId = null;
+    adjustOverflows();
+  });
 }
 
 /**
@@ -461,6 +470,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     verovioContainer.style.pointerEvents = 'none';
     facsimileContainer.style.userSelect = 'none';
     facsimileContainer.style.pointerEvents = 'none';
+    scheduleAdjustOverflows();
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
