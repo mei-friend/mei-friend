@@ -43,11 +43,10 @@ const ghActionsInputSetters = [
   },
 ];
 
-export function fillCustomConfigParams(selectContainer, paramsContainer, jsonResponse) {
-  if (!selectContainer || !paramsContainer) return;
-  selectContainer.innerHTML = '';
+export function fillWorkpackageConfigParams(paramsContainer, jsonResponse) {
+  if (!paramsContainer) return;
   paramsContainer.innerHTML = '';
-  console.log('Filling custom config params with: ', jsonResponse);
+  console.log('Filling workpackage config params with: ', jsonResponse);
   if (!jsonResponse) return;
   if (!Array.isArray(jsonResponse) || jsonResponse.length === 0) {
     paramsContainer.innerHTML =
@@ -62,23 +61,23 @@ export function fillCustomConfigParams(selectContainer, paramsContainer, jsonRes
     option.innerText = param.label ? param.label : `Workpackage ${ix + 1}`;
     select.appendChild(option);
   });
-  selectContainer.appendChild(select);
+  paramsContainer.appendChild(select);
 
   const workpackageDescription = document.createElement('p');
   workpackageDescription.classList.add('githubActionsWorkpackageDescription');
   paramsContainer.appendChild(workpackageDescription);
 
-  const customParamList = document.createElement('div');
-  customParamList.classList.add('githubActionsWorkpackageParamList');
-  paramsContainer.appendChild(customParamList);
+  const workpackageParamList = document.createElement('div');
+  workpackageParamList.classList.add('githubActionsWorkpackageParamList');
+  paramsContainer.appendChild(workpackageParamList);
 
   const renderParamList = (wp_id) => {
-    console.log('Selected custom config workpackage index: ', wp_id);
-    customParamList.innerHTML = '';
+    console.log('Selected workpackage index: ', wp_id);
+    workpackageParamList.innerHTML = '';
     const selected = jsonResponse.filter((item) => item.id === wp_id)[0];
     if (!selected || !('params' in selected)) {
-      console.log('Problem with selected custom config workpackage: ', selected, jsonResponse, wp_id);
-      customParamList.innerHTML =
+      console.log('Problem with selected workpackage: ', selected, jsonResponse, wp_id);
+      workpackageParamList.innerHTML =
         '<div class="warn">' + translator.lang.githubActionsWorkpackageConfigInvalidResponse.text + '</div>';
       workpackageDescription.innerText = '';
       return;
@@ -86,8 +85,8 @@ export function fillCustomConfigParams(selectContainer, paramsContainer, jsonRes
     workpackageDescription.innerText = selected.description || '';
     select.dataset.workpackageJson = JSON.stringify(selected);
     Object.keys(selected.params).forEach((p) => {
-      const cfg = generateGithubActionsInputConfig(selected.params, p, true);
-      customParamList.appendChild(cfg);
+      const cfg = generateGithubActionsParamConfig(selected.params, p, true);
+      workpackageParamList.appendChild(cfg);
     });
   };
 
@@ -882,18 +881,15 @@ async function handleClickGithubAction(e, gm) {
   ghLogo.classList.add('clockwise');
   console.log('dataset: ', target.dataset);
   const initialContents = document.getElementById('githubActionsInitialContents');
-  const selectWrapper = document.getElementById('githubActionsWorkpackageConfigSelectWrapper');
   const inputContainerWrapper = document.getElementById('githubActionsInputConfigContainer');
   initialContents.style.display = '';
+  document.getElementById('githubActionsUI')?.classList.add('githubActionsCentered');
   delete inputContainerWrapper.dataset.mode;
   if (inputContainerWrapper._configUrlObserver) {
     inputContainerWrapper._configUrlObserver.disconnect();
     delete inputContainerWrapper._configUrlObserver;
   }
-  // clear children of both containers (don't just reset innerHTML, so we also clear event handlers)
-  while (selectWrapper.firstChild) {
-    selectWrapper.removeChild(selectWrapper.firstChild);
-  }
+  // clear children of inputContainerWrapper (don't just reset innerHTML, so we also clear event handlers)
   while (inputContainerWrapper.firstChild) {
     inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
   }
@@ -921,7 +917,6 @@ async function handleClickGithubAction(e, gm) {
         const workpackageConfigUrlSetting = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
         const renderWorkPackages = (resp) => {
           if (!resp) {
-            selectWrapper.innerHTML = '';
             workpackageConfigParams.innerHTML = '';
             return;
           }
@@ -938,10 +933,9 @@ async function handleClickGithubAction(e, gm) {
               delete workpackageConfigUrlSetting.dataset.branch;
               delete workpackageConfigUrlSetting.dataset.automationPath;
             }
-            fillCustomConfigParams(selectWrapper, workpackageConfigParams, workPackages);
+            fillWorkpackageConfigParams(workpackageConfigParams, workPackages);
           } catch (err) {
-            console.warn('githubActions custom config: could not parse data-json-response', err);
-            selectWrapper.innerHTML = '';
+            console.warn('githubActions workpackage config: could not parse data-json-response', err);
             workpackageConfigParams.innerHTML = '';
           }
         };
@@ -972,7 +966,6 @@ async function handleClickGithubAction(e, gm) {
           if (state === 'valid') {
             renderWorkPackages(workpackageConfigUrlSetting.dataset.jsonResponse);
           } else {
-            selectWrapper.innerHTML = '';
             workpackageConfigParams.innerHTML =
               state === 'invalid'
                 ? '<p class="githubActionsRequiresWorkpackageMessage">' +
@@ -999,8 +992,8 @@ async function handleClickGithubAction(e, gm) {
       } else {
         const inputContainer = document.createElement('div');
         keys.forEach((k) => {
-          const inputConfig = generateGithubActionsInputConfig(inputs, k);
-          inputContainer.insertAdjacentElement('beforeend', inputConfig);
+          const paramConfig = generateGithubActionsParamConfig(inputs, k);
+          inputContainer.insertAdjacentElement('beforeend', paramConfig);
         });
         inputContainerWrapper.appendChild(inputContainer);
       }
@@ -1032,7 +1025,7 @@ async function handleClickGithubAction(e, gm) {
         try {
           repackagedInputs = {};
           repackagedInputs.parameters = JSON.stringify(specifiedInputs);
-          let select = document.querySelector('#githubActionsWorkpackageConfigSelectWrapper select');
+          let select = inputContainerWrapper.querySelector('select');
           let selectId = select.value;
           let selectText = select.options[select.selectedIndex].text;
           repackagedInputs.workpackage_id = selectId;
@@ -1112,8 +1105,6 @@ async function handleClickGithubAction(e, gm) {
           }
           if (summaryText) {
             statusMsg.innerHTML += `<div id="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
-            const githubActionsUI = document.getElementById('githubActionsUI');
-            if (githubActionsUI) githubActionsUI.classList.add('githubActionsCentered');
           }
         } catch (err) {
           console.warn('Could not retrieve job summary', err);
@@ -1570,8 +1561,8 @@ function stripMeiFileName() {
   }
 } // stripMeiFileName()
 
-function generateGithubActionsInputConfig(inputs, input, custom = false) {
-  const configType = custom ? 'CustomConfig' : 'InputConfig';
+function generateGithubActionsParamConfig(inputs, input, custom = false) {
+  const configType = custom ? 'WorkpackageConfig' : 'GenericConfig';
   const inputConfig = document.createElement('div');
   inputConfig.classList.add('githubActions' + configType);
   inputConfig.setAttribute('id', 'githubActions' + configType + '_' + input);

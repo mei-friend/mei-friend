@@ -316,7 +316,7 @@ a:active {
   box-sizing: border-box;
   background-color: var(--dropdownBackgroundColor);
   border-radius: 1em;
-  padding: 0.5em 1em;
+  padding: 0.75em 1em 0.5em;
 }
 
 #githubActionsWorkpackageConfigSelectWrapper:not(:empty) {
@@ -352,10 +352,11 @@ a:active {
 
 .githubActionsWorkpackageParamList {
   display: grid;
-  grid-template-columns: max-content max-content 1fr;
+  grid-template-columns: max-content 1fr;
+  row-gap: 0.5em;
 }
 
-.githubActionsInputConfig, .githubActionsWorkpackageConfig {
+.githubActionsGenericConfig, .githubActionsWorkpackageConfig {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
@@ -367,10 +368,25 @@ a:active {
   /* margin-bottom: 0.5em; */
 }
 
+/* Generic config has no parent grid, so subgrid doesn't apply — use explicit 2-column layout */
+.githubActionsGenericConfig {
+  grid-template-columns: max-content 1fr;
+  width: 100%;
+  box-sizing: border-box;
+  row-gap: 0.2em;
+}
+
+/* Workpackage config: add internal row spacing and fill the full container width */
+.githubActionsWorkpackageConfig {
+  row-gap: 0.3em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 #githubActionsWorkpackageContainer, #githubActionsJobSummary {
   color: var(--textColor);
 }
-.githubActionsInputConfig span, .githubActionsWorkpackageConfig span  {
+.githubActionsGenericConfig span, .githubActionsWorkpackageConfig span {
   color: var(--textColor);
 }
 
@@ -378,7 +394,8 @@ a:active {
   font-size: 0.85em;
   color: var(--textColor);
   opacity: 0.8;
-  margin: 0.25em 0.25em 0.25em ;
+  margin: 0.25em 0.5em 0.25em 0;
+  padding: 0 0.5em;
 }
 
 .githubActionsWorkpackageDescription:empty {
@@ -396,25 +413,6 @@ a:active {
   cursor: help;
 }
 
-.githubActionsParamInfo {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: center;
-  cursor: help;
-  margin-left: 0.3em;
-  opacity: 0.6;
-  margin-bottom: 0.15em;
-}
-
-.githubActionsParamInfo:hover {
-  opacity: 1;
-}
-
-.githubActionsParamInfo svg {
-  width: 13px;
-  height: 13px;
-  fill: var(--textColor);
-}
 
 .githubActionsInputSetter {
   cursor: pointer;
@@ -424,21 +422,24 @@ a:active {
   fill: var(--textColor);
 }
 
-.githubActionsInputConfig div, .githubActionsWorkpackageConfig div {
+.githubActionsGenericConfig div, .githubActionsWorkpackageConfig div {
   padding-left: 0.25em;
   padding-right: 0.5em;
   padding-bottom: 0.1em;
 }
 
 .githubActionsInputFieldWrapper {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1 / 3;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .githubActionsInputField {
-  width: 95%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #githubActionsJobSummary {
