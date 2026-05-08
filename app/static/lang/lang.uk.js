@@ -367,19 +367,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Запит на виконання дії GitHub:' },
-  githubActionsDescription: {
-    text: 'Клацніть "Виконати дію" для запиту API GitHub на виконання вищезазначеної дії з використанням конфігурації введеної нижче. Ваше кодування буде перезавантажено в останній версії після завершення виконання дії.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Не вдалося виконати дію - Статус GitHub' },
   githubActionStatusMsgWaiting: { text: 'Будь ласка, будьте терплячими, поки GitHub обробляє вашу дію...' },
   githubActionStatusMsgFailure: { text: 'Не вдалося виконати дію - Статус GitHub' },
-  githubActionStatusMsgSuccess: { text: 'Виконання дії завершено - Статус GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Виконання робочого процесу завершено:' },
+  githubActionsRunFailedMsg: { text: 'Не вдалося завершити виконання робочого процесу:' },
+  githubActionsGitHubStatusLink: { text: 'Статус GitHub' },
   githubActionsRunButton: { text: 'Виконати дію' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Надайте визначення робочого пакета' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Ця GitHub Action потребує визначення робочого пакета. Будь ласка, надайте його (URL JSON-об'єкта визначення) в налаштуваннях mei-friend.",
+  },
   githubActionsRunButtonReload: { text: 'Перезавантажити файл MEI' },
   githubActionsCancelButton: { text: 'Скасувати' },
   githubActionsInputSetterFilepath: { text: 'Скопіювати поточний шлях до файлу у вхідні дані' },
   githubActionsInputSetterSelection: { text: 'Скопіювати поточний вибір MEI до вхідних даних' },
-  githubActionsInputContainerHeader: { text: 'Конфігурація вхідних даних' },
   githubActionsNoSummaryProvided: { text: 'Підсумок не надано. Дивіться посилання на статус GitHub вище для деталей.' },
   githubActionsWaitingOpenLink: { text: 'Відстежувати статус робочого процесу на GitHub' },
   githubActionsDisabledTooltip: {
@@ -387,6 +388,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Зафіксуйте локальні зміни, щоб запускати робочі процеси GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Вказаний файл конфігурації JSON не відповідає очікуваній схемі. Зверніться до документації для отримання деталей.',
+  },
+  titleGithubActions: {
+    text: 'Використовувати GitHub Actions',
+    description: 'Працювати з GitHub Actions, коли вони доступні в репозиторії',
+  },
+  enableGithubActions: {
+    text: 'Показати доступні GitHub Actions',
+    description: 'Показати доступні GitHub Actions під час навігації репозиторієм у меню GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Визначення робочого пакета',
+    description: 'Використовуйте файл визначення робочого пакета для GitHub Actions',
   },
 
   // Fork modals

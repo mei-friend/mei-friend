@@ -375,19 +375,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Solicitar flujo de trabajo de GitHub:' },
-  githubActionsDescription: {
-    text: 'Haz clic en "Ejecutar flujo de trabajo" para solicitar a la API de GitHub que ejecute el flujo de trabajo mencionado arriba para ti, utilizando la configuración de entrada especificada a continuación. Tu codificación se recargará en su versión más reciente una vez que se complete la ejecución del flujo de trabajo.',
-  },
-  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub' },
   githubActionStatusMsgWaiting: { text: 'Por favor, ten paciencia mientras GitHub procesa tu flujo de trabajo...' },
   githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo - Estado de GitHub' },
-  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada - Estado de GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Ejecución del flujo de trabajo completada:' },
+  githubActionsRunFailedMsg: { text: 'No se pudo completar la ejecución del flujo de trabajo:' },
+  githubActionsGitHubStatusLink: { text: 'Estado de GitHub' },
   githubActionsRunButton: { text: 'Ejecutar flujo de trabajo' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Proporcionar definición del paquete de trabajo' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Esta acción de GitHub requiere una definición de paquete de trabajo. Por favor, proporcione una (URL de un objeto JSON de definición) en la configuración de mei-friend.',
+  },
   githubActionsRunButtonReload: { text: 'Recargar archivo MEI' },
   githubActionsCancelButton: { text: 'Cancelar' },
   githubActionsInputSetterFilepath: { text: 'Copiar la ruta actual del archivo a la entrada' },
   githubActionsInputSetterSelection: { text: 'Copiar la selección actual de MEI a la entrada' },
-  githubActionsInputContainerHeader: { text: 'Configuración de entrada' },
   githubActionsNoSummaryProvided: {
     text: 'No se proporcionó resumen. Consulte el enlace de estado de GitHub arriba para más detalles.',
   },
@@ -397,6 +398,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Confirme sus cambios locales para ejecutar los flujos de trabajo de GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'El archivo de configuración JSON que ha especificado no se ajusta al esquema esperado. Consulte la documentación para obtener más detalles.',
+  },
+  titleGithubActions: {
+    text: 'Usar GitHub Actions',
+    description: 'Trabajar con GitHub Actions cuando estén disponibles en un repositorio',
+  },
+  enableGithubActions: {
+    text: 'Mostrar las GitHub Actions disponibles',
+    description: 'Listar las GitHub Actions disponibles al navegar por el repositorio en el menú de GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definición de paquete de trabajo',
+    description: 'Usar un archivo de definición de paquete de trabajo de GitHub Actions',
   },
 
   // modales de fork

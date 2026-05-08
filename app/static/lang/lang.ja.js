@@ -361,19 +361,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHubアクションワークフローをリクエスト:' },
-  githubActionsDescription: {
-    text: '上記の設定を使用してGitHub APIにワークフローを実行するために「ワークフローを実行」をクリックしてください。ワークフロー実行が完了すると、エンコーディングが最新バージョンにリロードされます。',
-  },
-  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubステータス' },
   githubActionStatusMsgWaiting: { text: 'GitHubがワークフローを処理している間お待ちください...' },
   githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubステータス' },
-  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubステータス' },
+  githubActionsRunCompletedMsg: { text: 'ワークフローの実行が完了しました：' },
+  githubActionsRunFailedMsg: { text: 'ワークフローの実行を完了できませんでした：' },
+  githubActionsGitHubStatusLink: { text: 'GitHub ステータス' },
   githubActionsRunButton: { text: 'ワークフローを実行' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'ワークパッケージ定義を指定' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'この GitHub Action にはワークパッケージ定義が必要です。mei-friend 設定で定義（定義 JSON オブジェクトの URL）を指定してください。',
+  },
   githubActionsRunButtonReload: { text: 'MEIファイルを再読み込み' },
   githubActionsCancelButton: { text: 'キャンセル' },
   githubActionsInputSetterFilepath: { text: '現在のファイルパスを入力にコピー' },
   githubActionsInputSetterSelection: { text: '現在のMEI選択範囲を入力にコピー' },
-  githubActionsInputContainerHeader: { text: '入力設定' },
   githubActionsNoSummaryProvided: {
     text: '要約はありません。詳細については上記の GitHub ステータスリンクを参照してください。',
   },
@@ -383,6 +384,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'GitHub Actions のワークフローを実行するにはローカルの変更をコミットしてください。',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: '指定された JSON 設定ファイルは予期されるスキーマに準拠していません。詳細はドキュメントをご確認ください。',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions を使用',
+    description: 'リポジトリで利用可能な場合に GitHub Actions と連携する',
+  },
+  enableGithubActions: {
+    text: '利用可能な GitHub Actions を表示',
+    description: 'GitHub メニューでリポジトリ内をナビゲートする際に利用可能な GitHub Actions を一覧表示',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'ワークパッケージ定義',
+    description: 'GitHub Actions ワークパッケージ定義ファイルを使用',
   },
 
   // Fork modals

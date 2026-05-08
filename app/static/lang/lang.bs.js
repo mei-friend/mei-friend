@@ -377,19 +377,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Zahtev za GitHub Action tok:' },
-  githubActionsDescription: {
-    text: 'Kliknite na "Pokreni tok" da biste zatražili da GitHub API izvrši tok iznad za vas, koristeći konfiguraciju unetu ispod. Vaša enkodiranja će se ponovo učitati u svojoj najnovijoj verziji nakon završetka izvršenja toka.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Tok se nije mogao izvršiti - GitHub status' },
   githubActionStatusMsgWaiting: { text: 'Molimo vas da budete strpljivi dok GitHub obradi vaš tok...' },
   githubActionStatusMsgFailure: { text: 'Tok se nije mogao izvršiti - GitHub status' },
-  githubActionStatusMsgSuccess: { text: 'Izvršen je tok - GitHub status' },
+  githubActionsRunCompletedMsg: { text: 'Izvršavanje toka rada završeno:' },
+  githubActionsRunFailedMsg: { text: 'Nije moguće završiti izvršavanje toka rada:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub status' },
   githubActionsRunButton: { text: 'Pokreni tok' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Dostavite definiciju radnog paketa' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ova GitHub Action zahtijeva definiciju radnog paketa. Molimo dostavite jednu (URL JSON objekta definicije) u mei-friend postavkama.',
+  },
   githubActionsRunButtonReload: { text: 'Učitaj MEI fajl ponovo' },
   githubActionsCancelButton: { text: 'Otkaži' },
   githubActionsInputSetterFilepath: { text: 'Kopiraj trenutnu putanju fajla u unos' },
   githubActionsInputSetterSelection: { text: 'Kopiraj trenutnu MEI selekciju u unos' },
-  githubActionsInputContainerHeader: { text: 'Konfiguracija unosa' },
   githubActionsNoSummaryProvided: { text: 'Nije dostavljen sažetak. Pogledajte gornji GitHub status link za detalje.' },
   githubActionsWaitingOpenLink: { text: 'Prati status toka rada na GitHubu' },
   githubActionsDisabledTooltip: {
@@ -397,6 +398,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Commitajte lokalne promjene da biste pokrenuli GitHub Actions radne tokove.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Specificirana JSON konfiguracijska datoteka nije u skladu s očekivanom shemom. Molimo provjerite dokumentaciju za detalje.',
+  },
+  titleGithubActions: {
+    text: 'Koristi GitHub Actions',
+    description: 'Radite s GitHub Actions kada su dostupne u repozitoriju',
+  },
+  enableGithubActions: {
+    text: 'Prikaži dostupne GitHub Actions',
+    description: 'Prikaži dostupne GitHub Actions pri navigaciji unutar repozitorija u GitHub meniju',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definicija radnog paketa',
+    description: 'Koristite datoteku definicije radnog paketa za GitHub Actions',
   },
 
   // Fork modals

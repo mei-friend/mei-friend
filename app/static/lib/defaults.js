@@ -1053,8 +1053,8 @@ export const meiFriendSettingsOptions = {
     default: false,
   },
   supplyWorkpackageGithubActionsConfiguration: {
-    title: 'Custom configuration',
-    description: 'Use a custom GitHub Actions workflow configuration file',
+    title: 'Work package definition',
+    description: 'Use a GitHub Actions work package definition file',
     type: 'string',
     placeholder: 'https://...',
     default: '',

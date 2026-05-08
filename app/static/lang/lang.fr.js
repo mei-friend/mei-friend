@@ -377,19 +377,20 @@ export const lang = {
 
   // Modal GitHub actions
   githubActionsHeadingText: { text: 'Demander le flux de travail GitHub :' },
-  githubActionsDescription: {
-    text: "Cliquez sur \"Exécuter le flux de travail\" pour demander à l'API GitHub d'exécuter le flux de travail ci-dessus pour vous, en utilisant la configuration d'entrée spécifiée ci-dessous. Votre encodage sera rechargé dans sa dernière version une fois que l'exécution du flux de travail sera terminée.",
-  },
-  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - Statut GitHub" },
   githubActionStatusMsgWaiting: { text: 'Veuillez patienter pendant que GitHub traite votre flux de travail...' },
   githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - Statut GitHub" },
-  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - Statut GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Exécution du flux de travail terminée :' },
+  githubActionsRunFailedMsg: { text: "Impossible de terminer l'exécution du flux de travail :" },
+  githubActionsGitHubStatusLink: { text: 'Statut GitHub' },
   githubActionsRunButton: { text: 'Exécuter le flux de travail' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Fournir la définition du lot de travail' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Cette GitHub Action nécessite une définition de lot de travail. Veuillez en fournir une (URL d'un objet JSON de définition) dans les paramètres mei-friend.",
+  },
   githubActionsRunButtonReload: { text: 'Recharger le fichier MEI' },
   githubActionsCancelButton: { text: 'Annuler' },
   githubActionsInputSetterFilepath: { text: "Copier le chemin du fichier actuel dans l'entrée" },
   githubActionsInputSetterSelection: { text: "Copier la sélection MEI actuelle dans l'entrée" },
-  githubActionsInputContainerHeader: { text: "Configuration d'entrée" },
   githubActionsNoSummaryProvided: {
     text: 'Aucun résumé fourni. Veuillez consulter le lien de statut GitHub ci-dessus pour plus de détails.',
   },
@@ -399,6 +400,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Validez vos modifications locales pour exécuter des workflows GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: "Le fichier de configuration JSON que vous avez spécifié n'est pas conforme au schéma attendu. Veuillez consulter la documentation pour plus de détails.",
+  },
+  titleGithubActions: {
+    text: 'Utiliser GitHub Actions',
+    description: "Travailler avec GitHub Actions lorsqu'elles sont disponibles dans un dépôt",
+  },
+  enableGithubActions: {
+    text: 'Afficher les GitHub Actions disponibles',
+    description: 'Lister les GitHub Actions disponibles lors de la navigation dans le dépôt depuis le menu GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Définition du lot de travail',
+    description: 'Utiliser un fichier de définition de lot de travail GitHub Actions',
   },
 
   // fork modals / fenêtres modales de fork

@@ -380,33 +380,46 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Sol·licita el flux de treball de GitHub:' },
-  githubActionsDescription: {
-    text: "Feu clic a \"Executa el flux de treball\" per demanar a l'API de GitHub que executi el flux de treball anterior, utilitzant la configuració d'entrada especificada a continuació. El vostre codi es recarregarà a la seva darrera versió una vegada que s'hagi completat la execució del flux de treball.",
-  },
-  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub: " },
   githubActionStatusMsgWaiting: {
     text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...',
   },
-  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub: " },
-  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada - Estat de GitHub: ' },
-    githubActionStatusMsgPrompt: { text: 'No s’ha pogut executar el flux de treball - Estat de GitHub' },
-    githubActionStatusMsgWaiting: { text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...' },
-    githubActionStatusMsgFailure: { text: 'No s’ha pogut executar el flux de treball - Estat de GitHub' },
-    githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada - Estat de GitHub' },
+  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub" },
+  githubActionsRunCompletedMsg: { text: 'Execució del flux de treball completada:' },
+  githubActionsRunFailedMsg: { text: "No s'ha pogut completar l'execució del flux de treball:" },
+  githubActionsGitHubStatusLink: { text: 'Estat de GitHub' },
   githubActionsRunButton: { text: 'Executa el flux de treball' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Proporciona la definició del paquet de treball' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Aquesta acció de GitHub requereix una definició de paquet de treball. Si us plau, proporcioneu-ne una (URL d'un objecte JSON de definició) a la configuració de mei-friend.",
+  },
   githubActionsRunButtonReload: { text: "Torna a carregar l'arxiu MEI" },
   githubActionsCancelButton: { text: 'Cancel·la' },
   githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
   githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
-  githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
   githubActionsNoSummaryProvided: {
     text: 'No s’ha proporcionat cap resum. Consulteu l’enllaç d’estat de GitHub anterior per a més detalls.',
   },
+  githubActionsWaitingOpenLink: { text: 'Segueix l’estat del flux de treball a GitHub' },
   githubActionsDisabledTooltip: {
     text: 'Obriu una codificació d’aquest repositori per executar els fluxos de treball de GitHub Actions.',
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Confirmeu els canvis locals per executar els fluxos de treball de GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: "El fitxer de configuració JSON que heu especificat no s'ajusta a l'esquema esperat. Consulteu la documentació per obtenir més detalls.",
+  },
+  titleGithubActions: {
+    text: 'Usa GitHub Actions',
+    description: 'Treballar amb GitHub Actions quan estiguin disponibles en un repositori',
+  },
+  enableGithubActions: {
+    text: 'Mostra les GitHub Actions disponibles',
+    description: 'Llista les GitHub Actions disponibles en navegar pel repositori al menú de GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definició del paquet de treball',
+    description: 'Utilitza un fitxer de definició de paquet de treball de GitHub Actions',
   },
 
   // fork modals // forquilles modals

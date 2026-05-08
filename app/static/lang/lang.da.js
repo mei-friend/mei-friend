@@ -374,19 +374,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Anmod GitHub Action workflow:' },
-  githubActionsDescription: {
-    text: 'Klik på "Kør workflow" for at bede GitHub API om at køre ovenstående workflow for dig, ved hjælp af den specificerede inputkonfiguration nedenfor. Din kodning vil blive genindlæst i sin seneste version, når workflow-kørslen er færdig. ',
-  },
-  githubActionStatusMsgPrompt: { text: 'Kunne ikke køre workflow - GitHub-status' },
   githubActionStatusMsgWaiting: { text: 'Vær tålmodig, mens GitHub behandler din workflow...' },
   githubActionStatusMsgFailure: { text: 'Kunne ikke køre workflow - GitHub-status' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-kørsel færdig - GitHub-status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow-kørsel afsluttet:' },
+  githubActionsRunFailedMsg: { text: 'Workflow-kørsel kunne ikke afsluttes:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-status' },
   githubActionsRunButton: { text: 'Kør workflow' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Angiv arbejdspakkedefinition' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Denne GitHub Action kræver en arbejdspakkedefinition. Angiv venligst en (URL til et JSON-definitionsobjekt) i mei-friend-indstillingerne.',
+  },
   githubActionsRunButtonReload: { text: 'Genindlæs MEI fil' },
   githubActionsCancelButton: { text: 'Annuller' },
   githubActionsInputSetterFilepath: { text: 'Kopier nuværende filsti til input' },
   githubActionsInputSetterSelection: { text: 'Kopier nuværende MEI markering til input' },
-  githubActionsInputContainerHeader: { text: 'Inputkonfiguration' },
   githubActionsNoSummaryProvided: { text: 'Ingen oversigt tilgængelig. Se GitHub-statuslinket ovenfor for detaljer.' },
   githubActionsWaitingOpenLink: { text: 'Følg workflow-status på GitHub' },
   githubActionsDisabledTooltip: {
@@ -394,6 +395,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Commit dine lokale ændringer for at køre GitHub Actions-workflows.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Den angivne JSON-konfigurationsfil overholder ikke det forventede skema. Se dokumentationen for detaljer.',
+  },
+  titleGithubActions: {
+    text: 'Brug GitHub Actions',
+    description: 'Arbejd med GitHub Actions, når de er tilgængelige i et repository',
+  },
+  enableGithubActions: {
+    text: 'Vis tilgængelige GitHub Actions',
+    description: 'Vis tilgængelige GitHub Actions ved navigation i repository i GitHub-menuen',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Arbejdspakkedefinition',
+    description: 'Brug en GitHub Actions arbejdspakkedefinitionsfil',
   },
 
   // Fork modals

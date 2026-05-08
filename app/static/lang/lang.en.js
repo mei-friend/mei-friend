@@ -383,10 +383,8 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
-  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub status' }, // DEPRECATED: unused in code; remove in a future cleanup
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub status' },
-  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub status' }, // DEPRECATED: superseded by githubActionsRunCompletedMsg + githubActionsGitHubStatusLink; remove in a future cleanup
   githubActionsRunCompletedMsg: { text: 'Workflow run completed:' },
   githubActionsRunFailedMsg: { text: 'Could not complete workflow run:' },
   githubActionsGitHubStatusLink: { text: 'GitHub status' },
@@ -411,6 +409,18 @@ export const lang = {
   },
   githubActionsWorkpackageConfigInvalidResponse: {
     text: 'The JSON configuration file you have specified does not conform to the expected schema. Please check the documentation for details.',
+  },
+  titleGithubActions: {
+    text: 'Use GitHub Actions',
+    description: 'Work with GitHub Actions when available in a repository',
+  },
+  enableGithubActions: {
+    text: 'Show available GitHub Actions',
+    description: 'List available GitHub Actions when navigating within repository in GitHub menu',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Work package definition',
+    description: 'Use a GitHub Actions work package definition file',
   },
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },

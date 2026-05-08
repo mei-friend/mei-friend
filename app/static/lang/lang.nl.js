@@ -370,19 +370,20 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Vraag GitHub Action workflow aan:' },
-  githubActionsDescription: {
-    text: 'Klik op "Workflow uitvoeren" om de GitHub API te vragen de bovenstaande workflow voor u uit te voeren, met gebruik van de hieronder gespecificeerde invoerconfiguratie. Uw codering wordt opnieuw geladen in de nieuwste versie zodra de workflow is voltooid.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub-status' },
   githubActionStatusMsgWaiting: { text: 'Even geduld terwijl GitHub uw workflow verwerkt...' },
   githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub-status' },
-  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub-status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow voltooid:' },
+  githubActionsRunFailedMsg: { text: 'Workflow kon niet worden voltooid:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-status' },
   githubActionsRunButton: { text: 'Workflow uitvoeren' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Werkpakketdefinitie aanleveren' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Deze GitHub Action vereist een werkpakketdefinitie. Geef er een op (URL van een JSON-definitieobject) in de mei-friend-instellingen.',
+  },
   githubActionsRunButtonReload: { text: 'MEI-bestand opnieuw laden' },
   githubActionsCancelButton: { text: 'Annuleren' },
   githubActionsInputSetterFilepath: { text: 'Huidig bestandspad naar invoer kopiëren' },
   githubActionsInputSetterSelection: { text: 'Huidige MEI-selectie naar invoer kopiëren' },
-  githubActionsInputContainerHeader: { text: 'Invoerconfiguratie' },
   githubActionsNoSummaryProvided: {
     text: 'Geen samenvatting beschikbaar. Raadpleeg de GitHub-statuslink hierboven voor details.',
   },
@@ -392,6 +393,21 @@ export const lang = {
   },
   githubActionsDisabledDirtyTooltip: {
     text: 'Commit uw lokale wijzigingen om GitHub Actions-workflows uit te voeren.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Het opgegeven JSON-configuratiebestand voldoet niet aan het verwachte schema. Raadpleeg de documentatie voor details.',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions gebruiken',
+    description: 'Werken met GitHub Actions wanneer beschikbaar in een repository',
+  },
+  enableGithubActions: {
+    text: 'Beschikbare GitHub Actions tonen',
+    description: 'Beschikbare GitHub Actions weergeven bij navigeren binnen repository in GitHub-menu',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Werkpakketdefinitie',
+    description: 'Een GitHub Actions-werkpakketdefinitiebestand gebruiken',
   },
 
   // Fork modals
