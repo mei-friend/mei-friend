@@ -10,7 +10,7 @@
 * Fix control menu overflow behavior for both the notation and the facsimile panels
 * Prevent dragging overlay to appear when dragging other elements than files into or within the editor
 * Surface error when Verovio encounters an error during rendering, instead of silently failing and showing a blank screen (fixes [#186](https://github.com/mei-friend/mei-friend/issues/186), [#157](https://github.com/mei-friend/mei-friend/issues/157)).
-* Surface Verovio render-time warnings as a small orange badge under the Verovio logo, with the full message available on hover.
+* Surface Verovio render-time warnings and errors as small  badges under the Verovio logo, with full messages available on click.
 
 ### 1.2.12 patch
 * Fix issue with GitHub-resource-URIs posted to Solid missing their branch 
