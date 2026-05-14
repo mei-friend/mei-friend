@@ -26,6 +26,14 @@ import * as icon from './../css/icons.js';
 const GHAStartMarker = '---START_USER_MESSAGE---';
 const GHAEndMarker = '---END_USER_MESSAGE---';
 
+const escapeHtml = (value) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
 const ghActionsInputSetters = [
   {
     id: 'githubActionsInputSetterFilepath',
@@ -352,7 +360,7 @@ function onFileNameEdit(e) {
 
 function onMessageInput(e) {
   e.target.classList.remove('warn');
-  if ((e.target.innerText = '')) {
+  if (e.target.innerText === '') {
     document.getElementById('githubCommitButton').setAttribute('disabled', '');
   } else {
     document.getElementById('githubCommitButton').removeAttribute('disabled');
@@ -396,7 +404,7 @@ export async function onRemoteUpdate() {
       // keep displaying the '!' indicator
       // clear the check remote timeout
       // user will be asked to fork-and-PR on commit
-      this.stopPollingForRemoteUpdates();
+      gm.stopPollingForRemoteUpdates();
     });
 }
 
@@ -484,7 +492,7 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   }
   let githubMenu = document.getElementById('GithubMenu');
   repos.forEach((repo) => {
-    githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
+    githubMenu.innerHTML += `<a class="userRepo" href="#">${escapeHtml(repo.full_name)}</a>`;
   });
   if (repos.length && repos.length === per_page) {
     // there may be more repos on the next page
@@ -505,12 +513,12 @@ export async function fillInRepoBranches(e, repoBranches) {
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${escapeHtml(gm.repo)}</a>
     <hr class="dropdownLine">
     <a id="selectBranch" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
-    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
+    githubMenu.innerHTML += `<a class="repoBranch" href="#">${escapeHtml(branch.name)}</a>`;
   });
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
@@ -594,11 +602,11 @@ export async function fillInBranchContents(e) {
       githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${escapeHtml(gm.repo)}</a>
     <hr class="dropdownLine">
-    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
+    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${escapeHtml(gm.branch)}</a>
     <hr class="dropdownLine">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${gm.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${escapeHtml(gm.filepath)}</span></a>
     <div class="actionsContainer"><hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart"></div>
     `;
       // request Githug Action workflows (if any) and handle them
@@ -609,7 +617,7 @@ export async function fillInBranchContents(e) {
           githubMenu.innerHTML +=
             `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
             //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-            `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content.name}</span>${isDir ? '...' : ''}</a>`;
+            `<span class="filepath${isDir ? '' : ' closeOnClick'}">${escapeHtml(content.name)}</span>${isDir ? '...' : ''}</a>`;
           assignGithubMenuClickHandlers();
         });
       } else {
@@ -671,7 +679,7 @@ export async function fillInBranchContents(e) {
             generateUrl()
           )})`;
           // FIXME - make this work with isomorphic-git and all cloud providers
-          const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+          const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${encodeURIComponent(meiFileName)}&body=${openInMeiFriendUrl}`;
           window.open(fullOpenIssueUrl, '_blank');
         });
         const reportIssueDivider = document.createElement('hr');
@@ -841,10 +849,10 @@ export function renderCommitLog(gitlog) {
   gitlog.forEach((c) => {
     const commitRow = document.createElement('tr');
     commitRow.innerHTML = `
-      <td>${c.commit.author.date}</td>
-      <td>${c.commit.author.name}</td>
-      <td>${c.commit.message}</td>
-      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.sha.slice(0, 8)}...</a></td>`;
+      <td>${escapeHtml(c.commit.author.date)}</td>
+      <td>${escapeHtml(c.commit.author.name)}</td>
+      <td>${escapeHtml(c.commit.message)}</td>
+      <td><a target="_blank" href="https://github.com/${escapeHtml(gm.repo)}/commits/${escapeHtml(c.sha)}">${escapeHtml(c.sha.slice(0, 8))}...</a></td>`;
     logTable.appendChild(commitRow);
   });
   const commitLogHeader = document.createElement('a');
@@ -1057,13 +1065,6 @@ async function handleClickGithubAction(e, gm) {
       let workflowFinished = false;
       let cancelRequested = false;
       let cancelInFlight = false;
-      const escapeHtml = (value) =>
-        String(value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
       const extractJobSummary = (logText) => {
         if (!logText) return '';
         let startMarkerIx = logText.lastIndexOf(GHAStartMarker);
@@ -1169,6 +1170,10 @@ async function handleClickGithubAction(e, gm) {
           if (workflowRunResp.status >= 400) {
             // error
             statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+            if (initialContents) initialContents.style.display = '';
+            cancelBtn.removeAttribute('disabled');
+            runBtn.removeAttribute('disabled');
+            ghLogo.classList.remove('clockwise');
           } else {
             gm.awaitActionWorkflowStart(workflowName.dataset.id, dispatchTime).then((workflowStartResp) => {
               if (workflowStartResp && workflowStartResp.html_url) {
@@ -1281,6 +1286,7 @@ async function handleClickGithubAction(e, gm) {
           // network error
           console.error('Could not start workflow - perhaps network error?', e);
           statusMsg.innerHTML = 'Error';
+          if (initialContents) initialContents.style.display = '';
           cancelBtn.removeAttribute('disabled');
           runBtn.removeAttribute('disabled');
           ghLogo.classList.remove('clockwise');
@@ -1325,6 +1331,13 @@ async function handleClickGithubAction(e, gm) {
     }
   };
 } // handleClickGithubAction()
+
+// Test hook: lets e2e/githubActions.spec.ts invoke handleClickGithubAction
+// with a mock gm, bypassing a real GitHub login. Only exposed in dev mode.
+if (typeof environments !== 'undefined' && env === environments.develop) {
+  window.__mf_triggerGithubAction = (dataset, mockGm) =>
+    handleClickGithubAction({ target: { nodeName: 'SPAN', dataset } }, mockGm ?? gm);
+}
 
 export function logoutFromGithub() {
   if (storage.supported) {
