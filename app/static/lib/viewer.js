@@ -36,6 +36,7 @@ import {
   commonSchemas,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
+  defaultNotationUpdateDelay,
   defaultSpeedMode,
   defaultViewerTimeoutDelay,
   fontList,
@@ -80,6 +81,8 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.vrvTimeout; // time out task for updating verovio settings
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
+    this.notationUpdateTimeout = null; // debounce timer for editor-driven re-rendering
+    this.notationUpdateDelay = defaultNotationUpdateDelay;
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
     this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
@@ -729,20 +732,186 @@ export default class Viewer {
   } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
+  // Editor-driven calls (forceUpdate=false) are debounced so that rapid
+  // mid-typing edits don't trigger Verovio on every keystroke. Force-update
+  // calls (manual button, live-update toggle) bypass the debounce and the
+  // well-formedness pre-check so the user always gets immediate feedback.
   notationUpdated(cm, forceUpdate = false) {
+    if (this.notationUpdateTimeout) {
+      clearTimeout(this.notationUpdateTimeout);
+      this.notationUpdateTimeout = null;
+    }
+    if (forceUpdate) {
+      this._performNotationUpdate(cm, true);
+    } else {
+      this.notationUpdateTimeout = setTimeout(() => {
+        this.notationUpdateTimeout = null;
+        this._performNotationUpdate(cm, false);
+      }, this.notationUpdateDelay);
+    }
+  } // notationUpdated()
+
+  _performNotationUpdate(cm, forceUpdate) {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       cmd.toggleMidiPlaybackControlBar();
     }
-    // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
-    if (!isSafari) this.checkSchema(cm.getValue());
+    const mei = cm.getValue();
+    if (!isSafari) this.checkSchema(mei);
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      // For non-forced renders, cheaply check XML well-formedness first.
+      // Skipping malformed input avoids a Verovio "Cannot load MEI data"
+      // round-trip and the badge that goes with it during normal typing.
+      if (!forceUpdate && !this.isWellFormedXml(mei)) {
+        const msg = (translator?.lang?.notationStaleXmlInvalid?.text) || 'Rendering paused — waiting for valid XML';
+        this.setNotationStale(msg);
+        return;
+      }
       this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
-  } // notationUpdated()
+  } // _performNotationUpdate()
+
+  // Quick well-formedness check using DOMParser. Different browsers wrap
+  // syntax errors in differently-namespaced <parsererror> elements, so
+  // search across the known variants.
+  isWellFormedXml(mei) {
+    try {
+      const doc = this.parser.parseFromString(mei, 'text/xml');
+      if (!doc) return false;
+      if (doc.getElementsByTagName('parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.mozilla.org/newlayout/xml/parsererror.xml', 'parsererror').length)
+        return false;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  } // isWellFormedXml()
+
+  // Populate a notation badge (error or warning) with one or more messages.
+  // Splits `reason` on newlines, switches the prefix between singular and
+  // plural forms, prepends the count when more than one, and fills the
+  // expandable details list. Auto-reveals a previously hidden label only
+  // when the message set has actually changed.
+  _populateNotationBadge(badge, reason, singularKey, pluralKey) {
+    const wasVisible = badge.style.display !== 'none';
+    const prev = badge.dataset.currentMessage || '';
+    const textChanged = prev !== reason;
+    badge.style.display = '';
+    // Only the round icon shows the full message listing on hover; the
+    // summary/details get the click-to-expand hint via refreshExpansionTooltip().
+    const iconEl = badge.querySelector('.badge-icon');
+    if (iconEl) iconEl.title = reason;
+    badge.setAttribute('aria-label', reason);
+    const lines = (reason || '').split('\n').filter((l) => l.trim().length > 0);
+    const first = lines[0] || '';
+    const firstEl = badge.querySelector('.badge-message-first');
+    if (firstEl) firstEl.textContent = first;
+    const countEl = badge.querySelector('.badge-count');
+    if (countEl) countEl.textContent = lines.length > 1 ? `${lines.length} ` : '';
+    const prefixEl = badge.querySelector('.badge-prefix');
+    if (prefixEl) {
+      const key = lines.length > 1 ? pluralKey : singularKey;
+      prefixEl.textContent = (translator.lang[key] && translator.lang[key].text) || '';
+    }
+    const details = badge.querySelector('.badge-details');
+    if (details) {
+      details.innerHTML = '';
+      if (lines.length > 1) {
+        for (const line of lines) {
+          const li = document.createElement('li');
+          li.textContent = line;
+          details.appendChild(li);
+        }
+      }
+    }
+    if (lines.length > 1) {
+      badge.classList.add('has-multiple');
+    } else {
+      badge.classList.remove('has-multiple');
+      badge.classList.remove('expanded');
+    }
+    badge.dataset.currentMessage = reason;
+    if (!wasVisible || textChanged) badge.classList.remove('label-hidden');
+    // Refresh the click-zone tooltip ("X Verovio warnings: click to expand"
+    // etc.) now that count / prefix / has-multiple reflect the new state.
+    if (typeof badge.refreshExpansionTooltip === 'function') badge.refreshExpansionTooltip();
+  } // _populateNotationBadge()
+
+  // Mark the notation pane as stale: dim the SVG and surface a small badge
+  // with the given message(s). Preserves the previously-rendered SVG.
+  // `reason` may contain multiple errors joined by '\n'.
+  setNotationStale(reason) {
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.add('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) {
+      this._populateNotationBadge(
+        badge,
+        reason,
+        'notationErrorBadgeLabel',
+        'notationErrorBadgeLabelPlural'
+      );
+    }
+    // Error visible — warning (if any) drops back below it.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge) warningBadge.classList.remove('float-up');
+    const sb = document.getElementById('statusBar');
+    if (sb) sb.innerHTML = reason;
+    this.busy(false);
+  } // setNotationStale()
+
+  // Clear the stale state — but only if the current editor content is
+  // actually well-formed. Operations like updateLayout (triggered by the
+  // resizer) make the worker emit 'updated' using its cached MEI even when
+  // the editor has since become malformed; without this guard the badge
+  // would clear despite the user's current XML still being broken.
+  clearNotationStale() {
+    if (cm && !this.isWellFormedXml(cm.getValue())) return;
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.remove('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) {
+      badge.style.display = 'none';
+      badge.classList.remove('expanded');
+      delete badge.dataset.currentMessage;
+    }
+    // No error showing — let a visible warning float up under the logo.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge && warningBadge.style.display !== 'none') {
+      warningBadge.classList.add('float-up');
+    }
+  } // clearNotationStale()
+
+  // Verovio render-time warnings (e.g. structural advisories). Shown as a
+  // small orange badge that does NOT dim the SVG — the render succeeded.
+  // `reason` may contain multiple warnings joined by '\n'.
+  setNotationWarning(reason) {
+    const badge = document.getElementById('notation-warning-badge');
+    if (!badge) return;
+    this._populateNotationBadge(
+      badge,
+      reason,
+      'notationWarningBadgeLabel',
+      'notationWarningBadgeLabelPlural'
+    );
+    // Float up under the Verovio logo when no error badge is shown.
+    const errorBadge = document.getElementById('notation-error-badge');
+    const errorVisible = errorBadge && errorBadge.style.display !== 'none';
+    badge.classList.toggle('float-up', !errorVisible);
+  } // setNotationWarning()
+
+  clearNotationWarning() {
+    const badge = document.getElementById('notation-warning-badge');
+    if (!badge) return;
+    badge.style.display = 'none';
+    badge.classList.remove('expanded');
+    badge.classList.remove('float-up');
+    delete badge.dataset.currentMessage;
+  } // clearNotationWarning()
 
   /**
    * Highlights currently selected elements or the element at cursor in CodeMirror.
@@ -2442,19 +2611,14 @@ export default class Viewer {
     const neverCb = document.getElementById('vrv-expandNever');
     if (alwaysCb) alwaysCb.checked = expandAlways;
     if (neverCb) neverCb.checked = expandNever;
-    // MIDI-bar dropdown is the canonical expansion picker. On 'never' it
-    // is cleared and disabled; on default/always it auto-picks the first
-    // real option if nothing is currently selected.
+    // MIDI-bar dropdown is the canonical expansion picker. On 'never' the
+    // value is cleared (so it shows "No expansion") but the dropdown stays
+    // enabled — picking any other option clears expandNever automatically,
+    // so disabling here would needlessly trap the user.
     const barSel = document.getElementById('controlbar-midi-expansion-selector');
     const settingsSel = document.getElementById('selectMidiExpansion');
-    if (barSel) {
-      barSel.disabled = expandNever;
-      if (expandNever) barSel.value = '';
-    }
-    if (settingsSel) {
-      settingsSel.disabled = expandNever;
-      if (expandNever) settingsSel.value = '';
-    }
+    if (barSel && expandNever) barSel.value = '';
+    if (settingsSel && expandNever) settingsSel.value = '';
     if (expandNever) {
       this.expansionId = '';
     } else {

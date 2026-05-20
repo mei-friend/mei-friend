@@ -583,6 +583,7 @@ export const defaultVerovioOptions = {
 // Viewer
 export const defaultSpeedMode = true;
 export const defaultViewerTimeoutDelay = 300; // ms, time interval within which concurrent clicks are treated as one update
+export const defaultNotationUpdateDelay = 400; // ms, debounce window for editor-driven re-rendering (suppresses transient mid-typing errors)
 
 /**
  * mei-friend settings object.

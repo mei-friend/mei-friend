@@ -2,6 +2,49 @@ var tk;
 var tkOptions;
 var tkUrl;
 
+// Capture Verovio's emscripten log output so warnings/errors (e.g.
+// "scoreDef missing key signature" or "[Error] The tree of the MEI data
+// cannot be parsed") can be surfaced to the user. Verovio routes its
+// internal log lines through console.warn (warnings) and console.error
+// (errors) in the JS bundle; the worker's own diagnostic messages all
+// carry a "VerovioWorker:" prefix so they can be filtered out.
+let pendingVerovioWarnings = [];
+let pendingVerovioErrors = [];
+let captureActive = false;
+// Tracks whether the current command actually re-parsed MEI via tk.loadData().
+// Only operations that re-load data can produce a fresh, authoritative warning
+// list — layout-only operations (e.g. resizer-driven updateLayout) must not
+// be allowed to clear the previous warning state.
+let loadDataInvoked = false;
+const _origConsoleWarn = console.warn;
+const _origConsoleError = console.error;
+function _formatConsoleArgs(args) {
+  return Array.prototype.map
+    .call(args, (a) => {
+      if (a instanceof Error) return a.toString();
+      if (typeof a === 'object' && a !== null) {
+        try {
+          return JSON.stringify(a);
+        } catch (e) {
+          return String(a);
+        }
+      }
+      return String(a);
+    })
+    .join(' ');
+}
+console.warn = function () {
+  if (captureActive) pendingVerovioWarnings.push(_formatConsoleArgs(arguments));
+  _origConsoleWarn.apply(console, arguments);
+};
+console.error = function () {
+  const msg = _formatConsoleArgs(arguments);
+  if (captureActive && msg.indexOf('VerovioWorker:') === -1) {
+    pendingVerovioErrors.push(msg);
+  }
+  _origConsoleError.apply(console, arguments);
+};
+
 // music font list for PDF export
 let fontList = {
   Leipzig: 'https://raw.githubusercontent.com/rism-digital/leipzig/main/Leipzig.otf',
@@ -16,6 +59,13 @@ loadVerovio = () => {
   console.info('VerovioWorker: Loading toolkit...');
   try {
     tk = new verovio.toolkit();
+    // Wrap loadData so we can distinguish data-reloading commands from
+    // layout-only ones in the message dispatcher below.
+    const _origLoadData = tk.loadData.bind(tk);
+    tk.loadData = function (...args) {
+      loadDataInvoked = true;
+      return _origLoadData(...args);
+    };
     tkOptions = {};
     let message = {
       cmd: 'vrvLoaded',
@@ -26,17 +76,26 @@ loadVerovio = () => {
     console.info('Verovio Toolkit ' + message.version + ' loaded.');
     postMessage(message);
   } catch (err) {
-    log('loadVerovio(): ' + err);
+    const msg = 'loadVerovio: ' + err;
+    console.error('VerovioWorker:', msg);
+    postMessage({ cmd: 'error', msg });
   }
 };
 
 addEventListener(
   'message',
   function (e) {
+    pendingVerovioWarnings = [];
+    pendingVerovioErrors = [];
+    captureActive = true;
+    loadDataInvoked = false;
     let result = e.data;
     // console.log('verovio-worker: result: ', result);
     result.forceUpdate = false;
-    if (!tk && e.data.cmd !== 'loadVerovio') return result;
+    if (!tk && e.data.cmd !== 'loadVerovio') {
+      captureActive = false;
+      return result;
+    }
     console.log('VerovioWorker received: "' + result.cmd + '" (' + Math.random() + ').');
     switch (result.cmd) {
       case 'loadVerovio':
@@ -59,12 +118,10 @@ addEventListener(
           if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') {
             tkOptions.breaks = 'encoded';
           }
-          console.log('OPTIONS: ', tkOptions);
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'updateAll', 'Cannot load MEI data.');
             break;
           }
           result.mei = '';
@@ -89,7 +146,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log('updateAll: ' + err);
+          postError(result, 'updateAll', err);
         }
         break;
       case 'updateData':
@@ -103,8 +160,7 @@ addEventListener(
           });
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'updateData', 'Cannot load MEI data.');
             break;
           }
           result.mei = '';
@@ -126,11 +182,16 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log('updateData: ' + err);
+          postError(result, 'updateData', err);
         }
         break;
       case 'updatePage':
         try {
+          if (result.toolkitDataOutdated) {
+            console.log('!!!Verovio Worker ' + result.cmd + ': re-loading MEI because toolkitDataOutdated!!!');
+            tk.loadData(result.mei);
+            result.toolkitDataOutdated = false;
+          }
           result.setCursorToPageBeginning = true;
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
@@ -144,7 +205,7 @@ addEventListener(
           result.svg = tk.renderToSVG(result.pageNo);
           result.cmd = 'updated';
         } catch (err) {
-          log('updatePage: ' + err);
+          postError(result, 'updatePage', err);
         }
         break;
       // updateOption, updateLayout
@@ -183,7 +244,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log(result.cmd + ': ' + err);
+          postError(result, result.cmd, err);
         }
         break;
       case 'importData': // all non-MEI formats
@@ -193,8 +254,7 @@ addEventListener(
           });
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot import data.';
+            postError(result, 'importData', 'Cannot import data.');
             break;
           }
           result = {
@@ -207,7 +267,7 @@ addEventListener(
             tk.setOptions(tkOptions);
           }
         } catch (err) {
-          log('importData: ' + err);
+          postError(result, 'importData', err);
         }
         break;
       case 'importBinaryData': // compressed XML format
@@ -219,8 +279,7 @@ addEventListener(
           // tk.loadZipDataBase64(result.mei);
           let r = tk.loadZipDataBuffer(result.mei, result.mei.byteLength);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot import compressed data.';
+            postError(result, 'importBinaryData', 'Cannot import compressed data.');
             break;
           }
           result = {
@@ -232,15 +291,14 @@ addEventListener(
             tk.setOptions(tkOptions);
           }
         } catch (err) {
-          log('importBinaryData: ' + err);
+          postError(result, 'importBinaryData', err);
         }
         break;
       case 'reRenderMei':
         try {
           let r = tk.loadData(result.mei);
           if (!r) {
-            result.cmd = 'error';
-            result.msg = 'Cannot load MEI data.';
+            postError(result, 'reRenderMei', 'Cannot load MEI data.');
             break;
           }
           result.setCursorToPageBeginning = true;
@@ -258,7 +316,7 @@ addEventListener(
           result.cmd = 'updated';
           result.toolkitDataOutdated = false;
         } catch (err) {
-          log('reRenderMei: ' + err);
+          postError(result, 'reRenderMei', err);
         }
         break;
       case 'navigatePage': // for a page turn during navigation
@@ -275,7 +333,7 @@ addEventListener(
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
         } catch (err) {
-          log('navigatePage: ' + err);
+          postError(result, 'navigatePage', err);
         }
         break;
       case 'computePageBreaks': // compute page breaks
@@ -306,7 +364,7 @@ addEventListener(
           }
           // console.log('Worker computePageBreaks: ', result.pageBreaks);
         } catch (err) {
-          log('computePageBreaks: ' + err);
+          postError(result, 'computePageBreaks', err);
         }
         break;
       case 'exportMidi': // re-load data and export MIDI base-64 string
@@ -314,16 +372,16 @@ addEventListener(
           const isV6 = result.tkVersionNumber >= 6.0;
           tkOptions = result.options;
           tk.setOptions(tkOptions);
-          // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode || result.expand) {
+            // "Dirty" load: parse the MEI with breaks='none' + the requested
+            // expansion so renderToMIDI sees the right structure cheaply.
             let bOpt = tkOptions.breaks;
-            tk.setOptions({ breaks: 'none', expand: result.expand }); // if reloading data, skip rendering layout
+            tk.setOptions({ breaks: 'none', expand: result.expand });
             tk.loadData(result.mei);
             // Restore breaks but keep `expand` set — renderToMIDI consults
             // current options, so clearing it here would make Verovio fall
             // back to the first/default expansion regardless of selection.
             tk.setOptions({ breaks: bOpt });
-            result.toolkitDataOutdated = result.speedMode ? true : result.expand ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
@@ -335,14 +393,19 @@ addEventListener(
             result.expansionMap = tk.renderToExpansionMap();
           }
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
-          // Clear `expand` now that MIDI/timemap have been rendered, so the
-          // selection doesn't leak into subsequent layout renders.
-          tk.setOptions({ expand: '' });
-          if (result.toolkitDataOutdated || result.speedMode) {
-            tk.setOptions(tkOptions); // ... and re-set breaks option
+          if (result.toolkitDataOutdated || result.speedMode || result.expand) {
+            // Mirror of the entry condition: if we did the dirty load above,
+            // restore the toolkit's data with the user's actual options so
+            // subsequent updatePage / getPageWithElement calls run against
+            // the user's intended layout. Otherwise the breaks='none' /
+            // expand=<id> state lingers and surfaces as "entire piece on one
+            // system" plus broken auto-page-turn during playback (#188).
+            tk.setOptions({ ...tkOptions, expand: '' });
+            tk.loadData(result.mei);
+            result.toolkitDataOutdated = false;
           }
         } catch (err) {
-          log('exportMidi: ' + err);
+          postError(result, 'exportMidi', err);
         }
         break;
       case 'exportMeiBasic':
@@ -461,7 +524,9 @@ addEventListener(
                 tk.setOptions({ breaks: breaks });
               }
             } catch (err) {
-              log('saveAsPdf: ' + err);
+              const msg = 'renderPdf: ' + err;
+              console.error('VerovioWorker:', msg);
+              postMessage({ cmd: 'error', msg });
             }
             doc.end();
             result.cmd = '';
@@ -484,7 +549,7 @@ addEventListener(
             triggerMidiSeekTo: result.triggerMidiSeekTo,
           };
         } catch (err) {
-          log('getTimeForElement: ' + err);
+          postError(result, 'getTimeForElement', err);
         }
         break;
       case 'getPageWithElement':
@@ -498,7 +563,7 @@ addEventListener(
             type: result.type,
           };
         } catch (err) {
-          log('getPageWithElement: ' + err);
+          postError(result, 'getPageWithElement', err);
         }
         break;
       case 'getElementAttr':
@@ -508,7 +573,7 @@ addEventListener(
             msg: tk.getElementAttr(result.mei),
           };
         } catch (err) {
-          log('getElementAttr: ' + err);
+          postError(result, 'getElementAttr', err);
         }
         break;
       case 'stop':
@@ -524,16 +589,39 @@ addEventListener(
           msg: 'Unknown command: ' + result.msg,
         };
     }
+    // Verovio's own [Error] log lines went via console.error and are
+    // distinct from our wrapper's postError. Merge them into the outgoing
+    // result so they reach the error badge instead of the warning badge.
+    if (pendingVerovioErrors.length > 0 && result) {
+      const captured = pendingVerovioErrors.join('\n');
+      if (result.cmd === 'error') {
+        result.msg = result.msg ? result.msg + '\n' + captured : captured;
+      } else {
+        result.cmd = 'error';
+        result.msg = captured;
+      }
+      pendingVerovioErrors = [];
+    }
     if (result) {
       postMessage(result);
+    }
+    captureActive = false;
+    // Only emit warning state when MEI was actually re-parsed; otherwise we
+    // would erroneously clear warnings on layout-only operations like the
+    // resizer's updateLayout. An empty msg signals "no warnings — clear".
+    if (loadDataInvoked) {
+      postMessage({ cmd: 'warning', msg: pendingVerovioWarnings.join('\n') });
+      pendingVerovioWarnings = [];
     }
   },
   false
 );
 
-function log(e) {
-  console.log('ERROR in VerovioWorker ', e);
-  return;
+function postError(result, context, err) {
+  const msg = context + ': ' + err;
+  console.error('VerovioWorker:', msg);
+  result.cmd = 'error';
+  result.msg = msg;
 }
 
 function updateProgressbar(percentage, fileFormat) {
