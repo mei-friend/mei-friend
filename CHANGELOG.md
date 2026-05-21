@@ -11,6 +11,7 @@
 * Settings-tab `expandAlways` / `expandNever` checkboxes now mutually deactivate each other so users can flip freely between them
 * Auto-close the MIDI playback control bar when a new encoding is opened (Open file).
 * Add Playwright e2e coverage for v6 expansion behaviour
+* Run tests on push to core branches using GitHub Actions (thx @KazuyaMiyashita!)
 * Fix [#188](https://github.com/mei-friend/mei-friend/issues/188) that prevented page turning and sometimes showed mangled notation
 * Fix control menu overflow behavior for both the notation and the facsimile panels
 * Prevent dragging overlay to appear when dragging other elements than files into or within the editor
