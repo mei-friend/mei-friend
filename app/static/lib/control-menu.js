@@ -199,6 +199,19 @@ export function createNotationDiv(parentElement, scale) {
   attachTooltipApi(notationWarningBadge);
   verovioContainer.appendChild(notationWarningBadge);
 
+  // Click anywhere outside an expanded badge to contract it again.
+  // Uses bubble phase so the badge's own click handlers (expand/collapse,
+  // close, icon toggle) resolve first; this only acts on clicks whose
+  // target is outside the badge entirely.
+  const collapseExpandedBadgeOnOutsideClick = (badge) => (ev) => {
+    if (!badge.classList.contains('expanded')) return;
+    if (badge.contains(ev.target)) return;
+    badge.classList.remove('expanded');
+    refreshBadgeExpansionTooltip(badge);
+  };
+  document.addEventListener('click', collapseExpandedBadgeOnOutsideClick(notationBadge));
+  document.addEventListener('click', collapseExpandedBadgeOnOutsideClick(notationWarningBadge));
+
   // When the error badge is expanded with multiple errors it grows
   // downward and would occlude the warning badge below it. Watch its
   // size and slide the warning badge down to sit just under the expanded
