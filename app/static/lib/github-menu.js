@@ -1104,7 +1104,8 @@ async function handleClickGithubAction(e, gm) {
           if (!summaryText) {
             summaryText = buildStepsSummary(job);
           }
-          if (summaryText) {
+          // Skip writing if the user has left the githubActionsUI while we were fetching
+          if (summaryText && overlay.style.display !== 'none') {
             statusMsg.innerHTML += `<div id="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
           }
         } catch (err) {
@@ -1238,9 +1239,11 @@ async function handleClickGithubAction(e, gm) {
                     if (workflowCompletionResp.conclusion === 'success') {
                       workflowFinished = true;
                       statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionsRunCompletedMsg.text}</span> <a href="${workflowCompletionResp.html_url}" target="_blank">${translator.lang.githubActionsGitHubStatusLink.text}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
-                      appendJobSummary(runId, 'githubActionsSummaryLoading');
                       runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
-                      runBtn.removeAttribute('disabled');
+                      // Keep Reload MEI disabled until the job summary has finished loading
+                      appendJobSummary(runId, 'githubActionsSummaryLoading').finally(() => {
+                        runBtn.removeAttribute('disabled');
+                      });
                       ghLogo.classList.remove('clockwise');
                       // Keep initial contents hidden on success
                       runBtn.onclick = async () => {
