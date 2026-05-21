@@ -13,9 +13,7 @@ on:
 
 jobs:
   test:
-    # On the latest ubuntu-24.04, Playwright cannot resolve package 'libasound2' during installation. 
-    # Upgrading @playwright/test to v1.44 or later should make it work on ubuntu-24.04 as well.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
