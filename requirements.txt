@@ -1,10 +1,10 @@
 Authlib==1.6.9
 blinker==1.8.2
 certifi==2024.7.4
-cffi==1.17.1
+cffi==2.0.0
 charset-normalizer==3.1.0
 click==8.1.3
-cryptography==42.0.4
+cryptography==46.0.6
 Deprecated==1.2.14
 Flask==3.0.3
 Flask-Limiter==3.8.0
@@ -25,6 +25,6 @@ python-dotenv==1.0.0
 requests==2.32.3
 rich==13.7.1
 typing_extensions==4.12.2
-urllib3==1.26.19
+urllib3==2.7.0
 Werkzeug==3.0.3
 wrapt==1.16.0
