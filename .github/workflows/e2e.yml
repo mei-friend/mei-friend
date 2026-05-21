@@ -47,12 +47,12 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
-          npm install
+          npm ci
 
       - name: Build CodeMirror
         run: |
           cd app/static/CodeMirror
-          npm install
+          npm ci
           npm run build
 
       - name: Prepare environment
