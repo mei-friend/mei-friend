@@ -54,7 +54,7 @@ jobs:
       - name: Build CodeMirror
         run: |
           cd app/static/CodeMirror
-          npm ci
+          npm install
           npm run build
 
       - name: Prepare environment
