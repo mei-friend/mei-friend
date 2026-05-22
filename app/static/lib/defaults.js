@@ -1056,7 +1056,7 @@ export const meiFriendSettingsOptions = {
     title: 'Show available GitHub Actions',
     description: 'List available GitHub Actions when navigating within repository in GitHub menu',
     type: 'bool',
-    default: false,
+    default: true,
   },
   supplyWorkpackageGithubActionsConfiguration: {
     title: 'Work package definition',
