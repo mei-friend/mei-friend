@@ -108,6 +108,8 @@ test.describe('2 Test mei-friend settings panel tab', () => {
       page,
       'https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/b408031f725b0a1f4eea57a89a04c75c3431da62/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei'
     );
+    // wait for the new file's notation to render before continuing
+    await expect(page.locator('#note-0000000026346875')).toBeVisible();
     // scroll the editor to the end of the <appInfo> element to ensure that the application statements are in viewport
     await page.click('#editMenuTitle');
     await page.click('#startSearch');
@@ -136,6 +138,8 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     }).toPass({ timeout: 5000 });
     // re-check the application statement checkbox
     await page.click('#addApplicationNote');
+    // wait for Verovio to finish re-rendering after the previous pitch change before clicking again
+    await expect(page.locator('#note-0000000026346875')).toBeVisible();
     // make another change to the MEI (shift pitch of first note) and check app statement is present
     await page.locator('g.note').first().click({ force: true });
     await page.click('#manipulateMenuTitle');
