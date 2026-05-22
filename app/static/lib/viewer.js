@@ -4,7 +4,13 @@ import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as pageRagenSelector from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
+import {
+  getControlMenuState,
+  showPdfButtons,
+  setControlMenuState,
+  setCheckbox,
+  adjustCtrlMenuOverflow,
+} from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
 import { codeCheckerHeight } from './resizer.js';
@@ -16,6 +22,7 @@ import {
   rngLoader,
   storage,
   tkVersion,
+  tkVersionNumber,
   translator,
   validate,
   validator,
@@ -29,6 +36,7 @@ import {
   commonSchemas,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
+  defaultNotationUpdateDelay,
   defaultSpeedMode,
   defaultViewerTimeoutDelay,
   fontList,
@@ -73,9 +81,13 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.vrvTimeout; // time out task for updating verovio settings
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
+    this.notationUpdateTimeout = null; // debounce timer for editor-driven re-rendering
+    this.notationUpdateDelay = defaultNotationUpdateDelay;
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
+    this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
+    this.choiceSicCorrSelect = document.getElementById('choiceSicCorrSelect'); //choice select control
+    this.substSelect = document.getElementById('substSelect'); //subst select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -262,15 +274,17 @@ export default class Viewer {
     this.loadXml(mei, forceReload);
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    // TODO: instead of cloning node, just work in this.xmlDoc and force reload when required
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
-    const choiceOption = this.choiceSelect.value;
-    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
-    if (markupResult?.changed === true) {
-      speedMeiDoc = markupResult.doc;
-      //this.xmlDocOutdated = true;
-      // unnecessary if this.xmlDoc is not touched
-    }
+    const choiceOrigRegOption = this.choiceOrigRegSelect.value;
+    const choiceSicCorrOption = this.choiceSicCorrSelect.value;
+    const substOption = this.substSelect.value;
+    // Check if any of the multilevel markup options have been changed:
+    selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
+    selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
+
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = speedMeiDoc.querySelector('music score');
@@ -399,18 +413,37 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let choiceSelect = this.choiceSelect;
-    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
-      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
-      if (selectedChoice.dataset.prop) {
-        if (selectedChoice.value != '') {
-          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
-        } else {
-          this.vrvOptions[selectedChoice.dataset.prop] = [];
-        }
+    let choiceOrigRegSelect = this.choiceOrigRegSelect;
+    let choiceSicCorrSelect = this.choiceSicCorrSelect;
+    let substSelect = this.substSelect;
+    // handle choice translation to Vervio options
+    let choiceSelections = [...choiceOrigRegSelect.selectedOptions, ...choiceSicCorrSelect.selectedOptions];
+    console.log('choiceSelections: ', choiceSelections);
+    let choiceXpath = [];
+    choiceSelections.forEach((opt) => {
+      if (opt.value != '') {
+        choiceXpath.push('./' + opt.value);
       }
+    });
+    if (choiceXpath.length > 0) {
+      this.vrvOptions.choiceXPathQuery = choiceXpath;
+    } else {
+      delete this.vrvOptions.choiceXPathQuery;
     }
-
+    // handle subst translation to Verovio options
+    let substXpath = [];
+    if (substSelect && substSelect.selectedOptions.length > 0 && substSelect.value !== '') {
+      substXpath = ['./' + substSelect.value];
+    }
+    console.log('substXpath: ', substXpath);
+    console.log('substSelect value: ', substSelect.value);
+    console.log('substSelect.selectedOptions: ', substSelect.selectedOptions);
+    if (substXpath.length > 0) {
+      this.vrvOptions.substXPathQuery = substXpath;
+    } else {
+      delete this.vrvOptions.substXPathQuery;
+    }
+    console.log('!!!! ', this.vrvOptions);
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {
       let vpw = document.getElementById('vrv-pageWidth');
@@ -487,12 +520,11 @@ export default class Viewer {
       let note = document.querySelector('.note');
       if (note) {
         id = note.getAttribute('id');
-      }
-      else {
+      } else {
         return '';
       }
     } else {
-      sc = cm.getSearchCursor('xml:id="' + id + '"');
+      sc = cm.getSearchCursor(new RegExp(`xml:id=["']${id}["']`));
       if (sc.findNext()) {
         const p = sc.from();
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
@@ -502,7 +534,7 @@ export default class Viewer {
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
         } else {
-          id = document.querySelector('.note');;
+          id = document.querySelector('.note');
           let staff = document.querySelector('.staff');
           if (staff) {
             id = dutils.getFirstInMeasure(staff, dutils.navElsSelector, stNo, lyNo);
@@ -621,11 +653,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-        ' (' +
-        translator.lang.manipulateMenuTitle.text +
-        '&mdash;' +
-        translator.lang.addIdsText.text +
-        ')',
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
         'warning'
       );
     }
@@ -700,20 +732,186 @@ export default class Viewer {
   } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
+  // Editor-driven calls (forceUpdate=false) are debounced so that rapid
+  // mid-typing edits don't trigger Verovio on every keystroke. Force-update
+  // calls (manual button, live-update toggle) bypass the debounce and the
+  // well-formedness pre-check so the user always gets immediate feedback.
   notationUpdated(cm, forceUpdate = false) {
+    if (this.notationUpdateTimeout) {
+      clearTimeout(this.notationUpdateTimeout);
+      this.notationUpdateTimeout = null;
+    }
+    if (forceUpdate) {
+      this._performNotationUpdate(cm, true);
+    } else {
+      this.notationUpdateTimeout = setTimeout(() => {
+        this.notationUpdateTimeout = null;
+        this._performNotationUpdate(cm, false);
+      }, this.notationUpdateDelay);
+    }
+  } // notationUpdated()
+
+  _performNotationUpdate(cm, forceUpdate) {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       cmd.toggleMidiPlaybackControlBar();
     }
-    // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
-    if (!isSafari) this.checkSchema(cm.getValue());
+    const mei = cm.getValue();
+    if (!isSafari) this.checkSchema(mei);
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      // For non-forced renders, cheaply check XML well-formedness first.
+      // Skipping malformed input avoids a Verovio "Cannot load MEI data"
+      // round-trip and the badge that goes with it during normal typing.
+      if (!forceUpdate && !this.isWellFormedXml(mei)) {
+        const msg = (translator?.lang?.notationStaleXmlInvalid?.text) || 'Rendering paused — waiting for valid XML';
+        this.setNotationStale(msg);
+        return;
+      }
       this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
-  } // notationUpdated()
+  } // _performNotationUpdate()
+
+  // Quick well-formedness check using DOMParser. Different browsers wrap
+  // syntax errors in differently-namespaced <parsererror> elements, so
+  // search across the known variants.
+  isWellFormedXml(mei) {
+    try {
+      const doc = this.parser.parseFromString(mei, 'text/xml');
+      if (!doc) return false;
+      if (doc.getElementsByTagName('parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'parsererror').length) return false;
+      if (doc.getElementsByTagNameNS('http://www.mozilla.org/newlayout/xml/parsererror.xml', 'parsererror').length)
+        return false;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  } // isWellFormedXml()
+
+  // Populate a notation badge (error or warning) with one or more messages.
+  // Splits `reason` on newlines, switches the prefix between singular and
+  // plural forms, prepends the count when more than one, and fills the
+  // expandable details list. Auto-reveals a previously hidden label only
+  // when the message set has actually changed.
+  _populateNotationBadge(badge, reason, singularKey, pluralKey) {
+    const wasVisible = badge.style.display !== 'none';
+    const prev = badge.dataset.currentMessage || '';
+    const textChanged = prev !== reason;
+    badge.style.display = '';
+    // Only the round icon shows the full message listing on hover; the
+    // summary/details get the click-to-expand hint via refreshExpansionTooltip().
+    const iconEl = badge.querySelector('.badge-icon');
+    if (iconEl) iconEl.title = reason;
+    badge.setAttribute('aria-label', reason);
+    const lines = (reason || '').split('\n').filter((l) => l.trim().length > 0);
+    const first = lines[0] || '';
+    const firstEl = badge.querySelector('.badge-message-first');
+    if (firstEl) firstEl.textContent = first;
+    const countEl = badge.querySelector('.badge-count');
+    if (countEl) countEl.textContent = lines.length > 1 ? `${lines.length} ` : '';
+    const prefixEl = badge.querySelector('.badge-prefix');
+    if (prefixEl) {
+      const key = lines.length > 1 ? pluralKey : singularKey;
+      prefixEl.textContent = (translator.lang[key] && translator.lang[key].text) || '';
+    }
+    const details = badge.querySelector('.badge-details');
+    if (details) {
+      details.innerHTML = '';
+      if (lines.length > 1) {
+        for (const line of lines) {
+          const li = document.createElement('li');
+          li.textContent = line;
+          details.appendChild(li);
+        }
+      }
+    }
+    if (lines.length > 1) {
+      badge.classList.add('has-multiple');
+    } else {
+      badge.classList.remove('has-multiple');
+      badge.classList.remove('expanded');
+    }
+    badge.dataset.currentMessage = reason;
+    if (!wasVisible || textChanged) badge.classList.remove('label-hidden');
+    // Refresh the click-zone tooltip ("X Verovio warnings: click to expand"
+    // etc.) now that count / prefix / has-multiple reflect the new state.
+    if (typeof badge.refreshExpansionTooltip === 'function') badge.refreshExpansionTooltip();
+  } // _populateNotationBadge()
+
+  // Mark the notation pane as stale: dim the SVG and surface a small badge
+  // with the given message(s). Preserves the previously-rendered SVG.
+  // `reason` may contain multiple errors joined by '\n'.
+  setNotationStale(reason) {
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.add('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) {
+      this._populateNotationBadge(
+        badge,
+        reason,
+        'notationErrorBadgeLabel',
+        'notationErrorBadgeLabelPlural'
+      );
+    }
+    // Error visible — warning (if any) drops back below it.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge) warningBadge.classList.remove('float-up');
+    const sb = document.getElementById('statusBar');
+    if (sb) sb.innerHTML = reason;
+    this.busy(false);
+  } // setNotationStale()
+
+  // Clear the stale state — but only if the current editor content is
+  // actually well-formed. Operations like updateLayout (triggered by the
+  // resizer) make the worker emit 'updated' using its cached MEI even when
+  // the editor has since become malformed; without this guard the badge
+  // would clear despite the user's current XML still being broken.
+  clearNotationStale() {
+    if (cm && !this.isWellFormedXml(cm.getValue())) return;
+    const panel = document.getElementById('verovio-panel');
+    if (panel) panel.classList.remove('notation-stale');
+    const badge = document.getElementById('notation-error-badge');
+    if (badge) {
+      badge.style.display = 'none';
+      badge.classList.remove('expanded');
+      delete badge.dataset.currentMessage;
+    }
+    // No error showing — let a visible warning float up under the logo.
+    const warningBadge = document.getElementById('notation-warning-badge');
+    if (warningBadge && warningBadge.style.display !== 'none') {
+      warningBadge.classList.add('float-up');
+    }
+  } // clearNotationStale()
+
+  // Verovio render-time warnings (e.g. structural advisories). Shown as a
+  // small orange badge that does NOT dim the SVG — the render succeeded.
+  // `reason` may contain multiple warnings joined by '\n'.
+  setNotationWarning(reason) {
+    const badge = document.getElementById('notation-warning-badge');
+    if (!badge) return;
+    this._populateNotationBadge(
+      badge,
+      reason,
+      'notationWarningBadgeLabel',
+      'notationWarningBadgeLabelPlural'
+    );
+    // Float up under the Verovio logo when no error badge is shown.
+    const errorBadge = document.getElementById('notation-error-badge');
+    const errorVisible = errorBadge && errorBadge.style.display !== 'none';
+    badge.classList.toggle('float-up', !errorVisible);
+  } // setNotationWarning()
+
+  clearNotationWarning() {
+    const badge = document.getElementById('notation-warning-badge');
+    if (!badge) return;
+    badge.style.display = 'none';
+    badge.classList.remove('expanded');
+    badge.classList.remove('float-up');
+    delete badge.dataset.currentMessage;
+  } // clearNotationWarning()
 
   /**
    * Highlights currently selected elements or the element at cursor in CodeMirror.
@@ -1035,6 +1233,13 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
+    // for each visible .control-menu, adjust overflow
+    let ctrlMenus = document.querySelectorAll('.control-menu');
+    ctrlMenus.forEach((ctrlMenu) => {
+      if (ctrlMenu.style.display !== 'none') {
+        adjustCtrlMenuOverflow(ctrlMenu);
+      }
+    });
   } // pageModeOn()
 
   // Switches back from pdfMode
@@ -1068,6 +1273,7 @@ export default class Viewer {
       this.allowNotationInteraction = true;
     }
     this.pdfMode = false;
+    adjustCtrlMenuOverflow();
   } // pageModeOff()
 
   saveAsPdf() {
@@ -1100,13 +1306,54 @@ export default class Viewer {
   toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
-    const midiSpeedmodeIndicator = document.getElementById('midiSpeedmodeIndicator');
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 'flex' : 'none';
-    midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
-    // console.log('toggle: ', midiPlaybackControlBar);
+    this.applySpeedModeUi();
     setOrientation(cm);
     midiPlaybackControlBar.focus();
   } // toggleMidiPlaybackControlBar()
+
+  /**
+   * Reflect the current speedMode in the MIDI-bar indicator and in the
+   * expansion dropdown. In speed mode we force Verovio's expandNever and
+   * disable the dropdown so the user can't pick an expansion that contradicts
+   * the page-only rendering. Leaving speed mode just re-enables the dropdown;
+   * the user can change the expansion again from there.
+   */
+  applySpeedModeUi() {
+    const wrapper = document.getElementById('midiSpeedmodeIndicatorWrapper');
+    const indicatorTitle =
+      translator?.lang?.midiSpeedmodeIndicator?.description ||
+      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, uncheck this box.';
+    if (wrapper) {
+      wrapper.style.display = this.speedMode ? 'inline-flex' : 'none';
+      // Mirror the indicator span's translated title onto the wrapper and the
+      // checkbox so hovering any part of the control shows the same tooltip
+      // (the translator's id-based auto-translate only reaches the span).
+      wrapper.title = indicatorTitle;
+    }
+    const cb = document.getElementById('midiSpeedmodeCheckbox');
+    if (cb) {
+      cb.checked = this.speedMode;
+      cb.title = indicatorTitle;
+    }
+    const barSel = document.getElementById('controlbar-midi-expansion-selector');
+    if (this.speedMode) {
+      if (tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+        this.setExpansionMode('never', { reRender: false });
+      }
+      if (barSel) {
+        barSel.disabled = true;
+        barSel.title =
+          translator?.lang?.midiExpansionSelectorDisabledTitle?.text ||
+          'Disabled in speed mode (only the current page is rendered).';
+      }
+    } else if (barSel) {
+      barSel.disabled = false;
+      barSel.title =
+        translator?.lang?.midiExpansionSelectorTitle?.text ||
+        'Select expansion element for MIDI playback';
+    }
+  } // applySpeedModeUi()
 
   toggleAnnotationPanel() {
     setOrientation(cm);
@@ -1246,7 +1493,7 @@ export default class Viewer {
         //          translateLanguageSelection();
         //          break;
         case 'toggleSpeedMode':
-          document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
+          this.applySpeedModeUi();
           break;
         case 'showMarkup':
           att.modelTranscriptionLike.forEach((element) => {
@@ -1289,7 +1536,7 @@ export default class Viewer {
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
-          document.getElementById('speedDiv').style.display = value ? 'inherit' : 'none';
+          document.getElementById('speedDiv').style.display = value ? 'flex' : 'none';
           break;
         case 'controlMenuNavigateArrows':
           document.getElementById('navigationControls').style.display = value ? 'inherit' : 'none';
@@ -1299,7 +1546,7 @@ export default class Viewer {
           document.getElementById('flipButton').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('updateControls').style.display = value ? 'flex' : 'none';
           break;
         case 'facsimileZoomInput':
           document.getElementById('facsimileZoom').value = value;
@@ -1429,6 +1676,16 @@ export default class Viewer {
             cmd.toggleMidiPlaybackControlBar(false);
             break;
           case 'selectMidiExpansion':
+            // v6+: the dropdown is the canonical expandNever switch.
+            // Empty value → set expandNever. Real value while in expandNever →
+            // exit it so MIDI follows the new selection.
+            if (!value && tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+              this.setExpansionMode('never');
+              break;
+            }
+            if (value && tkVersionNumber >= 6.0 && this.getExpansionMode() === 'never') {
+              this.setExpansionMode('default', { reRender: false });
+            }
             this.updateSelectMidiExpansion();
             if (document.getElementById('showMidiPlaybackControlBar').checked) {
               startMidiTimeout(true);
@@ -1558,7 +1815,7 @@ export default class Viewer {
           case 'controlMenuSpeedmodeCheckbox':
             document.getElementById('speedDiv').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
-              ? 'inherit'
+              ? 'flex'
               : 'none';
             break;
           case 'controlMenuNavigateArrows':
@@ -1575,7 +1832,7 @@ export default class Viewer {
             break;
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
-            document.getElementById('updateControls').style.display = u ? 'inherit' : 'none';
+            document.getElementById('updateControls').style.display = u ? 'flex' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
@@ -1836,6 +2093,16 @@ export default class Viewer {
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
+        // Route v6 expansion checkboxes through the central normaliser so the
+        // midi-bar radio, dropdown, and the other checkbox stay in sync and
+        // can never both be checked at once.
+        if (opt === 'vrv-expandAlways' || opt === 'vrv-expandNever') {
+          let mode = 'default';
+          if (opt === 'vrv-expandAlways' && value) mode = 'always';
+          else if (opt === 'vrv-expandNever' && value) mode = 'never';
+          this.setExpansionMode(mode);
+          return;
+        }
         this.vrvOptions[opt.split('vrv-').pop()] = value;
         if (
           defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
@@ -1862,6 +2129,7 @@ export default class Viewer {
       vsp.addEventListener('click', (ev) => {
         if (ev.target.id === 'vrvReset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
+          this.applyExpansionModeVisibility();
           this.updateLayout(this.vrvOptions);
           this.applySettingsFilter();
           if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -1904,8 +2172,8 @@ export default class Viewer {
           option,
           value
             ? {
-              bothTags: true,
-            }
+                bothTags: true,
+              }
             : {}
         );
         break;
@@ -2053,14 +2321,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-          o.type +
-          ', title: ' +
-          o.title +
-          ' [' +
-          o.type +
-          '], default: [' +
-          optDefault +
-          ']'
+            o.type +
+            ', title: ' +
+            o.title +
+            ' [' +
+            o.type +
+            '], default: [' +
+            optDefault +
+            ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2112,7 +2380,8 @@ export default class Viewer {
     if (vrvOption) {
       while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
     }
-    dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
+    const noExpansionLabel = translator?.lang?.noExpansionOption?.text || 'No expansion';
+    dutils.generateExpansionList(this.xmlDoc, 'music score', noExpansionLabel).forEach((str, i) => {
       if (expandSelect) {
         expandSelect.add(new Option(str[0], str[1]));
       }
@@ -2120,6 +2389,11 @@ export default class Viewer {
         vrvOption.add(new Option(str[0], str[1]));
       }
     });
+    // v6+: auto-pick the first real expansion when in default/always mode so
+    // the user doesn't have to manually select one. No-op on <v6 or 'never'.
+    if (tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+      this.setExpansionMode(this.getExpansionMode(), { reRender: false });
+    }
   } // setMidiExpansionOptions()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
@@ -2315,8 +2589,85 @@ export default class Viewer {
     this.expansionId = document.getElementById('selectMidiExpansion').value;
     let mes = document.getElementById('controlbar-midi-expansion-selector');
     if (mes) mes.value = this.expansionId;
-    console.log('EEEEExpansion selector set to: ' + this.expansionId);
   }
+
+  /**
+   * Derive the current expansion mode ('default' | 'always' | 'never') from
+   * vrvOptions. Used to seed the UI on load and to reconcile state.
+   */
+  getExpansionMode() {
+    if (this.vrvOptions && this.vrvOptions.expandNever) return 'never';
+    if (this.vrvOptions && this.vrvOptions.expandAlways) return 'always';
+    return 'default';
+  }
+
+  /**
+   * Set the Verovio expansion mode across vrvOptions, localStorage, and the
+   * settings-tab checkboxes / MIDI-bar dropdown. No-op on Verovio <6.0 since
+   * expandAlways/expandNever are v6+.
+   * @param {'default'|'always'|'never'} mode
+   * @param {{reRender?: boolean}} [opts]
+   */
+  setExpansionMode(mode, { reRender = true } = {}) {
+    if (tkVersionNumber < 6.0) return;
+    const expandAlways = mode === 'always';
+    const expandNever = mode === 'never';
+    this.vrvOptions.expandAlways = expandAlways;
+    this.vrvOptions.expandNever = expandNever;
+    const ls = window.localStorage;
+    if (expandAlways) ls['vrv-expandAlways'] = true;
+    else delete ls['vrv-expandAlways'];
+    if (expandNever) ls['vrv-expandNever'] = true;
+    else delete ls['vrv-expandNever'];
+    // settings-tab checkboxes (may be absent before first render). Mutual
+    // exclusion is enforced by clearing the opposing checkbox when one is
+    // turned on — both remain clickable so the user can toggle freely.
+    const alwaysCb = document.getElementById('vrv-expandAlways');
+    const neverCb = document.getElementById('vrv-expandNever');
+    if (alwaysCb) alwaysCb.checked = expandAlways;
+    if (neverCb) neverCb.checked = expandNever;
+    // MIDI-bar dropdown is the canonical expansion picker. On 'never' the
+    // value is cleared (so it shows "No expansion") but the dropdown stays
+    // enabled — picking any other option clears expandNever automatically,
+    // so disabling here would needlessly trap the user.
+    const barSel = document.getElementById('controlbar-midi-expansion-selector');
+    const settingsSel = document.getElementById('selectMidiExpansion');
+    if (barSel && expandNever) barSel.value = '';
+    if (settingsSel && expandNever) settingsSel.value = '';
+    if (expandNever) {
+      this.expansionId = '';
+    } else {
+      const current = settingsSel?.value ?? barSel?.value ?? this.expansionId ?? '';
+      if (!current) {
+        const pickFrom = settingsSel || barSel;
+        const firstReal = pickFrom
+          ? Array.from(pickFrom.options).find((o) => o.value)
+          : null;
+        if (firstReal) {
+          this.expansionId = firstReal.value;
+          if (settingsSel) settingsSel.value = firstReal.value;
+          if (barSel) barSel.value = firstReal.value;
+        }
+      }
+    }
+    if (reRender) {
+      window.clearTimeout(this.vrvTimeout);
+      this.vrvTimeout = window.setTimeout(() => this.updateLayout(this.vrvOptions), this.timeoutDelay);
+      if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
+        startMidiTimeout(true);
+      }
+    }
+  } // setExpansionMode()
+
+  /**
+   * Reconcile expansion-mode UI state on toolkit (re)load. No-op pre-v6.
+   */
+  applyExpansionModeVisibility() {
+    if (tkVersionNumber >= 6.0) {
+      this.setExpansionMode(this.getExpansionMode(), { reRender: false });
+    }
+    this.applySpeedModeUi();
+  } // applyExpansionModeVisibility()
 
   busy(active = true, speedWorker = false) {
     let direction = speedWorker ? 'anticlockwise' : 'clockwise';
@@ -2485,12 +2836,24 @@ export default class Viewer {
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    const hasNameSpacePattern = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+    const hasNameSpacePattern =
+      /<\?xml-model\b[^>]*schematypens\s*=\s*["']http:\/\/relaxng\.org\/ns\/structure\/1\.0["']/;
     const hasSchemaMatch = hasNameSpacePattern.exec(mei);
-    const meiVersionPattern = /<mei.*meiversion="([^"]*).*/;
-    const meiVersionMatch = meiVersionPattern.exec(mei);
-    if (!hasSchemaMatch) {
-      // if no schema namespace, but a version in the mei tag, load common schema
+    if (hasSchemaMatch) {
+      // schema namespace found, now extract schema file name and load it
+      const schemaUrlPattern = /<\?xml-model\b[^>]*href=["']([^"']*)["']/;
+      const schemaUrlMatch = schemaUrlPattern.exec(mei);
+      if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
+        this.currentSchema = schemaUrlMatch[1];
+        console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
+        if (await this.replaceSchema(this.currentSchema)) {
+          return;
+        }
+      }
+    } else {
+      // if no schema namespace, but an MEI version in the mei tag, load common schema
+      const meiVersionPattern = /<mei\b[^>]*meiversion=["']([^"']*)["']/;
+      const meiVersionMatch = meiVersionPattern.exec(mei);
       if (meiVersionMatch && meiVersionMatch[1]) {
         let sch = commonSchemas['All'][meiVersionMatch[1]];
         if (sch) {
@@ -2506,17 +2869,11 @@ export default class Viewer {
           return;
         }
       }
+      // nothing at all
       console.error('Viewer.checkSchema(): ' + translator.lang.noSchemaFound.text);
       this.currentSchema = '';
       this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
-    }
-    const schemaUrlPattern = /<\?xml-model.*href="([^"]*).*/;
-    const schemaUrlMatch = schemaUrlPattern.exec(mei);
-    if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
-      this.currentSchema = schemaUrlMatch[1];
-      console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
-      await this.replaceSchema(this.currentSchema);
     }
   } // checkSchema()
 
@@ -2524,11 +2881,11 @@ export default class Viewer {
    * Loads and replaces XML schema; throws errors if not found/CORS error,
    * update validation-status icon
    * @param {string*} schemaFileName
-   * @returns
+   * @returns {boolean} success
    */
   async replaceSchema(schemaFileName) {
     if (!this.validatorInitialized) {
-      return;
+      return false;
     }
 
     // determine current schema profile (e.g., all, CMN, basic, mensural, neumes, anystart)
@@ -2557,7 +2914,7 @@ export default class Viewer {
           response: response,
           schemaFile: schemaFileName,
         });
-        return;
+        return false;
       }
       data = await response.text();
       const res = await validator.setRelaxNGSchema(data);
@@ -2566,7 +2923,7 @@ export default class Viewer {
         err: translator.lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFileName,
       });
-      return;
+      return false;
     }
     msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
@@ -2583,6 +2940,7 @@ export default class Viewer {
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
     console.log('New schema loaded for auto completion', schemaFileName);
     Viewer.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+    return true;
   } // replaceSchema()
 
   /**
@@ -2591,7 +2949,10 @@ export default class Viewer {
    */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      // clear validation error reports in CodeMirror
+      this.updateLinting(cm, []);
+    }
     // Remove schema from validator and hinting / code completion
     rngLoader.clearRelaxNGSchema();
     console.log('Schema removed from validator', this.currentSchema);
@@ -2738,7 +3099,9 @@ export default class Viewer {
       });
       i += 1;
     }
-    this.updateLinting(cm, found);
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, found);
+    }
 
     // update overall status of validation
     let vs = document.getElementById('validation-status');
@@ -2808,13 +3171,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-      ' ' +
-      this.currentSchema +
-      ': ' +
-      Object.keys(messages).length +
-      ' ' +
-      translator.lang.validationMessages.text +
-      '.'
+        ' ' +
+        this.currentSchema +
+        ': ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2826,8 +3189,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-            !document.getElementById('autoValidate')?.checked ||
-            showValidation
+          !document.getElementById('autoValidate')?.checked ||
+          showValidation
             ? 'visible'
             : 'hidden';
     }

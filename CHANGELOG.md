@@ -1,5 +1,39 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.3.0 patch: Verovio 6 expansion support and improvements (released on 22 May 2026)
+* Adjust expansion behaviour for Verovio 6+: MIDI follows the expansion while the SVG remains unexpanded by default; renditions ≥ 2 now highlight and page-follow correctly via the expansion map. Fixes [#187](https://github.com/mei-friend/mei-friend/issues/187).
+* Selecting "No expansion" in MIDI player dropdown sets `expandNever`; selecting any expansion sets `expand` to that id and clears `expandNever`
+* Settings-tab `expandAlways` / `expandNever` checkboxes now mutually deactivate each other so users can flip freely between them
+* Auto-close the MIDI playback control bar when a new encoding is opened (Open file).
+* Add Playwright e2e coverage for v6 expansion behaviour
+* Run tests on push to core branches using GitHub Actions (thx @KazuyaMiyashita!)
+* Fix [#188](https://github.com/mei-friend/mei-friend/issues/188) that prevented page turning and sometimes showed mangled notation
+* Fix control menu overflow behavior for both the notation and the facsimile panels
+* Prevent dragging overlay to appear when dragging other elements than files into or within the editor
+* Surface error when Verovio encounters an error during rendering, instead of silently failing and showing a blank screen (fixes [#186](https://github.com/mei-friend/mei-friend/issues/186), [#157](https://github.com/mei-friend/mei-friend/issues/157)).
+* Surface Verovio render-time warnings and errors as small  badges under the Verovio logo, with full messages available on click.
+
+### 1.2.12 patch
+* Fix issue with GitHub-resource-URIs posted to Solid missing their branch 
+* Include Verovio version 6.1.0
+* Comprehensive improvements of e2e tests to reduce flakiness
+
+### 1.2.11 patch
+* Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
+* Restrict ALT + arrow key bindings for shifting visual offset to notation panel
+* Include Verovio version 6.0.1
+
+### 1.2.10 patch
+* Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
+* Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)
+* Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
+* Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF 
+* Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201) 
+* Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
+* Include Verovio version 5.7.0
+* Support for altering @ho/@vo with ALT + arrow keys
+* Massively reduce editor changes when editing with annotation panel visible
+
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
 * Insertion of application info improved (without adding xml:id to meiHead)

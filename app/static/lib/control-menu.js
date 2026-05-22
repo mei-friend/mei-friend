@@ -3,7 +3,73 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
-import { choiceOptions } from './markup.js';
+import { choiceOrigRegOptions, choiceSicCorrOptions, substOptions } from './markup.js';
+
+const overflowMenus = [];
+let overflowGlobalHandlersAttached = false;
+
+function hideOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'hidden';
+  overflowContent.style.opacity = '0';
+  overflowContent.style.pointerEvents = 'none';
+  overflowContent.dataset.open = 'false';
+  overflowContent.setAttribute('aria-hidden', 'true');
+}
+
+function showOverflowContent(overflowContent) {
+  overflowContent.style.visibility = 'visible';
+  overflowContent.style.opacity = '1';
+  overflowContent.style.pointerEvents = 'auto';
+  overflowContent.dataset.open = 'true';
+  overflowContent.setAttribute('aria-hidden', 'false');
+}
+
+export function hideAllOverflowContents(exceptContent = null) {
+  overflowMenus.forEach(({ content }) => {
+    if (content !== exceptContent) hideOverflowContent(content);
+  });
+}
+
+function attachOverflowGlobalHandlers() {
+  if (overflowGlobalHandlersAttached) return;
+
+  document.addEventListener('click', (event) => {
+    overflowMenus.forEach(({ icon, content }) => {
+      if (content.dataset.open !== 'true') return;
+      if (!content.contains(event.target) && !icon.contains(event.target)) {
+        hideOverflowContent(content);
+      }
+    });
+  });
+
+  overflowGlobalHandlersAttached = true;
+}
+
+function registerOverflowMenu(overflowMenu) {
+  const overflowIcon = overflowMenu.querySelector('.control-menu-overflow-icon');
+  const overflowContent = overflowMenu.querySelector('.control-menu-overflow-content');
+  if (!overflowIcon || !overflowContent) return;
+
+  hideOverflowContent(overflowContent);
+  overflowMenus.push({ icon: overflowIcon, content: overflowContent });
+
+  overflowIcon.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = overflowContent.dataset.open === 'true';
+    if (isOpen) {
+      hideOverflowContent(overflowContent);
+    } else {
+      hideAllOverflowContents(overflowContent);
+      showOverflowContent(overflowContent);
+    }
+  });
+
+  overflowContent.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  attachOverflowGlobalHandlers();
+}
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -11,12 +77,174 @@ export function createNotationDiv(parentElement, scale) {
   let verovioContainer = document.createElement('div');
   verovioContainer.id = 'verovioContainer';
 
-  createNotationControlBar(verovioContainer, scale);
+  createNotationControlMenu(verovioContainer, scale);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
   verovioPanel.id = 'verovio-panel';
   verovioContainer.appendChild(verovioPanel);
+
+  // Both notation badges share the same DOM shape: a round icon + a
+  // translucent label containing a one-line summary (count, prefix, first
+  // message, chevron) and an expandable list of all messages. Click the
+  // icon (or ×) to hide the label; click the label to expand when there
+  // are multiple messages. The error badge dims the SVG via the
+  // .notation-stale class on #verovio-panel; the warning badge does not.
+  const buildBadgeHtml = () =>
+    `<div class="badge-icon" role="button" tabindex="0">${icon.alert}</div>` +
+    `<div class="badge-label">` +
+    `<button type="button" class="badge-close" aria-label="Hide">×</button>` +
+    `<div class="badge-summary">` +
+    `<span class="badge-count" aria-hidden="true"></span>` +
+    `<span class="badge-prefix"></span>` +
+    `<span class="badge-message-first"></span>` +
+    `<span class="badge-chevron" aria-hidden="true">${icon.arrowDown}</span>` +
+    `</div>` +
+    `<ul class="badge-details"></ul>` +
+    `</div>`;
+
+  // Compute the hover tooltip for a badge's summary line. The badge
+  // itself keeps its full-message tooltip; the summary gets a
+  // state-aware action hint that overrides it.
+  //   - Singular: "Verovio warning" (no colon, no hint — there's nothing
+  //     to expand).
+  //   - Plural collapsed: "30 Verovio warnings: click to expand".
+  //   - Plural expanded:  "30 Verovio warnings: click to contract".
+  const refreshBadgeExpansionTooltip = (badge) => {
+    const summaryEl = badge.querySelector('.badge-summary');
+    const messageFirstEl = badge.querySelector('.badge-message-first');
+    const countEl = badge.querySelector('.badge-count');
+    const prefixEl = badge.querySelector('.badge-prefix');
+    if (!summaryEl || !prefixEl) return;
+    const hasMultiple = badge.classList.contains('has-multiple');
+    let tooltip;
+    if (!hasMultiple) {
+      tooltip = (prefixEl.textContent || '').replace(/[:\s]+$/, '');
+    } else {
+      const hintKey = badge.classList.contains('expanded')
+        ? 'notationBadgeClickToContract'
+        : 'notationBadgeClickToExpand';
+      const hint = (translator.lang[hintKey] && translator.lang[hintKey].text) || '';
+      const count = countEl ? countEl.textContent : '';
+      const prefix = prefixEl.textContent || '';
+      tooltip = `${count}${prefix} ${hint}`.trim();
+    }
+    summaryEl.title = tooltip;
+    // Suppress the inherited tooltip on the message text so users can
+    // read/select the warning content without an overlay popping up.
+    if (messageFirstEl) messageFirstEl.title = '';
+  };
+
+  // When a badge is expanded its details panel needs an explicit max-height
+  // so the inner scrollbar engages instead of the badge overflowing the
+  // notation pane. Recomputed whenever the badge moves or the container
+  // resizes.
+  const recomputeBadgeDetailsHeight = (badge) => {
+    if (!badge.classList.contains('expanded')) return;
+    const details = badge.querySelector('.badge-details');
+    const summary = badge.querySelector('.badge-summary');
+    if (!details) return;
+    const containerHeight = verovioContainer.clientHeight;
+    const top = badge.offsetTop;
+    const summaryHeight = summary ? summary.offsetHeight : 0;
+    const available = Math.max(60, containerHeight - top - summaryHeight - 24);
+    details.style.maxHeight = available + 'px';
+  };
+
+  const wireBadge = (badge) => {
+    badge.querySelector('.badge-icon').addEventListener('click', () => {
+      badge.classList.toggle('label-hidden');
+    });
+    badge.querySelector('.badge-close').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      badge.classList.add('label-hidden');
+    });
+    badge.querySelector('.badge-label').addEventListener('click', (ev) => {
+      if (ev.target.closest('.badge-close')) return;
+      if (!badge.classList.contains('has-multiple')) return;
+      // Restrict expand/collapse to the prefix ("X Verovio warnings:"),
+      // the count, and the chevron, so the message text remains
+      // selectable for copy/paste (e.g., to grab xml:IDs).
+      if (!ev.target.closest('.badge-prefix, .badge-count, .badge-chevron')) return;
+      badge.classList.toggle('expanded');
+      recomputeBadgeDetailsHeight(badge);
+      refreshBadgeExpansionTooltip(badge);
+    });
+  };
+
+  // Expose the tooltip refresher on the badge itself so callers that
+  // change the message set (e.g. viewer.setNotationStale) can keep the
+  // click-zone hint in sync without importing this module.
+  const attachTooltipApi = (badge) => {
+    badge.refreshExpansionTooltip = () => refreshBadgeExpansionTooltip(badge);
+  };
+
+  let notationBadge = document.createElement('div');
+  notationBadge.id = 'notation-error-badge';
+  notationBadge.style.display = 'none';
+  notationBadge.setAttribute('role', 'status');
+  notationBadge.setAttribute('aria-live', 'polite');
+  notationBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationBadge);
+  attachTooltipApi(notationBadge);
+  verovioContainer.appendChild(notationBadge);
+
+  let notationWarningBadge = document.createElement('div');
+  notationWarningBadge.id = 'notation-warning-badge';
+  notationWarningBadge.style.display = 'none';
+  notationWarningBadge.setAttribute('role', 'status');
+  notationWarningBadge.setAttribute('aria-live', 'polite');
+  notationWarningBadge.innerHTML = buildBadgeHtml();
+  wireBadge(notationWarningBadge);
+  attachTooltipApi(notationWarningBadge);
+  verovioContainer.appendChild(notationWarningBadge);
+
+  // Click anywhere outside an expanded badge to contract it again.
+  // Uses bubble phase so the badge's own click handlers (expand/collapse,
+  // close, icon toggle) resolve first; this only acts on clicks whose
+  // target is outside the badge entirely.
+  const collapseExpandedBadgeOnOutsideClick = (badge) => (ev) => {
+    if (!badge.classList.contains('expanded')) return;
+    if (badge.contains(ev.target)) return;
+    badge.classList.remove('expanded');
+    refreshBadgeExpansionTooltip(badge);
+  };
+  document.addEventListener('click', collapseExpandedBadgeOnOutsideClick(notationBadge));
+  document.addEventListener('click', collapseExpandedBadgeOnOutsideClick(notationWarningBadge));
+
+  // When the error badge is expanded with multiple errors it grows
+  // downward and would occlude the warning badge below it. Watch its
+  // size and slide the warning badge down to sit just under the expanded
+  // error block, sizing its max-height so it still fits in the pane.
+  const repositionWarningBadge = () => {
+    const errorVisible = notationBadge.style.display !== 'none';
+    const errorExpanded = notationBadge.classList.contains('expanded');
+    if (errorVisible && errorExpanded) {
+      const errorBottom = notationBadge.offsetTop + notationBadge.offsetHeight;
+      const containerH = verovioContainer.clientHeight;
+      notationWarningBadge.style.top = errorBottom + 6 + 'px';
+      notationWarningBadge.style.maxHeight = Math.max(40, containerH - errorBottom - 12) + 'px';
+    } else {
+      // Clear inline overrides so the CSS-driven default/float-up positions apply.
+      notationWarningBadge.style.top = '';
+      notationWarningBadge.style.maxHeight = '';
+    }
+    // The warning may have moved; if its details panel is open, resize it
+    // so the scrollable region stays inside the notation pane.
+    recomputeBadgeDetailsHeight(notationWarningBadge);
+  };
+
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => {
+      repositionWarningBadge();
+      // The container may have changed size too — keep the error's open
+      // details panel sized correctly.
+      recomputeBadgeDetailsHeight(notationBadge);
+    });
+    ro.observe(notationBadge);
+    ro.observe(notationWarningBadge);
+    ro.observe(verovioContainer);
+  }
 
   // container for Verovio
   let facsimileDragger = document.createElement('div');
@@ -28,7 +256,7 @@ export function createNotationDiv(parentElement, scale) {
   let facsimileContainer = document.createElement('div');
   facsimileContainer.id = 'facsimileContainer';
 
-  createFacsimileControlBar(facsimileContainer);
+  createFacsimileControlMenu(facsimileContainer);
 
   // Create container element for Facsimile Image
   let facsimilePanel = document.createElement('div');
@@ -62,12 +290,76 @@ export function createNotationDiv(parentElement, scale) {
   if (resizer) resizer.innerHTML = icon.kebab;
 } // createNotationDiv()
 
-export function createNotationControlBar(parentElement, scale) {
+/**
+ * Wraps a control menu in a wrapper div that contains an overflow menu
+ * @param {HTMLElement} controlMenu - The control menu to wrap
+ * @param {HTMLElement[]} fixedElementsLeft - Array of button(s) to add to the left corner of the control menu (e.g., Verovio logo, Facsimile icon, ...). These will not be part of the overflow menu.
+ * @param {HTMLElement[]} fixedElementsRight - Array of button(s) to add to the right corner of the control menu (e.g., closing button, PDF saving button, ...). These will not be part of the overflow menu.
+ * @return {HTMLElement} The wrapper div containing the control menu, overflow menu, and any fixed elements
+ */
+function wrapControlMenu(controlMenu, fixedElementsLeft, fixedElementsRight) {
+  // create wrapper div for control menu and overflow menu
+  let wrapper = document.createElement('div');
+  wrapper.classList.add('control-menu-wrapper');
+  wrapper.id = controlMenu.id + '-wrapper';
+  if (fixedElementsLeft && Array.isArray(fixedElementsLeft)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsLeft.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
+    });
+    fixedElementsDiv.classList.add('control-menu-fixed-left');
+    wrapper.appendChild(fixedElementsDiv);
+  }
+  controlMenu.parentElement.insertBefore(wrapper, controlMenu);
+  wrapper.appendChild(controlMenu);
+  let overflowMenu = document.createElement('div');
+  let overflowIcon = document.createElement('div');
+  overflowIcon.innerHTML = '&#9776;';
+  overflowIcon.id = controlMenu.id + 'OverflowIcon';
+  overflowIcon.classList.add('control-menu-overflow-icon');
+  let overflowContent = document.createElement('div');
+  overflowContent.classList.add('control-menu-overflow-content');
+  overflowContent.id = controlMenu.id + 'OverflowContent';
+  overflowMenu.appendChild(overflowIcon);
+  overflowMenu.appendChild(overflowContent);
+  overflowMenu.classList.add('control-menu-overflow');
+  overflowMenu.id = controlMenu.id + 'Overflow';
+  wrapper.appendChild(overflowMenu);
+  if (fixedElementsRight && Array.isArray(fixedElementsRight)) {
+    let fixedElementsDiv = document.createElement('div');
+    fixedElementsRight.forEach((el) => {
+      fixedElementsDiv.appendChild(el);
+    });
+    fixedElementsDiv.classList.add('control-menu-fixed-right');
+    wrapper.appendChild(fixedElementsDiv);
+  }
+  assignOrderKeys(controlMenu);
+  registerOverflowMenu(overflowMenu);
+  return wrapper;
+}
+
+function assignOrderKeys(controlMenu) {
+  Array.from(controlMenu.children).forEach((child, index) => {
+    if (!child.dataset.order) child.dataset.order = String(index);
+  });
+}
+
+function insertByOrder(container, child) {
+  const order = Number(child.dataset.order ?? Number.MAX_SAFE_INTEGER);
+  const siblings = Array.from(container.children);
+  const before = siblings.find((el) => Number(el.dataset.order ?? Number.MAX_SAFE_INTEGER) > order);
+  if (before) {
+    container.insertBefore(child, before);
+  } else {
+    container.appendChild(child);
+  }
+}
+
+export function createNotationControlMenu(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'notationControlBar';
-
+  vrvCtrlMenu.id = 'notationControlMenu';
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
@@ -75,7 +367,6 @@ export function createNotationControlBar(parentElement, scale) {
   verovioIcon.title = `mei-friend worker activity:
      clockwise rotation denotes Verovio activity,
      anticlockwise rotation speed worker activity`;
-  vrvCtrlMenu.appendChild(verovioIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -240,11 +531,23 @@ export function createNotationControlBar(parentElement, scale) {
   choiceCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(choiceCtrls);
 
-  let choiceSelector = document.createElement('select');
-  choiceSelector.id = 'choiceSelect';
-  choiceSelector.classList.add('btn', 'input-select');
-  choiceSelector.title = 'Choose displayed content for choice elements';
-  choiceCtrls.appendChild(choiceSelector);
+  let choiceOrigRegSelector = document.createElement('select');
+  choiceOrigRegSelector.id = 'choiceOrigRegSelect';
+  choiceOrigRegSelector.classList.add('btn', 'input-select');
+  choiceOrigRegSelector.title = 'Choose displayed content for choice elements: orig or reg';
+  choiceCtrls.appendChild(choiceOrigRegSelector);
+
+  let choiceSicCorrSelector = document.createElement('select');
+  choiceSicCorrSelector.id = 'choiceSicCorrSelect';
+  choiceSicCorrSelector.classList.add('btn', 'input-select');
+  choiceSicCorrSelector.title = 'Choose displayed content for choice elements: sic or corr';
+  choiceCtrls.appendChild(choiceSicCorrSelector);
+
+  let substSelector = document.createElement('select');
+  substSelector.id = 'substSelect';
+  substSelector.classList.add('btn', 'input-select');
+  substSelector.title = 'Choose displayed content for subst elements: add or del';
+  choiceCtrls.appendChild(substSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -367,19 +670,14 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  vrvCtrlMenu.appendChild(filler);
-
   // page range selector for PDF export
-  vrvCtrlMenu.appendChild(createPageRangeSelector('none'));
+  let pdfPageRange = createPageRangeSelector('none');
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
   pdfCtrlDiv.id = 'pdfControlsDiv';
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
-  vrvCtrlMenu.appendChild(pdfCtrlDiv);
 
   let savePdfButton = document.createElement('button');
   savePdfButton.id = 'pdfSaveButton';
@@ -387,6 +685,7 @@ export function createNotationControlBar(parentElement, scale) {
   // savePdfButton.classList.add('icon');
   savePdfButton.textContent = 'Save PDF'; // icon.pdfIcon;
   savePdfButton.classList.add('inline-block-tight');
+  savePdfButton.style.display = 'none';
   savePdfButton.title = 'Save as PDF';
   pdfCtrlDiv.appendChild(savePdfButton);
 
@@ -396,30 +695,29 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCloseButton.style.display = 'none';
   pdfCloseButton.classList.add('topright');
   pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  vrvCtrlMenu.appendChild(pdfCloseButton);
 
   parentElement.appendChild(vrvCtrlMenu);
-} // createNotationControlBar()
+  wrapControlMenu(vrvCtrlMenu, [verovioIcon], [pdfPageRange, pdfCtrlDiv, pdfCloseButton]);
+} // createNotationControlMenu()
 
-export function createFacsimileControlBar(parentElement) {
+export function createFacsimileControlMenu(parentElement) {
   // Create control form
-  let facsCtrlBar = document.createElement('div');
-  facsCtrlBar.classList.add('control-menu');
-  facsCtrlBar.id = 'facsimileControlBar';
-  parentElement.appendChild(facsCtrlBar);
+  let facsCtrlMenu = document.createElement('div');
+  facsCtrlMenu.classList.add('control-menu');
+  facsCtrlMenu.id = 'facsimileControlMenu';
+  parentElement.appendChild(facsCtrlMenu);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
   facsimileIcon.innerHTML = icon.log;
   facsimileIcon.id = 'facsimileIcon';
   facsimileIcon.title = 'Facsimile panel';
-  facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
   zoomCtrls.id = 'facsimileZoomControls';
   zoomCtrls.classList.add('controls');
-  facsCtrlBar.appendChild(zoomCtrls);
+  facsCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
   decreaseBtn.id = 'facsimileDecreaseZoomButton';
@@ -472,7 +770,7 @@ export function createFacsimileControlBar(parentElement) {
   fullPageCheckbox.disabled = false;
   fullPageDiv.appendChild(fullPageCheckbox);
 
-  facsCtrlBar.appendChild(fullPageDiv);
+  facsCtrlMenu.appendChild(fullPageDiv);
 
   // show zone rectangles
   let showZonesDiv = document.createElement('div');
@@ -496,7 +794,7 @@ export function createFacsimileControlBar(parentElement) {
   showZonesCheckbox.disabled = false;
   showZonesDiv.appendChild(showZonesCheckbox);
 
-  facsCtrlBar.appendChild(showZonesDiv);
+  facsCtrlMenu.appendChild(showZonesDiv);
 
   // edit zones
   let editZonesDiv = document.createElement('div');
@@ -520,19 +818,81 @@ export function createFacsimileControlBar(parentElement) {
   editZonesCheckbox.disabled = false;
   editZonesDiv.appendChild(editZonesCheckbox);
 
-  facsCtrlBar.appendChild(editZonesDiv);
-
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  facsCtrlBar.appendChild(filler);
+  facsCtrlMenu.appendChild(editZonesDiv);
 
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  facsCtrlBar.appendChild(facsimileCloseButton);
-} // createFacsimileControlBar()
+  wrapControlMenu(facsCtrlMenu, [facsimileIcon], [facsimileCloseButton]);
+} // createFacsimileControlMenu()
+
+export function adjustCtrlMenuOverflow(ctrlMenu) {
+  if (!ctrlMenu) return;
+
+  const overflowContent = document.getElementById(ctrlMenu.id + 'OverflowContent');
+  const overflowMenu = document.getElementById(ctrlMenu.id + 'Overflow');
+  if (!overflowContent || !overflowMenu) return;
+
+  // Both directions of the algorithm use the same rule: a child "fits" only when there is
+  // at least 1 px of gap between its right edge and ctrlMenu's right edge.  Any overlap
+  // (gap ≤ 0) means the child must move into overflow.  Using a single criterion for both
+  // move-to and move-back prevents oscillation that arose from disagreement between the
+  // two paths (e.g. cached width sums that ignored inter-element margins).
+  const FIT_GAP = 1; // px — required gap between child's right edge and ctrlMenu's right
+  const overflows = (child, ctrlMenuRight) =>
+    child.getBoundingClientRect().right > ctrlMenuRight - FIT_GAP;
+
+  // Move any overflowing children (and all later siblings, to preserve order) into the
+  // overflow menu.  Returns true if any items were moved, so the caller can run a second
+  // pass — showing the icon narrows ctrlMenu and may expose additional overflows.
+  const moveOverflowingItems = () => {
+    const children = Array.from(ctrlMenu.children);
+    const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+    const firstOverflowingIndex = children.findIndex((child) => overflows(child, ctrlMenuRight));
+    if (firstOverflowingIndex === -1) return false;
+    children.slice(firstOverflowingIndex).forEach((child) => {
+      if (!child.dataset.order) assignOrderKeys(ctrlMenu);
+      insertByOrder(overflowContent, child);
+    });
+    overflowMenu.style.display = 'inline-block';
+    return true;
+  };
+
+  // Try to restore overflow items back into the main menu.  Trial-and-rollback: each
+  // candidate is optimistically inserted, ctrlMenu is re-measured, and the candidate is
+  // moved back to overflow if it doesn't actually fit.  This avoids the margin/border
+  // accounting errors that a precomputed-width approach is prone to, and guarantees the
+  // result is consistent with moveOverflowingItems'.  Iteration stops at the first item
+  // that doesn't fit: subsequent items have larger order keys and would be placed
+  // further right, where they cannot fit either.
+  const tryRestoreFromOverflow = () => {
+    const candidates = Array.from(overflowContent.children).sort(
+      (a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0)
+    );
+    for (const item of candidates) {
+      insertByOrder(ctrlMenu, item);
+      // If overflow just emptied, hide the burger so ctrlMenu's measured right edge
+      // reflects the icon being gone.
+      if (overflowContent.children.length === 0) overflowMenu.style.display = 'none';
+      const ctrlMenuRight = ctrlMenu.getBoundingClientRect().right;
+      if (overflows(item, ctrlMenuRight)) {
+        insertByOrder(overflowContent, item);
+        overflowMenu.style.display = 'inline-block';
+        break;
+      }
+    }
+  };
+
+  if (moveOverflowingItems()) {
+    moveOverflowingItems();
+  } else {
+    tryRestoreFromOverflow();
+  }
+
+  overflowMenu.style.display = overflowContent.children.length > 0 ? 'inline-block' : 'none';
+}
 
 export function createEncodingPanel() {
   let codeCheckerResizer = document.getElementById('codeCheckerResizer');
@@ -545,6 +905,7 @@ export function createEncodingPanel() {
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
   document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdfSaveButton').style.display = show ? '' : 'none';
   document.getElementById('pdfCloseButton').style.display = show ? '' : 'none';
 } // showPdfButtons()
 
@@ -619,7 +980,9 @@ export function manualCurrentPage(v, cm, ev) {
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaksSelect');
-  while (breaksEl.hasChildNodes()) breaksEl.remove(0);
+  while (breaksEl.hasChildNodes()) {
+    breaksEl.remove(0);
+  }
   var breaksOpts = {
     none: translator.lang.breaksSelectNone.text,
     auto: translator.lang.breaksSelectAuto.text,
@@ -632,8 +995,11 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     let o = new Option(breaksOpts[key], key);
     // generate ids in the form of breaksSelectNone, breaksSelectAuto etc.
     o.id = 'breaksSelect' + key.charAt(0).toUpperCase() + key.slice(1);
+    o.title = 'breaks: ' + key; // tooltip with the Verovio option name
     breaksEl[breaksEl.options.length] = o;
-    if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+    if (key === 'smart') {
+      breaksEl[breaksEl.length - 1].disabled = true;
+    }
   }
 } // setBreaksOptions()
 
@@ -653,39 +1019,54 @@ export function handleSmartBreaksOption(speedMode) {
 
 /**
  * Adds the options for choice to the choiceSelect in the
- * notation control bar.
+ * notation control menu.
  * @param {string} active value of currently active selection
+ * @param {string} selector id of the select element
  */
-export function setChoiceOptions(active) {
-  let choiceSelect = document.getElementById('choiceSelect');
+export function setChoiceOptions(active, selector) {
+  let choiceOptions;
+  switch (selector) {
+    case 'choiceOrigRegSelect':
+      choiceOptions = choiceOrigRegOptions;
+      break;
+    case 'choiceSicCorrSelect':
+      choiceOptions = choiceSicCorrOptions;
+      break;
+    case 'substSelect':
+      choiceOptions = substOptions;
+      break;
+    default:
+      console.error('setChoiceOptions: Unknown selector ', selector);
+      return;
+  }
+  let choiceSelect = document.getElementById(selector);
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
   }
   if (choiceOptions.length > 0) {
-    choiceOptions.forEach((groupEl) => {
-      let group = document.createElement('optgroup');
-      group.label = groupEl.label ? groupEl.label : groupEl.elName;
-      if (groupEl.id) group.id = groupEl.id;
+    let groupEl = choiceOptions[0]; // take first, because always same structure in this array
+    let group = document.createElement('optgroup');
+    group.label = groupEl.label ? groupEl.label : groupEl.elName;
+    if (groupEl.id) group.id = groupEl.id;
 
-      groupEl.options.forEach((el) => {
-        let option;
-        if (active && el.value === active) {
-          option = new Option(el.label, el.value, false, true);
-        } else {
-          option = new Option(el.label, el.value, false, false);
-        }
-        option.id = el.id;
-        option.dataset.prop = el.prop;
-        group.appendChild(option);
-      });
-      choiceSelect.appendChild(group);
+    groupEl.options.forEach((el) => {
+      let option;
+      if (active && el.value === active) {
+        option = new Option(el.label, el.value, false, true);
+      } else {
+        option = new Option(el.label, el.value, false, false);
+      }
+      option.id = el.id;
+      option.dataset.prop = el.prop;
+      group.appendChild(option);
     });
+    choiceSelect.appendChild(group);
   } else {
     let option = new Option(translator.lang.noChoice.text, '', false, false);
     option.id = 'noChoice';
     choiceSelect.appendChild(option);
   }
-}
+} // setChoiceOptions()
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {

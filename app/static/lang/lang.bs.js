@@ -498,10 +498,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Režim brzine',
     description:
-      'Aktivan je režim brzine; reprodukcija MIDI-ja je moguća samo za trenutnu stranicu. Da biste reprodukovali ceo zapis, onemogućite režim brzine.',
+      'Aktivan je režim brzine; reprodukcija MIDI-ja je moguća samo za trenutnu stranicu. Da biste reprodukovali ceo zapis, isključite ovaj okvir.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Odaberi element ekspanzije za MIDI reprodukciju',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Onemogućeno u režimu brzine (renderuje se samo trenutna stranica).',
+  },
+  noExpansionOption: {
+    text: 'Bez ekspanzije',
   },
   closeMidiPlaybackControlBarButton: { description: 'Sakrij traku za kontrolu reprodukcije MIDI-ja' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Postavke',
@@ -607,6 +615,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Prikaži kućicu za brzi način',
     description: 'Prikaži kućicu za brzi način notacije u izborniku kontrole notacije',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Prikaži dodatna kontrolna dugmad',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Prikaži dodatna kontrolna dugmad',
   },
 
   // MIDI Playback

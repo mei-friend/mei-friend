@@ -53,3 +53,8 @@
 #markupToolsMenu {
   flex-direction: column;
 }
+
+#friendContainer:not(.pdfMode) .control-menu-overflow-content {
+  left: auto;
+  right: 0;
+}

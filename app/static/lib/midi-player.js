@@ -124,12 +124,17 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
     // highlight notes and turn pages
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
+        // Prefer the id as emitted by the timemap — works when the SVG is
+        // expanded (expandAlways / pre-v6 with explicit expand) or when no
+        // expansion is in play. Fall back to the expansion map when the
+        // timemap references a non-first rendition but the SVG only contains
+        // the notated (first) rendition (v6 default behaviour).
+        let note = document.getElementById(id);
         let origId = id;
-        if (expansionMap && id in expansionMap) {
-          origId = expansionMap[id][0]; // use local object for lookup
-          // id = expansionMap.getNotatedIdForElement(id);
+        if (!note && expansionMap && id in expansionMap) {
+          origId = expansionMap[id][0];
+          note = document.getElementById(origId);
         }
-        let note = document.getElementById(origId);
         if (note && highlightCheckbox.checked) {
           highlightNote(note, id);
           // search for corresponding note-off and check whether onset there
@@ -156,8 +161,12 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
         }
       }
       if (scrollFollowCheckbox.checked && closestTimemapTime && 'on' in closestTimemapTime) {
-        // find parent measure
-        let el = document.getElementById(closestTimemapTime['on'][0]);
+        // find parent measure, resolving via expansion map if needed
+        let onId = closestTimemapTime['on'][0];
+        let el = document.getElementById(onId);
+        if (!el && expansionMap && onId in expansionMap) {
+          el = document.getElementById(expansionMap[onId][0]);
+        }
         let measure = el ? el.closest('.measure') : null;
         if (measure) {
           // scroll to its ID
@@ -190,7 +199,7 @@ export function getTimemap() {
 }
 
 export function setExpansionMap(em) {
-  expansionMap = em;
+  expansionMap = em || null;
 }
 
 export function requestPlaybackOnLoad() {

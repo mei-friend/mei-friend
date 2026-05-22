@@ -581,10 +581,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Режим швидкості',
     description:
-      'Активовано режим швидкості; грається лише MIDI для поточної сторінки. Щоб відтворити весь кодування, вимкніть режим швидкості.',
+      'Активовано режим швидкості; грається лише MIDI для поточної сторінки. Щоб відтворити весь кодування, зніміть позначку з цього поля.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Виберіть елемент розширення для відтворення MIDI',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Вимкнено в режимі швидкості (відображається лише поточна сторінка).',
+  },
+  noExpansionOption: {
+    text: 'Без розширення',
   },
   closeMidiPlaybackControlBarButton: { description: 'Сховати панель управління відтворенням MIDI' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Налаштування mei-friend',
@@ -691,6 +699,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Показувати прапорець режиму швидкості',
     description: 'Показувати прапорець режиму швидкості в панелі управління нотацією',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Показати додаткові кнопки керування',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Показати додаткові кнопки керування',
   },
 
   // MIDI Playback

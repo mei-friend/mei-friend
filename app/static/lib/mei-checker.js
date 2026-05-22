@@ -437,7 +437,7 @@ export function checkAccidGes(v, cm) {
 export function checkMeterConformance(v, cm) {
   // checkMeterSignature(v); // test for meter signatures in xmlDoc
 
-  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'fTrem'];
+  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'fTrem', 'tabGrp'];
   let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
 
   v.allowCursorActivity = false;

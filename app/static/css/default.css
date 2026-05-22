@@ -182,9 +182,6 @@ a:active {
   height: 1.6em;
 }
 
-.fillSpace {
-  flex: auto;
-}
 
 .settingsButton {
   width: 16px;
@@ -193,6 +190,13 @@ a:active {
   padding-right: 4px;
   cursor: pointer;
   fill: var(--textColor);
+}
+
+.settingsButtonWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 #facsimileCloseButton {
@@ -571,6 +575,235 @@ a:active {
   overflow: inherit;
   display: flex;
   flex-direction: column;
+}
+
+#verovioContainer {
+  position: relative;
+}
+
+#verovio-panel.notation-stale {
+  opacity: 0.45;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#notation-error-badge,
+#notation-warning-badge {
+  position: absolute;
+  /* Stacked under the control bar (min-height 28px + 2px*2 wrapper padding ~ 32px),
+     horizontally aligned with the Verovio logo (#verovioIcon margin-left: 3px). */
+  left: 3px;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: calc(100% - 6px);
+  pointer-events: auto;
+}
+
+#notation-error-badge {
+  top: 36px;
+  max-height: calc(100% - 42px);
+}
+
+#notation-warning-badge {
+  top: 59px; /* sits below the error badge: 36 + 20 + 3 */
+  max-height: calc(100% - 65px);
+}
+
+/* When error is hidden, warning floats up under the Verovio logo. */
+#notation-warning-badge.float-up {
+  top: 36px;
+  max-height: calc(100% - 42px);
+}
+
+#notation-error-badge .badge-icon,
+#notation-warning-badge .badge-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+#notation-error-badge .badge-icon {
+  background-color: #e57373;
+}
+
+#notation-warning-badge .badge-icon {
+  background-color: #ffb74d;
+}
+
+#notation-error-badge .badge-icon svg,
+#notation-warning-badge .badge-icon svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+#notation-error-badge .badge-label,
+#notation-warning-badge .badge-label {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #444;
+  padding: 2px 20px 2px 6px; /* extra right padding for close button */
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.25;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+/* Both labels need a vertical stack so the summary sits above the
+   collapsible details list. The label itself shows a text cursor so
+   users can select and copy message content (e.g. xml:IDs). */
+#notation-error-badge .badge-label,
+#notation-warning-badge .badge-label {
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+}
+
+/* The prefix (e.g. "3 Verovio warnings:"), count, and chevron are the
+   actual expand/collapse controls — show a pointer there and suppress
+   text selection so a quick click toggles cleanly. Only meaningful when
+   there is more than one message. */
+#notation-error-badge.has-multiple .badge-prefix,
+#notation-error-badge.has-multiple .badge-count,
+#notation-error-badge.has-multiple .badge-chevron,
+#notation-warning-badge.has-multiple .badge-prefix,
+#notation-warning-badge.has-multiple .badge-count,
+#notation-warning-badge.has-multiple .badge-chevron {
+  cursor: pointer;
+  user-select: none;
+}
+
+#notation-error-badge .badge-close,
+#notation-warning-badge .badge-close {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 1px 4px;
+  color: #555;
+  border-radius: 2px;
+}
+
+#notation-error-badge .badge-close:hover,
+#notation-warning-badge .badge-close:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+#notation-error-badge.label-hidden .badge-label,
+#notation-warning-badge.label-hidden .badge-label {
+  display: none;
+}
+
+#notation-error-badge .badge-prefix,
+#notation-warning-badge .badge-prefix {
+  font-weight: 600;
+}
+
+#notation-error-badge .badge-summary,
+#notation-warning-badge .badge-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+#notation-error-badge .badge-prefix,
+#notation-error-badge .badge-count,
+#notation-warning-badge .badge-prefix,
+#notation-warning-badge .badge-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+#notation-error-badge .badge-count:empty,
+#notation-warning-badge .badge-count:empty {
+  display: none;
+}
+
+#notation-error-badge .badge-message-first,
+#notation-warning-badge .badge-message-first {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* When expanded, the full message list is in .badge-details, so suppress
+   the first-message text in the summary to avoid duplication. */
+#notation-error-badge.expanded .badge-message-first,
+#notation-warning-badge.expanded .badge-message-first {
+  display: none;
+}
+
+#notation-error-badge .badge-chevron,
+#notation-warning-badge .badge-chevron {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+
+#notation-error-badge .badge-chevron svg,
+#notation-warning-badge .badge-chevron svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+#notation-error-badge.has-multiple .badge-chevron,
+#notation-warning-badge.has-multiple .badge-chevron {
+  display: inline-flex;
+}
+
+#notation-error-badge.expanded .badge-chevron,
+#notation-warning-badge.expanded .badge-chevron {
+  transform: rotate(180deg);
+}
+
+#notation-error-badge .badge-details,
+#notation-warning-badge .badge-details {
+  display: none;
+  margin: 4px 0 0 0;
+  padding: 4px 0 0 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  /* Opaque so the long warning/error list stays readable over busy
+     notation; the summary above keeps its translucent look. */
+  background-color: #ffffff;
+  overflow-y: auto;
+  list-style: disc;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#notation-error-badge.expanded .badge-details,
+#notation-warning-badge.expanded .badge-details {
+  display: block;
+}
+
+#notation-error-badge .badge-details li,
+#notation-warning-badge .badge-details li {
+  margin-bottom: 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 #facsimile-panel {
@@ -978,17 +1211,114 @@ a:active {
   white-space: nowrap;
 }
 
+.control-menu-wrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2px 0px;
+  font-size: 10pt;
+  color: var(--textColor);
+  background-color: var(--controlMenuBackgroundColor);
+}
+
 .control-menu {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  font-size: 10pt;
-  height: 28px;
-  padding: 2px;
-  margin: 0px;
+  height: auto;
+  min-height: 28px;
   z-index: 6;
-  color: var(--textColor);
-  background-color: var(--controlMenuBackgroundColor);
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/*.control-menu > * {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}*/
+
+/* control menu overflow: when there are too many buttons to fit */
+/* Display a menu button that shows the hidden buttons in a dropdown menu */
+.control-menu-overflow {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-menu-overflow-content { 
+  position: fixed; 
+  top: calc(inherit + 1.5em);
+  left: inherit;
+  display:inline;
+  background-color: var(--dropdownBackgroundColor);
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  z-index: 20;
+  width: calc(fit-content + 20px);
+}
+
+.control-menu-overflow-icon { 
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  border-radius: 4px;
+  z-index: 20;
+  font-style: bold;
+  width: fit-content;
+  margin: 0px 3px;
+  font-size: large;
+  padding-bottom: 4px;
+}
+
+.control-menu-fixed-right .topright {
+  padding: 0px 12px;
+}
+
+.control-menu-overflow-icon:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.control-menu-overflow-content div {
+  width: 100%;
+  border:none;
+  margin-bottom: .25em;
+}
+
+.control-menu-fixed-left, .control-menu-fixed-right { 
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.control-menu-fixed-left > *, .control-menu-fixed-right > * {
+  box-sizing: border-box;
+  width: fit-content;
+  display: flex;
+}
+
+/* Hide the choice / subst control bar menus if they only contain one option (which will be "no choice available")
+n.b. if there are choices available, they are wrapped within an optgroup element*/
+#choiceControls select:has(> option:only-child) {
+  display: none;
+}
+
+/* Hide the choice controls wrapper by default */
+#choiceControls {
+  display: none;
+}
+
+/* Show the wrapper when any optgroup exists in its descendants */
+#choiceControls:has(optgroup) {
+  display: flex;
 }
 
 .controls {
@@ -998,7 +1328,9 @@ a:active {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
+  width:fit-content;
 }
+
 
 .btn {
   margin: 2px;
@@ -1338,6 +1670,15 @@ svg text {
 
 #verovio-panel svg.definition-scale {
   color: unset;
+}
+
+/** 
+  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes 
+  see https://github.com/rism-digital/verovio/pull/4201
+*/
+#verovio-panel g.bounding-box rect,
+#verovio-panel g.content-bounding-box rect {
+  stroke: transparent;
 }
 
 #facsimile-panel rect {
@@ -1895,19 +2236,40 @@ midi-player::part(play-button) {
   max-width: 70%;
 }
 
-#midiSpeedmodeIndicator {
+#midiSpeedmodeIndicatorWrapper {
   display: none;
+  align-items: center;
+  align-self: center;
+  transform: translateY(-1px);
+  gap: 4px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
   font-weight: bold;
   border-width: 1.5px;
   border-style: solid;
   border-radius: 4px;
-  border-color: var(--textColor);
-  padding: 2px;
-  max-height: calc(1em + 2px);
-  cursor: default;
+  border-color: #d18d00;
+  background-color: rgba(255, 165, 0, 0.18);
+  color: #b06f00;
+  padding: 2px 4px;
+  max-height: calc(1em + 4px);
+  cursor: pointer;
+}
+
+#midiSpeedmodeIndicatorWrapper input[type='checkbox'] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: #d18d00;
+}
+
+#midiSpeedmodeIndicator {
+  cursor: pointer;
+}
+
+#controlbar-midi-expansion-selector:disabled {
+  opacity: 0.5;
   color: var(--textColor);
+  cursor: not-allowed;
 }
 
 #closeMidiPlaybackControlBarButton {

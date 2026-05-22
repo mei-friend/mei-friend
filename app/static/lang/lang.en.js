@@ -272,6 +272,13 @@ export const lang = {
   verovioLoaded: { text: 'loaded' },
   convertedToPdf: { text: 'converted to PDF' },
   statusBarCompute: { text: 'Compute' },
+  notationStaleXmlInvalid: { text: 'Rendering paused — waiting for valid XML' },
+  notationErrorBadgeLabel: { text: 'Verovio error:' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio errors:' },
+  notationWarningBadgeLabel: { text: 'Verovio warning:' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio warnings:' },
+  notationBadgeClickToExpand: { text: 'click to expand' },
+  notationBadgeClickToContract: { text: 'click to contract' },
   middleFooterPage: { text: 'page' },
   middleFooterOf: { text: 'of' },
   middleFooterLoaded: { text: 'loaded' },
@@ -636,7 +643,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Speed mode',
     description:
-      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.',
+      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, uncheck this box.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Select expansion element for MIDI playback',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Disabled in speed mode (only the current page is rendered).',
+  },
+  noExpansionOption: {
+    text: 'No expansion',
   },
   closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
 
@@ -749,6 +765,14 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Show speed mode checkbox',
     description: 'Show speed mode checkbox in notation control menu',
+  },
+
+  notationControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Show additional control buttons',
   },
 
   // MIDI Playback

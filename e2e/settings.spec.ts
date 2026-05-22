@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupPage, openUrl } from './setup';
+import { setupPage, openUrl, forceSetCheckbox } from './setup';
 
 test.beforeEach(async ({ page }) => {
   console.log('Testing settings functions.');
@@ -53,22 +53,25 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     // check that a note is visible in the notation
     await expect(page.locator('g.note').first()).toBeVisible();
   });
-  test('2.2 Test Speed mode checkbox updates control-bar and vice-versa', async ({ page }) => {
+  test('2.2 Test Speed mode checkbox updates control-menu and vice-versa', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
     await page.click('#meifriendOptionsTab');
     // ensure that speed mode checkbox in settings is checked (default behaviour)
     await expect(page.locator('#toggleSpeedMode')).toBeChecked();
-    // ensure that speed mode checkbox in control-bar is checked
+    // ensure that speed mode checkbox in control-menu is checked
     await expect(page.locator('#speedCheckbox')).toBeChecked();
     // click settings checkbox
     await page.click('#toggleSpeedMode');
     // ensure both boxes are now no longer checked
     await expect(page.locator('#toggleSpeedMode')).not.toBeChecked();
     await expect(page.locator('#speedCheckbox')).not.toBeChecked();
-    // click control-bar checkbox
-    await page.click('#speedCheckbox');
+    // close settings panel so control-menu checkbox is clickable
+    await page.click('#closeSettingsButton');
+    await expect(page.locator('#closeSettingsButton')).not.toBeInViewport();
+    // click control-menu checkbox (may be in overflow menu, so use evaluate)
+    await forceSetCheckbox(page, '#speedCheckbox', true);
     // ensure both boxes are now checked again
     await expect(page.locator('#toggleSpeedMode')).toBeChecked();
     await expect(page.locator('#speedCheckbox')).toBeChecked();
@@ -111,28 +114,29 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     await page.keyboard.type('</appInfo');
     // send a return key to ensure that the search is performed
     await page.keyboard.press('Enter');
-    // ensure that the application statement is not present in the MEI:
-    await expect(await page.locator('#encoding').innerText()).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    // ensure that the application statement is not present in the MEI
+    await expect(async () => {
+      const text = await page.locator('#encoding').innerText();
+      expect(text).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    }).toPass({ timeout: 5000 });
     // make a change to the MEI (shift pitch of first note) and check app statement still not present
     // click on the first g.note element
-    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
-    // TODO - figure out why this happens
     await page.locator('g.note').first().click({ force: true });
     await page.click('#manipulateMenuTitle');
     await page.click('#pitchChromUp');
-    // reset viewport to end of <appInfo> element]
+    // reset viewport to end of <appInfo> element
     await page.click('#editMenuTitle');
     await page.click('#startSearch');
     await page.keyboard.type('</appInfo');
     // send a return key to ensure that the search is performed
     await page.keyboard.press('Enter');
-    await expect(await page.locator('#encoding').innerText()).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    await expect(async () => {
+      const text = await page.locator('#encoding').innerText();
+      expect(text).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    }).toPass({ timeout: 5000 });
     // re-check the application statement checkbox
-    // click on the first g.note element
     await page.click('#addApplicationNote');
     // make another change to the MEI (shift pitch of first note) and check app statement is present
-    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
-    // TODO - figure out why this happens
     await page.locator('g.note').first().click({ force: true });
     await page.click('#manipulateMenuTitle');
     await page.click('#pitchChromUp');
@@ -142,8 +146,10 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     await page.keyboard.type('</appInfo');
     // send a return key to ensure that the search is performed
     await page.keyboard.press('Enter');
-    await expect(await page.locator('#encoding').innerText()).toMatch(/.*<name .*mei-friend<\/.*/);
-    // check the inner text of the #encoding element matches the regex /<name .*mei-friend<\//
+    await expect(async () => {
+      const text = await page.locator('#encoding').innerText();
+      expect(text).toMatch(/.*<name .*mei-friend<\/.*/);
+    }).toPass({ timeout: 5000 });
   });
 });
 
@@ -168,19 +174,18 @@ test.describe('4 Test Verovio settings panel tab', () => {
   test('4.1 Test that checkboxes work', async ({ page }) => {
     await page.click('#showSettingsButton');
     await page.click('#verovioOptionsTab');
-    const checkbox = await page.locator('#verovioSettings input[type="checkbox"]').first();
+    const checkbox = page.locator('#verovioSettings input[type="checkbox"]').first();
     const checkVal = await checkbox.isChecked();
     await checkbox.click();
-    await expect((await checkbox.isChecked()) !== checkVal).toBeTruthy();
+    const newCheckVal = await checkbox.isChecked();
+    expect(newCheckVal).not.toEqual(checkVal);
   });
   test('4.2 Test that selects work', async ({ page }) => {
     await page.click('#showSettingsButton');
     await page.click('#verovioOptionsTab');
-    const select = await page.locator('#verovioSettings select#vrv-condense');
+    const select = page.locator('#verovioSettings select#vrv-condense');
     await select.selectOption('encoded');
-    // determine current value of select
-    const selectedOption = await select.evaluate((el: HTMLSelectElement) => el.value);
-    await expect(selectedOption === 'encoded').toBeTruthy();
+    await expect(select).toHaveValue('encoded');
   });
   test('4.3 Test that number inputs work', async ({ page }) => {
     // check that number input works
@@ -192,13 +197,14 @@ test.describe('4 Test Verovio settings panel tab', () => {
       await page.click('#verovioOptionsTab');
     });
     await test.step('Test that number input works', async () => {
-      const numberInput = await page.locator('#verovioSettings input#vrv-breaksSmartSb');
+      const numberInput = page.locator('#verovioSettings input#vrv-breaksSmartSb');
       await numberInput.fill('.5');
-      // use evaluate to check that numberInput value is mathematically equal to 0.5
-      await expect(await numberInput.evaluate((el: HTMLInputElement) => Number(el.value))).toBe(0.5);
+      // browser may store as ".5" or "0.5" — check the numeric value
+      const numericValue = await numberInput.evaluate((el: HTMLInputElement) => Number(el.value));
+      expect(numericValue).toBe(0.5);
     });
     await test.step('Test that number incr / decr works', async () => {
-      const numberInput = await page.locator('#verovioSettings input#vrv-breaksSmartSb');
+      const numberInput = page.locator('#verovioSettings input#vrv-breaksSmartSb');
       await numberInput.fill('0.5');
       // use eval to call stepUp on the input in the DOM
       await numberInput.evaluate((el: HTMLInputElement) => el.stepUp());
@@ -207,17 +213,19 @@ test.describe('4 Test Verovio settings panel tab', () => {
       await expect(numberInput).toHaveValue('0.5');
     });
     await test.step('Test that invalid numbers fail appropriately', async () => {
-      const numberInput = await page.locator('#verovioSettings input#vrv-breaksSmartSb');
+      const numberInput = page.locator('#verovioSettings input#vrv-breaksSmartSb');
       await numberInput.fill('5');
-      await expect(await numberInput.evaluate((el: HTMLInputElement) => el.validity.rangeOverflow)).toBeTruthy();
+      const isOverflow = await numberInput.evaluate((el: HTMLInputElement) => el.validity.rangeOverflow);
+      expect(isOverflow).toBeTruthy();
       await numberInput.evaluate((el: HTMLInputElement) => el.stepDown());
-      await expect(await numberInput.evaluate((el: HTMLInputElement) => el.validity.rangeOverflow)).toBeFalsy();
+      const isStillOverflow = await numberInput.evaluate((el: HTMLInputElement) => el.validity.rangeOverflow);
+      expect(isStillOverflow).toBeFalsy();
       await expect(numberInput).toHaveValue('1');
     });
     /*
     TODO figure out how to let this run only on Firefox (because other browsers prevent alphabetic input to number fields)
     await test.step('Test that text content fails appropriately', async () => {
-      const numberInput = await page.locator('#verovioSettings input#vrv-breaksSmartSb');
+      const numberInput = page.locator('#verovioSettings input#vrv-breaksSmartSb');
       // click on the input
       await numberInput.click();
       await numberInput.press('a');

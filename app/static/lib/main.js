@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.9';
-export const versionDate = '15 September 2025'; // use full or 3-character english months, will be translated
+export const version = '1.3.0';
+export const versionDate = '22 May 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -74,6 +74,7 @@ import {
   manualCurrentPage,
   setBreaksOptions,
   setChoiceOptions,
+  hideAllOverflowContents,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
@@ -277,6 +278,13 @@ export function updateFileStatusDisplay() {
 export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
+  }
+  // Close the MIDI playback control bar whenever a new encoding is loaded.
+  // The previous file's MIDI/timemap is now stale and the bar will re-render
+  // fresh next time the user opens it. This covers Open file, Open URL,
+  // public repertoire, and the GitHub integration since they all funnel here.
+  if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
+    cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
   v.hideCodeCheckerPanel();
@@ -819,11 +827,11 @@ async function completeInitialLoad() {
 
   setNotationProportion(np);
   setFacsimileProportion(fp);
+  addAnnotationHandlers();
+  addMarkupHandlers();
   setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
-  addAnnotationHandlers();
-  addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   addCodeCheckerResizerHandlers(v, cm);
@@ -1008,6 +1016,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.applyExpansionModeVisibility();
 
       translator.translateGui();
       translateLanguageSelection(translator.langCode);
@@ -1016,7 +1025,9 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
-      setChoiceOptions('');
+      setChoiceOptions('', 'choiceOrigRegSelect');
+      setChoiceOptions('', 'choiceSicCorrSelect');
+      setChoiceOptions('', 'substSelect');
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -1076,8 +1087,12 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       //update choiceSelect
-      let cs = document.getElementById('choiceSelect').selectedOptions[0]?.value;
-      setChoiceOptions(cs);
+      let choiceOrigReg = document.getElementById('choiceOrigRegSelect').selectedOptions[0]?.value;
+      let choiceSigCorr = document.getElementById('choiceSicCorrSelect').selectedOptions[0]?.value;
+      let subst = document.getElementById('substSelect').selectedOptions[0]?.value;
+      setChoiceOptions(choiceOrigReg, 'choiceOrigRegSelect');
+      setChoiceOptions(choiceSigCorr, 'choiceSicCorrSelect');
+      setChoiceOptions(subst, 'substSelect');
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
@@ -1086,6 +1101,11 @@ async function vrvWorkerEventsHandler(ev) {
         pageInfoToStatusBar();
         setProgressBar(0);
         updateHtmlTitle();
+        v.clearNotationStale();
+        // Note: do NOT eagerly clear the warning badge here — the worker
+        // will follow up with a 'warning' message (possibly empty) only
+        // when MEI was re-parsed. Layout-only updates (e.g. resizer drags)
+        // must preserve any existing warning state.
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
           // loadFacsimile(v.xmlDoc);
@@ -1106,7 +1126,7 @@ async function vrvWorkerEventsHandler(ev) {
       if (mp.playing) {
         highlightNotesAtMidiPlaybackTime();
       }
-      if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) {
+      if ((!'setFocusToVerovioPane') in ev.data || ev.data.setFocusToVerovioPane) {
         v.setFocusToVerovioPane();
       }
       if (ev.data.computePageBreaks) {
@@ -1118,6 +1138,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'navigatePage': // resolve navigation with page turning
       pageInfoToStatusBar();
       setProgressBar(0);
+      v.clearNotationStale();
       document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -1162,16 +1183,19 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
-      if (ev.data.expansionMap) {
-        setExpansionMap(ev.data.expansionMap);
-      }
+      // Feed the expansion map through unconditionally so the midi player
+      // can resolve expanded timemap ids back to notated ids in the SVG.
+      setExpansionMap(ev.data.expansionMap || null);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
         midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
-        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
-          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        // Pre-v6 only: re-render notation to match the selected expansion.
+        // On v6+ the vrvOptions pipeline (expandAlways) handles SVG expansion,
+        // so no extra re-render from here.
+        if (tkVersionNumber < 6.0 && 'expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm);
         }
       }
       break;
@@ -1206,9 +1230,22 @@ async function vrvWorkerEventsHandler(ev) {
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
-      document.getElementById('verovio-panel').innerHTML =
-        '<h3>Invalid MEI in ' + meiFileName + ' (' + ev.data.msg + ')</h3>';
       v.busy(false);
+      // Soft notification: dim the previously-rendered SVG and show a small
+      // badge in the notation pane instead of a full-pane orange overlay.
+      // See issues #157 and #186 for context.
+      v.setNotationStale(ev.data.msg);
+      break;
+    case 'warning':
+      // Verovio emitted log output during the last render (e.g. "scoreDef
+      // missing key signature"). Surface in an orange badge alongside the
+      // SVG without dimming, since the render itself succeeded.
+      // Empty msg means MEI was re-parsed and produced no warnings — clear.
+      if (ev.data.msg && ev.data.msg.length > 0) {
+        v.setNotationWarning(ev.data.msg);
+      } else {
+        v.clearNotationWarning();
+      }
       break;
   }
   // cm.blockChanges = false;
@@ -1533,20 +1570,7 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let meiString;
-  // if (v.expansionId) {
-  //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
-  //   let existingList = [];
-  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
-  //   if (v.speedMode) {
-  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
-  //   } else {
-  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
-  //   }
-  // } else {
-  // }
-  meiString = v.speedFilter(cm.getValue(), false);
+  let meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
@@ -1555,6 +1579,7 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
+    tkVersionNumber: tkVersionNumber,
   };
   vrvWorker.postMessage(message);
 } // requestMidiFromVrvWorker()
@@ -1909,10 +1934,11 @@ export let cmd = {
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
+    // hide any control bar overflow content menus
+    hideAllOverflowContents();
     // hide overlays
     // TODO refactor logic for all overlays below. For now only splash overlay...
     document.getElementById('splashOverlay').style.display = 'none';
-
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
@@ -1954,6 +1980,10 @@ export let cmd = {
       cmd.toggleMidiPlaybackControlBar();
     }
   },
+  shiftVisualOffsetUp: () => e.shiftVisualOffset(v, cm, 'up'),
+  shiftVisualOffsetDown: () => e.shiftVisualOffset(v, cm, 'down'),
+  shiftVisualOffsetLeft: () => e.shiftVisualOffset(v, cm, 'left'),
+  shiftVisualOffsetRight: () => e.shiftVisualOffset(v, cm, 'right'),
 }; // cmd{}
 
 // add event listeners when controls menu has been instantiated
@@ -2179,12 +2209,25 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // choice selector
-  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+  document.getElementById('choiceOrigRegSelect').addEventListener('change', (ev) => {
     // selection has changed
     // then updateAll()
     v.updateAll(cm, {}, v.selectedElements[0]);
     requestMidiFromVrvWorker(true);
   });
+  document.getElementById('choiceSicCorrSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
+  document.getElementById('substSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
+
   // navigation
   document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
   document.getElementById('forwardsButton').addEventListener('click', cmd.nextNote);
@@ -2370,11 +2413,22 @@ function addEventListeners(v, cm) {
     //   v.pageBreaks = {};
     let sm = document.getElementById('toggleSpeedMode');
     if (sm) sm.checked = v.speedMode;
+    v.applySpeedModeUi();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
-      document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
+  });
+
+  // Speed-mode toggle replicated inside the MIDI-bar indicator: forward to
+  // the canonical speedCheckbox so all the side-effects (storage, settings
+  // checkbox, expansion lock, MIDI rerender) run through one path.
+  document.getElementById('midiSpeedmodeCheckbox').addEventListener('change', (ev) => {
+    const speedCb = document.getElementById('speedCheckbox');
+    if (speedCb.checked !== ev.target.checked) {
+      speedCb.checked = ev.target.checked;
+      speedCb.dispatchEvent(new Event('change'));
+    }
   });
 
   document.getElementById('solidLoadingIndicator').addEventListener('click', () => {
@@ -2390,14 +2444,42 @@ function addEventListeners(v, cm) {
 
   addZoneDrawer();
 
-  // MIDI control bar expansion selector change listener
+  // MIDI control bar expansion selector change listener.
+  // v6+: the dropdown is the sole UI for the bar — empty value means
+  // expandNever, anything else means "use this expansion for MIDI".
   document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
-    v.expansionId = ev.target.value;
-    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    const value = ev.target.value;
+    if (!value && tkVersionNumber >= 6.0) {
+      v.setExpansionMode('never');
+      return;
+    }
+    if (tkVersionNumber >= 6.0 && v.getExpansionMode() === 'never') {
+      // Coming back out of expandNever via picking a real expansion: clear the
+      // expandNever flag so MIDI actually follows the new selection.
+      v.setExpansionMode('default', { reRender: false });
+    }
+    v.expansionId = value;
+    document.getElementById('selectMidiExpansion').value = value;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
     }
-    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
+  });
+
+  // Refresh tooltips/text that we set programmatically (not via the translator's
+  // id-based auto-translate) whenever the active language changes.
+  document.addEventListener('mf-language-changed', () => {
+    v.applySpeedModeUi();
+    // Re-label the first ("No expansion") option of both MIDI expansion
+    // dropdowns. The dynamic Options carry no id, so the translator's
+    // id-based auto-translate can't reach them. Updating the option text
+    // in place preserves the current selection.
+    const noExpansionLabel = translator?.lang?.noExpansionOption?.text || 'No expansion';
+    ['controlbar-midi-expansion-selector', 'selectMidiExpansion'].forEach((id) => {
+      const sel = document.getElementById(id);
+      if (sel && sel.options.length > 0 && sel.options[0].value === '') {
+        sel.options[0].text = noExpansionLabel;
+      }
+    });
   });
 } // addEventListeners()
 

@@ -583,10 +583,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Rapida Reĝimo',
     description:
-      'La rapida reĝimo estas aktiva; nur ludante MIDI-on por la nuntempa paĝo. Por ludi la tutan kodon, malŝaltu la rapidan reĝimon.',
+      'La rapida reĝimo estas aktiva; nur ludante MIDI-on por la nuntempa paĝo. Por ludi la tutan kodon, malmarku ĉi tiun keston.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Elektu vastiĝan elementon por MIDI-reproduktado',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Malŝaltita en rapida reĝimo (nur la nuna paĝo estas bildigita).',
+  },
+  noExpansionOption: {
+    text: 'Neniu vastiĝo',
   },
   closeMidiPlaybackControlBarButton: { description: 'Kaŝi la MIDI Ludado-Kontrolobaron' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Agordoj',
@@ -691,6 +699,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Montri rapidan modan markobutonon',
     description: 'Montri rapidan modan markobutonon en la menuo de notacia kontrolado',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Montri pliajn regajn butonojn',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Montri pliajn regajn butonojn',
   },
 
   // MIDI Playback

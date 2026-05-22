@@ -51,7 +51,7 @@ export function readListItemsFromXML(flagLimit = false) {
   clearInlineListItems();
   annot.readAnnots(flagLimit);
   markup.readMarkup();
-  situateAndRefreshAnnotationsList();
+  // situateAndRefreshAnnotationsList();
   refreshAnnotationsInNotation(true);
 } // readListItemsFromXML()
 
@@ -105,8 +105,8 @@ export function deleteListItem(uuid) {
       // remove only the annotation from the list that should be deleted
       listItems.splice(ix, 1);
     }
-    situateAndRefreshAnnotationsList(true);
-    refreshAnnotationsInNotation();
+    // situateAndRefreshAnnotationsList(true);
+    refreshAnnotationsInNotation(true);
   }
 } // deleteListItem()
 
@@ -164,6 +164,7 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
  *  @returns {Array} Sorted list items.
  */
 async function situateListItems() {
+  console.debug('SSSSSSSSSSSituating list items: ' + listItems.length + ' items');
   const asyncResults = await Promise.all(listItems.length > 0 ? listItems.map((item) => situateOneListItem(item)) : []);
   // when deleting the last item from the list, sometimes, asyncResults finds the item again after it should have been deleted
   // to make sure to abort, when itemList is empty, because nothings needs to be sorted

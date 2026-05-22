@@ -383,6 +383,27 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
+supportedVerovioVersions['6.2.0'] = {
+  url: 'https://www.verovio.org/javascript/6.2.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.2.0',
+  releaseDate: '20 May 2026',
+};
+supportedVerovioVersions['6.1.0'] = {
+  // Verovio 6.1.1 does not provide JS toolkit files, so we keep 6.1.0 
+  url: 'https://www.verovio.org/javascript/6.1.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.1.0',
+  releaseDate: '12 March 2026',
+};
+supportedVerovioVersions['6.0.1'] = {
+  url: 'https://www.verovio.org/javascript/6.0.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.0.1',
+  releaseDate: '29 January 2026',
+};
+supportedVerovioVersions['5.7.0'] = {
+  url: 'https://www.verovio.org/javascript/5.7.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.7.0',
+  releaseDate: '2 December 2025',
+};
 supportedVerovioVersions['5.6.0'] = {
   url: 'https://www.verovio.org/javascript/5.6.0/verovio-toolkit-hum.js',
   description: 'Verovio release 5.6.0',
@@ -567,6 +588,7 @@ export const defaultVerovioOptions = {
 // Viewer
 export const defaultSpeedMode = true;
 export const defaultViewerTimeoutDelay = 300; // ms, time interval within which concurrent clicks are treated as one update
+export const defaultNotationUpdateDelay = 400; // ms, debounce window for editor-driven re-rendering (suppresses transient mid-typing errors)
 
 /**
  * mei-friend settings object.

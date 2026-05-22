@@ -594,10 +594,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Modo de velocidad',
     description:
-      'Modo de velocidad activado; solo se está reproduciendo MIDI para la página actual. Para reproducir todo el archivo, desactivar el modo de velocidad.',
+      'Modo de velocidad activado; solo se está reproduciendo MIDI para la página actual. Para reproducir todo el archivo, desmarque esta casilla.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Seleccionar elemento de expansión para reproducción MIDI',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Desactivado en modo de velocidad (solo se renderiza la página actual).',
+  },
+  noExpansionOption: {
+    text: 'Sin expansión',
   },
   closeMidiPlaybackControlBarButton: { description: 'Ocultar la barra de control de reproducción de MIDI' },
-
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
   meiFriendSettingsHeader: {
     text: 'Configuración',
@@ -707,6 +715,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Mostrar casilla de verificación de modo de velocidad',
     description: 'Mostrar casilla de verificación de modo de velocidad en el menú de control de notación',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Mostrar botones de control adicionales',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Mostrar botones de control adicionales',
   },
   // MIDI Playback / Reproducción MIDI
   titleMidiPlayback: {

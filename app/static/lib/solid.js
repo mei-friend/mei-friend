@@ -40,7 +40,7 @@ export function getCurrentFileUri() {
       fileUri = meiFileLocation;
       break;
     case 'github':
-      fileUri = gm.getRawURL() + gm.filepath;
+      fileUri = gm.getRawURL() + '/' + gm.branch + (gm.filepath.startsWith('/') ? '' : '/') + gm.filepath;
       break;
     default:
       fileUri = meiFileLocation;

@@ -492,10 +492,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Snelheidsmodus',
     description:
-      'Snelheidsmodus is actief; alleen MIDI voor huidige pagina wordt afgespeeld. Om de hele codering af te spelen, schakelt u de snelheidsmodus uit.',
+      'Snelheidsmodus is actief; alleen MIDI voor huidige pagina wordt afgespeeld. Om de hele codering af te spelen, schakelt u dit selectievakje uit.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Selecteer expansie-element voor MIDI-afspelen',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Uitgeschakeld in snelheidsmodus (alleen de huidige pagina wordt weergegeven).',
+  },
+  noExpansionOption: {
+    text: 'Geen expansie',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-afspeelbedieningsbalk verbergen' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend instellingen',
@@ -606,6 +614,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Toon snelheidsmodus selectievakje',
     description: 'Toon snelheidsmodus selectievakje in het notatiebedieningsmenu',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Extra bedieningsknoppen tonen',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Extra bedieningsknoppen tonen',
   },
 
   // MIDI Playback
@@ -973,7 +988,9 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'maten hernummerd' },
 
   // Code checker @accid.ges
-  accidGesCodeCheckerTitle: { text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).' },
+  accidGesCodeCheckerTitle: {
+    text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).',
+  },
   codeCheckerFix: { text: 'Repareren' },
   codeCheckerFixAll: { text: 'Alles repareren' },
   codeCheckerIgnore: { text: 'Negeren' },

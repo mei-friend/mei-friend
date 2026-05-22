@@ -569,7 +569,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'スピードモード',
     description:
-      'スピードモードがアクティブです。現在のページのMIDIのみ再生します。スピードモードを無効にすると、エンコーディング全体が再生されます。',
+      'スピードモードがアクティブです。現在のページのMIDIのみ再生します。エンコーディング全体を再生するには、このチェックボックスをオフにしてください。',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'MIDI再生用の展開要素を選択',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'スピードモードでは無効です（現在のページのみがレンダリングされます）。',
+  },
+  noExpansionOption: {
+    text: '展開なし',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI再生コントロールバーを非表示' },
   // mei-friend SETTINGS MENU
@@ -676,6 +685,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'スピードモードチェックボックスを表示',
     description: '楽譜操作メニューにスピードモードチェックボックスを表示',
+  },
+  notationControlMenuOverflowIcon: {
+    description: '追加の操作ボタンを表示',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: '追加の操作ボタンを表示',
   },
 
   // MIDI Playback

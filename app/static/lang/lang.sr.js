@@ -487,10 +487,18 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Режим брзине',
     description:
-      'Активан је режим брзине; репродукција MIDI-ја је могућа само за тренутну страницу. Да бисте репродуковали цео запис, онемогућите режим брзине.',
+      'Активан је режим брзине; репродукција MIDI-ја је могућа само за тренутну страницу. Да бисте репродуковали цео запис, уклоните ознаку из овог поља.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Изаберите елемент експанзије за MIDI репродукцију',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Онемогућено у режиму брзине (рендерује се само тренутна страница).',
+  },
+  noExpansionOption: {
+    text: 'Без експанзије',
   },
   closeMidiPlaybackControlBarButton: { description: 'Сакриј траку за контролу репродукције MIDI-ја' },
-
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Поставке',
@@ -597,6 +605,13 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Прикажи кућицу за режим брзине',
     description: 'Прикажи кућицу за режим брзине нотације у менију контроле нотације',
+  },
+  notationControlMenuOverflowIcon: {
+    description: 'Прикажи додатна контролна дугмад',
+  },
+
+  facsimileControlMenuOverflowIcon: {
+    description: 'Прикажи додатна контролна дугмад',
   },
 
   // MIDI Playback
@@ -962,7 +977,9 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'тактова је пребројано' },
 
   // Code checker @accid.ges
-  accidGesCodeCheckerTitle: { text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).' },
+  accidGesCodeCheckerTitle: {
+    text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).',
+  },
   codeCheckerFix: { text: 'Исправи' },
   codeCheckerFixAll: { text: 'Исправи све' },
   codeCheckerIgnore: { text: 'Занемари' },

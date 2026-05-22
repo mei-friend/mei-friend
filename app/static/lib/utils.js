@@ -161,7 +161,7 @@ export function moveCursorToEndOfMeasure(cm, p = null) {
  */
 export function setCursorToId(cm, id) {
   if (!id) return;
-  let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
+  let c = cm.getSearchCursor(new RegExp(`xml:id=["']${id}["']`));
   if (c.findNext()) {
     cm.setCursor(c.from());
     goTagStart(cm);
