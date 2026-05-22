@@ -492,7 +492,16 @@ export const lang = {
   // MIDI
   midiSpeedmodeIndicator: {
     text: '速度模式',
-    description: '速度模式已激活；仅播放当前页面的 MIDI。要播放整个编码，请禁用速度模式。',
+    description: '速度模式已激活；仅播放当前页面的 MIDI。要播放整个编码，请取消勾选此复选框。',
+  },
+  midiExpansionSelectorTitle: {
+    text: '选择用于 MIDI 播放的扩展元素',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: '速度模式下已禁用（仅渲染当前页面）。',
+  },
+  noExpansionOption: {
+    text: '无展开',
   },
   closeMidiPlaybackControlBarButton: { description: '隐藏 MIDI 播放控制栏' },
   // mei-friend SETTINGS MENU

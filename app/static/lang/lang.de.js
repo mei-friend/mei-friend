@@ -629,7 +629,16 @@ export const lang = {
     text: 'Speed mode',
     description:
       'Der Speed Mode ist aktiv, es werden nur die MIDI-Daten der aktuellen Seite abgespielt. ' +
-      'Um die gesamte Kodierung abzuspielen, bitte Speed Mode deaktivieren.',
+      'Um die gesamte Kodierung abzuspielen, bitte dieses Kästchen abwählen.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Expansionselement für MIDI-Wiedergabe auswählen',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Im Speed Mode deaktiviert (nur die aktuelle Seite wird gerendert).',
+  },
+  noExpansionOption: {
+    text: 'Keine Expansion',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
   // mei-friend SETTINGS MENU

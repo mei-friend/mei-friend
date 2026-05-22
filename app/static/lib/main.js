@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.4.0';
-export const versionDate = '21 May 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '22 May 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -2458,11 +2458,22 @@ function addEventListeners(v, cm) {
     //   v.pageBreaks = {};
     let sm = document.getElementById('toggleSpeedMode');
     if (sm) sm.checked = v.speedMode;
+    v.applySpeedModeUi();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
-      document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
+  });
+
+  // Speed-mode toggle replicated inside the MIDI-bar indicator: forward to
+  // the canonical speedCheckbox so all the side-effects (storage, settings
+  // checkbox, expansion lock, MIDI rerender) run through one path.
+  document.getElementById('midiSpeedmodeCheckbox').addEventListener('change', (ev) => {
+    const speedCb = document.getElementById('speedCheckbox');
+    if (speedCb.checked !== ev.target.checked) {
+      speedCb.checked = ev.target.checked;
+      speedCb.dispatchEvent(new Event('change'));
+    }
   });
 
   document.getElementById('solidLoadingIndicator').addEventListener('click', () => {
@@ -2497,6 +2508,23 @@ function addEventListeners(v, cm) {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
     }
+  });
+
+  // Refresh tooltips/text that we set programmatically (not via the translator's
+  // id-based auto-translate) whenever the active language changes.
+  document.addEventListener('mf-language-changed', () => {
+    v.applySpeedModeUi();
+    // Re-label the first ("No expansion") option of both MIDI expansion
+    // dropdowns. The dynamic Options carry no id, so the translator's
+    // id-based auto-translate can't reach them. Updating the option text
+    // in place preserves the current selection.
+    const noExpansionLabel = translator?.lang?.noExpansionOption?.text || 'No expansion';
+    ['controlbar-midi-expansion-selector', 'selectMidiExpansion'].forEach((id) => {
+      const sel = document.getElementById(id);
+      if (sel && sel.options.length > 0 && sel.options[0].value === '') {
+        sel.options[0].text = noExpansionLabel;
+      }
+    });
   });
 } // addEventListeners()
 

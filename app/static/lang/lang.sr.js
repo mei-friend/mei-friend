@@ -511,7 +511,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Режим брзине',
     description:
-      'Активан је режим брзине; репродукција MIDI-ја је могућа само за тренутну страницу. Да бисте репродуковали цео запис, онемогућите режим брзине.',
+      'Активан је режим брзине; репродукција MIDI-ја је могућа само за тренутну страницу. Да бисте репродуковали цео запис, уклоните ознаку из овог поља.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Изаберите елемент експанзије за MIDI репродукцију',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Онемогућено у режиму брзине (рендерује се само тренутна страница).',
+  },
+  noExpansionOption: {
+    text: 'Без експанзије',
   },
   closeMidiPlaybackControlBarButton: { description: 'Сакриј траку за контролу репродукције MIDI-ја' },
   // mei-friend SETTINGS MENU

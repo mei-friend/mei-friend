@@ -366,9 +366,9 @@ export function sortNodeAttributes(xmlNode) {
  * @param {string} baseSelector
  * @returns {string[][]}
  */
-export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
+export function generateExpansionList(xmlDoc, baseSelector = 'music score', noExpansionLabel = 'No expansion') {
   let selector = 'section,ending,lem,rdg';
-  let expansions = [['No expansion', '']];
+  let expansions = [[noExpansionLabel, '']];
   let baseSection = xmlDoc.querySelector(baseSelector);
   if (baseSection) {
     baseSection.querySelectorAll('expansion').forEach((el) => {

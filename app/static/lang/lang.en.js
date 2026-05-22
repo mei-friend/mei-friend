@@ -668,7 +668,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Speed mode',
     description:
-      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.',
+      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, uncheck this box.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Select expansion element for MIDI playback',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Disabled in speed mode (only the current page is rendered).',
+  },
+  noExpansionOption: {
+    text: 'No expansion',
   },
   closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
 

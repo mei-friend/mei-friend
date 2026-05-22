@@ -23,3 +23,4 @@ tmp
 /blob-report/
 /playwright/.cache/
 node_modules/
+ROADMAP.md

@@ -518,7 +518,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Hastigheds mode',
     description:
-      'Hastigheds mode er aktiv; kun afspilning af MIDI for nuværende side. For at afspille hele kodningen, deaktiver hastigheds mode.',
+      'Hastigheds mode er aktiv; kun afspilning af MIDI for nuværende side. For at afspille hele kodningen, fjern markeringen i dette felt.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Vælg ekspansionselement til MIDI-afspilning',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Deaktiveret i hastighedsmode (kun den aktuelle side gengives).',
+  },
+  noExpansionOption: {
+    text: 'Ingen ekspansion',
   },
   closeMidiPlaybackControlBarButton: { description: 'Skjul MIDI afspilnings kontrolbar' },
   // mei-friend SETTINGS MENU
