@@ -599,7 +599,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Tryb szybki',
     description:
-      'Tryb szybki jest aktywny; odtwarzanie MIDI odbywa się tylko dla bieżącej strony. Aby odtworzyć całe kodowanie, wyłącz tryb szybki.',
+      'Tryb szybki jest aktywny; odtwarzanie MIDI odbywa się tylko dla bieżącej strony. Aby odtworzyć całe kodowanie, odznacz to pole.',
+  },
+  midiExpansionSelectorTitle: {
+    text: 'Wybierz element rozszerzenia do odtwarzania MIDI',
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Wyłączone w trybie szybkim (renderowana jest tylko bieżąca strona).',
+  },
+  noExpansionOption: {
+    text: 'Bez rozszerzenia',
   },
   closeMidiPlaybackControlBarButton: { description: 'Ukryj pasek kontrolny odtwarzania MIDI' },
   // mei-friend SETTINGS MENU
