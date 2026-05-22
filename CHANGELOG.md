@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.3.0 patch: Verovio 6 expansion support and improvements (released on 21 May 2026)
+### 1.3.0 patch: Verovio 6 expansion support and improvements (released on 22 May 2026)
 * Adjust expansion behaviour for Verovio 6+: MIDI follows the expansion while the SVG remains unexpanded by default; renditions ≥ 2 now highlight and page-follow correctly via the expansion map. Fixes [#187](https://github.com/mei-friend/mei-friend/issues/187).
 * Selecting "No expansion" in MIDI player dropdown sets `expandNever`; selecting any expansion sets `expand` to that id and clears `expandNever`
 * Settings-tab `expandAlways` / `expandNever` checkboxes now mutually deactivate each other so users can flip freely between them
