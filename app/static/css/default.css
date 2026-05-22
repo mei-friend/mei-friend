@@ -606,8 +606,8 @@ a:active {
 }
 
 #notation-warning-badge {
-  top: 70px; /* sits below the error badge: 36 + 28 + 6 */
-  max-height: calc(100% - 76px);
+  top: 59px; /* sits below the error badge: 36 + 20 + 3 */
+  max-height: calc(100% - 65px);
 }
 
 /* When error is hidden, warning floats up under the Verovio logo. */
@@ -622,39 +622,39 @@ a:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   color: white;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
 
 #notation-error-badge .badge-icon {
-  background-color: #f44336;
+  background-color: #e57373;
 }
 
 #notation-warning-badge .badge-icon {
-  background-color: #ff9800;
+  background-color: #ffb74d;
 }
 
 #notation-error-badge .badge-icon svg,
 #notation-warning-badge .badge-icon svg {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   fill: currentColor;
 }
 
 #notation-error-badge .badge-label,
 #notation-warning-badge .badge-label {
   position: relative;
-  background-color: rgba(255, 255, 255, 0.78);
-  color: #222;
-  padding: 4px 22px 4px 8px; /* extra right padding for close button */
-  border-radius: 4px;
-  font-size: 12px;
-  line-height: 1.3;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #444;
+  padding: 2px 20px 2px 6px; /* extra right padding for close button */
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.25;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   min-width: 0;
   min-height: 0;
   max-height: 100%;
