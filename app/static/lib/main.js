@@ -430,10 +430,27 @@ async function suspendedValidate(text, updateLinting, options) {
 }
 
 // when initial page content has been loaded
-document.addEventListener('DOMContentLoaded', function () {
-  // disable GitHub menu if server-side configuration not available
-  if (!gitEnabled) {
-    document.getElementById('GithubButton').disabled = true;
+document.addEventListener('DOMContentLoaded', async function () {
+  // Fetch authentication and configuration status from the server
+  try {
+    const response = await fetch('/auth_status');
+    const status = await response.json();
+    isLoggedIn = status.isLoggedIn;
+    gitEnabled = status.gitEnabled;
+    if (isLoggedIn) {
+      githubToken = status.githubToken;
+      userLogin = status.userLogin;
+      userName = status.userName;
+      userEmail = status.userEmail;
+    }
+  } catch (err) {
+    console.error('Could not fetch auth status:', err);
+  }
+
+  // enable GitHub menu if server-side configuration is available (disabled by default in index.html)
+  const githubButton = document.getElementById('GithubButton');
+  if (githubButton) {
+    githubButton.disabled = !gitEnabled;
   }
 
   translator = new Translator();
