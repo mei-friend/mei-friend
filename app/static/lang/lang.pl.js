@@ -379,19 +379,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Zażądaj pracy akcji GitHub:' },
-  githubActionsDescription: {
-    text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
-  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
-  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - GitHub mówi' },
+  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - Status GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Wykonanie zadania zakończone:' },
+  githubActionsRunFailedMsg: { text: 'Nie udało się ukończyć zadania:' },
+  githubActionsGitHubStatusLink: { text: 'Status GitHub' },
   githubActionsRunButton: { text: 'Uruchom zadanie' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Podaj definicję pakietu pracy' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ta akcja GitHub wymaga definicji pakietu pracy. Podaj jedną (URL obiektu JSON definicji) w ustawieniach mei-friend.',
+  },
   githubActionsRunButtonReload: { text: 'Przeładuj plik MEI' },
   githubActionsCancelButton: { text: 'Anuluj' },
   githubActionsInputSetterFilepath: { text: 'Kopiuj bieżącą ścieżkę pliku do wejścia' },
   githubActionsInputSetterSelection: { text: 'Kopiuj bieżący wybór MEI do wejścia' },
-  githubActionsInputContainerHeader: { text: 'Konfiguracja wejścia' },
+  githubActionsNoSummaryProvided: {
+    text: 'Nie podano podsumowania. Zobacz powyższy link do statusu GitHub, aby uzyskać szczegóły.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Śledź status workflow na GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Otwórz kodowanie z tego repozytorium, aby uruchomić workflowy GitHub Actions.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Zatwierdź lokalne zmiany, aby uruchomić przepływy pracy GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Określony plik konfiguracji JSON nie jest zgodny z oczekiwanym schematem. Zapoznaj się z dokumentacją, aby uzyskać szczegóły.',
+  },
+  titleGithubActions: {
+    text: 'Używaj GitHub Actions',
+    description: 'Pracuj z GitHub Actions, gdy są dostępne w repozytorium',
+  },
+  enableGithubActions: {
+    text: 'Pokaż dostępne GitHub Actions',
+    description: 'Wyświetl dostępne GitHub Actions podczas nawigacji po repozytorium w menu GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definicja pakietu pracy',
+    description: 'Użyj pliku definicji pakietu pracy dla GitHub Actions',
+  },
 
   // Fork modals // Okna modalne fork
   forkRepoGithubText: { text: 'Forkuj Repozytorium Github' },

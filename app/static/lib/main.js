@@ -1,5 +1,5 @@
 // mei-friend version and date
-export const version = '1.3.0';
+export const version = '1.4.0';
 export const versionDate = '22 May 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
@@ -201,13 +201,43 @@ export async function setFileChangedState(fileChangedState) {
     let actionsWorkflows = document.querySelectorAll('.workflow');
     if (commitUI) setCommitUIEnabledStatus();
     if (actionsWorkflows) {
-      if (await gm.fileChanged()) {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
-      } else {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.remove('notAllowed'));
-      }
+      const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
+      const disabledWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledTooltip?.text ||
+        'Open an encoding from this repository to run GitHub Actions workflows.';
+      const dirtyWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledDirtyTooltip?.text ||
+        'Commit your local changes to run GitHub Actions workflows.';
+      const hasUncommittedChanges =
+        typeof gm.hasUncommittedChanges === 'function' ? await gm.hasUncommittedChanges() : await gm.fileChanged();
+      const disableForRepo = !hasMatchingGithubEncoding;
+      const disableForDirty = hasMatchingGithubEncoding && hasUncommittedChanges;
+      const disableActions = disableForRepo || disableForDirty;
+      actionsWorkflows.forEach((el) => {
+        const container = el.parentElement;
+        const actionsContainer = container?.parentElement;
+        if (disableActions) {
+          const tooltipText = disableForRepo ? disabledWorkflowTooltip : dirtyWorkflowTooltip;
+          if (container) {
+            container.classList.add('workflow-disabled');
+            container.classList.remove('disabled');
+            container.setAttribute('aria-disabled', 'true');
+            container.title = tooltipText;
+          }
+          el.classList.add('disabled');
+          el.title = tooltipText;
+        } else {
+          if (container) {
+            container.classList.remove('workflow-disabled');
+            container.classList.remove('disabled');
+            container.removeAttribute('aria-disabled');
+            container.removeAttribute('title');
+          }
+          el.classList.remove('disabled');
+          el.title = el.dataset?.url || '';
+        }
+        if (actionsContainer) actionsContainer.classList.toggle('notAllowed', disableActions);
+      });
     }
   }
   if (storage.supported) {
@@ -533,6 +563,17 @@ async function completeInitialLoad() {
     selectParam = selectParam.map((e) => e.split(',')).reduce((a1, a2) => a1.concat(a2));
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
+  let automationParam = searchParams.get('automation');
+
+  // Must be written before addMeiFriendOptionsToSettingsPanel() reads storage to populate the input.
+  if (automationParam !== null) {
+    try {
+      window.localStorage['mf-supplyWorkpackageGithubActionsConfiguration'] = automationParam;
+      window.localStorage['mf-enableGithubActions'] = 'true';
+    } catch (err) {
+      console.warn('Could not save automation URL to localStorage: ', err);
+    }
+  }
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
   createEncodingPanel();
@@ -1939,6 +1980,10 @@ export let cmd = {
     // hide overlays
     // TODO refactor logic for all overlays below. For now only splash overlay...
     document.getElementById('splashOverlay').style.display = 'none';
+    const githubActionsOverlay = document.getElementById('githubActionsOverlay');
+    if (githubActionsOverlay && githubActionsOverlay.style.display !== 'none') {
+      githubActionsOverlay.style.display = 'none';
+    }
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&

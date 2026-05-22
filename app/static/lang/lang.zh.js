@@ -355,19 +355,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: '请求 GitHub Action 工作流：' },
-  githubActionsDescription: {
-    text: '点击“运行工作流”以请求 GitHub API 为您运行上述工作流，使用下面指定的输入配置。工作流运行完成后，您的编码将重新加载为最新版本。',
-  },
-  githubActionStatusMsgPrompt: { text: '无法运行工作流 - GitHub 显示' },
   githubActionStatusMsgWaiting: { text: '请耐心等待 GitHub 处理您的工作流...' },
-  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 显示' },
-  githubActionStatusMsgSuccess: { text: '工作流运行完成 - GitHub 显示' },
+  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 状态' },
+  githubActionsRunCompletedMsg: { text: '工作流运行完成：' },
+  githubActionsRunFailedMsg: { text: '无法完成工作流运行：' },
+  githubActionsGitHubStatusLink: { text: 'GitHub 状态' },
   githubActionsRunButton: { text: '运行工作流' },
+  githubActionsSupplyWorkpackageDefinition: { text: '提供工作包定义' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: '此 GitHub Action 需要工作包定义。请在 mei-friend 设置中提供一个（定义 JSON 对象的 URL）。',
+  },
   githubActionsRunButtonReload: { text: '重新加载 MEI 文件' },
   githubActionsCancelButton: { text: '取消' },
   githubActionsInputSetterFilepath: { text: '复制当前文件路径到输入' },
   githubActionsInputSetterSelection: { text: '复制当前 MEI 选择到输入' },
-  githubActionsInputContainerHeader: { text: '输入配置' },
+  githubActionsNoSummaryProvided: { text: '未提供摘要。请参阅上面的 GitHub 状态链接以获取详细信息。' },
+  githubActionsWaitingOpenLink: { text: '在 GitHub 上跟踪工作流状态' },
+  githubActionsDisabledTooltip: {
+    text: '请打开此仓库中的编码以运行 GitHub Actions 工作流。',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: '请提交本地更改以运行 GitHub Actions 工作流。',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: '您指定的 JSON 配置文件不符合预期的架构。请查阅文档以了解详细信息。',
+  },
+  titleGithubActions: {
+    text: '使用 GitHub Actions',
+    description: '在仓库中可用时使用 GitHub Actions',
+  },
+  enableGithubActions: {
+    text: '显示可用的 GitHub Actions',
+    description: '在 GitHub 菜单中浏览仓库时列出可用的 GitHub Actions',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: '工作包定义',
+    description: '使用 GitHub Actions 工作包定义文件',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github 仓库' },

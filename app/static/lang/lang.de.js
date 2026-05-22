@@ -375,19 +375,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
-  githubActionsDescription: {
-    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
-  },
-  githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
-  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-Lauf abgeschlossen - GitHub meldet' },
+  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow-Ausführung abgeschlossen:' },
+  githubActionsRunFailedMsg: { text: 'Workflow-Ausführung konnte nicht abgeschlossen werden:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-Status' },
   githubActionsRunButton: { text: 'Workflow ausführen' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Arbeitspaketdefinition bereitstellen' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Diese GitHub Action erfordert eine Arbeitspaketdefinition. Bitte stellen Sie eine bereit (URL eines JSON-Definitionsobjekts) in den mei-friend-Einstellungen.',
+  },
   githubActionsRunButtonReload: { text: 'MEI-Datei neu laden' },
   githubActionsCancelButton: { text: 'Abbrechen' },
   githubActionsInputSetterFilepath: { text: 'Aktuellen Dateipfad in Eingabe kopieren' },
   githubActionsInputSetterSelection: { text: 'Aktuelle MEI-Auswahl in Eingabe kopieren' },
-  githubActionsInputContainerHeader: { text: 'Eingabekonfiguration' },
+  githubActionsNoSummaryProvided: {
+    text: 'Keine Zusammenfassung verfügbar. Weitere Informationen finden Sie beim dem GitHub-Status-Link.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Workflow-Status auf GitHub verfolgen' },
+  githubActionsDisabledTooltip: {
+    text: 'Öffnen Sie eine Kodierung aus diesem Repository, um GitHub-Actions-Workflows auszuführen.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Committen Sie Ihre lokalen Änderungen, um GitHub Actions-Workflows auszuführen.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Die angegebene JSON-Konfigurationsdatei entspricht nicht dem erwarteten Schema. Bitte konsultieren Sie die Dokumentation für Details.',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions verwenden',
+    description: 'Mit GitHub Actions arbeiten, wenn in einem Repository verfügbar',
+  },
+  enableGithubActions: {
+    text: 'Verfügbare GitHub Actions anzeigen',
+    description: 'Verfügbare GitHub Actions auflisten beim Navigieren im Repository im GitHub-Menü',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Arbeitspaketdefinition',
+    description: 'Eine GitHub-Actions-Arbeitspaketdefinitionsdatei verwenden',
+  },
 
   // fork modals
   forkRepoGithubText: { text: 'Github Repositorium Forken' },

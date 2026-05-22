@@ -1,3 +1,7 @@
+/* Hide initial contents of GitHub Actions modal when running */
+.githubActionsInitialContentsHidden {
+  display: none !important;
+}
 :root {
   /* DEFAULT COLORS */
   /* almost black */
@@ -287,6 +291,10 @@ a:active {
   width: 200px;
 }
 
+#supplyWorkpackageGithubActionsConfiguration {
+  width: 100%;
+}
+
 #githubActionsUI {
   display: flex;
   flex-direction: column;
@@ -294,20 +302,116 @@ a:active {
   height: fit-content !important;
 }
 
-.githubActionsInputConfig {
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  background-color: var(--navbarBackgroundColor);
+#githubActionsUI.githubActionsCentered {
+  top: 20%;
+}
+
+#githubActionsUI a {
+  color: var(--overlayLinkColor);
+}
+
+#githubActionsInputConfigContainer {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--dropdownBackgroundColor);
   border-radius: 1em;
-  width: 90%;
-  padding: 0.5em;
+  padding: 0.75em 1em 0.5em;
+}
+
+#githubActionsWorkpackageConfigSelectWrapper:not(:empty) {
   margin-bottom: 0.5em;
 }
 
-.githubActionsInputConfig span {
+@keyframes githubActionsFlashAlert {
+  0%, 100% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+  8%, 33%, 58% {
+    box-shadow: 0 0 0 8px var(--fileStatusWarnColor);
+    transform: scale(1.04);
+  }
+  17%, 42%, 67% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+}
+
+.githubActionsFlashAlert {
+  animation: githubActionsFlashAlert 2.4s ease-in-out;
+}
+
+.githubActionsRequiresWorkpackageMessage {
+  color: var(--fileStatusWarnColor);
+  text-align: center;
+  margin: 0;
+  padding: 1em;
+  font-style: italic;
+}
+
+.githubActionsWorkpackageParamList {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  row-gap: 0.5em;
+}
+
+.githubActionsGenericConfig, .githubActionsWorkpackageConfig {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  grid-template-rows: auto auto;
+  background-color: var(--dropdownBackgroundColor);
+  border-radius: 1em;
+  width: 90%;
+  padding: 0.5em;
+  /* margin-bottom: 0.5em; */
+}
+
+/* Generic config has no parent grid, so subgrid doesn't apply — use explicit 2-column layout */
+.githubActionsGenericConfig {
+  grid-template-columns: max-content 1fr;
+  width: 100%;
+  box-sizing: border-box;
+  row-gap: 0.2em;
+}
+
+/* Workpackage config: add internal row spacing and fill the full container width */
+.githubActionsWorkpackageConfig {
+  row-gap: 0.3em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#githubActionsWorkpackageContainer, #githubActionsJobSummary {
   color: var(--textColor);
 }
+.githubActionsGenericConfig span, .githubActionsWorkpackageConfig span {
+  color: var(--textColor);
+}
+
+.githubActionsWorkpackageDescription {
+  font-size: 0.85em;
+  color: var(--textColor);
+  opacity: 0.8;
+  margin: 0.25em 0.5em 0.25em 0;
+  padding: 0 0.5em;
+}
+
+.githubActionsWorkpackageDescription:empty {
+  display: none;
+}
+
+.githubActionsParamName {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  margin-bottom: 0.15em;
+}
+
+.githubActionsParamName[title] {
+  cursor: help;
+}
+
 
 .githubActionsInputSetter {
   cursor: pointer;
@@ -317,17 +421,78 @@ a:active {
   fill: var(--textColor);
 }
 
-.githubActionsInputConfig div {
-  padding-left: 0.5em;
+.githubActionsGenericConfig div, .githubActionsWorkpackageConfig div {
+  padding-left: 0.25em;
   padding-right: 0.5em;
+  padding-bottom: 0.1em;
 }
 
 .githubActionsInputFieldWrapper {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .githubActionsInputField {
-  width: 95%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#githubActionsJobSummary {
+  max-height: 10em;
+  overflow-y: auto;
+  margin-top: 0.5em;
+  padding: 0.25em 0.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 6px;
+  background-color: var(--dropdownBackgroundColor);
+}
+
+#githubActionsJobSummary pre {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.2;
+}
+
+.githubActionsProgress {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.githubActionsProgress progress {
+  flex: 1 1 auto;
+}
+
+#githubActionsCancelRun {
+  flex: 0 0 auto;
+}
+
+.githubActionsSummaryLoading::after {
+  content: '.';
+  display: inline-block;
+  animation: githubActionsEllipsis 3s steps(3, end) infinite;
+  color: var(--textColor);
+  opacity: 0.7;
+  margin-top: 0.25em;
+}
+
+@keyframes githubActionsEllipsis {
+  0% { content: '...'; }
+  30% { content: '·..'; }
+  35% { content: '...'; }
+  40% { content: '.·.';}
+  45% { content: '...'; }
+  50% { content: '..·'; }
+  55% { content: '...';}
+  70% { content: '..·'; }
+  75% { content: '...'; }
+  80% { content: '.·.'; }
+  85% { content: '...'; }
+  90% { content: '·..'; }
 }
 
 .dropdownContent a.disabled {
@@ -336,6 +501,18 @@ a:active {
 
 .actionsContainer.notAllowed {
   cursor: not-allowed;
+}
+
+.workflow-disabled {
+  cursor: not-allowed;
+}
+
+input.urlDoesNotResolve {
+  border: 3px solid #c62828;
+}
+
+input.urlResolves {
+  border: 3px solid #2e7d32;
 }
 
 .openUrlOverlay a,
@@ -392,8 +569,8 @@ a:active {
 }
 
 /** start loading animation for splash screen text (not used for now) */
-/* 
-#splashBodyLoading { 
+/*
+#splashBodyLoading {
   position:relative;
   left: calc(50% - 1em);
   top: 50%;
@@ -417,7 +594,7 @@ a:active {
     75% {
         content: '...';
     }
-} 
+}
 */
 /** end loading animation for splash screen text **/
 
@@ -451,7 +628,6 @@ a:active {
 #githubActionsUI details,
 #githubActionsUI button {
   cursor: pointer;
-  margin-bottom: 1em;
 }
 
 #githubActionsUI details label {
@@ -1253,8 +1429,8 @@ a:active {
   justify-content: center;
 }
 
-.control-menu-overflow-content { 
-  position: fixed; 
+.control-menu-overflow-content {
+  position: fixed;
   top: calc(inherit + 1.5em);
   left: inherit;
   display:inline;
@@ -1265,7 +1441,7 @@ a:active {
   width: calc(fit-content + 20px);
 }
 
-.control-menu-overflow-icon { 
+.control-menu-overflow-icon {
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
@@ -1292,7 +1468,7 @@ a:active {
   margin-bottom: .25em;
 }
 
-.control-menu-fixed-left, .control-menu-fixed-right { 
+.control-menu-fixed-left, .control-menu-fixed-right {
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
@@ -1672,8 +1848,8 @@ svg text {
   color: unset;
 }
 
-/** 
-  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes 
+/**
+  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes
   see https://github.com/rism-digital/verovio/pull/4201
 */
 #verovio-panel g.bounding-box rect,

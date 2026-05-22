@@ -427,6 +427,20 @@ export default class GitManager {
     });
   }
 
+  async hasUncommittedChanges() {
+    try {
+      const matrix = await git.statusMatrix({
+        fs,
+        dir: this.directory,
+        ref: this.branch,
+      });
+      return matrix.some(([, head, workdir, stage]) => head !== workdir || workdir !== stage);
+    } catch (err) {
+      console.warn('git-manager: could not determine uncommitted changes', err);
+      return false;
+    }
+  }
+
   async fileChanged(path = this.filepath, status) {
     let fileChanged;
     if (!status) {
@@ -627,6 +641,18 @@ export default class GitManager {
     return await this.cloud.getWorkflowRun(wfUri);
   }
 
+  async getWorkflowJobs(runId) {
+    return await this.cloud.getWorkflowJobs(runId);
+  }
+
+  async getWorkflowJobLogs(jobId) {
+    return await this.cloud.getWorkflowJobLogs(jobId);
+  }
+
+  async cancelWorkflowRun(runId) {
+    return await this.cloud.cancelWorkflowRun(runId);
+  }
+
   async getWorkflowInputs(path) {
     return await this.cloud.getWorkflowInputs(path);
   }
@@ -639,8 +665,12 @@ export default class GitManager {
     return await this.cloud.requestActionWorkflowRun(wfId, inputs);
   }
 
-  async awaitActionWorkflowCompletion(workflowId) {
-    return await this.cloud.awaitActionWorkflowCompletion(workflowId);
+  async awaitActionWorkflowStart(workflowId, dispatchTime) {
+    return await this.cloud.awaitActionWorkflowStart(workflowId, dispatchTime);
+  }
+
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null, runUrl = null) {
+    return await this.cloud.awaitActionWorkflowCompletion(workflowId, runStartAt, dispatchTime, runUrl);
   }
 }
 

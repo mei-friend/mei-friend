@@ -366,19 +366,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Захтев за GitHub акцијски радни ток:' },
-  githubActionsDescription: {
-    text: 'Кликните на "Покрени радни ток" како бисте затражили од GitHub API-ја да изврши радни ток за вас, користећи конфигурацију уноса наведену испод. Ваше енкодирање ће се учитати у својој најновијој верзији након што се радни ток заврши.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Ток се није могао извршити - GitHub обавештава' },
   githubActionStatusMsgWaiting: { text: 'Молимо вас да будете стрпљиви док GitHub обрађује ваш ток...' },
-  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub обавештава' },
-  githubActionStatusMsgSuccess: { text: 'Извршен је ток - GitHub обавештава' },
+  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub статус' },
+  githubActionsRunCompletedMsg: { text: 'Извршавање тока рада завршено:' },
+  githubActionsRunFailedMsg: { text: 'Није могуће завршити извршавање тока рада:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub статус' },
   githubActionsRunButton: { text: 'Покрени радни ток' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Доставите дефиницију радног пакета' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ова GitHub Action захтева дефиницију радног пакета. Молимо доставите једну (URL JSON објекта дефиниције) у mei-friend подешавањима.',
+  },
   githubActionsRunButtonReload: { text: 'Учитај MEI фајл поново' },
   githubActionsCancelButton: { text: 'Откажи' },
   githubActionsInputSetterFilepath: { text: 'Копирај тренутну путању фајла у унос' },
   githubActionsInputSetterSelection: { text: 'Копирај тренутну MEI селекцију у унос' },
-  githubActionsInputContainerHeader: { text: 'Конфигурација уноса' },
+  githubActionsNoSummaryProvided: { text: 'Није достављен сажетак. Погледајте горњи GitHub статус линк за детаље.' },
+  githubActionsWaitingOpenLink: { text: 'Пратите статус тока рада на GitHub-у' },
+  githubActionsDisabledTooltip: {
+    text: 'Отворите кодирање из овог репозиторијума да бисте покренули GitHub Actions токове рада.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Комитујте локалне измене да бисте покренули GitHub Actions токове рада.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Наведена JSON конфигурациона датотека није у складу са очекиваном схемом. Молимо проверите документацију за детаље.',
+  },
+  titleGithubActions: {
+    text: 'Користи GitHub Actions',
+    description: 'Радите са GitHub Actions када су доступне у репозиторијуму',
+  },
+  enableGithubActions: {
+    text: 'Прикажи доступне GitHub Actions',
+    description: 'Прикажи доступне GitHub Actions при навигацији унутар репозиторијума у GitHub менију',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Дефиниција радног пакета',
+    description: 'Користите датотеку дефиниције радног пакета за GitHub Actions',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Направи копију GitHub репозиторијума' },

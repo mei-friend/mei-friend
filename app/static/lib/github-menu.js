@@ -8,6 +8,7 @@ import {
   handleEncoding,
   isMEI,
   log,
+  meiFileLocation,
   meiFileName,
   openUrlFetch,
   setFileChangedState,
@@ -21,6 +22,17 @@ import {
   v,
 } from './main.js';
 import * as icon from './../css/icons.js';
+
+const GHAStartMarker = '---START_USER_MESSAGE---';
+const GHAEndMarker = '---END_USER_MESSAGE---';
+
+const escapeHtml = (value) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 
 const ghActionsInputSetters = [
   {
@@ -38,6 +50,57 @@ const ghActionsInputSetters = [
     },
   },
 ];
+
+export function fillWorkpackageConfigParams(paramsContainer, jsonResponse) {
+  if (!paramsContainer) return;
+  paramsContainer.innerHTML = '';
+  console.log('Filling workpackage config params with: ', jsonResponse);
+  if (!jsonResponse) return;
+  if (!Array.isArray(jsonResponse) || jsonResponse.length === 0) {
+    paramsContainer.innerHTML =
+      '<div class="warn">' + translator.lang.githubActionsWorkpackageConfigInvalidResponse.text + '</div>';
+  }
+  // build a workpackage selection dropdown, using 'label' property of each item
+  const select = document.createElement('select');
+  jsonResponse = jsonResponse.filter((item) => 'userFacing' in item && item.userFacing == true);
+  jsonResponse.forEach((param, ix) => {
+    const option = document.createElement('option');
+    option.value = param.id;
+    option.innerText = param.label ? param.label : `Workpackage ${ix + 1}`;
+    select.appendChild(option);
+  });
+  paramsContainer.appendChild(select);
+
+  const workpackageDescription = document.createElement('p');
+  workpackageDescription.classList.add('githubActionsWorkpackageDescription');
+  paramsContainer.appendChild(workpackageDescription);
+
+  const workpackageParamList = document.createElement('div');
+  workpackageParamList.classList.add('githubActionsWorkpackageParamList');
+  paramsContainer.appendChild(workpackageParamList);
+
+  const renderParamList = (wp_id) => {
+    console.log('Selected workpackage index: ', wp_id);
+    workpackageParamList.innerHTML = '';
+    const selected = jsonResponse.filter((item) => item.id === wp_id)[0];
+    if (!selected || !('params' in selected)) {
+      console.log('Problem with selected workpackage: ', selected, jsonResponse, wp_id);
+      workpackageParamList.innerHTML =
+        '<div class="warn">' + translator.lang.githubActionsWorkpackageConfigInvalidResponse.text + '</div>';
+      workpackageDescription.innerText = '';
+      return;
+    }
+    workpackageDescription.innerText = selected.description || '';
+    select.dataset.workpackageJson = JSON.stringify(selected);
+    Object.keys(selected.params).forEach((p) => {
+      const cfg = generateGithubActionsParamConfig(selected.params, p, true);
+      workpackageParamList.appendChild(cfg);
+    });
+  };
+
+  select.addEventListener('change', () => renderParamList(select.value));
+  renderParamList(select.value);
+}
 
 const REPO_SIZE_WARNING_THRESHOLD = 100 * 1024; // 100MB; consider making this a user setting
 
@@ -297,7 +360,7 @@ function onFileNameEdit(e) {
 
 function onMessageInput(e) {
   e.target.classList.remove('warn');
-  if ((e.target.innerText = '')) {
+  if (e.target.innerText === '') {
     document.getElementById('githubCommitButton').setAttribute('disabled', '');
   } else {
     document.getElementById('githubCommitButton').removeAttribute('disabled');
@@ -341,7 +404,7 @@ export async function onRemoteUpdate() {
       // keep displaying the '!' indicator
       // clear the check remote timeout
       // user will be asked to fork-and-PR on commit
-      this.stopPollingForRemoteUpdates();
+      gm.stopPollingForRemoteUpdates();
     });
 }
 
@@ -429,7 +492,7 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   }
   let githubMenu = document.getElementById('GithubMenu');
   repos.forEach((repo) => {
-    githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
+    githubMenu.innerHTML += `<a class="userRepo" href="#">${escapeHtml(repo.full_name)}</a>`;
   });
   if (repos.length && repos.length === per_page) {
     // there may be more repos on the next page
@@ -450,12 +513,12 @@ export async function fillInRepoBranches(e, repoBranches) {
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${escapeHtml(gm.repo)}</a>
     <hr class="dropdownLine">
     <a id="selectBranch" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
-    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
+    githubMenu.innerHTML += `<a class="repoBranch" href="#">${escapeHtml(branch.name)}</a>`;
   });
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
@@ -539,11 +602,11 @@ export async function fillInBranchContents(e) {
       githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${escapeHtml(gm.repo)}</a>
     <hr class="dropdownLine">
-    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
+    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${escapeHtml(gm.branch)}</a>
     <hr class="dropdownLine">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${gm.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${escapeHtml(gm.filepath)}</span></a>
     <div class="actionsContainer"><hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart"></div>
     `;
       // request Githug Action workflows (if any) and handle them
@@ -554,7 +617,7 @@ export async function fillInBranchContents(e) {
           githubMenu.innerHTML +=
             `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
             //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-            `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content.name}</span>${isDir ? '...' : ''}</a>`;
+            `<span class="filepath${isDir ? '' : ' closeOnClick'}">${escapeHtml(content.name)}</span>${isDir ? '...' : ''}</a>`;
           assignGithubMenuClickHandlers();
         });
       } else {
@@ -616,7 +679,7 @@ export async function fillInBranchContents(e) {
             generateUrl()
           )})`;
           // FIXME - make this work with isomorphic-git and all cloud providers
-          const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+          const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${encodeURIComponent(meiFileName)}&body=${openInMeiFriendUrl}`;
           window.open(fullOpenIssueUrl, '_blank');
         });
         const reportIssueDivider = document.createElement('hr');
@@ -673,8 +736,19 @@ function showCloneErrorAlert(e) {
   ]);*/
 }
 
-function handleWorkflowsListReceived(resp) {
+async function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById('actionsDividerStart');
+  const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
+  const disabledWorkflowTooltip =
+    translator?.lang?.githubActionsDisabledTooltip?.text ||
+    'Open an encoding from this repository to run GitHub Actions workflows.';
+  const dirtyWorkflowTooltip =
+    translator?.lang?.githubActionsDisabledDirtyTooltip?.text ||
+    'Commit or discard your local changes to run GitHub Actions workflows.';
+  const hasUncommittedChanges =
+    typeof gm.hasUncommittedChanges === 'function' ? await gm.hasUncommittedChanges() : await gm.fileChanged();
+  const disableForRepo = !hasMatchingGithubEncoding;
+  const disableForDirty = hasMatchingGithubEncoding && hasUncommittedChanges;
   if (actionsDivider) {
     resp.forEach((wf) => {
       if (wf.state === 'active') {
@@ -690,7 +764,25 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.innerText = 'GH Action: ' + wf.name;
         workflowSpan.classList.add('inline-block-tight', 'workflow');
         let workflowSpanContainer = document.createElement('a');
-        workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
+        workflowSpanContainer.onclick = (e) => {
+          if (
+            workflowSpanContainer.classList.contains('workflow-disabled') ||
+            workflowSpanContainer.getAttribute('aria-disabled') === 'true'
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          handleClickGithubAction(e, gm);
+        };
+        if (disableForRepo || disableForDirty) {
+          const tooltipText = disableForRepo ? disabledWorkflowTooltip : dirtyWorkflowTooltip;
+          workflowSpanContainer.classList.add('workflow-disabled');
+          workflowSpan.classList.add('disabled');
+          workflowSpanContainer.setAttribute('aria-disabled', 'true');
+          workflowSpanContainer.title = tooltipText;
+          workflowSpan.title = tooltipText;
+        }
         workflowSpanContainer.insertAdjacentElement('beforeend', workflowSpan);
         actionsDivider.insertAdjacentElement('afterend', workflowSpanContainer);
       } else {
@@ -706,6 +798,10 @@ function handleWorkflowsListReceived(resp) {
         actionsContentDivider.classList.add('actionsDivider');
         firstBranchContents.insertAdjacentElement('beforebegin', actionsContentDivider);
       }
+    }
+    const actionsContainer = actionsDivider.parentElement;
+    if (actionsContainer) {
+      actionsContainer.classList.toggle('notAllowed', disableForRepo || disableForDirty);
     }
   }
   // show or hide GitHub actions depending on user preference
@@ -753,10 +849,10 @@ export function renderCommitLog(gitlog) {
   gitlog.forEach((c) => {
     const commitRow = document.createElement('tr');
     commitRow.innerHTML = `
-      <td>${c.commit.author.date}</td>
-      <td>${c.commit.author.name}</td>
-      <td>${c.commit.message}</td>
-      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.sha.slice(0, 8)}...</a></td>`;
+      <td>${escapeHtml(c.commit.author.date)}</td>
+      <td>${escapeHtml(c.commit.author.name)}</td>
+      <td>${escapeHtml(c.commit.message)}</td>
+      <td><a target="_blank" href="https://github.com/${escapeHtml(gm.repo)}/commits/${escapeHtml(c.sha)}">${escapeHtml(c.sha.slice(0, 8))}...</a></td>`;
     logTable.appendChild(commitRow);
   });
   const commitLogHeader = document.createElement('a');
@@ -792,29 +888,122 @@ async function handleClickGithubAction(e, gm) {
   }
   ghLogo.classList.add('clockwise');
   console.log('dataset: ', target.dataset);
+  const initialContents = document.getElementById('githubActionsInitialContents');
   const inputContainerWrapper = document.getElementById('githubActionsInputConfigContainer');
+  initialContents.style.display = '';
+  document.getElementById('githubActionsUI')?.classList.add('githubActionsCentered');
+  delete inputContainerWrapper.dataset.mode;
+  if (inputContainerWrapper._configUrlObserver) {
+    inputContainerWrapper._configUrlObserver.disconnect();
+    delete inputContainerWrapper._configUrlObserver;
+  }
+  // clear children of inputContainerWrapper (don't just reset innerHTML, so we also clear event handlers)
   while (inputContainerWrapper.firstChild) {
-    // clear content of input container
-    // (don't just reset innerHTML, so that we also clear event handlers)
     inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
   }
   gm.getWorkflowInputs(target.dataset.path)
-    .then((inputs) => {
-      if (!inputs) {
+    .then((wfInputsObj) => {
+      if (!wfInputsObj || !wfInputsObj.inputs) {
         return;
       }
-      let keys = Object.keys(inputs);
-      if (keys.length) {
+      const showWorkPackageUI = wfInputsObj.showWorkPackageUI;
+      const inputs = wfInputsObj.inputs;
+      const keys = Object.keys(inputs);
+      workflowName.dataset.inputKeys = JSON.stringify(keys);
+      if (!keys.length) return;
+
+      inputContainerWrapper.dataset.mode = showWorkPackageUI ? 'workpackage' : 'generic';
+
+      if (showWorkPackageUI) {
+        const workpackageContainer = document.createElement('div');
+        workpackageContainer.setAttribute('id', 'githubActionsWorkpackageContainer');
+        const workpackageConfigParams = document.createElement('div');
+        workpackageConfigParams.setAttribute('id', 'githubActionsWorkpackageConfigParams');
+        workpackageContainer.appendChild(workpackageConfigParams);
+        inputContainerWrapper.appendChild(workpackageContainer);
+
+        const workpackageConfigUrlSetting = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+        const renderWorkPackages = (resp) => {
+          if (!resp) {
+            workpackageConfigParams.innerHTML = '';
+            return;
+          }
+          try {
+            const parsed = JSON.parse(resp);
+            let workPackages = parsed;
+            if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.work_packages)) {
+              workPackages = parsed.work_packages;
+              workpackageConfigUrlSetting.dataset.centralRepository = parsed.central_repository || '';
+              workpackageConfigUrlSetting.dataset.branch = parsed.branch || '';
+              workpackageConfigUrlSetting.dataset.automationPath = parsed.automation_path || '';
+            } else {
+              delete workpackageConfigUrlSetting.dataset.centralRepository;
+              delete workpackageConfigUrlSetting.dataset.branch;
+              delete workpackageConfigUrlSetting.dataset.automationPath;
+            }
+            fillWorkpackageConfigParams(workpackageConfigParams, workPackages);
+          } catch (err) {
+            console.warn('githubActions workpackage config: could not parse data-json-response', err);
+            workpackageConfigParams.innerHTML = '';
+          }
+        };
+
+        const evaluateWorkpackageState = () => {
+          if (!workpackageConfigUrlSetting || !workpackageConfigUrlSetting.value) return 'invalid';
+          const resp = workpackageConfigUrlSetting.dataset.jsonResponse;
+          if (resp) {
+            try {
+              const parsed = JSON.parse(resp);
+              let workPackages = parsed;
+              if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.work_packages)) {
+                workPackages = parsed.work_packages;
+              }
+              if (Array.isArray(workPackages) && workPackages.some((item) => item && item.userFacing == true)) {
+                return 'valid';
+              }
+            } catch {
+              // fall through
+            }
+          }
+          if (workpackageConfigUrlSetting.classList.contains('urlDoesNotResolve')) return 'invalid';
+          return 'loading';
+        };
+
+        const updateUI = () => {
+          const state = evaluateWorkpackageState();
+          if (state === 'valid') {
+            renderWorkPackages(workpackageConfigUrlSetting.dataset.jsonResponse);
+          } else {
+            workpackageConfigParams.innerHTML =
+              state === 'invalid'
+                ? '<p class="githubActionsRequiresWorkpackageMessage">' +
+                  translator.lang.githubActionsRequiresWorkpackageDefinition.text +
+                  '</p>'
+                : '';
+            if (workpackageConfigUrlSetting) {
+              delete workpackageConfigUrlSetting.dataset.centralRepository;
+              delete workpackageConfigUrlSetting.dataset.branch;
+              delete workpackageConfigUrlSetting.dataset.automationPath;
+            }
+          }
+          setRunButtonMode(state);
+        };
+        updateUI();
+        if (workpackageConfigUrlSetting) {
+          const configUrlObserver = new MutationObserver(updateUI);
+          configUrlObserver.observe(workpackageConfigUrlSetting, {
+            attributes: true,
+            attributeFilter: ['data-json-response', 'class'],
+          });
+          inputContainerWrapper._configUrlObserver = configUrlObserver;
+        }
+      } else {
         const inputContainer = document.createElement('div');
-        const inputContainerHeader = document.createElement('h4');
-        inputContainerHeader.setAttribute('id', 'githubActionsInputContainerHeader');
-        inputContainerHeader.innerText = translator.lang.githubActionsInputContainerHeader.text;
-        inputContainer.insertAdjacentElement('afterbegin', inputContainerHeader);
         keys.forEach((k) => {
-          const inputConfig = generateGithubActionsInputConfig(inputs, k);
-          inputContainer.insertAdjacentElement('beforeend', inputConfig);
+          const paramConfig = generateGithubActionsParamConfig(inputs, k);
+          inputContainer.insertAdjacentElement('beforeend', paramConfig);
         });
-        inputContainerWrapper.insertAdjacentElement('beforeend', inputContainer);
+        inputContainerWrapper.appendChild(inputContainer);
       }
     })
     .finally(() => {
@@ -827,73 +1016,331 @@ async function handleClickGithubAction(e, gm) {
     overlay.style.display = 'none';
     statusMsg.innerHTML = '';
   };
-  runBtn.onclick = () => {
-    statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
-    cancelBtn.setAttribute('disabled', true);
-    runBtn.setAttribute('disabled', true);
-    ghLogo.classList.add('clockwise');
-    // gather inputs:
-    const specifiedInputs = {};
-    document.querySelectorAll('.githubActionsInputField').forEach((i) => {
-      specifiedInputs[i.dataset.input] = i.value;
-    });
-    gm.requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
-      .then((workflowRunResp) => {
-        console.log('Got workflow run response: ', workflowRunResp);
-        if (workflowRunResp.status >= 400) {
-          // error
-          statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
-        } else {
-          // poll on latest workflow run
-          gm.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
-            console.log('Got workflow completion resp: ', workflowCompletionResp);
-            if ('conclusion' in workflowCompletionResp) {
-              if (workflowCompletionResp.conclusion === 'success') {
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
-                runBtn.removeAttribute('disabled');
-                ghLogo.classList.remove('clockwise');
-                runBtn.onclick = async () => {
-                  ghLogo.classList.add('clockwise');
-                  // do a pull to refresh the file
-                  await gm.pull();
-                  // redraw github menu to reflect changes in git log
-                  fillInCommitLog('withRefresh');
-                  console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
-                  loadFile();
-                  overlay.style.display = 'none';
-                  statusMsg.innerHTML = '';
-                  runBtn.innerText = translator.lang.githubActionsRunButton.text;
-                  cancelBtn.removeAttribute('disabled');
-                  ghLogo.classList.add('clockwise');
-                };
-              } else {
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                cancelBtn.removeAttribute('disabled');
-                runBtn.removeAttribute('disabled');
-                ghLogo.classList.remove('clockwise');
-              }
-            } else {
-              console.error('Invalid response received from GitHub API', workflowCompletionResp);
-              cancelBtn.removeAttribute('disabled');
-              runBtn.removeAttribute('disabled');
-              ghLogo.classList.remove('clockwise');
-              statusMsg.innerHTML = 'Error - invalid response received from GitHub API (see console)';
-            }
-          });
-          //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
-        }
-      })
-      .catch((e) => {
-        // network error
-        console.error('Could not start workflow - perhaps network error?', e);
-        statusMsg.innerHTML = 'Error';
-        cancelBtn.removeAttribute('disabled');
-        runBtn.removeAttribute('disabled');
-        ghLogo.classList.remove('clockwise');
+  const runWorkflow = () => {
+    // Hide initial contents when workflow starts
+    const initialContents = document.getElementById('githubActionsInitialContents');
+    if (initialContents) initialContents.style.display = 'none';
+    if (inputContainerWrapper.dataset.mode) {
+      const isWorkpackage = inputContainerWrapper.dataset.mode === 'workpackage';
+      // gather inputs:
+      const specifiedInputs = {};
+      inputContainerWrapper.querySelectorAll('.githubActionsInputField').forEach((i) => {
+        specifiedInputs[i.dataset.input] = i.value;
       });
+      // if we are in workpackage mode, we must repackage the inputs to the expected format
+      let repackagedInputs;
+      if (isWorkpackage) {
+        try {
+          repackagedInputs = {};
+          repackagedInputs.parameters = JSON.stringify(specifiedInputs);
+          let select = inputContainerWrapper.querySelector('select');
+          let selectId = select.value;
+          let selectText = select.options[select.selectedIndex].text;
+          repackagedInputs.workpackage_id = selectId;
+          repackagedInputs.workpackage_json = select.dataset.workpackageJson || '';
+          let strippedPath = gm.filepath.startsWith('/') ? gm.filepath.substring(1) : gm.filepath;
+          repackagedInputs.filepath = strippedPath;
+          repackagedInputs.commit_message =
+            'mei-friend: Used GitHub Action to apply ' + selectText + ' to ' + strippedPath;
+          const customConfigUrlEl = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+          if (customConfigUrlEl) {
+            if (customConfigUrlEl.dataset.centralRepository) {
+              repackagedInputs.central_repository = customConfigUrlEl.dataset.centralRepository;
+            }
+            if (customConfigUrlEl.dataset.branch) {
+              repackagedInputs.branch = customConfigUrlEl.dataset.branch;
+            }
+            if (customConfigUrlEl.dataset.automationPath) {
+              repackagedInputs.automation_path = customConfigUrlEl.dataset.automationPath;
+            }
+          }
+        } catch (err) {
+          console.error('Could not repackage custom GitHub Actions inputs: ', err);
+          statusMsg.innerHTML = 'Error - could not repackage custom inputs (see console)';
+          return;
+        }
+      }
+      const waitingLinkText = translator?.lang?.githubActionsWaitingOpenLink?.text || 'Open workflow on GitHub';
+      let progressInterval = null;
+      let workflowFinished = false;
+      let cancelRequested = false;
+      let cancelInFlight = false;
+      const extractJobSummary = (logText) => {
+        if (!logText) return '';
+        let startMarkerIx = logText.lastIndexOf(GHAStartMarker);
+        let endMarkerIx = logText.lastIndexOf(GHAEndMarker);
+        if (startMarkerIx !== -1 && endMarkerIx !== -1 && endMarkerIx > startMarkerIx) {
+          let extractedText = logText.slice(startMarkerIx + GHAStartMarker.length, endMarkerIx).trim();
+          // On each new line in extracted text, remove the first 29 characters (timestamp and space)
+          extractedText = extractedText
+            .split('\n')
+            .map((line) => line.slice(29))
+            .join('\n');
+          return extractedText;
+        }
+        return translator.lang.githubActionsNoSummaryProvided.text;
+      };
+      const buildStepsSummary = (job) => {
+        if (!job || !Array.isArray(job.steps)) return '';
+        const lines = job.steps.map((s) => `${s.name}: ${s.conclusion || s.status || 'unknown'}`);
+        return lines.join('\n');
+      };
+      const appendJobSummary = async (runId, loadingElementId = '') => {
+        if (!runId) return;
+        try {
+          const jobsResp = await gm.getWorkflowJobs(runId);
+          if (!jobsResp || !Array.isArray(jobsResp.jobs) || jobsResp.jobs.length === 0) return;
+          const jobsSorted = jobsResp.jobs
+            .slice()
+            .sort(
+              (a, b) => new Date(b.completed_at || b.started_at || 0) - new Date(a.completed_at || a.started_at || 0)
+            );
+          const job = jobsSorted[0];
+          let summaryText = '';
+          const logsResp = await gm.getWorkflowJobLogs(job.id);
+          if (logsResp && logsResp.type === 'text') {
+            summaryText = extractJobSummary(logsResp.text);
+          }
+          if (!summaryText) {
+            summaryText = buildStepsSummary(job);
+          }
+          // Skip writing if the user has left the githubActionsUI while we were fetching
+          if (summaryText && overlay.style.display !== 'none') {
+            statusMsg.innerHTML += `<div id="githubActionsJobSummary"><pre>${escapeHtml(summaryText)}</pre></div>`;
+          }
+        } catch (err) {
+          console.warn('Could not retrieve job summary', err);
+        } finally {
+          if (loadingElementId) {
+            const loadingEl = document.getElementById(loadingElementId);
+            if (loadingEl) loadingEl.remove();
+          }
+        }
+      };
+      const clearProgressInterval = () => {
+        if (progressInterval) {
+          clearInterval(progressInterval);
+          progressInterval = null;
+        }
+      };
+      const renderWaitingStatus = (linkUrl = '', progress = null, onCancel = null) => {
+        if (workflowFinished) return;
+        const showProgress = linkUrl && progress && !cancelRequested;
+        const progressHtml = showProgress
+          ? `<a href="${linkUrl}" target="_blank" rel="noopener"><progress max="${progress.total}" value="${progress.completed}"></progress></a>`
+          : '';
+        const cancelHtml =
+          linkUrl && onCancel && !cancelRequested
+            ? `<button id="githubActionsCancelRun" type="button">${translator.lang.githubActionsCancelButton.text}</button>`
+            : '';
+        const cancelingHtml = linkUrl && cancelRequested ? `<div class="githubActionsSummaryLoading"></div>` : '';
+        const linkHtml = linkUrl ? `<a href="${linkUrl}" target="_blank" rel="noopener">${waitingLinkText}</a>` : '';
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
+        if (showProgress || cancelingHtml) {
+          statusMsg.innerHTML += `<div class="githubActionsProgress">${progressHtml}${cancelHtml}${cancelingHtml}</div>`;
+        }
+        if (linkHtml) {
+          statusMsg.innerHTML += `<div class="githubActionsProgressLink">${linkHtml}</div>`;
+        }
+        if (onCancel) {
+          const cancelRunBtn = document.getElementById('githubActionsCancelRun');
+          if (cancelRunBtn) {
+            cancelRunBtn.onclick = async (ev) => {
+              if (!ev?.isTrusted || cancelInFlight || cancelRequested) return;
+              cancelInFlight = true;
+              try {
+                await onCancel();
+              } finally {
+                cancelInFlight = false;
+              }
+            };
+          }
+        }
+      };
+      renderWaitingStatus();
+      cancelBtn.setAttribute('disabled', true);
+      runBtn.setAttribute('disabled', true);
+      ghLogo.classList.add('clockwise');
+      const actionInputs = repackagedInputs ? repackagedInputs : specifiedInputs;
+      console.log('Requesting workflow run ' + workflowName.dataset.id + ' with inputs: ', actionInputs);
+      gm.requestActionWorkflowRun(workflowName.dataset.id, actionInputs)
+        .then((workflowRunResp) => {
+          console.log('Got workflow run response: ', workflowRunResp);
+          const dispatchTime = workflowRunResp?.dispatchTime || new Date().toISOString();
+          console.log('Dispatch time for workflow run:', dispatchTime);
+          if (workflowRunResp.status >= 400) {
+            // error
+            statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+            if (initialContents) initialContents.style.display = '';
+            cancelBtn.removeAttribute('disabled');
+            runBtn.removeAttribute('disabled');
+            ghLogo.classList.remove('clockwise');
+          } else {
+            gm.awaitActionWorkflowStart(workflowName.dataset.id, dispatchTime).then((workflowStartResp) => {
+              if (workflowStartResp && workflowStartResp.html_url) {
+                renderWaitingStatus(workflowStartResp.html_url);
+                const updateProgress = async () => {
+                  try {
+                    if (workflowFinished || cancelRequested) return;
+                    const jobsResp = await gm.getWorkflowJobs(workflowStartResp.id);
+                    if (jobsResp && Array.isArray(jobsResp.jobs)) {
+                      let totalSteps = 0;
+                      let completedSteps = 0;
+                      jobsResp.jobs.forEach((job) => {
+                        if (Array.isArray(job.steps)) {
+                          totalSteps += job.steps.length;
+                          completedSteps += job.steps.filter((s) => s.status === 'completed').length;
+                        }
+                      });
+                      if (totalSteps > 0) {
+                        renderWaitingStatus(
+                          workflowStartResp.html_url,
+                          {
+                            completed: completedSteps,
+                            total: totalSteps,
+                          },
+                          async () => {
+                            try {
+                              const cancelResp = await gm.cancelWorkflowRun(workflowStartResp.id);
+                              if (!cancelResp || cancelResp.status >= 400) {
+                                statusMsg.innerHTML += `<div class="githubActionsCancelError">Cancel failed</div>`;
+                              } else {
+                                if (cancelResp.status === 202 || cancelResp.status === 204) {
+                                  cancelRequested = true;
+                                  renderWaitingStatus(workflowStartResp.html_url, {
+                                    completed: completedSteps,
+                                    total: totalSteps,
+                                  });
+                                }
+                              }
+                            } catch (err) {
+                              console.warn('Could not cancel workflow run', err);
+                            }
+                          }
+                        );
+                      }
+                    }
+                  } catch (err) {
+                    console.warn('Could not fetch workflow jobs for progress', err);
+                  }
+                };
+                updateProgress();
+                progressInterval = setInterval(updateProgress, 1000);
+              }
+              const runStartAt = workflowStartResp?.run_started_at || null;
+              const runUrl = workflowStartResp?.url || null;
+              const runId = workflowStartResp?.id || null;
+              // poll on latest workflow run
+              gm.awaitActionWorkflowCompletion(workflowName.dataset.id, runStartAt, dispatchTime, runUrl).then(
+                (workflowCompletionResp) => {
+                  clearProgressInterval();
+                  console.log('Got workflow completion resp: ', workflowCompletionResp);
+                  if ('conclusion' in workflowCompletionResp) {
+                    if (workflowCompletionResp.conclusion === 'success') {
+                      workflowFinished = true;
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionsRunCompletedMsg.text}</span> <a href="${workflowCompletionResp.html_url}" target="_blank">${translator.lang.githubActionsGitHubStatusLink.text}</a><div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                      runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
+                      // Keep Reload MEI disabled until the job summary has finished loading
+                      appendJobSummary(runId, 'githubActionsSummaryLoading').finally(() => {
+                        runBtn.removeAttribute('disabled');
+                      });
+                      ghLogo.classList.remove('clockwise');
+                      // Keep initial contents hidden on success
+                      runBtn.onclick = async () => {
+                        ghLogo.classList.add('clockwise');
+                        // do a pull to refresh the file
+                        await gm.pull();
+                        // redraw github menu to reflect changes in git log
+                        fillInCommitLog('withRefresh');
+                        console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
+                        loadFile();
+                        overlay.style.display = 'none';
+                        statusMsg.innerHTML = '';
+                        runBtn.innerText = translator.lang.githubActionsRunButton.text;
+                        cancelBtn.removeAttribute('disabled');
+                        ghLogo.classList.add('clockwise');
+                      };
+                    } else {
+                      workflowFinished = true;
+                      statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionsRunFailedMsg.text}</span> <a href="${workflowCompletionResp.html_url}" target="_blank">${translator.lang.githubActionsGitHubStatusLink.text}</a>`;
+                      cancelBtn.removeAttribute('disabled');
+                      runBtn.removeAttribute('disabled');
+                      ghLogo.classList.remove('clockwise');
+                      // Show initial contents again on failure
+                      const initialContents = document.getElementById('githubActionsInitialContents');
+                      if (initialContents) initialContents.style.display = '';
+                    }
+                  } else {
+                    workflowFinished = true;
+                    console.error('Invalid response received from GitHub API', workflowCompletionResp);
+                    cancelBtn.removeAttribute('disabled');
+                    runBtn.removeAttribute('disabled');
+                    ghLogo.classList.remove('clockwise');
+                    statusMsg.innerHTML = `Error - invalid response received from GitHub API (see console)<div id="githubActionsSummaryLoading" class="githubActionsSummaryLoading"></div>`;
+                    appendJobSummary(runId, 'githubActionsSummaryLoading');
+                  }
+                }
+              );
+            });
+            //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
+          }
+        })
+        .catch((e) => {
+          // network error
+          console.error('Could not start workflow - perhaps network error?', e);
+          statusMsg.innerHTML = 'Error';
+          if (initialContents) initialContents.style.display = '';
+          cancelBtn.removeAttribute('disabled');
+          runBtn.removeAttribute('disabled');
+          ghLogo.classList.remove('clockwise');
+          clearProgressInterval();
+        });
+    }
+  };
+  runBtn.innerText = translator.lang.githubActionsRunButton.text;
+  runBtn.removeAttribute('disabled');
+  runBtn.onclick = runWorkflow;
+
+  const supplyWorkpackageDefinition = () => {
+    overlay.style.display = 'none';
+    statusMsg.innerHTML = '';
+    v.showSettingsPanel();
+    document.getElementById('meifriendOptionsTab').click();
+    const input = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+    if (!input) return;
+    const details = input.closest('details');
+    if (details) details.open = true;
+    const optionsItem = input.closest('.optionsItem');
+    if (optionsItem) optionsItem.scrollIntoView({ block: 'center' });
+    input.focus({ preventScroll: true });
+    if (!optionsItem) return;
+    optionsItem.classList.remove('githubActionsFlashAlert');
+    void optionsItem.offsetWidth; // restart animation
+    optionsItem.classList.add('githubActionsFlashAlert');
+  };
+  const setRunButtonMode = (mode) => {
+    if (mode === 'loading') {
+      runBtn.innerText = '...';
+      runBtn.setAttribute('disabled', '');
+      runBtn.onclick = null;
+    } else if (mode === 'invalid') {
+      runBtn.innerText = translator.lang.githubActionsSupplyWorkpackageDefinition.text;
+      runBtn.removeAttribute('disabled');
+      runBtn.onclick = supplyWorkpackageDefinition;
+    } else {
+      runBtn.innerText = translator.lang.githubActionsRunButton.text;
+      runBtn.removeAttribute('disabled');
+      runBtn.onclick = runWorkflow;
+    }
   };
 } // handleClickGithubAction()
+
+// Test hook: lets e2e/githubActions.spec.ts invoke handleClickGithubAction
+// with a mock gm, bypassing a real GitHub login. Only exposed in dev mode.
+if (typeof environments !== 'undefined' && env === environments.develop) {
+  window.__mf_triggerGithubAction = (dataset, mockGm) =>
+    handleClickGithubAction({ target: { nodeName: 'SPAN', dataset } }, mockGm ?? gm);
+}
 
 export function logoutFromGithub() {
   if (storage.supported) {
@@ -1130,23 +1577,39 @@ function stripMeiFileName() {
   }
 } // stripMeiFileName()
 
-function generateGithubActionsInputConfig(inputs, input) {
+function generateGithubActionsParamConfig(inputs, input, custom = false) {
+  const configType = custom ? 'WorkpackageConfig' : 'GenericConfig';
   const inputConfig = document.createElement('div');
-  inputConfig.classList.add('githubActionsInputConfig');
-  inputConfig.setAttribute('id', 'githubActionsInputConfig_' + input);
+  inputConfig.classList.add('githubActions' + configType);
+  inputConfig.setAttribute('id', 'githubActions' + configType + '_' + input);
   const inputName = document.createElement('span');
+  inputName.classList.add('githubActionsParamName');
   inputName.innerText = input;
-  if ('description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
+  if (!custom && 'description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
+  if (custom && inputs[input] && inputs[input].description) {
+    inputName.setAttribute('title', inputs[input].description);
+  }
   const inputFieldWrapper = document.createElement('div');
   inputFieldWrapper.classList.add('githubActionsInputFieldWrapper');
   const inputField = document.createElement('input');
   inputField.setAttribute('type', 'text');
   inputField.classList.add('githubActionsInputField');
+  inputField.classList.add('preventKeyBindings');
   inputField.dataset.input = input;
   inputField.setAttribute('id', 'githubActionsInputField_' + input);
   if ('default' in inputs[input]) {
-    inputField.defaultValue = inputs[input].default;
+    // use value so it persists for custom params, defaultValue for standard inputs
+    if (custom) {
+      inputField.value = inputs[input].default ? inputs[input].default : '';
+    } else {
+      inputField.defaultValue = inputs[input].default;
+    }
   }
+  if (custom && inputs[input] && inputs[input].type) {
+    inputField.dataset.type = inputs[input].type;
+    inputField.setAttribute('placeholder', inputs[input].type);
+  }
+
   const inputSetters = document.createElement('div');
   ghActionsInputSetters.forEach((inp) => {
     // create "input setters" that copy useful content into the input field on user request
