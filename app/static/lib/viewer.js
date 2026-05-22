@@ -1306,13 +1306,54 @@ export default class Viewer {
   toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
-    const midiSpeedmodeIndicator = document.getElementById('midiSpeedmodeIndicator');
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 'flex' : 'none';
-    midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
-    // console.log('toggle: ', midiPlaybackControlBar);
+    this.applySpeedModeUi();
     setOrientation(cm);
     midiPlaybackControlBar.focus();
   } // toggleMidiPlaybackControlBar()
+
+  /**
+   * Reflect the current speedMode in the MIDI-bar indicator and in the
+   * expansion dropdown. In speed mode we force Verovio's expandNever and
+   * disable the dropdown so the user can't pick an expansion that contradicts
+   * the page-only rendering. Leaving speed mode just re-enables the dropdown;
+   * the user can change the expansion again from there.
+   */
+  applySpeedModeUi() {
+    const wrapper = document.getElementById('midiSpeedmodeIndicatorWrapper');
+    const indicatorTitle =
+      translator?.lang?.midiSpeedmodeIndicator?.description ||
+      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, uncheck this box.';
+    if (wrapper) {
+      wrapper.style.display = this.speedMode ? 'inline-flex' : 'none';
+      // Mirror the indicator span's translated title onto the wrapper and the
+      // checkbox so hovering any part of the control shows the same tooltip
+      // (the translator's id-based auto-translate only reaches the span).
+      wrapper.title = indicatorTitle;
+    }
+    const cb = document.getElementById('midiSpeedmodeCheckbox');
+    if (cb) {
+      cb.checked = this.speedMode;
+      cb.title = indicatorTitle;
+    }
+    const barSel = document.getElementById('controlbar-midi-expansion-selector');
+    if (this.speedMode) {
+      if (tkVersionNumber >= 6.0 && this.getExpansionMode() !== 'never') {
+        this.setExpansionMode('never', { reRender: false });
+      }
+      if (barSel) {
+        barSel.disabled = true;
+        barSel.title =
+          translator?.lang?.midiExpansionSelectorDisabledTitle?.text ||
+          'Disabled in speed mode (only the current page is rendered).';
+      }
+    } else if (barSel) {
+      barSel.disabled = false;
+      barSel.title =
+        translator?.lang?.midiExpansionSelectorTitle?.text ||
+        'Select expansion element for MIDI playback';
+    }
+  } // applySpeedModeUi()
 
   toggleAnnotationPanel() {
     setOrientation(cm);
@@ -1452,7 +1493,7 @@ export default class Viewer {
         //          translateLanguageSelection();
         //          break;
         case 'toggleSpeedMode':
-          document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
+          this.applySpeedModeUi();
           break;
         case 'showMarkup':
           att.modelTranscriptionLike.forEach((element) => {
@@ -2339,7 +2380,8 @@ export default class Viewer {
     if (vrvOption) {
       while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
     }
-    dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
+    const noExpansionLabel = translator?.lang?.noExpansionOption?.text || 'No expansion';
+    dutils.generateExpansionList(this.xmlDoc, 'music score', noExpansionLabel).forEach((str, i) => {
       if (expandSelect) {
         expandSelect.add(new Option(str[0], str[1]));
       }
@@ -2624,6 +2666,7 @@ export default class Viewer {
     if (tkVersionNumber >= 6.0) {
       this.setExpansionMode(this.getExpansionMode(), { reRender: false });
     }
+    this.applySpeedModeUi();
   } // applyExpansionModeVisibility()
 
   busy(active = true, speedWorker = false) {

@@ -599,7 +599,16 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Mode de velocitat',
     description:
-      'El mode de velocitat està actiu; només es reprodueix el MIDI per a la pàgina actual. Per reproduir tota la codificació, desactiveu el mode de velocitat.',
+      'El mode de velocitat està actiu; només es reprodueix el MIDI per a la pàgina actual. Per reproduir tota la codificació, desmarqueu aquesta casella.',
+  },
+  midiExpansionSelectorTitle: {
+    text: "Selecciona l'element d'expansió per a la reproducció MIDI",
+  },
+  midiExpansionSelectorDisabledTitle: {
+    text: 'Desactivat al mode de velocitat (només es renderitza la pàgina actual).',
+  },
+  noExpansionOption: {
+    text: 'Sense expansió',
   },
   closeMidiPlaybackControlBarButton: { description: 'Amaga la barra de control de reproducció MIDI' },
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ

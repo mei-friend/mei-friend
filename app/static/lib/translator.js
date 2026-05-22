@@ -98,6 +98,11 @@ export default class Translator {
     this.handleLanguageExceptions();
 
     if (isSafari) this.handleBrowserExceptions('Safari');
+
+    // Notify listeners that the UI strings are now in a (possibly) new language,
+    // so they can refresh any text they own outside the id-based auto-translate
+    // (e.g. dynamic tooltips set programmatically).
+    document.dispatchEvent(new CustomEvent('mf-language-changed'));
   } // translateGui()
 
   /**
