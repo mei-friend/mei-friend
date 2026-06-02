@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.5.0 develop
+### 1.4.1 develop
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 
 ### 1.4.0 Custom GitHub Action Configurations
