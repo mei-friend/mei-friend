@@ -818,7 +818,7 @@ export function invertPlacement(v, cm, modifier = false) {
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
     } else if (att.attStems.includes(el.nodeName)) {
-      (attr = 'stem.dir'), (val = 'up');
+      ((attr = 'stem.dir'), (val = 'up'));
       if (el.hasAttribute(attr) && el.getAttribute(attr) === val) {
         val = 'down';
       }
@@ -837,7 +837,7 @@ export function invertPlacement(v, cm, modifier = false) {
       // txtEdr.autoIndentSelectedRows();
     } else if (el.nodeName === 'beamSpan') {
       // replace individual notes in beamSpan
-      (attr = 'stem.dir'), (val = 'up');
+      ((attr = 'stem.dir'), (val = 'up'));
       let plist = el.getAttribute('plist');
       if (plist) {
         plist.split(' ').forEach((p) => {
@@ -855,7 +855,7 @@ export function invertPlacement(v, cm, modifier = false) {
       // find all note/chord elements children and execute InvertingAction
     } else if ((noteList = el.querySelectorAll('note, chord'))) {
       // console.info('noteList: ', noteList);
-      (attr = 'stem.dir'), (val = 'up');
+      ((attr = 'stem.dir'), (val = 'up'));
       for (let note of noteList) {
         // skip notes within chords
         if (note.parentNode.nodeName === 'chord') continue;
@@ -1363,7 +1363,9 @@ export function renumberMeasures(v, cm, change = false) {
 } // renumberMeasures()
 
 /**
- * Function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+ * Function for adding/removing xml:ids in xmlDoc & reloading MEI into cm.
+ * When a non-empty CodeMirror selection exists, only the selected XML is
+ * processed. For incomplete XML selections, xml:ids are identified by regex.
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {boolean} removeIds
@@ -1375,6 +1377,7 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
   let startTime = Date.now();
   let report = { added: 0, removed: 0 };
   let skipList = []; // list of xml:ids that will not be removed
+  let selectionKept = 0; // IDs found in selection that were kept because pointed to
 
   v.allowCursorActivity = false;
   cm.blockChanges = true;
@@ -1383,41 +1386,128 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
   let cursorPosition = cm.getCursor();
   let scrollInfo = cm.getScrollInfo();
 
+  // Determine whether a non-empty selection exists in CodeMirror
+  const cmSel = cm.listSelections()[0];
+  const selFrom =
+    cmSel.anchor.line < cmSel.head.line || (cmSel.anchor.line === cmSel.head.line && cmSel.anchor.ch <= cmSel.head.ch)
+      ? cmSel.anchor
+      : cmSel.head;
+  const selTo = selFrom === cmSel.anchor ? cmSel.head : cmSel.anchor;
+  const hasSelection = selFrom.line !== selTo.line || selFrom.ch !== selTo.ch;
+
+  // Load full XML document (needed for skipList and DOM manipulation)
   v.loadXml(cm.getValue(), true);
 
-  // start from these elements
-  let selector = 'mei'; // 'body > mdiv';
-  let rootList = v.xmlDoc.querySelectorAll(selector);
+  if (hasSelection) {
+    // === Selection-only mode ===
+    // Build skipList from the full document so cross-references outside the
+    // selection are respected when removing IDs
+    v.xmlDoc.querySelectorAll('mei').forEach((e) => dig(e, true));
 
-  // determine skipList to securely remove ids
-  if (removeIds) {
-    rootList.forEach((e) => dig(e, true));
+    const selText = cm.getRange(selFrom, selTo);
+
+    if (removeIds) {
+      // Find all xml:ids present in the selected text by regex, then remove them
+      // from the full XML DOM — no fragment reconstruction needed
+      const xmlIdPattern = /xml:id=["']([^"']+)["']/g;
+      let m;
+      while ((m = xmlIdPattern.exec(selText)) !== null) {
+        const id = m[1];
+        if (skipList.includes(id)) {
+          selectionKept++;
+        } else {
+          const el = v.xmlDoc.querySelector(`[*|id="${CSS.escape(id)}"]`);
+          if (el) {
+            el.removeAttribute('xml:id');
+            report.removed++;
+          }
+        }
+      }
+    } else {
+      // addIds: walk the full DOM sequentially while tracking the current character
+      // position in the original editor text to detect which elements fall inside
+      // the selection range — no fragment reconstruction needed
+      const fullText = cm.getValue();
+      const selStart = cm.indexFromPos(selFrom);
+      const selEnd = cm.indexFromPos(selTo);
+      let textPos = 0;
+
+      const walkForAdd = (el) => {
+        if (el.nodeType !== Node.ELEMENT_NODE) return;
+
+        // Advance textPos to this element's location in the original text.
+        // For elements that already have xml:id use the id string as anchor;
+        // for those without, search for the opening tag by name.
+        if (el.hasAttribute('xml:id')) {
+          const id = el.getAttribute('xml:id');
+          const idxDouble = fullText.indexOf(`xml:id="${id}"`, textPos);
+          const idxSingle = fullText.indexOf(`xml:id='${id}'`, textPos);
+          const idIdx = idxDouble < 0 ? idxSingle : idxSingle < 0 ? idxDouble : Math.min(idxDouble, idxSingle);
+          if (idIdx >= 0) textPos = idIdx + 1;
+        } else {
+          const tagIdx = fullText.indexOf(`<${el.nodeName}`, textPos);
+          if (tagIdx >= 0) {
+            textPos = tagIdx + 1;
+            if (
+              tagIdx >= selStart &&
+              tagIdx < selEnd &&
+              (selectedElements.length === 0 || selectedElements.includes(el.nodeName))
+            ) {
+              el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
+              report.added++;
+            }
+          }
+        }
+
+        el.childNodes.forEach((child) => walkForAdd(child));
+      };
+
+      v.xmlDoc.querySelectorAll('mei').forEach((e) => walkForAdd(e));
+    }
+
+    // Serialize the modified full DOM back into the editor
+    v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
+    cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+    addApplicationInfo(v, cm);
+
+    // Restore the selection so the user can see the processed region
+    cm.setSelection(selFrom, selTo);
+  } else {
+    // === Full-document mode (no selection) ===
+    const rootList = v.xmlDoc.querySelectorAll('mei');
+
+    // determine skipList to securely remove ids
+    if (removeIds) {
+      rootList.forEach((e) => dig(e, true));
+    }
+
+    // manipulate xml tree starting from selector
+    rootList.forEach((e) => dig(e));
+
+    // before serialization, sort xml attributes with xml:id first, then alphabetically
+    v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
+    cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+    addApplicationInfo(v, cm);
+
+    // Restore cursor position and editor viewport
+    cm.setCursor(cursorPosition);
+    cm.scrollIntoView({
+      left: scrollInfo.left,
+      top: scrollInfo.top,
+      right: scrollInfo.left + scrollInfo.width,
+      bottom: scrollInfo.top + scrollInfo.height,
+    });
   }
 
-  // manipulate xml tree starting from selector
-  rootList.forEach((e) => dig(e));
-
-  // before serialization, sort xml attributes with xml:id first, then alphabetically
-  v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
-  cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
-  addApplicationInfo(v, cm);
-
-  // Restore cursor position and editor viewport
-  cm.setCursor(cursorPosition);
-  cm.scrollIntoView({
-    left: scrollInfo.left,
-    top: scrollInfo.top,
-    right: scrollInfo.left + scrollInfo.width,
-    bottom: scrollInfo.top + scrollInfo.height,
-  });
-
   // reporting
+  const scope = hasSelection ? ' in selection' : ' in encoding';
   let msg;
   if (removeIds) {
-    msg = report.removed + ' xml:ids removed from encoding, ';
-    msg += skipList.length + ' xml:ids kept, because they are pointed to.';
+    msg = report.removed + ' xml:ids removed' + scope + ', ';
+    const kept = hasSelection ? selectionKept : skipList.length;
+    msg += kept + ' xml:ids kept, because they are pointed to.';
   } else {
-    msg = report.added + ' new xml:ids added to encoding';
+    msg = report.added + ' new xml:ids added' + scope;
     if (report.added > 0) {
       let el = document.getElementById('selectIdStyle');
       msg += ' (xml:id style: ' + el.value + '; e.g., "' + el.options[el.options.selectedIndex].title + '")';
@@ -1429,6 +1519,19 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
   v.allowCursorActivity = true;
   cm.blockChanges = false;
   handleEditorChanges();
+
+  // For selection mode: populate v.selectedElements with all xml:ids still present in
+  // the restored selection so that both the immediate updateHighlight call here and the
+  // one issued by the async Verovio re-render callback highlight the right elements.
+  if (hasSelection) {
+    const updatedSelText = cm.getRange(selFrom, selTo);
+    const selIdsPattern = /xml:id=["']([^"']+)["']/g;
+    let im;
+    v.selectedElements = [];
+    while ((im = selIdsPattern.exec(updatedSelText)) !== null) v.selectedElements.push(im[1]);
+    v.scrollSvgTo(cm);
+    v.updateHighlight(cm);
+  }
 
   if (showReport) {
     v.showAlert(msg, 'success');
