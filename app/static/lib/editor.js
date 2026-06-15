@@ -1489,15 +1489,17 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
     addApplicationInfo(v, cm);
 
-    // Restore cursor position and editor viewport
+    // Restore cursor position (selection path keeps its setSelection instead)
     cm.setCursor(cursorPosition);
-    cm.scrollIntoView({
-      left: scrollInfo.left,
-      top: scrollInfo.top,
-      right: scrollInfo.left + scrollInfo.width,
-      bottom: scrollInfo.top + scrollInfo.height,
-    });
   }
+
+  // Restore editor viewport for both paths so cm.setValue doesn't jump the view
+  cm.scrollIntoView({
+    left: scrollInfo.left,
+    top: scrollInfo.top,
+    right: scrollInfo.left + scrollInfo.width,
+    bottom: scrollInfo.top + scrollInfo.height,
+  });
 
   // reporting
   const scope = hasSelection ? ' in selection' : ' in encoding';
@@ -1529,7 +1531,6 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     let im;
     v.selectedElements = [];
     while ((im = selIdsPattern.exec(updatedSelText)) !== null) v.selectedElements.push(im[1]);
-    v.scrollSvgTo(cm);
     v.updateHighlight(cm);
   }
 
