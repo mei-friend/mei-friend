@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.4.1 develop
+* Add selection for Verovio 6.2.1 instead of 6.2.0
+* Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
+
 ### 1.4.0 Custom GitHub Action Configurations
 
 - Implement [#140](https://github.com/mei-friend/mei-friend/issues/140) to support custom GitHub Actions configurations

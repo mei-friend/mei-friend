@@ -383,10 +383,10 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
-supportedVerovioVersions['6.2.0'] = {
-  url: 'https://www.verovio.org/javascript/6.2.0/verovio-toolkit-hum.js',
-  description: 'Verovio release 6.2.0',
-  releaseDate: '20 May 2026',
+supportedVerovioVersions['6.2.1'] = {
+  url: 'https://www.verovio.org/javascript/6.2.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.2.1',
+  releaseDate: '22 May 2026',
 };
 supportedVerovioVersions['6.1.0'] = {
   // Verovio 6.1.1 does not provide JS toolkit files, so we keep 6.1.0
