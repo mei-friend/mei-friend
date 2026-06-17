@@ -612,15 +612,15 @@ export function generateAnnotationLocationLabel(a) {
     // trigger fetching of MAO components; subsequent refetching handled by situateAnnotations()
     annot.fetchMAOComponentsForIdentifiedObject(a.id);
   } else if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
-  } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection?.length ?? 0}&nbsp;${translator.lang.elementsPlural.text})`;
+  } else if (a.firstPage === 'unsituated' || a.firstPage === undefined || a.firstPage < 0) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
     annotationLocationLabel.innerHTML =
       translator.lang.pageAbbreviation.text +
       '&nbsp;' +
       (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
-      ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
+      ` (${a.selection?.length ?? 0}&nbsp;${translator.lang.elementsPlural.text})`;
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = 'loc-' + a.id;
