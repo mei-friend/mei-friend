@@ -635,7 +635,7 @@ async function writeStandoffIfRequested(a) {
           establishContainerResource(annotationContainer).then((annotationContainerResource) => {
             establishDiscoveryResource(currentFileUri)
               .then((dataCatalogResource) => {
-                let discoveryUri = dataCatalogResource.url;
+                let discoveryUri = dataCatalogResource;
                 // generate a web annotation JSON-LD object
                 let webAnno = new Object();
                 let body = new Object();
