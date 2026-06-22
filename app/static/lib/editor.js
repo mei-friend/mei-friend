@@ -1424,33 +1424,53 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
         }
       }
     } else {
-      // addIds: walk the full DOM sequentially while tracking the current character
-      // position in the original editor text to detect which elements fall inside
-      // the selection range — no fragment reconstruction needed
+      // addIds: walk the DOM in document order, using the last xml:id before the
+      // selection as a text-position anchor so the scan starts close to the
+      // selection rather than at position 0 — critical for large files.
       const fullText = cm.getValue();
       const selStart = cm.indexFromPos(selFrom);
       const selEnd = cm.indexFromPos(selTo);
+
+      // Scan backwards through the text prefix to find the last xml:id before selStart.
+      const prefixText = fullText.slice(0, selStart);
+      const lastDbl = prefixText.lastIndexOf('xml:id="');
+      const lastSgl = prefixText.lastIndexOf("xml:id='");
+      const lastIdPos = Math.max(lastDbl, lastSgl); // -1 when none found
+
       let textPos = 0;
+      const treeWalker = v.xmlDoc.createTreeWalker(v.xmlDoc, NodeFilter.SHOW_ELEMENT);
 
-      const walkForAdd = (el) => {
-        if (el.nodeType !== Node.ELEMENT_NODE) return;
+      if (lastIdPos >= 0) {
+        // 'xml:id=' is 7 chars, so lastIdPos+7 is the opening quote character.
+        const quoteChar = fullText[lastIdPos + 7];
+        const anchorId = fullText.slice(lastIdPos + 8, fullText.indexOf(quoteChar, lastIdPos + 8));
+        const anchorEl = anchorId ? v.xmlDoc.querySelector(`[*|id="${CSS.escape(anchorId)}"]`) : null;
+        if (anchorEl) {
+          treeWalker.currentNode = anchorEl; // nextNode() starts just after this element
+          textPos = lastIdPos + 1;
+        }
+      }
 
-        // Advance textPos to this element's location in the original text.
-        // For elements that already have xml:id use the id string as anchor;
-        // for those without, search for the opening tag by name.
+      // Walk forward from the anchor (or document root) in document order.
+      // Stop as soon as the tracked text position passes selEnd.
+      let el = treeWalker.nextNode();
+      while (el) {
         if (el.hasAttribute('xml:id')) {
           const id = el.getAttribute('xml:id');
-          const idxDouble = fullText.indexOf(`xml:id="${id}"`, textPos);
-          const idxSingle = fullText.indexOf(`xml:id='${id}'`, textPos);
-          const idIdx = idxDouble < 0 ? idxSingle : idxSingle < 0 ? idxDouble : Math.min(idxDouble, idxSingle);
-          if (idIdx >= 0) textPos = idIdx + 1;
+          const idxDbl = fullText.indexOf(`xml:id="${id}"`, textPos);
+          const idxSgl = fullText.indexOf(`xml:id='${id}'`, textPos);
+          const idIdx = idxDbl < 0 ? idxSgl : idxSgl < 0 ? idxDbl : Math.min(idxDbl, idxSgl);
+          if (idIdx >= 0) {
+            textPos = idIdx + 1;
+            if (textPos > selEnd) break;
+          }
         } else {
           const tagIdx = fullText.indexOf(`<${el.nodeName}`, textPos);
           if (tagIdx >= 0) {
             textPos = tagIdx + 1;
+            if (tagIdx >= selEnd) break;
             if (
               tagIdx >= selStart &&
-              tagIdx < selEnd &&
               (selectedElements.length === 0 || selectedElements.includes(el.nodeName))
             ) {
               el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
@@ -1458,11 +1478,8 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
             }
           }
         }
-
-        el.childNodes.forEach((child) => walkForAdd(child));
-      };
-
-      v.xmlDoc.querySelectorAll('mei').forEach((e) => walkForAdd(e));
+        el = treeWalker.nextNode();
+      }
     }
 
     // Serialize the modified full DOM back into the editor
