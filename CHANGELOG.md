@@ -3,6 +3,7 @@
 ### 1.4.1 develop
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
+* Speed up schema-based hinting behavior while typing in CodeMirror editor
 
 ### 1.4.0 Custom GitHub Action Configurations
 

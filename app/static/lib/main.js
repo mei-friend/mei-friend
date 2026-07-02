@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.4.1';
-export const versionDate = '22 June 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '2 July 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -133,6 +133,7 @@ import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
 import GitManager from './git-manager.js';
+import { completeAfter, completeIfAfterLt, completeIfInTag } from './codemirror-hints.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -384,65 +385,6 @@ export async function updateGithubInLocalStorage() {
     };
   }
 }
-
-function completeAfter(cm, pred) {
-  if (!pred || pred())
-    setTimeout(function () {
-      if (!cm.state.completionActive)
-        cm.showHint({
-          completeSingle: false,
-        });
-    }, 100);
-  return CodeMirror.Pass;
-}
-
-function completeIfAfterLt(cm) {
-  return completeAfter(cm, function () {
-    var cur = cm.getCursor();
-    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === '<';
-  });
-}
-
-function completeIfInTag(cm) {
-  return completeAfter(cm, function () {
-    var tok = cm.getTokenAt(cm.getCursor());
-    if (tok.type === 'string' && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1))
-      return false;
-    var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
-    return inner.tagName;
-  });
-}
-
-// Wrap the xml hint helper so that picking an attribute name from the popup
-// automatically inserts =" and immediately re-triggers completion for the
-// allowed attribute values (if the schema defines any).
-(function wrapXmlHintsForAttributeValues() {
-  var orig = CodeMirror.helpers && CodeMirror.helpers.hint && CodeMirror.helpers.hint.xml;
-  if (!orig) return;
-  CodeMirror.registerHelper('hint', 'xml', function (cm, options) {
-    var result = orig(cm, options);
-    if (!result) return result;
-    result.list = result.list.map(function (item) {
-      var text = typeof item === 'string' ? item : item.text;
-      // Leave element names (<foo), attribute values ("bar"), and items that
-      // already carry a custom hint function unchanged.
-      if (!text || text[0] === '<' || text[0] === '"' || text[0] === "'" ||
-          (typeof item === 'object' && typeof item.hint === 'function')) return item;
-      // Attribute name: insert name + =" then offer value completion.
-      return {
-        text: text,
-        displayText: (typeof item === 'object' && item.displayText) ? item.displayText : text,
-        hint: function (cm, data, completion) {
-          cm.replaceRange(completion.text + '="', data.from, data.to);
-          setTimeout(function () {
-            if (!cm.state.completionActive) cm.showHint({ completeSingle: false });
-          }, 0);
-        },
-      };
-    });
-    return result;
-  });
-})();
 
 /**
  * Carries out code validation using validator.validateNG() and calls
