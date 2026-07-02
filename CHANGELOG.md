@@ -5,6 +5,7 @@
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
 * Speed up schema-based hinting behavior while typing in CodeMirror editor
 * Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
+* Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), stop forwarding the session cookie to upstream providers, remove the wildcard CORS header, and no longer log the access token to the browser console
 
 ### 1.4.0 Custom GitHub Action Configurations
 

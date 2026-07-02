@@ -7,7 +7,7 @@ window.pfs = window.fs.promises; // promisified version of fs, for your convenie
 
 export default class GitManager {
   constructor(provider, providerType, token, opts = {}) {
-    console.log('GitManager constructor', provider, providerType, token);
+    console.log('GitManager constructor', provider, providerType);
     this.token = token;
     this.directory = '/' + provider; // e.g. '/github'
     this.provider = provider;

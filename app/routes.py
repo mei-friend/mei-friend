@@ -80,9 +80,30 @@ def loginProvider(provider):
     else:
         return 'Unsupported provider', 400
 
+def revoke_github_token(token):
+    # Ask GitHub to invalidate the OAuth token so it cannot be reused after
+    # logout. OAuth App tokens do not expire on their own, so without this a
+    # leaked token stays valid indefinitely. Best-effort: never let a failure
+    # here block the user from logging out.
+    client_id = getenv("CLIENT_ID")
+    client_secret = getenv("SECRET_ID")
+    if not (token and client_id and client_secret):
+        return
+    try:
+        requests.delete(
+            'https://api.github.com/applications/{}/token'.format(client_id),
+            auth=(client_id, client_secret),
+            json={'access_token': token},
+            headers={'Accept': 'application/vnd.github+json'},
+            timeout=5,
+        )
+    except requests.RequestException as e:
+        print("Could not revoke GitHub token on logout:", e)
+
 @app.route("/logout")
 def logout():
     # log out of every provider
+    revoke_github_token(session.get('githubToken'))
     session.clear()
     env_url = getenv("ROOT_URL")
     return redirect(env_url if env_url else url_for('index'))
@@ -91,7 +112,11 @@ def logout():
 def logoutProvider(provider):
     # log out of a specific provider
     if provider == 'github':
-        session.pop('github_user', None)
+        revoke_github_token(session.get('githubToken'))
+        session.pop('githubToken', None)
+        session.pop('userLogin', None)
+        session.pop('userName', None)
+        session.pop('userEmail', None)
     elif provider == 'gitlab':
         session.pop('gitlab_user', None)
     elif provider == 'bitbucket':
@@ -135,6 +160,12 @@ def is_allowed_domain(url):
 @app.route('/proxy/<path:url>', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 @limiter.limit("5 per second")
 def proxy(url):
+    # Only logged-in users may use the proxy. All client-side git operations
+    # that route through here are gated on a GitHub login, so this does not
+    # restrict any anonymous flow; it prevents the endpoint being abused as an
+    # open relay by arbitrary third-party sites.
+    if 'githubToken' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
     # decode the URL to handle special characters
     url = requests.utils.unquote(url)
     if not url:
@@ -146,31 +177,25 @@ def proxy(url):
         return jsonify({'error': 'Domain not allowed'}), 400
     url+= '?' + request.query_string.decode()
 
-    # Get the request method and headers
+    # Get the request method and headers. Drop hop-by-hop and identity-bearing
+    # headers: never forward our own session cookie upstream (it is readable and
+    # carries the token), and let requests set its own Host.
     method = request.method
-    headers = {key: value for key, value in request.headers if key != 'Host'}
-    headers["Origin"] = headers["Referer"].strip("/")
+    excluded_request_headers = {'host', 'cookie'}
+    headers = {key: value for key, value in request.headers
+               if key.lower() not in excluded_request_headers}
+    headers["Origin"] = request.headers.get("Referer", request.host_url).strip("/")
     headers["Sec-Fetch-Site"] = "cross-site"
-    headers["TE"] = "trailers" 
-    auth_str = ''
-    if 'userLogin' in session:
-        auth_str = session['userLogin'] + ':' + session['githubToken']
+    headers["TE"] = "trailers"
 
-#   # Forward the request to the target URL
-    response = requests.request(method, url, headers=headers, data=request.get_data(), cookies=request.cookies)
+#   # Forward the request to the target URL (without forwarding client cookies)
+    response = requests.request(method, url, headers=headers, data=request.get_data())
 
     # Prepare the response to return to the client
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'www-authenticate']
     headers = [(name, value) for name, value in response.raw.headers.items() if name.lower() not in excluded_headers]
 
     return (response.content, response.status_code, headers)
-
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    return response
 
 if __name__ == '__main__':
     load_dotenv()
