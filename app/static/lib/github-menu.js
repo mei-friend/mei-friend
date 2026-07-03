@@ -360,7 +360,7 @@ function onFileNameEdit(e) {
 
 function onMessageInput(e) {
   e.target.classList.remove('warn');
-  if (e.target.innerText === '') {
+  if (e.target.value === '') {
     document.getElementById('githubCommitButton').setAttribute('disabled', '');
   } else {
     document.getElementById('githubCommitButton').removeAttribute('disabled');
