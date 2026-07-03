@@ -23,7 +23,9 @@ export default class GitManager {
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
     switch (providerType) {
       case 'github':
-        this.onAuth = () => ({ username: this.token, password: 'x-oauth-basic' });
+        // no client-side credentials: git requests go through the server-side
+        // /proxy (corsProxy), which attaches auth from the user's session
+        this.onAuth = undefined;
         break;
       case 'gitlab':
         this.onAuth = () => ({ username: 'oauth2', password: this.token });

@@ -1,5 +1,6 @@
 Authlib==1.6.9
 blinker==1.8.2
+cachelib==0.13.0
 certifi==2024.7.4
 cffi==2.0.0
 charset-normalizer==3.1.0
@@ -8,6 +9,7 @@ cryptography==46.0.6
 Deprecated==1.2.14
 Flask==3.0.3
 Flask-Limiter==3.8.0
+Flask-Session==0.8.0
 gunicorn==22.0.0
 idna==3.7
 importlib_resources==6.4.0
@@ -17,6 +19,7 @@ limits==3.13.0
 markdown-it-py==3.0.0
 MarkupSafe==2.1.2
 mdurl==0.1.2
+msgspec==0.21.1
 ordered-set==4.1.0
 packaging==24.1
 pycparser==2.21
