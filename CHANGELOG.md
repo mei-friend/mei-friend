@@ -4,6 +4,7 @@
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
 * Speed up schema-based hinting behavior while typing in CodeMirror editor
+* Show linked elements in the editor (as additional selection) and the notation panel (through rounded recangles) when selecting an element with @startid/@endid/@plist attributes (this function can be disabled in the settings panel, default: enabled)
 
 ### 1.4.0 Custom GitHub Action Configurations
 
