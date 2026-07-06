@@ -1037,6 +1037,10 @@ export const lang = {
     text: 'Kongruecaj etikedoj',
     description: 'Emfazi kongruecajn etikedojn ĉirkaŭ la kursoro de la redaktoro',
   },
+  showLinkedElements: {
+    text: 'Montri ligitajn elementojn',
+    description: 'Emfazi elementojn referencitajn de la elektita elemento (ekz. startid/endid/plist) en la redaktilo kaj notacio',
+  },
   showTrailingSpace: {
     text: 'Emfazi finspacojn',
     description: 'Emfazi senbezonajn finspacojn ĉe la fino de linioj',

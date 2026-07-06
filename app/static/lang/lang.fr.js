@@ -1062,6 +1062,10 @@ export const lang = {
     text: 'Correspondance des balises',
     description: "Surligne les balises correspondantes autour du curseur de l'éditeur",
   },
+  showLinkedElements: {
+    text: 'Afficher les éléments liés',
+    description: "Mettre en évidence les éléments référencés par l'élément sélectionné (p. ex. startid/endid/plist) dans l'éditeur et la notation",
+  },
   showTrailingSpace: {
     text: 'Mettre en évidence les espaces en fin de ligne',
     description: 'Met en évidence les espaces inutiles en fin de ligne',

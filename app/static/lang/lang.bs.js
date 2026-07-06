@@ -918,6 +918,10 @@ export const lang = {
     text: 'Uparivanje etiketa',
     description: 'Ističe uparene etikete oko kursora uređivača',
   },
+  showLinkedElements: {
+    text: 'Prikaži povezane elemente',
+    description: 'Istakni elemente na koje se odabrani element poziva (npr. startid/endid/plist) u uređivaču i notaciji',
+  },
   showTrailingSpace: {
     text: 'Ističi prazna mesta na kraju',
     description: 'Ističe nepotrebna prazna mesta na kraju linija',

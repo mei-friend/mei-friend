@@ -1022,6 +1022,10 @@ export const lang = {
     text: 'タグの一致',
     description: 'エディタカーソル周りの一致したタグを強調表示',
   },
+  showLinkedElements: {
+    text: 'リンク要素を表示',
+    description: '選択された要素から参照される要素（startid/endid/plistなど）をエディタと楽譜でハイライト表示する',
+  },
   showTrailingSpace: {
     text: 'トレーリングスペースを強調表示',
     description: '行末の不要なトレーリングスペースを強調表示',
