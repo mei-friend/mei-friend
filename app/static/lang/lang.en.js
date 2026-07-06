@@ -1105,6 +1105,10 @@ export const lang = {
     text: 'Match tags',
     description: 'Highlights matched tags around editor cursor',
   },
+  showLinkedElements: {
+    text: 'Show linked elements',
+    description: 'Highlight elements referenced by the selected element (i.e., through @startid/@endid/@plist) in the editor and notation',
+  },
   showTrailingSpace: {
     text: 'Highlight trailing spaces',
     description: 'Highlights unnecessary trailing spaces at end of lines',

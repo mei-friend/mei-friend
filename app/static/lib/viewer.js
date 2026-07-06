@@ -617,7 +617,8 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
-    this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+    if (document.getElementById('showLinkedElements')?.checked)
+      this.linkedElements = this.resolveLinkedElements(this.selectedElements);
     this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -678,7 +679,8 @@ export default class Viewer {
         const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
         if (!isHeaderElement) { // avoid attempting page flip to header elements
           if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-          this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+          if (document.getElementById('showLinkedElements')?.checked)
+            this.linkedElements = this.resolveLinkedElements(this.selectedElements);
           let fl = document.getElementById('flipCheckbox');
           if (
             !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
@@ -1012,25 +1014,30 @@ export default class Viewer {
     const svgRoot = document.querySelector('#verovio-panel svg');
     if (!svgRoot) return;
 
-    const svgBbox = svgRoot.getBoundingClientRect();
-    if (svgBbox.width === 0 || svgBbox.height === 0) return;
+    // Append the overlay to .page-margin so it shares the exact coordinate
+    // system used by all notation elements and staff-line paths.
+    const pageSvg    = svgRoot.querySelector('svg[viewBox]') || svgRoot;
+    const pageMargin = pageSvg.querySelector('.page-margin') || pageSvg;
 
-    // Verovio may omit viewBox and express dimensions directly in px.
-    // In that case the SVG coordinate space is 1:1 with CSS pixels.
-    const vb = svgRoot.viewBox?.baseVal;
-    const vbX = (vb && vb.width) ? vb.x : 0;
-    const vbY = (vb && vb.width) ? vb.y : 0;
-    const vbW = (vb && vb.width) ? vb.width  : svgBbox.width;
-    const vbH = (vb && vb.width) ? vb.height : svgBbox.height;
+    // getScreenCTM() on .page-margin accounts for the viewBox scaling of the
+    // parent <svg> AND the translate() on .page-margin itself.  Inverting it
+    // converts getBoundingClientRect() screen coords into .page-margin's local
+    // coordinate system — consistent across Chrome, Firefox and Safari.
+    const ctm = pageMargin.getScreenCTM();
+    if (!ctm) return;
+    const invCTM = ctm.inverse();
 
-    const scaleX = vbW / svgBbox.width;
-    const scaleY = vbH / svgBbox.height;
+    // For non-rotated SVGs invCTM.a = SVG units per CSS pixel.
+    const pxToSVG = invCTM.a;
 
-    // All visual constants expressed as desired CSS pixels, then converted to
-    // SVG user units so they look right regardless of the viewBox magnitude.
-    const pad         =  2 * scaleX;  // space around the element (~2 px)
-    const rx          =  4 * scaleX;  // corner radius (~4 px)
-    const strokeWidth =  1 * scaleX;  // stroke width  (~1 px, matching editor band)
+    // All visual constants expressed as desired CSS pixels, converted to SVG units.
+    const pad = 4 * pxToSVG;  // ~4 px padding
+    const rx  = 5 * pxToSVG;  // ~5 px corner radius
+
+    // Staff-line paths are in the same coordinate system — use stroke-width directly.
+    const staffLinePath = pageMargin.querySelector('.staff path');
+    const staffLineSW = staffLinePath ? parseFloat(staffLinePath.getAttribute('stroke-width')) : 0;
+    const strokeWidth = staffLineSW > 0 ? staffLineSW : pxToSVG;
 
     const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     overlay.id = 'linked-highlight-overlay';
@@ -1041,11 +1048,19 @@ export default class Viewer {
       const eb = el.getBoundingClientRect();
       if (eb.width === 0 && eb.height === 0) continue; // not on current page
 
+      // Convert screen-space corners to .page-margin local coords via inverse CTM.
+      const pt1 = pageSvg.createSVGPoint();
+      pt1.x = eb.left;  pt1.y = eb.top;
+      const pt2 = pageSvg.createSVGPoint();
+      pt2.x = eb.right; pt2.y = eb.bottom;
+      const p1 = pt1.matrixTransform(invCTM);
+      const p2 = pt2.matrixTransform(invCTM);
+
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x',            (eb.left - svgBbox.left) * scaleX + vbX - pad);
-      rect.setAttribute('y',            (eb.top  - svgBbox.top)  * scaleY + vbY - pad);
-      rect.setAttribute('width',        eb.width  * scaleX + 2 * pad);
-      rect.setAttribute('height',       eb.height * scaleY + 2 * pad);
+      rect.setAttribute('x',            p1.x - pad);
+      rect.setAttribute('y',            p1.y - pad);
+      rect.setAttribute('width',        (p2.x - p1.x) + 2 * pad);
+      rect.setAttribute('height',       (p2.y - p1.y) + 2 * pad);
       rect.setAttribute('rx',           rx);
       rect.setAttribute('ry',           rx);
       rect.setAttribute('stroke-width', strokeWidth);
@@ -1053,7 +1068,7 @@ export default class Viewer {
       overlay.appendChild(rect);
     }
 
-    if (overlay.childElementCount > 0) svgRoot.appendChild(overlay);
+    if (overlay.childElementCount > 0) pageMargin.appendChild(overlay);
   } // drawLinkedBoxes()
 
   updateHighlight(cm) {
@@ -1095,11 +1110,12 @@ export default class Viewer {
       }
     }
 
-    // draw rounded boxes around linked elements in the notation
-    this.drawLinkedBoxes();
-
-    // mark linked elements in the CodeMirror editor
-    this.updateLinkedEditorMarks(cm);
+    if (document.getElementById('showLinkedElements')?.checked) {
+      // draw rounded boxes around linked elements in the notation
+      this.drawLinkedBoxes();
+      // mark linked elements in the CodeMirror editor
+      this.updateLinkedEditorMarks(cm);
+    }
   } // updateHighlight()
 
   setNotationColors(matchTheme = false, alwaysBW = false) {
@@ -2320,6 +2336,13 @@ export default class Viewer {
         break;
       case 'matchTheme':
         this.setNotationColors(value);
+        break;
+      case 'showLinkedElements':
+        if (!value) {
+          this.linkedElements = [];
+          document.getElementById('linked-highlight-overlay')?.remove();
+          this.updateLinkedEditorMarks(cm);
+        }
         break;
       case 'matchTags':
         cm.setOption(

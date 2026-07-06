@@ -226,6 +226,10 @@ export function addDragSelector(v, vp) {
     }
     oldEls = [];
     console.debug('Drag-Selector selected elements: ', v.selectedElements);
+    if (document.getElementById('showLinkedElements')?.checked) {
+      v.linkedElements = v.resolveLinkedElements(v.selectedElements);
+    }
+    v.updateHighlight(cm);
   }); // mouse up event listener
 } // addDragSelector()
 
