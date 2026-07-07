@@ -3,7 +3,7 @@
  */
 
 // attributes that reference other element IDs (att.startid, att.endid, att.plist, att.linking)
-export const defaultLinkingAttrs = [
+export const attLinking = [
   'startid',
   'endid',
   'plist',

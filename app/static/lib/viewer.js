@@ -64,7 +64,7 @@ export default class Viewer {
     this.linkedElements = []; // IDs of elements referenced by the current selection (orange)
     this.primaryLinkedElements = []; // IDs directly under cursor's linking attr (highlight color)
     this._linkedEditorMarks = []; // active CodeMirror TextMarker objects for linked elements
-    this.linkingAttrs = [...att.defaultLinkingAttrs]; // populated from schema on load
+    this.linkingAttrs = [...att.attLinking]; // populated from schema on load
     this.lastNoteId = '';
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
