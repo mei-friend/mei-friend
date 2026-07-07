@@ -1048,7 +1048,7 @@ export default class Viewer {
     const existing = document.getElementById('linked-highlight-overlay');
     if (existing) existing.remove();
 
-    if (this.linkedElements.length === 0) return;
+    if (this.linkedElements.length === 0 && this.primaryLinkedElements.length === 0) return;
 
     const svgRoot = document.querySelector('#verovio-panel svg');
     if (!svgRoot) return;
