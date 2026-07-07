@@ -189,6 +189,7 @@ export const lang = {
   toggleDotsText: { text: 'Toggle dotting' },
   cleanAccidText: { text: 'Check @accid.ges' },
   meterConformanceText: { text: 'Check @metcon' },
+  checkLinkedElementsText: { text: 'Check linked elements' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
   addIdsText: { text: 'Add ids to MEI' },
@@ -1245,6 +1246,14 @@ export const lang = {
   codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'lacks an' },
   codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Checking linked elements (references via startid, endid, plist, and other linking attributes).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'All linked element references found in the encoding.' },
+  codeCheckerLinkedElementNotFound: { text: '— target not found in encoding' },
+  codeCheckerLinkingAttrEmpty: { text: '— linking attribute has no value' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

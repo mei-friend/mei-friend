@@ -1917,6 +1917,7 @@ export let cmd = {
   addBeamSpan: () => e.addBeamSpan(v, cm),
   correctAccid: () => checker.checkAccidGes(v, cm),
   checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
+  checkLinkedElements: () => setTimeout(() => checker.checkLinkedElements(v, cm), 10),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -2273,6 +2274,7 @@ function addEventListeners(v, cm) {
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
+  document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio

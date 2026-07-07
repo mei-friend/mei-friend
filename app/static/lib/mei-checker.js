@@ -1,3 +1,4 @@
+import * as att from './attribute-classes.js';
 import * as defaults from './defaults.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
@@ -547,6 +548,117 @@ export function checkMeterConformance(v, cm) {
   } // processMeasure()
   processMeasure();
 } // checkMeterConformance()
+
+/**
+ * Checks all linking attributes (startid, endid, plist, copyof, corresp, etc.)
+ * for references to non-existent xml:id targets within the MEI document.
+ * External links (values containing ':') are skipped.
+ *
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function checkLinkedElements(v, cm) {
+  v.allowCursorActivity = false;
+  v.initCodeCheckerPanel(translator.lang.linkedElementsCodeCheckerTitle.text);
+  // No automatic fix exists for broken links — remove the Fix all / Ignore all buttons
+  document.querySelectorAll('#codeCheckerTitle .btn').forEach((btn) => btn.remove());
+
+  try {
+    v.loadXml(cm.getValue(), true);
+
+    // Walk all elements once: collect xml:ids AND filter to those with linking attrs
+    const allIds = new Set();
+    const elements = [];
+    const allElements = v.xmlDoc.getElementsByTagName('*');
+    for (let i = 0; i < allElements.length; i++) {
+      const el = allElements[i];
+      const id = el.getAttribute('xml:id');
+      if (id) allIds.add(id);
+      if (att.attLinking.some((a) => el.hasAttribute(a))) elements.push(el);
+    }
+    console.log('checkLinkedElements: allIds=' + allIds.size + ', elements with linking attrs=' + elements.length);
+
+    setProgressBar(0);
+    let n = 0;
+    const increment = elements.length / 100;
+    let step = increment;
+
+    function processNext() {
+      try {
+        if (n < elements.length) {
+          const el = elements[n];
+
+          if (n > step) {
+            setProgressBar((100 * n) / elements.length);
+            step += increment;
+          }
+
+          const elName = el.nodeName;
+          const elId = el.getAttribute('xml:id') || '';
+
+          for (const attrName of att.attLinking) {
+            const attrVal = el.getAttribute(attrName);
+            if (attrVal === null) continue; // attribute not present on this element
+
+            if (attrVal.trim() === '') {
+              const data = {};
+              data.xmlId = elId;
+              data.html =
+                `<b>${elName}</b>` +
+                (elId ? ` <code>#${elId}</code>` : '') +
+                `: @${attrName} ` +
+                translator.lang.codeCheckerLinkingAttrEmpty.text;
+              v.addCodeCheckerEntry(data);
+              continue;
+            }
+
+            for (const ref of attrVal.trim().split(/\s+/)) {
+              // skip empty values and external links (URIs containing ':')
+              if (!ref || ref.includes(':')) continue;
+              const targetId = utils.rmHash(ref);
+              if (!targetId) {
+                const data = {};
+                data.xmlId = elId;
+                data.html =
+                  `<b>${elName}</b>` +
+                  (elId ? ` <code>#${elId}</code>` : '') +
+                  `: @${attrName}=<code>"${ref}"</code> ` +
+                  translator.lang.codeCheckerLinkingAttrEmpty.text;
+                v.addCodeCheckerEntry(data);
+                continue;
+              }
+
+              if (!allIds.has(targetId)) {
+                const data = {};
+                data.xmlId = elId;
+                data.html =
+                  `<b>${elName}</b>` +
+                  (elId ? ` <code>#${elId}</code>` : '') +
+                  `: @${attrName}=<code>"${ref}"</code> ` +
+                  translator.lang.codeCheckerLinkedElementNotFound.text;
+                v.addCodeCheckerEntry(data);
+              }
+            }
+          }
+
+          n++;
+          setTimeout(processNext, 0);
+        } else {
+          setProgressBar(0);
+          v.finalizeCodeCheckerPanel(translator.lang.codeCheckerNoLinkedElementsIssues.text);
+          v.allowCursorActivity = true;
+        }
+      } catch (err) {
+        console.error('checkLinkedElements processNext error at n=' + n + ':', err);
+        v.allowCursorActivity = true;
+      }
+    }
+    processNext();
+  } catch (err) {
+    console.error('checkLinkedElements setup error:', err);
+    v.allowCursorActivity = true;
+  }
+} // checkLinkedElements()
 
 /**
  * Debug function:
