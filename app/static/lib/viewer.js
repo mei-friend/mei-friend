@@ -63,6 +63,7 @@ export default class Viewer {
     this.selectedElements = [];
     this.linkedElements = []; // IDs of elements referenced by the current selection
     this._linkedEditorMarks = []; // active CodeMirror TextMarker objects for linked elements
+    this.linkingAttrs = [...att.defaultLinkingAttrs]; // populated from schema on load
     this.lastNoteId = '';
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
@@ -677,13 +678,12 @@ export default class Viewer {
       if (id) {
         const xmlEl = this.xmlDoc?.querySelector('[*|id="' + id + '"]');
         const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
-        if (!isHeaderElement) { // avoid attempting page flip to header elements
+        if (!isHeaderElement) {
+          // avoid attempting page flip to header elements
           if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
           if (document.getElementById('showLinkedElements')?.checked) {
             const attrIds = this._getLinkedAttrAtCursor(cm);
-            this.linkedElements = attrIds !== null
-              ? attrIds
-              : this.resolveLinkedElements(this.selectedElements);
+            this.linkedElements = attrIds !== null ? attrIds : this.resolveLinkedElements(this.selectedElements);
           }
           let fl = document.getElementById('flipCheckbox');
           if (
@@ -780,7 +780,7 @@ export default class Viewer {
       // Skipping malformed input avoids a Verovio "Cannot load MEI data"
       // round-trip and the badge that goes with it during normal typing.
       if (!forceUpdate && !this.isWellFormedXml(mei)) {
-        const msg = (translator?.lang?.notationStaleXmlInvalid?.text) || 'Rendering paused — waiting for valid XML';
+        const msg = translator?.lang?.notationStaleXmlInvalid?.text || 'Rendering paused — waiting for valid XML';
         this.setNotationStale(msg);
         return;
       }
@@ -864,12 +864,7 @@ export default class Viewer {
     if (panel) panel.classList.add('notation-stale');
     const badge = document.getElementById('notation-error-badge');
     if (badge) {
-      this._populateNotationBadge(
-        badge,
-        reason,
-        'notationErrorBadgeLabel',
-        'notationErrorBadgeLabelPlural'
-      );
+      this._populateNotationBadge(badge, reason, 'notationErrorBadgeLabel', 'notationErrorBadgeLabelPlural');
     }
     // Error visible — warning (if any) drops back below it.
     const warningBadge = document.getElementById('notation-warning-badge');
@@ -907,12 +902,7 @@ export default class Viewer {
   setNotationWarning(reason) {
     const badge = document.getElementById('notation-warning-badge');
     if (!badge) return;
-    this._populateNotationBadge(
-      badge,
-      reason,
-      'notationWarningBadgeLabel',
-      'notationWarningBadgeLabelPlural'
-    );
+    this._populateNotationBadge(badge, reason, 'notationWarningBadgeLabel', 'notationWarningBadgeLabelPlural');
     // Float up under the Verovio logo when no error badge is shown.
     const errorBadge = document.getElementById('notation-error-badge');
     const errorVisible = errorBadge && errorBadge.style.display !== 'none';
@@ -929,16 +919,8 @@ export default class Viewer {
   } // clearNotationWarning()
 
   /**
-   * Given an array of primary element IDs, returns the IDs of elements they
-   * reference via @startid, @endid, or @plist (hash-prefixed values are stripped).
-   * The primary IDs themselves are excluded from the result.
-   * @param {string[]} ids
-   * @returns {string[]}
-   */
-  /**
-   * If the CodeMirror cursor sits on (or inside) a startid/endid/plist
-   * attribute name or value, return the IDs it references.
-   * Returns null when the cursor is not on such an attribute.
+   * Returns the referenced IDs when the CodeMirror cursor is on or inside a
+   * linking attribute (name, '=', or value) from this.linkingAttrs; null otherwise.
    * @param {CodeMirror} cm
    * @returns {string[]|null}
    */
@@ -946,28 +928,43 @@ export default class Viewer {
     const cursor = cm.getCursor();
     const line = cm.getLine(cursor.line);
     const ch = cursor.ch;
-    const attrRe = /\b(startid|endid|plist)\s*=\s*["']([^"']*)["']/g;
+    const attrNames = this.linkingAttrs.join('|');
+    const attrRe = new RegExp(`\\b(${attrNames})\\s*=\\s*["']([^"']*)["']`, 'g');
     let match;
     while ((match = attrRe.exec(line)) !== null) {
       if (ch >= match.index && ch <= match.index + match[0].length) {
-        return match[2].trim().split(/\s+/).map((v) => utils.rmHash(v)).filter(Boolean);
+        return match[2]
+          .trim()
+          .split(/\s+/)
+          .map((v) => utils.rmHash(v))
+          .filter(Boolean);
       }
     }
     return null;
   } // _getLinkedAttrAtCursor()
 
+  /**
+   * Given an array of primary element IDs, returns the IDs of elements they
+   * reference via any attribute in this.linkingAttrs (hash-prefixes stripped).
+   * The primary IDs themselves are excluded from the result.
+   * @param {string[]} ids
+   * @returns {string[]}
+   */
   resolveLinkedElements(ids) {
     if (!this.xmlDoc || !ids || ids.length === 0) return [];
     const linked = new Set();
     for (const id of ids) {
       const el = this.xmlDoc.querySelector(`[*|id="${CSS.escape(id)}"]`);
       if (!el) continue;
-      for (const attr of ['startid', 'endid']) {
+      for (const attr of this.linkingAttrs) {
         const val = el.getAttribute(attr);
-        if (val) linked.add(utils.rmHash(val));
+        // split handles both single-value attrs (startid/endid) and multi-value (plist)
+        if (val)
+          val
+            .trim()
+            .split(/\s+/)
+            .forEach((v) => linked.add(utils.rmHash(v)));
       }
-      const plist = el.getAttribute('plist');
-      if (plist) plist.trim().split(/\s+/).forEach((v) => linked.add(utils.rmHash(v)));
     }
     ids.forEach((id) => linked.delete(id)); // don't repeat primary IDs
     return [...linked].filter(Boolean);
@@ -1041,7 +1038,7 @@ export default class Viewer {
 
     // Append the overlay to .page-margin so it shares the exact coordinate
     // system used by all notation elements and staff-line paths.
-    const pageSvg    = svgRoot.querySelector('svg[viewBox]') || svgRoot;
+    const pageSvg = svgRoot.querySelector('svg[viewBox]') || svgRoot;
     const pageMargin = pageSvg.querySelector('.page-margin') || pageSvg;
 
     // getScreenCTM() on .page-margin accounts for the viewBox scaling of the
@@ -1056,8 +1053,8 @@ export default class Viewer {
     const pxToSVG = invCTM.a;
 
     // All visual constants expressed as desired CSS pixels, converted to SVG units.
-    const pad = 4 * pxToSVG;  // ~4 px padding
-    const rx  = 5 * pxToSVG;  // ~5 px corner radius
+    const pad = 4 * pxToSVG; // ~4 px padding
+    const rx = 5 * pxToSVG; // ~5 px corner radius
 
     // Staff-line paths are in the same coordinate system — use stroke-width directly.
     const staffLinePath = pageMargin.querySelector('.staff path');
@@ -1075,19 +1072,21 @@ export default class Viewer {
 
       // Convert screen-space corners to .page-margin local coords via inverse CTM.
       const pt1 = pageSvg.createSVGPoint();
-      pt1.x = eb.left;  pt1.y = eb.top;
+      pt1.x = eb.left;
+      pt1.y = eb.top;
       const pt2 = pageSvg.createSVGPoint();
-      pt2.x = eb.right; pt2.y = eb.bottom;
+      pt2.x = eb.right;
+      pt2.y = eb.bottom;
       const p1 = pt1.matrixTransform(invCTM);
       const p2 = pt2.matrixTransform(invCTM);
 
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x',            p1.x - pad);
-      rect.setAttribute('y',            p1.y - pad);
-      rect.setAttribute('width',        (p2.x - p1.x) + 2 * pad);
-      rect.setAttribute('height',       (p2.y - p1.y) + 2 * pad);
-      rect.setAttribute('rx',           rx);
-      rect.setAttribute('ry',           rx);
+      rect.setAttribute('x', p1.x - pad);
+      rect.setAttribute('y', p1.y - pad);
+      rect.setAttribute('width', p2.x - p1.x + 2 * pad);
+      rect.setAttribute('height', p2.y - p1.y + 2 * pad);
+      rect.setAttribute('rx', rx);
+      rect.setAttribute('ry', rx);
       rect.setAttribute('stroke-width', strokeWidth);
       rect.setAttribute('class', 'linked-highlight-box');
       overlay.appendChild(rect);
@@ -1534,9 +1533,7 @@ export default class Viewer {
       }
     } else if (barSel) {
       barSel.disabled = false;
-      barSel.title =
-        translator?.lang?.midiExpansionSelectorTitle?.text ||
-        'Select expansion element for MIDI playback';
+      barSel.title = translator?.lang?.midiExpansionSelectorTitle?.text || 'Select expansion element for MIDI playback';
     }
   } // applySpeedModeUi()
 
