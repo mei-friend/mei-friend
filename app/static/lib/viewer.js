@@ -679,8 +679,12 @@ export default class Viewer {
         const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
         if (!isHeaderElement) { // avoid attempting page flip to header elements
           if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-          if (document.getElementById('showLinkedElements')?.checked)
-            this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+          if (document.getElementById('showLinkedElements')?.checked) {
+            const attrIds = this._getLinkedAttrAtCursor(cm);
+            this.linkedElements = attrIds !== null
+              ? attrIds
+              : this.resolveLinkedElements(this.selectedElements);
+          }
           let fl = document.getElementById('flipCheckbox');
           if (
             !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
@@ -931,6 +935,27 @@ export default class Viewer {
    * @param {string[]} ids
    * @returns {string[]}
    */
+  /**
+   * If the CodeMirror cursor sits on (or inside) a startid/endid/plist
+   * attribute name or value, return the IDs it references.
+   * Returns null when the cursor is not on such an attribute.
+   * @param {CodeMirror} cm
+   * @returns {string[]|null}
+   */
+  _getLinkedAttrAtCursor(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    const ch = cursor.ch;
+    const attrRe = /\b(startid|endid|plist)\s*=\s*["']([^"']*)["']/g;
+    let match;
+    while ((match = attrRe.exec(line)) !== null) {
+      if (ch >= match.index && ch <= match.index + match[0].length) {
+        return match[2].trim().split(/\s+/).map((v) => utils.rmHash(v)).filter(Boolean);
+      }
+    }
+    return null;
+  } // _getLinkedAttrAtCursor()
+
   resolveLinkedElements(ids) {
     if (!this.xmlDoc || !ids || ids.length === 0) return [];
     const linked = new Set();
