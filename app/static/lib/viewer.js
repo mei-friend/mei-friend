@@ -61,7 +61,8 @@ export default class Viewer {
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
-    this.linkedElements = []; // IDs of elements referenced by the current selection
+    this.linkedElements = []; // IDs of elements referenced by the current selection (orange)
+    this.primaryLinkedElements = []; // IDs directly under cursor's linking attr (highlight color)
     this._linkedEditorMarks = []; // active CodeMirror TextMarker objects for linked elements
     this.linkingAttrs = [...att.defaultLinkingAttrs]; // populated from schema on load
     this.lastNoteId = '';
@@ -618,8 +619,10 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
-    if (document.getElementById('showLinkedElements')?.checked)
+    if (document.getElementById('showLinkedElements')?.checked) {
+      this.primaryLinkedElements = [];
       this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+    }
     this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -675,6 +678,7 @@ export default class Viewer {
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
       this.linkedElements = [];
+      this.primaryLinkedElements = [];
       if (id) {
         const xmlEl = this.xmlDoc?.querySelector('[*|id="' + id + '"]');
         const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
@@ -683,7 +687,16 @@ export default class Viewer {
           if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
           if (document.getElementById('showLinkedElements')?.checked) {
             const attrIds = this._getLinkedAttrAtCursor(cm);
-            this.linkedElements = attrIds !== null ? attrIds : this.resolveLinkedElements(this.selectedElements);
+            if (attrIds !== null) {
+              // cursor is on a linking attribute: show that target in primary color,
+              // remaining linked elements from the element in orange
+              this.primaryLinkedElements = attrIds;
+              const all = this.resolveLinkedElements(this.selectedElements);
+              this.linkedElements = all.filter((id) => !attrIds.includes(id));
+            } else {
+              this.primaryLinkedElements = [];
+              this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+            }
           }
           let fl = document.getElementById('flipCheckbox');
           if (
@@ -980,10 +993,14 @@ export default class Viewer {
       this._linkedEditorMarks.forEach((m) => m.clear());
     }
     this._linkedEditorMarks = [];
-    if (!cm || this.linkedElements.length === 0) return;
+    if (!cm || (this.linkedElements.length === 0 && this.primaryLinkedElements.length === 0)) return;
 
     const fullText = cm.getValue();
-    for (const id of this.linkedElements) {
+    const markIds = [
+      ...this.primaryLinkedElements.map((id) => ({ id, cls: 'cm-primary-linked-element' })),
+      ...this.linkedElements.map((id) => ({ id, cls: 'cm-linked-element' })),
+    ];
+    for (const { id, cls } of markIds) {
       let idx = fullText.indexOf(`xml:id="${id}"`);
       if (idx < 0) idx = fullText.indexOf(`xml:id='${id}'`);
       if (idx < 0) continue;
@@ -1011,7 +1028,7 @@ export default class Viewer {
       if (endCh < 0) continue;
 
       this._linkedEditorMarks.push(
-        cm.markText({ line: pos.line, ch: tagStart }, { line: endLine, ch: endCh }, { className: 'cm-linked-element' })
+        cm.markText({ line: pos.line, ch: tagStart }, { line: endLine, ch: endCh }, { className: cls })
       );
     }
   } // updateLinkedEditorMarks()
@@ -1064,7 +1081,11 @@ export default class Viewer {
     const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     overlay.id = 'linked-highlight-overlay';
 
-    for (const id of this.linkedElements) {
+    const boxIds = [
+      ...this.primaryLinkedElements.map((id) => ({ id, cls: 'primary-linked-highlight-box' })),
+      ...this.linkedElements.map((id) => ({ id, cls: 'linked-highlight-box' })),
+    ];
+    for (const { id, cls } of boxIds) {
       const el = document.querySelector('#' + utils.escapeXmlId(id));
       if (!el) continue;
       const eb = el.getBoundingClientRect();
@@ -1088,7 +1109,7 @@ export default class Viewer {
       rect.setAttribute('rx', rx);
       rect.setAttribute('ry', rx);
       rect.setAttribute('stroke-width', strokeWidth);
-      rect.setAttribute('class', 'linked-highlight-box');
+      rect.setAttribute('class', cls);
       overlay.appendChild(rect);
     }
 
@@ -2362,6 +2383,7 @@ export default class Viewer {
       case 'showLinkedElements':
         if (!value) {
           this.linkedElements = [];
+          this.primaryLinkedElements = [];
           document.getElementById('linked-highlight-overlay')?.remove();
           this.updateLinkedEditorMarks(cm);
         }

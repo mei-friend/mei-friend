@@ -1738,6 +1738,19 @@ svg text {
   border-bottom: 1px solid var(--linkedHighlightBorderColor);
 }
 
+#verovio-panel .primary-linked-highlight-box {
+  fill: none;
+  stroke: var(--highlightColor);
+  stroke-opacity: 0.8;
+  pointer-events: none;
+}
+
+.cm-primary-linked-element {
+  background-color: rgba(78, 139, 237, 0.15);
+  border-top: 1px solid var(--highlightColor);
+  border-bottom: 1px solid var(--highlightColor);
+}
+
 #verovio-panel .supplied {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
