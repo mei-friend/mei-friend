@@ -612,6 +612,27 @@ export function checkLinkedElements(v, cm) {
               continue;
             }
 
+            // Check for multiple consecutive blanks (or leading/trailing whitespace) in plist
+            if (attrName === 'plist') {
+              const normalized = attrVal.trim().replace(/\s+/g, ' ');
+              if (attrVal !== normalized) {
+                const data = {};
+                data.xmlId = elId;
+                data.html =
+                  `<b>${elName}</b>` +
+                  (elId ? ` <code>#${elId}</code>` : '') +
+                  `: @plist ` +
+                  translator.lang.codeCheckerPlistMultipleBlanks.text;
+                data.correct = () => {
+                  v.allowCursorActivity = false;
+                  el.setAttribute('plist', normalized);
+                  editor.replaceInEditor(cm, el, false);
+                  v.allowCursorActivity = true;
+                };
+                v.addCodeCheckerEntry(data);
+              }
+            }
+
             for (const ref of attrVal.trim().split(/\s+/)) {
               // skip empty values and external links (URIs containing ':')
               if (!ref || ref.includes(':')) continue;

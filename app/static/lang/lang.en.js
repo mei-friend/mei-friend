@@ -1254,6 +1254,7 @@ export const lang = {
   codeCheckerNoLinkedElementsIssues: { text: 'All linked element references found in the encoding.' },
   codeCheckerLinkedElementNotFound: { text: '— target not found in encoding' },
   codeCheckerLinkingAttrEmpty: { text: '— linking attribute has no value' },
+  codeCheckerPlistMultipleBlanks: { text: '— contains multiple or surrounding spaces between items' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {
