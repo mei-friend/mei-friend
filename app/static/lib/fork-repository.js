@@ -62,7 +62,7 @@ function onSelectComposer(e) {
     });
 } // onSelectComposer()
 
-async function fillInUserOrgRepos(per_page = 30, page = 1) {
+async function fillInUserOrgRepos(per_page = 100, page = 1) {
   // read a page of repos from the specified user or organisation
   // add it to the repository drop-down,
   // recursing to fetch next page, if applicable

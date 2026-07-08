@@ -60,7 +60,7 @@ export default class GitCloudClient {
     }
     this.githubRequestQueue = Promise.resolve();
     this.githubLastRequestTime = 0;
-    this.githubMinIntervalMs = 500; // 2 requests per second
+    this.githubMinIntervalMs = 150; // ~6-7 requests/second, serialized -- well within GitHub's 5000/hr and respects the "no concurrent requests" secondary-rate-limit rule
   }
 
   isGithubApiUrl(url) {

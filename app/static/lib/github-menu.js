@@ -482,7 +482,7 @@ function assignGithubMenuClickHandlers() {
   });
 } // assignGithubMenuClickHandlers()
 
-export async function fillInUserRepos(per_page = 30, page = 1) {
+export async function fillInUserRepos(per_page = 100, page = 1) {
   const repos = await gm.getRepos(per_page, page);
   console.log('fillInUserRepos() got repos: ', repos);
   if (document.getElementById('selectBranch')) {
