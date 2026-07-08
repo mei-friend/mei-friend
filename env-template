@@ -1,7 +1,12 @@
 CLIENT_ID=""
 SECRET_ID=""
 FLASK_SECRET=""
+# set FLASK_ENV="development" for local http development
+# (otherwise the session cookie is marked Secure and requires https)
 FLASK_ENV=""
+# directory for server-side session files (shared between gunicorn workers);
+# defaults to a mei-friend-sessions directory in the system temp dir
+SESSION_DIR=""
 REDIRECT_URL=""
 STATIC_URL_PATH=""
 STATIC_FOLDER=""

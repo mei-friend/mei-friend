@@ -375,7 +375,6 @@ export async function updateGithubInLocalStorage() {
     const author = await gm.getAuthor();
     storage.github = {
       githubRepo: gm.repo,
-      githubToken: gm.token,
       branch: gm.branch,
       headSha: gm.headSha,
       filepath: gm.filepath,
@@ -621,7 +620,8 @@ async function completeInitialLoad() {
   if (storage.supported) {
     if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      gm = new GitManager('github', 'github', storage.github.githubToken, {
+      // (no token: authenticated GitHub traffic is proxied via the server session)
+      gm = new GitManager('github', 'github', null, {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
@@ -640,13 +640,11 @@ async function completeInitialLoad() {
       // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
       // console.log('Registered git manager: ', msg);
 
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
       gm.getAuthor()
         .then((author) => {
-          //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
           storage.github = {
             githubRepo: gm.repo,
-            githubToken: gm.token,
             branch: gm.branch,
             headSha: gm.headSha,
             filepath: gm.filepath,
@@ -765,8 +763,7 @@ async function completeInitialLoad() {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
-      //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -902,7 +899,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 
       if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
-        gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+        gm = new GitManager('github', 'github', null, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
 
