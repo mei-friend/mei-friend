@@ -179,6 +179,7 @@ export const lang = {
   toggleDotsText: { text: 'Alterna la punteggiatura' },
   cleanAccidText: { text: 'Verificare @accid.ges' },
   meterConformanceText: { text: 'Verificare @metcon' },
+  checkLinkedElementsText: { text: 'Verificare elementi collegati' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },
   addIdsText: { text: 'Aggiungi ids a MEI' },
@@ -262,6 +263,13 @@ export const lang = {
   verovioLoaded: { text: 'Caricato' },
   convertedToPdf: { text: 'Convertito in PDF' },
   statusBarCompute: { text: 'Calcola' },
+  notationStaleXmlInvalid: { text: 'Rendering in pausa — in attesa di XML valido' },
+  notationErrorBadgeLabel: { text: 'Errore Verovio:' },
+  notationErrorBadgeLabelPlural: { text: 'Errori Verovio:' },
+  notationWarningBadgeLabel: { text: 'Avviso Verovio:' },
+  notationWarningBadgeLabelPlural: { text: 'Avvisi Verovio:' },
+  notationBadgeClickToExpand: { text: 'clicca per espandere' },
+  notationBadgeClickToContract: { text: 'clicca per contrarre' },
   middleFooterPage: { text: 'Pagina' },
   middleFooterOf: { text: 'Di' },
   middleFooterLoaded: { text: 'Caricato' },
@@ -486,6 +494,36 @@ export const lang = {
   annotationToolsButton: { description: 'Strumenti di annotazione' },
   annotationListButton: { description: 'Elenco delle annotazioni' },
   writeAnnotStandoffText: { text: 'Annotazione Web' },
+  annotationToolDomainSelectorLegend: { text: 'Seleziona archiviazione annotazione' },
+  annotationToolTargetTypeSelectorLegend: {
+    text: 'Tipo di destinazione',
+    description: "Seleziona un tipo di destinazione per l'annotazione",
+  },
+  annotationToolTargetTypeElements: {
+    description: 'Annota gli elementi MEI selezionati usando @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Enumerazione di elementi',
+    description: 'Annota gli elementi MEI selezionati usando @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: "Annota l'intervallo di elementi MEI selezionati usando @startid e @endid",
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Intervallo di elementi',
+    description: "Annota l'intervallo di elementi MEI selezionati usando @startid e @endid",
+  },
+  annotationToolTargetTypeInterval: {
+    description:
+      "Annota l'intervallo di tempo corrispondente agli elementi MEI selezionati usando @tstamp e @tstamp2",
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Intervallo metrico',
+    description:
+      "Annota l'intervallo di tempo corrispondente agli elementi MEI selezionati usando @tstamp e @tstamp2",
+  },
+  insertInlineAnnotationLegend: { text: 'Inserisci annotazione' },
+  insertStandoffAnnotationLegend: { text: 'Inserisci annotazione stand-off' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica oggetto musicale' },
   annotationToolsHighlightTitle: { text: 'Evidenzia' },
@@ -527,6 +565,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Spiacente, non è possibile scrivere annotazioni al di fuori del tag <score>',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: "Impossibile scrivere l'annotazione poiché almeno un elemento della selezione non ha un xml:id.",
+    text2: 'Assegna un identificativo selezionando "Manipola" -> "Rendi il MEI di nuovo con id" e riprova.',
   },
   annotationWithoutIdWarning: {
     text1: "Impossibile scrivere l'annotazione perché il punto di ancoraggio MEI non ha un xml:id.",
@@ -621,6 +663,15 @@ export const lang = {
     text: '<del>',
     description:
       '(eliminazione) - Contiene informazioni eliminate, contrassegnate come eliminate o indicate come superflue o spurie nel testo di copia da parte di un autore, uno scriba, un annotatore o un correttore.',
+  },
+  missingParentIdWarning: {
+    text: "L'azione può essere eseguita solo se l'elemento padre ha un xml:id. Aggiungi prima gli xml:id al documento.",
+  },
+  handleMissingParentIdAbort: {
+    text: 'Annulla',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Aggiungi ids a MEI',
   },
 
   // MIDI
@@ -1138,6 +1189,17 @@ export const lang = {
   githubMessage: { text: 'Messaggio' },
   none: { text: 'Nessuno' },
   commitFileNameText: { text: 'Nome del file' },
+  cloneError: { text: 'Errore durante la clonazione del repository. ' },
+  repoTooLargeError: { text: 'Il repository è troppo grande per essere clonato: ' },
+  repoSizeWarning: {
+    text: 'Per aprire il file richiesto da GitHub, mei-friend dovrà clonare questo repository piuttosto grande. Sei sicuro di voler procedere? Dimensione dei dati da scaricare: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Annulla',
+  },
+  repoSizeWarningProceed: {
+    text: 'Procedi',
+  },
   forkRepository: { text: 'Fork del repository' },
   forkError: { text: 'Spiacenti, non è possibile eseguire il fork del repository' },
   loadingFile: { text: 'Caricamento file' },
@@ -1177,6 +1239,7 @@ export const lang = {
   codeCheckerNoAccidMessagesFound: { text: 'Tutti gli attributi accid.ges sembrano corretti.' },
   codeCheckerMeterConformanceMessage: { text: 'Tutte le misure rispettano le firme metriche.' },
   codeCheckerMeasure: { text: 'Misura' },
+  codeCheckerStaff: { text: 'Rigo' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'ha entrambi' },
   codeCheckerAnd: { text: 'e' },
@@ -1194,6 +1257,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'ha extra' },
   codeCheckerLacksAn: { text: 'manca un' },
   codeCheckerBecauseAlreadyDefined: { text: 'poiché è già stato definito in precedenza nella misura' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Verifica degli elementi collegati (riferimenti tramite startid, endid, plist e altri attributi di collegamento).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Tutti i riferimenti agli elementi collegati trovati nella codifica.' },
+  codeCheckerLinkedElementNotFound: { text: '— destinazione non trovata nella codifica' },
+  codeCheckerLinkingAttrEmpty: { text: "— l'attributo di collegamento non ha alcun valore" },
+  codeCheckerPlistMultipleBlanks: { text: '— contiene spazi multipli o circostanti tra gli elementi' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

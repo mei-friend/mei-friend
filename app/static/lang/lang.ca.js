@@ -178,6 +178,7 @@ export const lang = {
   toggleDotsText: { text: 'Afegeix un punt' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   meterConformanceText: { text: 'Verificar @metcon' },
+  checkLinkedElementsText: { text: 'Verificar elements enllaçats' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
@@ -206,8 +207,6 @@ export const lang = {
   addBeamText: { text: 'Barra (unir pliques)' },
   addBeamSpanText: { text: 'Amplada de la barra' },
   addSuppliedText: { text: 'Afegit (supplied)' },
-  addSuppliedArticText: { text: 'Afegit (articulació)' },
-  addSuppliedAccidText: { text: 'Afegit (accidentals)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -264,6 +263,13 @@ export const lang = {
   verovioLoaded: { text: 'carregat' },
   convertedToPdf: { text: 'convertit a PDF' },
   statusBarCompute: { text: 'Calcular' },
+  notationStaleXmlInvalid: { text: "Renderització en pausa — a l'espera d'un XML vàlid" },
+  notationErrorBadgeLabel: { text: 'Error de Verovio:' },
+  notationErrorBadgeLabelPlural: { text: 'Errors de Verovio:' },
+  notationWarningBadgeLabel: { text: 'Avís de Verovio:' },
+  notationWarningBadgeLabelPlural: { text: 'Avisos de Verovio:' },
+  notationBadgeClickToExpand: { text: 'clica per expandir' },
+  notationBadgeClickToContract: { text: 'clica per contraure' },
   middleFooterPage: { text: 'pàgina' },
   middleFooterOf: { text: 'de' },
   middleFooterLoaded: { text: 'carregat' },
@@ -486,6 +492,34 @@ export const lang = {
   annotationToolsButton: { description: "Eines d'annotació" },
   annotationListButton: { description: "Llista d'annotacions" },
   writeAnnotStandoffText: { text: 'Anotació web' },
+  annotationToolDomainSelectorLegend: { text: "Selecciona l'emmagatzematge de l'anotació" },
+  annotationToolTargetTypeSelectorLegend: {
+    text: 'Tipus de destinació',
+    description: "Selecciona un tipus de destinació d'anotació",
+  },
+  annotationToolTargetTypeElements: {
+    description: 'Anota els elements MEI seleccionats utilitzant @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: "Enumeració d'elements",
+    description: 'Anota els elements MEI seleccionats utilitzant @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: "Anota el rang d'elements MEI seleccionats utilitzant @startid i @endid",
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: "Rang d'elements",
+    description: "Anota el rang d'elements MEI seleccionats utilitzant @startid i @endid",
+  },
+  annotationToolTargetTypeInterval: {
+    description: "Anota l'interval de temps corresponent als elements MEI seleccionats utilitzant @tstamp i @tstamp2",
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Rang mètric',
+    description: "Anota l'interval de temps corresponent als elements MEI seleccionats utilitzant @tstamp i @tstamp2",
+  },
+  insertInlineAnnotationLegend: { text: 'Insereix anotació' },
+  insertStandoffAnnotationLegend: { text: 'Insereix anotació independent (stand-off)' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica objecte musical' },
   annotationToolsHighlightTitle: { text: 'Resalta' },
@@ -526,6 +560,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Ho sentim, actualment no es poden escriure anotacions situades fora de <score>',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: "No es pot escriure l'anotació perquè almenys un element de la selecció no té xml:id.",
+    text2: 'Assigneu identificadors seleccionant "Manipula" -> "Afegeix IDs a MEI" i torneu-ho a intentar.',
   },
   annotationWithoutIdWarning: {
     text1: "No es pot escriure l'annotació perquè el punt d'ancoratge MEI no té xml:id.",
@@ -619,6 +657,15 @@ export const lang = {
     text: '<del>',
     description:
       '(supressió) – Conté informació eliminada, marcada com a eliminada o indicada com a superflua o espúria al text original per un autor, escriptor, annotador o corrector.',
+  },
+  missingParentIdWarning: {
+    text: "L'acció només es pot realitzar si l'element pare té un xml:id. Si us plau, afegiu primer xml:ids al document.",
+  },
+  handleMissingParentIdAbort: {
+    text: 'Cancel·la',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Afegeix IDs a MEI',
   },
 
   // MIDI
@@ -1128,6 +1175,17 @@ export const lang = {
   githubMessage: { text: 'Missatge' },
   none: { text: 'Cap' },
   commitFileNameText: { text: 'Nom del fitxer' },
+  cloneError: { text: 'Error en clonar el repositori. ' },
+  repoTooLargeError: { text: 'El repositori és massa gran per clonar-lo: ' },
+  repoSizeWarning: {
+    text: 'Per obrir el fitxer sol·licitat des de GitHub, mei-friend haurà de clonar aquest repositori força gran. Esteu segur que voleu continuar? Mida de les dades a descarregar: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Cancel·la',
+  },
+  repoSizeWarningProceed: {
+    text: 'Continua',
+  },
   forkRepository: { text: 'Bifurcar el repositori' },
   forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
   loadingFile: { text: 'Carregant fitxer' },
@@ -1167,6 +1225,7 @@ export const lang = {
   codeCheckerNoAccidMessagesFound: { text: 'Tots els atributs accid.ges semblen correctes.' },
   codeCheckerMeterConformanceMessage: { text: 'Tots els compassos compleixen amb les seves signatures de compàs.' },
   codeCheckerMeasure: { text: 'compàs' },
+  codeCheckerStaff: { text: 'Pauta' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'té ambdós' },
   codeCheckerAnd: { text: 'i' },
@@ -1184,6 +1243,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'té extra' },
   codeCheckerLacksAn: { text: 'li falta un' },
   codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la compàs" },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: "Comprovant elements enllaçats (referències mitjançant startid, endid, plist i altres atributs d'enllaç).",
+  },
+  codeCheckerNoLinkedElementsIssues: { text: "S'han trobat totes les referències d'elements enllaçats a la codificació." },
+  codeCheckerLinkedElementNotFound: { text: '— destinació no trobada a la codificació' },
+  codeCheckerLinkingAttrEmpty: { text: "— l'atribut d'enllaç no té cap valor" },
+  codeCheckerPlistMultipleBlanks: { text: '— conté espais múltiples o envoltants entre elements' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

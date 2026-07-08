@@ -167,6 +167,7 @@ export const lang = {
   toggleDotsText: { text: 'トグル・ドッティング' },
   cleanAccidText: { text: '@accid.gesを確認' },
   meterConformanceText: { text: '@metconを確認' },
+  checkLinkedElementsText: { text: 'リンク要素を確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
   addIdsText: { text: 'MEIにIDを追加' },
@@ -195,8 +196,6 @@ export const lang = {
   addBeamText: { text: '連桁' },
   addBeamSpanText: { text: '小節をまたぐ連桁' },
   addSuppliedText: { text: '供給' },
-  addSuppliedArticText: { text: '供給（アーティキュレーション）' },
-  addSuppliedAccidText: { text: '供給（アクシデント）' },
   addArpeggioText: { text: 'アルペジオ' },
   addFermataText: { text: 'フェルマータ' },
   addGlissandoText: { text: 'グリッサンド' },
@@ -253,6 +252,13 @@ export const lang = {
   verovioLoaded: { text: '読み込み完了' },
   convertedToPdf: { text: 'PDFに変換' },
   statusBarCompute: { text: '計算' },
+  notationStaleXmlInvalid: { text: 'レンダリングを一時停止 — 有効なXMLを待っています' },
+  notationErrorBadgeLabel: { text: 'Verovioエラー：' },
+  notationErrorBadgeLabelPlural: { text: 'Verovioエラー：' },
+  notationWarningBadgeLabel: { text: 'Verovio警告：' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio警告：' },
+  notationBadgeClickToExpand: { text: 'クリックして展開' },
+  notationBadgeClickToContract: { text: 'クリックして折りたたむ' },
   middleFooterPage: { text: 'ページ' },
   middleFooterOf: { text: '全' },
   middleFooterLoaded: { text: '読み込み完了' },
@@ -458,6 +464,32 @@ export const lang = {
   annotationToolsButton: { description: '注釈ツール' },
   annotationListButton: { description: '注釈リスト' },
   writeAnnotStandoffText: { text: 'Web注釈' },
+  annotationToolDomainSelectorLegend: { text: '注釈の保存先を選択' },
+  annotationToolTargetTypeSelectorLegend: { text: '対象タイプ', description: '注釈の対象タイプを選択' },
+  annotationToolTargetTypeElements: {
+    description: '@plistを使用して選択されたMEI要素に注釈を付けます。',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: '要素の列挙',
+    description: '@plistを使用して選択されたMEI要素に注釈を付けます。',
+  },
+  annotationToolTargetTypeRange: {
+    description: '@startidと@endidを使用して選択されたMEI要素の範囲に注釈を付けます',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: '要素の範囲',
+    description: '@startidと@endidを使用して選択されたMEI要素の範囲に注釈を付けます',
+  },
+  annotationToolTargetTypeInterval: {
+    description: '@tstampと@tstamp2を使用して選択されたMEI要素に対応する時間区間に注釈を付けます',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: '拍節範囲',
+    description: '@tstampと@tstamp2を使用して選択されたMEI要素に対応する時間区間に注釈を付けます',
+  },
+
+  insertInlineAnnotationLegend: { text: '注釈を挿入' },
+  insertStandoffAnnotationLegend: { text: 'スタンドオフ注釈を挿入' },
   annotationToolsIdentifyTitle: { text: '識別' },
   annotationToolsIdentifySpan: { text: '音楽オブジェクトを識別' },
   annotationToolsHighlightTitle: { text: 'ハイライト' },
@@ -498,6 +530,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: '&lt;score&gt;の外に配置された注釈を書き込むことはできません。',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: '選択範囲内の少なくとも1つの要素にxml:idがないため、注釈を書き込むことができません。',
+    text2: '「操作」->「MEIにIDを追加」を選択して識別子を割り当て、もう一度お試しください。',
   },
   annotationWithoutIdWarning: {
     text1: 'MEIアンカーポイントにxml:idがないため、注釈を書き込むことができません。',
@@ -589,6 +625,15 @@ export const lang = {
     text: '<del>',
     description:
       '(削除) - 著者、書記、注釈者、または校正者によって削除された情報、削除されたもの、またはコピーテキストで不要または誤って指定されたものを含みます。',
+  },
+  missingParentIdWarning: {
+    text: 'この操作は親要素にxml:idがある場合にのみ実行できます。先にドキュメントにxml:idを追加してください。',
+  },
+  handleMissingParentIdAbort: {
+    text: 'キャンセル',
+  },
+  handleMissingParentIdProceed: {
+    text: 'MEIにIDを追加',
   },
 
   // MIDI
@@ -1089,6 +1134,17 @@ export const lang = {
   githubMessage: { text: 'メッセージ' },
   none: { text: 'なし' },
   commitFileNameText: { text: 'ファイル名' },
+  cloneError: { text: 'リポジトリのクローン中にエラーが発生しました。' },
+  repoTooLargeError: { text: 'リポジトリが大きすぎてクローンできません：' },
+  repoSizeWarning: {
+    text: 'GitHubから要求されたファイルを開くには、mei-friendがこのかなり大きなリポジトリをクローンする必要があります。続行してもよろしいですか？ ダウンロードされるデータのサイズ：',
+  },
+  repoSizeWarningCancel: {
+    text: 'キャンセル',
+  },
+  repoSizeWarningProceed: {
+    text: '続行',
+  },
   forkRepository: { text: 'リポジトリをフォーク' },
   forkError: { text: '申し訳ありません、リポジトリをフォークできませんでした' },
   loadingFile: { text: 'ファイルを読み込み中' },
@@ -1113,16 +1169,23 @@ export const lang = {
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },
+  metConCodeCheckerTitle: {
+    text: '拍子適合性をチェック（各段の少なくとも1つのレイヤーに拍子記号で示された拍数があること）',
+  },
   codeCheckerFix: { text: '修正' },
   codeCheckerFixAll: { text: 'すべて修正' },
   codeCheckerIgnore: { text: '無視' },
   codeCheckerIgnoreAll: { text: 'すべて無視' },
   codeCheckerCheckingCode: { text: 'コードをチェック中...' },
   codeCheckerNoAccidMessagesFound: { text: 'すべてのaccid.ges属性が正しいようです' },
+  codeCheckerMeterConformanceMessage: { text: 'すべての小節が拍子記号に適合しています。' },
   codeCheckerMeasure: { text: '小節' },
+  codeCheckerStaff: { text: '段' },
   codeCheckerNote: { text: '音符' },
   codeCheckerHasBoth: { text: '両方を持つ' },
   codeCheckerAnd: { text: 'および' },
+  codeCheckerHasADurationOf: { text: 'の音価を持っています' },
+  codeCheckerInsteadOf: { text: 'の代わりに' },
   codeCheckerRemove: { text: '削除' },
   codeCheckerFixTo: { text: '次に修正' },
   codeCheckerAdd: { text: '追加' },
@@ -1135,6 +1198,15 @@ export const lang = {
   codeCheckerHasExtra: { text: '余分な' }, // 余分な
   codeCheckerLacksAn: { text: '持っていません' },
   codeCheckerBecauseAlreadyDefined: { text: '以前に同じ要素が定義されているため' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'リンク要素をチェック（startid、endid、plist、およびその他のリンク属性による参照）',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'エンコーディング内のすべてのリンク要素参照が見つかりました。' },
+  codeCheckerLinkedElementNotFound: { text: '— 対象がエンコーディング内に見つかりません' },
+  codeCheckerLinkingAttrEmpty: { text: '— リンク属性に値がありません' },
+  codeCheckerPlistMultipleBlanks: { text: '— 項目間に複数または前後の空白が含まれています' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

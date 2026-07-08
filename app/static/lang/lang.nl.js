@@ -172,6 +172,7 @@ export const lang = {
   toggleDotsText: { text: 'Puntjes wisselen' },
   cleanAccidText: { text: 'Controleer @accid.ges' },
   meterConformanceText: { text: 'Controleer @metcon' },
+  checkLinkedElementsText: { text: 'Controleer gekoppelde elementen' },
   renumberMeasuresTestText: { text: 'Herhaal maten (test)' },
   renumberMeasuresExecText: { text: 'Herhaal maten (uitvoeren)' },
   addIdsText: { text: 'Ids toevoegen aan MEI' },
@@ -199,9 +200,10 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo haak' },
   addBeamText: { text: 'Balk' },
   addBeamSpanText: { text: 'Balkspan' },
-  addSuppliedText: { text: 'Toegevoegd' },
-  addSuppliedArticText: { text: 'Toegevoegd (Articulatie)' },
-  addSuppliedAccidText: { text: 'Toegevoegd (Accident)' },
+  addSuppliedText: {
+    text: 'Toegevoegd',
+    description: 'Bevat materiaal dat door de transcribent of redacteur om welke reden dan ook is toegevoegd.',
+  },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermate' },
   addGlissandoText: { text: 'Glissando' },
@@ -258,6 +260,13 @@ export const lang = {
   verovioLoaded: { text: 'geladen' },
   convertedToPdf: { text: 'omgezet naar PDF' },
   statusBarCompute: { text: 'Berekenen' },
+  notationStaleXmlInvalid: { text: 'Weergave gepauzeerd — wachten op geldige XML' },
+  notationErrorBadgeLabel: { text: 'Verovio-fout:' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio-fouten:' },
+  notationWarningBadgeLabel: { text: 'Verovio-waarschuwing:' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio-waarschuwingen:' },
+  notationBadgeClickToExpand: { text: 'klik om uit te vouwen' },
+  notationBadgeClickToContract: { text: 'klik om in te klappen' },
   middleFooterPage: { text: 'pagina' },
   middleFooterOf: { text: 'van' },
   middleFooterLoaded: { text: 'geladen' },
@@ -290,6 +299,9 @@ export const lang = {
   breaksSelectLine: { text: 'Systeem' },
   breaksSelectEncoded: { text: 'Systeem en pagina' },
   breaksSelectSmart: { text: 'Slim' },
+  choiceSelect: { description: 'Kies weergegeven inhoud voor choice-elementen' },
+  choiceDefault: { text: '(standaardkeuze)' },
+  noChoice: { text: '(geen keuze beschikbaar)' },
   updateControlsLabel: {
     text: 'Bijwerken',
     description: 'Controleer bijwerkgedrag van notatie na wijzigingen in codering',
@@ -466,9 +478,36 @@ export const lang = {
   annotationCloseButtonText: { text: 'Annotatiespaneel sluiten' },
   hideAnnotationPanelButton: { description: 'Annotatiespaneel sluiten' },
   closeAnnotationPanelButton: { description: 'Annotatiespaneel sluiten' },
-  annotationToolsButton: { text: 'Gereedschappen', description: 'Annotatiegereedschappen' },
-  annotationListButton: { text: 'Lijst', description: 'Annotaties lijst' },
+  markupToolsButton: { description: 'Markup-gereedschappen' },
+  annotationToolsButton: { description: 'Annotatiegereedschappen' },
+  annotationListButton: { description: 'Annotaties lijst' },
   writeAnnotStandoffText: { text: 'Web Annotatie' },
+  annotationToolDomainSelectorLegend: { text: 'Selecteer annotatieopslag' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Doeltype', description: 'Selecteer een annotatie-doeltype' },
+  annotationToolTargetTypeElements: {
+    description: 'Annoteer geselecteerde MEI-elementen met @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Elementopsomming',
+    description: 'Annoteer geselecteerde MEI-elementen met @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Annoteer het bereik van geselecteerde MEI-elementen met @startid en @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Elementbereik',
+    description: 'Annoteer het bereik van geselecteerde MEI-elementen met @startid en @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Annoteer het tijdsinterval dat overeenkomt met geselecteerde MEI-elementen met @tstamp en @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Metrisch bereik',
+    description: 'Annoteer het tijdsinterval dat overeenkomt met geselecteerde MEI-elementen met @tstamp en @tstamp2',
+  },
+
+  insertInlineAnnotationLegend: { text: 'Annotatie invoegen' },
+  insertStandoffAnnotationLegend: { text: 'Stand-off annotatie invoegen' },
   annotationToolsIdentifyTitle: { text: 'Identificeren' },
   annotationToolsIdentifySpan: { text: 'Muzikaal Object Identificeren' },
   annotationToolsHighlightTitle: { text: 'Markeren' },
@@ -484,6 +523,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'probeer het opnieuw' },
   noAnnotationsToDisplay: { text: 'Geen annotaties om weer te geven' },
   flipPageToAnnotationText: { description: 'Blader naar deze annotatie' },
+  describeMarkup: { description: 'Beschrijf deze markup' },
+  deleteMarkup: { description: 'Verwijder deze markup' },
+  deleteMarkupConfirmation: { text: 'Weet u zeker dat u deze markup wilt verwijderen?' },
   deleteAnnotation: { description: 'Verwijder deze annotatie' },
   deleteAnnotationConfirmation: { text: 'Weet u zeker dat u deze annotatie wilt verwijderen?' },
   makeStandOffAnnotation: {
@@ -507,6 +549,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Sorry, kan momenteel geen annotaties buiten &lt;score&gt; plaatsen',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Kan geen annotatie schrijven omdat ten minste één element in de selectie geen xml:id heeft.',
+    text2: 'Wijs ID\'s toe door te selecteren "Manipuleren" -> "Ids toevoegen aan MEI" en probeer het opnieuw.',
   },
   annotationWithoutIdWarning: {
     text1: 'Kan geen annotatie schrijven omdat MEI ankerpunt geen xml:id heeft.',
@@ -838,17 +884,145 @@ export const lang = {
     text: 'Redactionele inhoud beheren',
     description: 'Controleer de behandeling van <supplied> elementen',
   },
-  showSupplied: {
-    text: 'Toon <supplied> elementen',
-    description: 'Markeer alle elementen die door een <supplied> element worden omvat',
+  showMarkup: {
+    text: 'Toon redactionele markup-elementen',
+    description: 'Markeer alle elementen die door redactionele markup-elementen worden omvat',
+  },
+  markupToPDF: {
+    text: 'Toon markup in PDF',
+    description: 'Toon redactionele markup in PDF-export',
+  },
+  alternativeVersionContent: {
+    text: 'Inhoud van alternatieve coderingen',
+    description:
+      'Kies standaardinhoud van alternatieve coderingen: nieuw aangemaakte alternatieve coderingen zijn leeg of kopieën van de oorspronkelijke lezing',
+    labels: ['leeg', 'kopie'],
   },
   suppliedColor: {
     text: 'Selecteer <supplied> markeerkleur',
     description: 'Selecteer <supplied> markeerkleur',
   },
+  unclearColor: {
+    text: 'Selecteer <unclear> markeerkleur',
+    description: 'Selecteer <unclear> markeerkleur',
+  },
+  sicColor: {
+    text: 'Selecteer <sic> markeerkleur',
+    description: 'Selecteer <sic> markeerkleur',
+  },
+  corrColor: {
+    text: 'Selecteer <corr> markeerkleur',
+    description: 'Selecteer <corr> markeerkleur',
+  },
+  origColor: {
+    text: 'Selecteer <orig> markeerkleur',
+    description: 'Selecteer <orig> markeerkleur',
+  },
+  regColor: {
+    text: 'Selecteer <reg> markeerkleur',
+    description: 'Selecteer <reg> markeerkleur',
+  },
+  addColor: {
+    text: 'Selecteer <add> markeerkleur',
+    description: 'Selecteer <add> markeerkleur',
+  },
+  delColor: {
+    text: 'Selecteer <del> markeerkleur',
+    description: 'Selecteer <del> markeerkleur',
+  },
   respSelect: {
     text: 'Selecteer <supplied> verantwoordelijkheid',
     description: 'Selecteer verantwoordelijkheids-id',
+  },
+  selectionSelect: {
+    text: 'Standaardselectie voor markup',
+    description:
+      'Kies of nieuw aangemaakte markup de geselecteerde elementen, articulatie of accidenten moet omvatten',
+    labels: ['Geselecteerde elementen', 'Articulatie', 'Accidenten'],
+    valuesDescriptions: [
+      'Voeg markup toe aan geselecteerde elementen.',
+      'Voeg markup toe aan articulaties binnen de selectie.',
+      'Voeg markup toe aan accidenten binnen de selectie.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Alternatieve codering toevoegen',
+    description: 'Voeg markup-elementen in die meerdere versies bevatten.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Groepeert een aantal alternatieve coderingen voor hetzelfde punt in een tekst. ',
+  },
+  choiceSicCorr: {
+    description: 'Plaats de selectie in <sic> en voeg <corr> toe.',
+  },
+  choiceCorrSic: {
+    description: 'Plaats de selectie in <corr> en voeg <sic> toe.',
+  },
+  choiceOrigReg: {
+    description: 'Plaats de selectie in <orig> en voeg <reg> toe.',
+  },
+  choiceRegOrig: {
+    description: 'Plaats de selectie in <reg> en voeg <orig> toe.',
+  },
+  choiceContentTarget: {
+    description: 'Selecteer eerst inhoud voor dit element door over <choice> te hoveren.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(substitutie) – Groepeert transcriptie-elementen wanneer de combinatie moet worden beschouwd als één redactionele ingreep in de tekst.',
+  },
+  substAddDel: {
+    description: 'Plaats de selectie in <add> en voeg <del> toe.',
+  },
+  substDelAdd: {
+    description: 'Plaats de selectie in <del> en voeg <add> toe.',
+  },
+  substContentTarget: {
+    description: 'Selecteer eerst inhoud voor dit element door over <subst> te hoveren.',
+  },
+  editInterventionsGrp: {
+    text: 'Redactionele ingreep toevoegen',
+    description: 'Voeg markup-elementen in die worden gebruikt om redactionele ingrepen te coderen.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Bevat materiaal dat niet met zekerheid kan worden getranscribeerd omdat het in de bron onleesbaar of onhoorbaar is.',
+  },
+  addSicText: { text: '<sic>', description: 'Bevat ogenschijnlijk onjuist of onnauwkeurig materiaal.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(correctie) – Bevat de correcte vorm van een ogenschijnlijk foutieve passage.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(origineel) – Bevat materiaal dat gemarkeerd is als het volgen van het origineel, in plaats van genormaliseerd of gecorrigeerd te zijn.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(regularisatie) – Bevat materiaal dat in zekere zin geregulariseerd of genormaliseerd is.',
+  },
+  descMarkupGrp: {
+    text: 'Beschrijvende markup toevoegen',
+    description: 'Markup-elementen die worden gebruikt om ingrepen in het bronmateriaal te coderen.',
+  },
+  addAddText: { text: '<add>', description: '(toevoeging) – Markeert een toevoeging aan de tekst.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(verwijdering) – Bevat informatie die is verwijderd, gemarkeerd als verwijderd, of anderszins aangeduid als overbodig of onjuist in de brontekst door een auteur, kopiist, annotator of corrector.',
+  },
+  missingParentIdWarning: {
+    text: 'Actie kan alleen worden uitgevoerd als het bovenliggende element een xml:id heeft. Voeg eerst xml:ids toe aan het document.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Annuleren',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Ids toevoegen aan MEI',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS
@@ -991,6 +1165,17 @@ export const lang = {
   githubMessage: { text: 'Bericht' },
   none: { text: 'Geen' },
   commitFileNameText: { text: 'Bestandsnaam' },
+  cloneError: { text: 'Fout bij klonen van repository. ' },
+  repoTooLargeError: { text: 'De repository is te groot om te klonen: ' },
+  repoSizeWarning: {
+    text: 'Om het opgevraagde bestand van GitHub te openen, moet mei-friend deze vrij grote repository klonen. Weet u zeker dat u wilt doorgaan? Grootte van de gegevens die gedownload moeten worden: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Annuleren',
+  },
+  repoSizeWarningProceed: {
+    text: 'Doorgaan',
+  },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, kon repository niet fork' },
   loadingFile: { text: 'Bestand laden' },
@@ -1017,16 +1202,23 @@ export const lang = {
   accidGesCodeCheckerTitle: {
     text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).',
   },
+  metConCodeCheckerTitle: {
+    text: 'Controleer metrumconformiteit (ten minste één laag per staf heeft het aantal tellen opgegeven in de maatsoort).',
+  },
   codeCheckerFix: { text: 'Repareren' },
   codeCheckerFixAll: { text: 'Alles repareren' },
   codeCheckerIgnore: { text: 'Negeren' },
   codeCheckerIgnoreAll: { text: 'Alles negeren' },
   codeCheckerCheckingCode: { text: 'Code controleren...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges attributen lijken correct.' },
+  codeCheckerMeterConformanceMessage: { text: 'Alle maten voldoen aan hun maatsoorten.' },
   codeCheckerMeasure: { text: 'Maat' },
+  codeCheckerStaff: { text: 'Staf' },
   codeCheckerNote: { text: 'Noot' },
   codeCheckerHasBoth: { text: 'heeft beide' },
   codeCheckerAnd: { text: 'en' },
+  codeCheckerHasADurationOf: { text: 'heeft een duur van' },
+  codeCheckerInsteadOf: { text: 'in plaats van' },
   codeCheckerRemove: { text: 'Verwijderen' },
   codeCheckerFixTo: { text: 'Repareren naar' },
   codeCheckerAdd: { text: 'Toevoegen' },
@@ -1039,6 +1231,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'heeft extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'mist een' },
   codeCheckerBecauseAlreadyDefined: { text: 'omdat het eerder in de maat is gedefinieerd' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Controleer gekoppelde elementen (verwijzingen via startid, endid, plist en andere koppelingsattributen).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Alle verwijzingen naar gekoppelde elementen zijn gevonden in de codering.' },
+  codeCheckerLinkedElementNotFound: { text: '— doel niet gevonden in codering' },
+  codeCheckerLinkingAttrEmpty: { text: '— koppelingsattribuut heeft geen waarde' },
+  codeCheckerPlistMultipleBlanks: { text: '— bevat meerdere of omringende spaties tussen items' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

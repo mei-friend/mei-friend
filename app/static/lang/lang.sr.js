@@ -170,6 +170,7 @@ export const lang = {
   toggleDotsText: { text: 'Toggle dotting' }, // TODO: translate
   cleanAccidText: { text: 'Провери @accid.ges' },
   meterConformanceText: { text: 'Провери @metcon' },
+  checkLinkedElementsText: { text: 'Провери повезане елементе' },
   renumberMeasuresTestText: { text: ' Ренумерирај мере (тест)' },
   renumberMeasuresExecText: { text: ' Ренумерирај мере (изврши)' },
   addIdsText: { text: 'Додај ИД-ове МЕИ' },
@@ -197,9 +198,10 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Диминуендо дужина' },
   addBeamText: { text: 'Група нота' },
   addBeamSpanText: { text: 'Размак између група нота' },
-  addSuppliedText: { text: 'Исправка' },
-  addSuppliedArticText: { text: 'Исправка (Артикулација)' },
-  addSuppliedAccidText: { text: 'Исправка (Акцент)' },
+  addSuppliedText: {
+    text: 'Исправка',
+    description: 'Садржи материјал који је доставио преписивач или уредник из било ког разлога.',
+  },
   addArpeggioText: { text: 'Арпеджо' },
   addFermataText: { text: 'Фермата' },
   addGlissandoText: { text: 'Глиђандо' },
@@ -256,6 +258,13 @@ export const lang = {
   verovioLoaded: { text: 'учитан' },
   convertedToPdf: { text: 'претворен у PDF' },
   statusBarCompute: { text: 'Израчун' },
+  notationStaleXmlInvalid: { text: 'Рендеровање паузирано — чека се исправан XML' },
+  notationErrorBadgeLabel: { text: 'Verovio грешка:' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio грешке:' },
+  notationWarningBadgeLabel: { text: 'Verovio упозорење:' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio упозорења:' },
+  notationBadgeClickToExpand: { text: 'кликните да проширите' },
+  notationBadgeClickToContract: { text: 'кликните да сажмете' },
   middleFooterPage: { text: 'страница' },
   middleFooterOf: { text: 'од' },
   middleFooterLoaded: { text: 'учитано' },
@@ -286,6 +295,9 @@ export const lang = {
   breaksSelectLine: { text: 'Систем' },
   breaksSelectEncoded: { text: 'Систем и страница' },
   breaksSelectSmart: { text: 'Паметно' },
+  choiceSelect: { description: 'Изаберите приказани садржај за елементе избора' },
+  choiceDefault: { text: '(подразумевани избор)' },
+  noChoice: { text: '(нема доступног избора)' },
   updateControlsLabel: {
     text: 'Ажурирај',
     description: 'Понашање ажурирања контроле нотације након промена у кодирању',
@@ -460,9 +472,35 @@ export const lang = {
   annotationCloseButtonText: { text: 'Затвори панел са напоменама' },
   hideAnnotationPanelButton: { description: 'Затвори панел са напоменама' },
   closeAnnotationPanelButton: { description: 'Затвори панел са напоменама' },
-  annotationToolsButton: { text: 'Алатке', description: 'Алатке за напомене' },
-  annotationListButton: { text: 'Листа', description: 'Листа напомена' },
+  markupToolsButton: { description: 'Алатке за ознаке' },
+  annotationToolsButton: { description: 'Алатке за напомене' },
+  annotationListButton: { description: 'Листа напомена' },
   writeAnnotStandoffText: { text: 'Web напомена' },
+  annotationToolDomainSelectorLegend: { text: 'Изаберите складиште напомена' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Врста циља', description: 'Изаберите врсту циља напомене' },
+  annotationToolTargetTypeElements: {
+    description: 'Означите изабране MEI елементе користећи @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Набрајање елемената',
+    description: 'Означите изабране MEI елементе користећи @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Означите опсег изабраних MEI елемената користећи @startid и @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Опсег елемената',
+    description: 'Означите опсег изабраних MEI елемената користећи @startid и @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Означите временски интервал који одговара изабраним MEI елементима користећи @tstamp и @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Метрички опсег',
+    description: 'Означите временски интервал који одговара изабраним MEI елементима користећи @tstamp и @tstamp2',
+  },
+  insertInlineAnnotationLegend: { text: 'Уметни напомену' },
+  insertStandoffAnnotationLegend: { text: 'Уметни станд-оф напомену' },
   annotationToolsIdentifyTitle: { text: 'Идентификација' },
   annotationToolsIdentifySpan: { text: 'Идентификација музичког објекта' },
   annotationToolsHighlightTitle: { text: 'Истакни' },
@@ -478,6 +516,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'покушајте поново' },
   noAnnotationsToDisplay: { text: 'Нема напомена за приказ' },
   flipPageToAnnotationText: { description: 'Пређите на ову напомену' },
+  describeMarkup: { description: 'Опишите ову ознаку' },
+  deleteMarkup: { description: 'Обришите ову ознаку' },
+  deleteMarkupConfirmation: { text: 'Да ли сте сигурни да желите да обришете ову ознаку?' },
   deleteAnnotation: { description: 'Обришите ову напомену' },
   deleteAnnotationConfirmation: { text: 'Да ли сте сигурни да желите да обришете ову напомену?' },
   makeStandOffAnnotation: {
@@ -500,6 +541,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Нажалост, тренутно није могуће уписивање напомена изван &lt;score&gt;',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Није могуће уписивање напомене јер бар један елемент у избору нема xml:id.',
+    text2: 'Молимо вас да доделите идентификаторе тако што ћете изабрати "Манипулација" -> "Додај ИД-ове МЕИ" и покушати поново.',
   },
   annotationWithoutIdWarning: {
     text1: 'Није могуће уписивање напомене јер MEI референтна тачка нема xml:id.',
@@ -826,17 +871,144 @@ export const lang = {
     text: 'Управљање уредничким садржајем',
     description: 'Контрола управљања <supplied> елементима',
   },
-  showSupplied: {
-    text: 'Прикажи <supplied> елементе',
-    description: 'Истакни све елементе садржане у <supplied> елементу',
+  showMarkup: {
+    text: 'Прикажи елементе уредничких ознака',
+    description: 'Истакни све елементе садржане у елементима уредничких ознака',
+  },
+  markupToPDF: {
+    text: 'Прикажи ознаке у PDF-у',
+    description: 'Прикажи уредничке ознаке у PDF извозу',
+  },
+  alternativeVersionContent: {
+    text: 'Садржај алтернативних кодирања',
+    description:
+      'Изаберите подразумевани садржај алтернативних кодирања: ново креирана алтернативна кодирања су празна или копије оригиналног читања',
+    labels: ['празно', 'копија'],
   },
   suppliedColor: {
     text: 'Изабери боју за <supplied> елементе',
     description: 'Изабери боју за истицање <supplied> елемената',
   },
+  unclearColor: {
+    text: 'Изабери боју за истицање <unclear>',
+    description: 'Изабери боју за истицање <unclear>',
+  },
+  sicColor: {
+    text: 'Изабери боју за истицање <sic>',
+    description: 'Изабери боју за истицање <sic>',
+  },
+  corrColor: {
+    text: 'Изабери боју за истицање <corr>',
+    description: 'Изабери боју за истицање <corr>',
+  },
+  origColor: {
+    text: 'Изабери боју за истицање <orig>',
+    description: 'Изабери боју за истицање <orig>',
+  },
+  regColor: {
+    text: 'Изабери боју за истицање <reg>',
+    description: 'Изабери боју за истицање <reg>',
+  },
+  addColor: {
+    text: 'Изабери боју за истицање <add>',
+    description: 'Изабери боју за истицање <add>',
+  },
+  delColor: {
+    text: 'Изабери боју за истицање <del>',
+    description: 'Изабери боју за истицање <del>',
+  },
   respSelect: {
     text: 'Изабери одговорност за <supplied> елементе',
     description: 'Изабери одговорност ID-а',
+  },
+  selectionSelect: {
+    text: 'Подразумевани избор за ознаке',
+    description: 'Изаберите да ли нова ознака треба да обухвати изабране елементе, артикулацију или предзнаке',
+    labels: ['Изабрани елементи', 'Артикулација', 'Предзнаци'],
+    valuesDescriptions: [
+      'Додај ознаку изабраним елементима.',
+      'Додај ознаку артикулацијама у оквиру избора.',
+      'Додај ознаку предзнацима у оквиру избора.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Додај алтернативно кодирање',
+    description: 'Уметни елементе ознака који садрже више верзија.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Групише низ алтернативних кодирања за исто место у тексту. ',
+  },
+  choiceSicCorr: {
+    description: 'Стави избор у <sic> и додај <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Стави избор у <corr> и додај <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Стави избор у <orig> и додај <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Стави избор у <reg> и додај <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Прво, изаберите садржај за овај елемент постављањем показивача миша преко <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(замена) – Групише транскрипционе елементе када комбинацију треба сматрати једном интервенцијом у тексту.',
+  },
+  substAddDel: {
+    description: 'Стави избор у <add> и додај <del>.',
+  },
+  substDelAdd: {
+    description: 'Стави избор у <del> и додај <add>.',
+  },
+  substContentTarget: {
+    description: 'Прво, изаберите садржај за овај елемент постављањем показивача миша преко <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Додај уредничку интервенцију',
+    description: 'Уметни елементе ознака који се користе за кодирање уредничких интервенција.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Садржи материјал који не може бити транскрибован са сигурношћу јер је нечитљив или нечујан у извору.',
+  },
+  addSicText: { text: '<sic>', description: 'Садржи очигледно нетачан или непрецизан материјал.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(исправка) – Садржи исправан облик очигледно погрешног одломка.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(оригинал) – Садржи материјал који је означен као веран оригиналу, уместо да буде нормализован или исправљен.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(регуларизација) – Садржи материјал који је на неки начин регуларизован или нормализован.',
+  },
+  descMarkupGrp: {
+    text: 'Додај описну ознаку',
+    description: 'Елементи ознака који се користе за кодирање интервенција у изворном материјалу.',
+  },
+  addAddText: { text: '<add>', description: '(додатак) – Означава додатак тексту.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(брисање) – Садржи информације обрисане, означене као обрисане, или на други начин означене као сувишне или лажне у преписаном тексту од стране аутора, писара, коментатора или лектора.',
+  },
+  missingParentIdWarning: {
+    text: 'Радња се може извршити само ако родитељски елемент има xml:id. Молимо вас да прво додате xml:id-ове документу.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Откажи',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Додај ИД-ове МЕИ',
   },
 
   // ПОСТАВКЕ УРЕЂИВАЧА / ПОСТАВКЕ КОДМИРА
@@ -978,6 +1150,17 @@ export const lang = {
   githubMessage: { text: 'Порука' },
   none: { text: 'Ништа' },
   commitFileNameText: { text: 'Име фајла' },
+  cloneError: { text: 'Грешка при клонирању репозиторијума. ' },
+  repoTooLargeError: { text: 'Репозиторијум је превелик за клонирање: ' },
+  repoSizeWarning: {
+    text: 'Да би отворио тражену датотеку са GitHub-а, mei-friend ће морати да клонира овај прилично велики репозиторијум. Да ли сте сигурни да желите да наставите? Величина података за преузимање: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Откажи',
+  },
+  repoSizeWarningProceed: {
+    text: 'Настави',
+  },
   forkRepository: { text: 'Форкуј репозиторијум' },
   forkError: { text: 'Извињавамо се, није могуће форковање репозиторијума' },
   loadingFile: { text: 'Учитавање фајла' },
@@ -1004,16 +1187,23 @@ export const lang = {
   accidGesCodeCheckerTitle: {
     text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).',
   },
+  metConCodeCheckerTitle: {
+    text: 'Провера усклађености метра (бар један слој по ставу има број откуцаја наведен у ознаци такта).',
+  },
   codeCheckerFix: { text: 'Исправи' },
   codeCheckerFixAll: { text: 'Исправи све' },
   codeCheckerIgnore: { text: 'Занемари' },
   codeCheckerIgnoreAll: { text: 'Занемари све' },
   codeCheckerCheckingCode: { text: 'Проверавање кода...' },
   codeCheckerNoAccidMessagesFound: { text: 'Сви @accid.ges атрибути изгледају исправно.' },
+  codeCheckerMeterConformanceMessage: { text: 'Сви тактови су усклађени са својим ознакама такта.' },
   codeCheckerMeasure: { text: 'Такт' },
+  codeCheckerStaff: { text: 'Став' },
   codeCheckerNote: { text: 'Напомена' },
   codeCheckerHasBoth: { text: 'има и' },
   codeCheckerAnd: { text: 'и' },
+  codeCheckerHasADurationOf: { text: 'има трајање од' },
+  codeCheckerInsteadOf: { text: 'уместо' },
   codeCheckerRemove: { text: 'Уклони' },
   codeCheckerFixTo: { text: 'Исправи на' },
   codeCheckerAdd: { text: 'Додај' },
@@ -1026,6 +1216,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'има сувишно' }, // има суперфлуозно
   codeCheckerLacksAn: { text: 'недостаје' },
   codeCheckerBecauseAlreadyDefined: { text: 'зато што је већ дефинисано раније у такту' },
+
+  // Провера кода: повезани елементи
+  linkedElementsCodeCheckerTitle: {
+    text: 'Провера повезаних елемената (референце преко startid, endid, plist и других атрибута за повезивање).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Све референце повезаних елемената пронађене су у кодирању.' },
+  codeCheckerLinkedElementNotFound: { text: '— циљ није пронађен у кодирању' },
+  codeCheckerLinkingAttrEmpty: { text: '— атрибут за повезивање нема вредност' },
+  codeCheckerPlistMultipleBlanks: { text: '— садржи више или околне размаке између ставки' },
 
   // Упозорење за недостајућим идентификаторима
   missingIdsWarningAlert: {

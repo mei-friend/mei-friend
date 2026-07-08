@@ -176,6 +176,7 @@ export const lang = {
   toggleDotsText: { text: 'Skift punktering' },
   cleanAccidText: { text: 'Kontroller @accid.ges' },
   meterConformanceText: { text: 'Kontroller @metcon' },
+  checkLinkedElementsText: { text: 'Kontroller linkede elementer' },
   renumberMeasuresTestText: { text: 'Omdøbn mål (test)' },
   renumberMeasuresExecText: { text: 'Omdøbn mål (exec)' },
   addIdsText: { text: 'Tilføj ids til MEI' },
@@ -203,9 +204,10 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo hårnål' },
   addBeamText: { text: 'Bjælke' },
   addBeamSpanText: { text: 'Bjælke span' },
-  addSuppliedText: { text: 'Tilføjet' },
-  addSuppliedArticText: { text: 'Tilføjet (Artic)' },
-  addSuppliedAccidText: { text: 'Tilføjet (Accid)' },
+  addSuppliedText: {
+    text: 'Tilføjet',
+    description: 'Indeholder materiale, der er tilføjet af transskribenten eller redaktøren af en eller anden grund.',
+  },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -262,6 +264,13 @@ export const lang = {
   verovioLoaded: { text: 'indlæst' },
   convertedToPdf: { text: 'konverteret til PDF' },
   statusBarCompute: { text: 'Beregne' },
+  notationStaleXmlInvalid: { text: 'Rendering sat på pause — venter på gyldig XML' },
+  notationErrorBadgeLabel: { text: 'Verovio-fejl:' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio-fejl:' },
+  notationWarningBadgeLabel: { text: 'Verovio-advarsel:' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio-advarsler:' },
+  notationBadgeClickToExpand: { text: 'klik for at folde ud' },
+  notationBadgeClickToContract: { text: 'klik for at folde sammen' },
   middleFooterPage: { text: 'side' },
   middleFooterOf: { text: 'af' },
   middleFooterLoaded: { text: 'indlæst' },
@@ -292,6 +301,9 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System og side' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Vælg vist indhold for choice-elementer' },
+  choiceDefault: { text: '(standardvalg)' },
+  noChoice: { text: '(intet valg tilgængeligt)' },
   updateControlsLabel: {
     text: 'Opdater',
     description: 'Kontroller opdateringsopførsel af notation efter ændringer i kodning',
@@ -468,9 +480,35 @@ export const lang = {
   annotationCloseButtonText: { text: 'Luk annotationspanel' },
   hideAnnotationPanelButton: { description: 'Luk annotationspanel' },
   closeAnnotationPanelButton: { description: 'Luk annotationspanel' },
-  annotationToolsButton: { text: 'Værktøjer', description: 'Annotations værktøjer' },
-  annotationListButton: { text: 'Liste', description: 'Liste over annotationer' },
+  markupToolsButton: { description: 'Opmærkningsværktøjer' },
+  annotationToolsButton: { description: 'Annotations værktøjer' },
+  annotationListButton: { description: 'Liste over annotationer' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
+  annotationToolDomainSelectorLegend: { text: 'Vælg lagringssted for annotationer' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Måltype', description: 'Vælg en måltype for annotation' },
+  annotationToolTargetTypeElements: {
+    description: 'Annoter valgte MEI-elementer ved hjælp af @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Elementopremsning',
+    description: 'Annoter valgte MEI-elementer ved hjælp af @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Annoter intervallet af valgte MEI-elementer ved hjælp af @startid og @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Elementinterval',
+    description: 'Annoter intervallet af valgte MEI-elementer ved hjælp af @startid og @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Annoter det tidsinterval, der svarer til valgte MEI-elementer, ved hjælp af @tstamp og @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Metrisk interval',
+    description: 'Annoter det tidsinterval, der svarer til valgte MEI-elementer, ved hjælp af @tstamp og @tstamp2',
+  },
+  insertInlineAnnotationLegend: { text: 'Indsæt annotation' },
+  insertStandoffAnnotationLegend: { text: 'Indsæt stand-off-annotation' },
   annotationToolsIdentifyTitle: { text: 'Identificer' },
   annotationToolsIdentifySpan: { text: 'Identificer musisk objekt' },
   annotationToolsHighlightTitle: { text: 'Fremhæv' },
@@ -486,6 +524,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'prøv venligst igen' },
   noAnnotationsToDisplay: { text: 'Ingen annotationer at vise' },
   flipPageToAnnotationText: { description: 'Skift side til denne annotation' },
+  describeMarkup: { description: 'Beskriv denne opmærkning' },
+  deleteMarkup: { description: 'Slet denne opmærkning' },
+  deleteMarkupConfirmation: { text: 'Er du sikker på, at du ønsker at slette denne opmærkning?' },
   deleteAnnotation: { description: 'Slet denne annotation' },
   deleteAnnotationConfirmation: { text: 'Er du sikker på, at du ønsker at slette denne annotation?' },
   makeStandOffAnnotation: {
@@ -509,9 +550,105 @@ export const lang = {
   annotationsOutsideScoreWarning: {
     text: 'Beklager, kan i øjeblikket ikke skrive annotationer placeret uden for &lt;score&gt;',
   },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Kan ikke skrive annotation, da mindst ét element i markeringen mangler xml:id.',
+    text2: 'Tildel venligst identifikatorer ved at vælge "Manipuler" -> "Tilføj ids til MEI" og prøv igen.',
+  },
   annotationWithoutIdWarning: {
     text1: 'Kan ikke skrive annotation, da MEI forankringspunktet mangler xml:id.',
     text2: 'Tildel venligst identifikatorer ved at vælge "Manipuler" -> "Genrender MEI (med ids)" og prøv igen.',
+  },
+
+  // MARKUP MENU
+  selectionSelect: {
+    text: 'Standardmarkering for opmærkning',
+    description: 'Vælg om nyoprettet opmærkning skal omslutte de valgte elementer, artikulation eller fortegn',
+    labels: ['Valgte elementer', 'Artikulation', 'Fortegn'],
+    valuesDescriptions: [
+      'Tilføj opmærkning til valgte elementer.',
+      'Tilføj opmærkning til artikulationer inden for markeringen.',
+      'Tilføj opmærkning til fortegn inden for markeringen.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Tilføj alternativ kodning',
+    description: 'Indsæt opmærkningselementer, der indeholder flere versioner.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Grupperer en række alternative kodninger for samme sted i en tekst. ',
+  },
+  choiceSicCorr: {
+    description: 'Placer markering i <sic> og tilføj <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Placer markering i <corr> og tilføj <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Placer markering i <orig> og tilføj <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Placer markering i <reg> og tilføj <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Vælg først indhold for dette element ved at holde musen over <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(substitution) – Grupperer transskriptionselementer, når kombinationen skal betragtes som et enkelt indgreb i teksten.',
+  },
+  substAddDel: {
+    description: 'Placer markering i <add> og tilføj <del>.',
+  },
+  substDelAdd: {
+    description: 'Placer markering i <del> og tilføj <add>.',
+  },
+  substContentTarget: {
+    description: 'Vælg først indhold for dette element ved at holde musen over <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Tilføj redaktionelt indgreb',
+    description: 'Indsæt opmærkningselementer, der bruges til at kode redaktionelle indgreb.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Indeholder materiale, der ikke kan transskriberes med sikkerhed, fordi det er ulæseligt eller uhørligt i kilden.',
+  },
+  addSicText: { text: '<sic>', description: 'Indeholder tilsyneladende ukorrekt eller unøjagtigt materiale.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(korrektion) – Indeholder den korrekte form af et tilsyneladende fejlagtigt afsnit.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(original) – Indeholder materiale, der er markeret som følgende originalen, i stedet for at være normaliseret eller korrigeret.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description:
+      '(regularisering) – Indeholder materiale, der på en eller anden måde er blevet regulariseret eller normaliseret.',
+  },
+  descMarkupGrp: {
+    text: 'Tilføj deskriptiv opmærkning',
+    description: 'Opmærkningselementer, der bruges til at kode indgreb i kildematerialet.',
+  },
+  addAddText: { text: '<add>', description: '(tilføjelse) – Markerer en tilføjelse til teksten.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(sletning) – Indeholder information, der er slettet, markeret som slettet, eller på anden måde angivet som overflødig eller uægte i kildeteksten af en forfatter, skriver, annotator eller korrekturlæser.',
+  },
+  missingParentIdWarning: {
+    text: 'Handlingen kan kun udføres, hvis det overordnede element har et xml:id. Tilføj venligst xml:ids til dokumentet først.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Annuller',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Tilføj ids til MEI',
   },
 
   // MIDI
@@ -834,13 +971,51 @@ export const lang = {
     text: 'Håndter redaktionelt indhold',
     description: 'Kontroller håndtering af <supplied> elementer',
   },
-  showSupplied: {
-    text: 'Vis <supplied> elementer',
-    description: 'Fremhæv alle elementer indeholdt af et <supplied> element',
+  showMarkup: {
+    text: 'Vis redaktionelle opmærkningselementer',
+    description: 'Fremhæv alle elementer indeholdt i redaktionelle opmærkningselementer',
+  },
+  markupToPDF: {
+    text: 'Vis opmærkning i PDF',
+    description: 'Vis redaktionel opmærkning i PDF-eksport',
+  },
+  alternativeVersionContent: {
+    text: 'Indhold af alternative kodninger',
+    description:
+      'Vælg standardindhold for alternative kodninger: nyoprettede alternative kodninger er tomme eller kopier af den oprindelige læsning',
+    labels: ['tom', 'kopi'],
   },
   suppliedColor: {
     text: 'Vælg <supplied> fremhævningsfarve',
     description: 'Vælg <supplied> fremhævningsfarve',
+  },
+  unclearColor: {
+    text: 'Vælg <unclear> fremhævningsfarve',
+    description: 'Vælg <unclear> fremhævningsfarve',
+  },
+  sicColor: {
+    text: 'Vælg <sic> fremhævningsfarve',
+    description: 'Vælg <sic> fremhævningsfarve',
+  },
+  corrColor: {
+    text: 'Vælg <corr> fremhævningsfarve',
+    description: 'Vælg <corr> fremhævningsfarve',
+  },
+  origColor: {
+    text: 'Vælg <orig> fremhævningsfarve',
+    description: 'Vælg <orig> fremhævningsfarve',
+  },
+  regColor: {
+    text: 'Vælg <reg> fremhævningsfarve',
+    description: 'Vælg <reg> fremhævningsfarve',
+  },
+  addColor: {
+    text: 'Vælg <add> fremhævningsfarve',
+    description: 'Vælg <add> fremhævningsfarve',
+  },
+  delColor: {
+    text: 'Vælg <del> fremhævningsfarve',
+    description: 'Vælg <del> fremhævningsfarve',
   },
   respSelect: {
     text: 'Vælg <supplied> ansvar',
@@ -986,6 +1161,17 @@ export const lang = {
   githubMessage: { text: 'Besked' },
   none: { text: 'Ingen' },
   commitFileNameText: { text: 'Filnavn' },
+  cloneError: { text: 'Fejl ved kloning af repository. ' },
+  repoTooLargeError: { text: 'Repositoryet er for stort til at klone: ' },
+  repoSizeWarning: {
+    text: 'For at åbne den ønskede fil fra GitHub skal mei-friend klone dette temmelig store repository. Er du sikker på, at du ønsker at fortsætte? Størrelse af data, der skal downloades: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Annuller',
+  },
+  repoSizeWarningProceed: {
+    text: 'Fortsæt',
+  },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Beklager, kunne ikke fork repository' },
   loadingFile: { text: 'Indlæser fil' },
@@ -1010,16 +1196,23 @@ export const lang = {
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: 'Kontroller @accid.ges attributter (mod toneart, mål accids og bindinger).' },
+  metConCodeCheckerTitle: {
+    text: 'Kontrollerer overensstemmelse med taktart (mindst ét lag pr. system har det antal taktslag, der er angivet i taktartsangivelsen).',
+  },
   codeCheckerFix: { text: 'Fix' },
   codeCheckerFixAll: { text: 'Fix alle' },
   codeCheckerIgnore: { text: 'Ignorer' },
   codeCheckerIgnoreAll: { text: 'Ignorer alle' },
   codeCheckerCheckingCode: { text: 'Kontrollerer kode...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges attributter synes korrekte.' },
+  codeCheckerMeterConformanceMessage: { text: 'Alle mål stemmer overens med deres taktarter.' },
   codeCheckerMeasure: { text: 'Mål' },
+  codeCheckerStaff: { text: 'System' },
   codeCheckerNote: { text: 'Note' },
   codeCheckerHasBoth: { text: 'har både' },
   codeCheckerAnd: { text: 'og' },
+  codeCheckerHasADurationOf: { text: 'har en varighed på' },
+  codeCheckerInsteadOf: { text: 'i stedet for' },
   codeCheckerRemove: { text: 'Fjern' },
   codeCheckerFixTo: { text: 'Fix til' },
   codeCheckerAdd: { text: 'Tilføj' },
@@ -1032,6 +1225,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'har ekstra' }, // har overflødig
   codeCheckerLacksAn: { text: 'mangler en' },
   codeCheckerBecauseAlreadyDefined: { text: 'fordi det er defineret tidligere i målet' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Kontrollerer linkede elementer (referencer via startid, endid, plist og andre link-attributter).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Alle linkede elementreferencer fundet i kodningen.' },
+  codeCheckerLinkedElementNotFound: { text: '— mål ikke fundet i kodningen' },
+  codeCheckerLinkingAttrEmpty: { text: '— link-attribut har ingen værdi' },
+  codeCheckerPlistMultipleBlanks: { text: '— indeholder flere eller omgivende mellemrum mellem elementer' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

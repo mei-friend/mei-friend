@@ -174,6 +174,7 @@ export const lang = {
   toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
   meterConformanceText: { text: 'Kontroli @metcon' },
+  checkLinkedElementsText: { text: 'Kontroli ligitajn elementojn' },
   renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
@@ -257,6 +258,13 @@ export const lang = {
   verovioLoaded: { text: 'ŝargita' },
   convertedToPdf: { text: 'konvertita al PDF' },
   statusBarCompute: { text: 'Kalkuli' },
+  notationStaleXmlInvalid: { text: 'Bildigo paŭzigita — atendante validan XML' },
+  notationErrorBadgeLabel: { text: 'Verovia eraro:' },
+  notationErrorBadgeLabelPlural: { text: 'Veroviaj eraroj:' },
+  notationWarningBadgeLabel: { text: 'Verovia averto:' },
+  notationWarningBadgeLabelPlural: { text: 'Veroviaj avertoj:' },
+  notationBadgeClickToExpand: { text: 'klaku por vastigi' },
+  notationBadgeClickToContract: { text: 'klaku por malvastigi' },
   middleFooterPage: { text: 'paĝo' },
   middleFooterOf: { text: 'de' },
   middleFooterLoaded: { text: 'ŝargita' },
@@ -467,9 +475,36 @@ export const lang = {
   annotationCloseButtonText: { text: 'Fermi la Panelon de Notoj' },
   hideAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
   closeAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
+  markupToolsButton: { description: 'Iloj de markado' },
   annotationToolsButton: { description: 'Iloj de Notoj' },
   annotationListButton: { description: 'Listigi Notojn' },
   writeAnnotStandoffText: { text: 'Reteja Noto' },
+  annotationToolDomainSelectorLegend: { text: 'Elekti konservejon de notoj' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Cela tipo', description: 'Elekti celan tipon de la noto' },
+  annotationToolTargetTypeElements: {
+    description: 'Noti la elektitajn MEI-elementojn per @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Listigo de elementoj',
+    description: 'Noti la elektitajn MEI-elementojn per @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Noti la amplekson de la elektitaj MEI-elementoj per @startid kaj @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Amplekso de elementoj',
+    description: 'Noti la amplekson de la elektitaj MEI-elementoj per @startid kaj @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Noti la tempan intervalon respondan al la elektitaj MEI-elementoj per @tstamp kaj @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Metrika amplekso',
+    description: 'Noti la tempan intervalon respondan al la elektitaj MEI-elementoj per @tstamp kaj @tstamp2',
+  },
+
+  insertInlineAnnotationLegend: { text: 'Enmeti noton' },
+  insertStandoffAnnotationLegend: { text: 'Enmeti stenda-RDF noton' },
   annotationToolsIdentifyTitle: { text: 'Identigi' },
   annotationToolsIdentifySpan: { text: 'Identigi Muzikan Objekton' },
   annotationToolsHighlightTitle: { text: 'Emfazi' },
@@ -510,6 +545,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Bedaŭrinde, estas neeble enmeti notojn ekster &lt;score&gt;',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Ne eblas skribi noton ĉar almenaŭ unu elemento en la elektado mankas xml:id.',
+    text2: 'Bonvolu aljuĝi identigilojn elektante "Mankanĝi" -> "Aldoni id-ojn al MEI" kaj provi denove.',
   },
   annotationWithoutIdWarning: {
     text1: 'Ne eblas enmeti noton ĉar la MEI ankorpunkto ne havas xml:id.',
@@ -603,6 +642,15 @@ export const lang = {
     text: '<del>',
     description:
       '(forigo) – Enhavas informon forigitan, markitan kiel forigita, aŭ alie indikitan kiel superflua aŭ fuŝa en la kopia teksto de aŭtoro, skribanto, notanto, aŭ korektisto.',
+  },
+  missingParentIdWarning: {
+    text: 'La ago eblas nur se la patra elemento havas xml:id. Bonvolu unue aldoni xml:id-ojn al la dokumento.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Malfari',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Aldoni id-ojn al MEI',
   },
 
   // MIDI
@@ -1107,6 +1155,17 @@ export const lang = {
   githubMessage: { text: 'Mesaĝo' },
   none: { text: 'Neniu' },
   commitFileNameText: { text: 'Dosiernomo' },
+  cloneError: { text: 'Eraro dum klonado de deponejo. ' },
+  repoTooLargeError: { text: 'La deponejo estas tro granda por kloni: ' },
+  repoSizeWarning: {
+    text: 'Por malfermi la petitan dosieron el GitHub, mei-friend devos kloni tiun ĉi sufiĉe grandan deponejon. Ĉu vi certas, ke vi volas daŭrigi? Grando de la datumoj elŝutotaj: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Malfari',
+  },
+  repoSizeWarningProceed: {
+    text: 'Daŭrigi',
+  },
   forkRepository: { text: 'Forki deponejon' },
   forkError: { text: 'Pardonu, ne povis forki deponejon' },
   loadingFile: { text: 'Ŝargante dosieron' },
@@ -1133,16 +1192,23 @@ export const lang = {
   accidGesCodeCheckerTitle: {
     text: 'Kontroli @accid.ges atributojn (kontraŭ ŝlosilsigno, mezur-spezifaj akcidentoj, kaj ligoj).',
   },
+  metConCodeCheckerTitle: {
+    text: 'Kontroli @metcon-konformecon (almenaŭ unu tavolo por ĉiu portilo havas takt-nombron laŭ la mezursigno).',
+  },
   codeCheckerFix: { text: 'Korekti' },
   codeCheckerFixAll: { text: 'Korekti ĉion' },
   codeCheckerIgnore: { text: 'Ignori' },
   codeCheckerIgnoreAll: { text: 'Ignori ĉion' },
   codeCheckerCheckingCode: { text: 'Kontrolante kodo...' },
   codeCheckerNoAccidMessagesFound: { text: 'Ŝajnas, ke ĉiuj @accid.ges atributoj estas ĝustaj.' },
+  codeCheckerMeterConformanceMessage: { text: 'Ĉiuj taktoj konformas al siaj mezursignoj.' },
   codeCheckerMeasure: { text: 'takto' },
+  codeCheckerStaff: { text: 'Portilo' },
   codeCheckerNote: { text: 'Noto' },
   codeCheckerHasBoth: { text: 'havas kaj' },
   codeCheckerAnd: { text: 'kaj' },
+  codeCheckerHasADurationOf: { text: 'havas daŭron de' },
+  codeCheckerInsteadOf: { text: 'anstataŭ' },
   codeCheckerRemove: { text: 'Forigi' },
   codeCheckerFixTo: { text: 'Korekti al' },
   codeCheckerAdd: { text: 'Aldoni' },
@@ -1155,6 +1221,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'havas ekstran' }, // havas superfluan
   codeCheckerLacksAn: { text: 'mankas unu' },
   codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la takto' },
+
+  // Kodo-kontrolilo: ligitaj elementoj
+  linkedElementsCodeCheckerTitle: {
+    text: 'Kontroli ligitajn elementojn (referencoj per startid, endid, plist, kaj aliaj ligaj atributoj).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Ĉiuj referencoj al ligitaj elementoj troviĝas en la kodo.' },
+  codeCheckerLinkedElementNotFound: { text: '— celo ne troviĝas en la kodo' },
+  codeCheckerLinkingAttrEmpty: { text: '— la liga atributo havas neniun valoron' },
+  codeCheckerPlistMultipleBlanks: { text: '— enhavas multoblajn aŭ ĉirkaŭajn spacojn inter eroj' },
 
   // Averto pri mankantaj ID-oj
   missingIdsWarningAlert: {

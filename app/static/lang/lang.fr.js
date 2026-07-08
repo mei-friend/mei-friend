@@ -178,6 +178,7 @@ export const lang = {
   toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Vérifier les @accid.ges' },
   meterConformanceText: { text: 'Vérifier les @metcon' },
+  checkLinkedElementsText: { text: 'Vérifier les éléments liés' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
@@ -261,6 +262,13 @@ export const lang = {
   verovioLoaded: { text: 'chargé' },
   convertedToPdf: { text: 'converti en PDF' },
   statusBarCompute: { text: 'Calculer' },
+  notationStaleXmlInvalid: { text: 'Rendu en pause — en attente de XML valide' },
+  notationErrorBadgeLabel: { text: 'Erreur Verovio :' },
+  notationErrorBadgeLabelPlural: { text: 'Erreurs Verovio :' },
+  notationWarningBadgeLabel: { text: 'Avertissement Verovio :' },
+  notationWarningBadgeLabelPlural: { text: 'Avertissements Verovio :' },
+  notationBadgeClickToExpand: { text: 'cliquer pour développer' },
+  notationBadgeClickToContract: { text: 'cliquer pour réduire' },
   middleFooterPage: { text: 'page' },
   middleFooterOf: { text: 'sur' },
   middleFooterLoaded: { text: 'chargées' },
@@ -477,6 +485,36 @@ export const lang = {
   annotationToolsButton: { description: "Outils d'annotation" },
   annotationListButton: { description: 'Liste des annotations' },
   writeAnnotStandoffText: { text: 'Annotation Web' },
+  annotationToolDomainSelectorLegend: { text: "Sélectionner le stockage de l'annotation" },
+  annotationToolTargetTypeSelectorLegend: {
+    text: 'Type de cible',
+    description: "Sélectionner un type de cible d'annotation",
+  },
+  annotationToolTargetTypeElements: {
+    description: 'Annoter les éléments MEI sélectionnés à l’aide de @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: "Énumération d'éléments",
+    description: 'Annoter les éléments MEI sélectionnés à l’aide de @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: "Annoter la plage d'éléments MEI sélectionnés à l'aide de @startid et @endid",
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: "Plage d'éléments",
+    description: "Annoter la plage d'éléments MEI sélectionnés à l'aide de @startid et @endid",
+  },
+  annotationToolTargetTypeInterval: {
+    description:
+      "Annoter l'intervalle de temps correspondant aux éléments MEI sélectionnés à l'aide de @tstamp et @tstamp2",
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Plage métrique',
+    description:
+      "Annoter l'intervalle de temps correspondant aux éléments MEI sélectionnés à l'aide de @tstamp et @tstamp2",
+  },
+  insertInlineAnnotationLegend: { text: 'Insérer une annotation' },
+  insertStandoffAnnotationLegend: { text: 'Insérer une annotation stand-off' },
   annotationToolsIdentifyTitle: { text: 'Identifier' },
   annotationToolsIdentifySpan: { text: 'Identifier un objet musical' },
   annotationToolsHighlightTitle: { text: 'Surligner' },
@@ -517,6 +555,11 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: "Désolé, il est actuellement impossible d'écrire des annotations placées à l'extérieur de la balise <score>",
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: "Impossible d'écrire l'annotation car au moins un élément de la sélection ne possède pas d'xml:id.",
+    text2:
+      'Veuillez assigner des identifiants en sélectionnant "Manipuler" -> "Ajouter des identifiants à MEI" et réessayer.',
   },
   annotationWithoutIdWarning: {
     text1: "Impossible d'écrire une annotation car le point d'ancrage MEI ne possède pas d'identifiant xml:",
@@ -612,6 +655,15 @@ export const lang = {
     text: '<del>',
     description:
       '(suppression) - Contient des informations supprimées, marquées comme supprimées ou indiquées comme superflues ou erronées dans le texte de copie par un auteur, un scribe, un annotateur ou un correcteur.',
+  },
+  missingParentIdWarning: {
+    text: "L'action ne peut être effectuée que si l'élément parent possède un xml:id. Veuillez d'abord ajouter des xml:id au document.",
+  },
+  handleMissingParentIdAbort: {
+    text: 'Annuler',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Ajouter des identifiants à MEI',
   },
 
   // MIDI
@@ -1137,6 +1189,17 @@ export const lang = {
   githubMessage: { text: 'Message' },
   none: { text: 'Aucun' },
   commitFileNameText: { text: 'Nom du fichier' },
+  cloneError: { text: 'Erreur lors du clonage du dépôt. ' },
+  repoTooLargeError: { text: 'Le dépôt est trop volumineux pour être cloné : ' },
+  repoSizeWarning: {
+    text: 'Pour ouvrir le fichier demandé depuis GitHub, mei-friend devra cloner ce dépôt assez volumineux. Êtes-vous sûr(e) de vouloir continuer ? Taille des données à télécharger : ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Annuler',
+  },
+  repoSizeWarningProceed: {
+    text: 'Continuer',
+  },
   forkRepository: { text: 'Créer une copie du répertoire' },
   forkError: { text: 'Désolé, impossible de créer une copie du répertoire' },
   loadingFile: { text: 'Chargement du fichier' },
@@ -1194,6 +1257,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'possède un élément supplémentaire' },
   codeCheckerLacksAn: { text: "manque d'un" },
   codeCheckerBecauseAlreadyDefined: { text: 'car il a été défini plus tôt dans la mesure' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Vérification des éléments liés (références via startid, endid, plist et autres attributs de liaison).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: "Toutes les références d'éléments liés ont été trouvées dans l'encodage." },
+  codeCheckerLinkedElementNotFound: { text: "— cible introuvable dans l'encodage" },
+  codeCheckerLinkingAttrEmpty: { text: "— l'attribut de liaison n'a pas de valeur" },
+  codeCheckerPlistMultipleBlanks: { text: '— contient plusieurs espaces ou des espaces en début/fin entre les éléments' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

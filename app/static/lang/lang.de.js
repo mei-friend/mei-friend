@@ -177,6 +177,7 @@ export const lang = {
   toggleDotsText: { text: 'Punktierung an/abschalten' },
   cleanAccidText: { text: '@accid.ges überprüfen' },
   meterConformanceText: { text: '@metcon überprüfen' },
+  checkLinkedElementsText: { text: 'Verlinkte Elemente überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
@@ -260,6 +261,13 @@ export const lang = {
   verovioLoaded: { text: 'geladen' },
   convertedToPdf: { text: 'Konvertiere PDF' },
   statusBarCompute: { text: 'Berechne' },
+  notationStaleXmlInvalid: { text: 'Rendering pausiert — warte auf gültiges XML' },
+  notationErrorBadgeLabel: { text: 'Verovio-Fehler:' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio-Fehler:' },
+  notationWarningBadgeLabel: { text: 'Verovio-Warnung:' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio-Warnungen:' },
+  notationBadgeClickToExpand: { text: 'zum Erweitern klicken' },
+  notationBadgeClickToContract: { text: 'zum Verkleinern klicken' },
   middleFooterPage: { text: 'Seite' },
   middleFooterOf: { text: 'von' },
   middleFooterLoaded: { text: 'geladen' },
@@ -484,6 +492,29 @@ export const lang = {
   annotationListButton: { description: 'Annotationen auflisten' },
   writeAnnotStandoffText: { text: 'Web Annotationen' },
   annotationToolDomainSelectorLegend: { text: 'Ort für Annotationen auswählen' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Zieltyp', description: 'Zieltyp der Annotation auswählen' },
+  annotationToolTargetTypeElements: {
+    description: 'Annotiert die ausgewählten MEI-Elemente mittels @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Elementaufzählung',
+    description: 'Annotiert die ausgewählten MEI-Elemente mittels @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Annotiert den Bereich der ausgewählten MEI-Elemente mittels @startid und @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Elementbereich',
+    description: 'Annotiert den Bereich der ausgewählten MEI-Elemente mittels @startid und @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Annotiert das den ausgewählten MEI-Elementen entsprechende Zeitintervall mittels @tstamp und @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Metrischer Bereich',
+    description: 'Annotiert das den ausgewählten MEI-Elementen entsprechende Zeitintervall mittels @tstamp und @tstamp2',
+  },
+
   insertInlineAnnotationLegend: { text: 'Annotationen einfügen' },
   insertStandoffAnnotationLegend: { text: 'Web Annotation einfügen' },
   annotationToolsIdentifyTitle: { text: 'Identifizieren' },
@@ -527,6 +558,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Leider können derzeit keine Annotationen außerhalb von &lt;score&gt; geschrieben werden',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Annotation kann nicht geschrieben werden, da mindestens ein Element der Auswahl kein xml:id Attribut hat.',
+    text2: 'Bitte xml:ids zuweisen ("Verändern" -> "Ids zu MEI hinzufügen") und erneut versuchen.',
   },
   annotationWithoutIdWarning: {
     text1: 'Annotation kann nicht geschrieben werden, da MEI-Ankerpunkt kein xml:id Attribut hat.',
@@ -622,6 +657,15 @@ export const lang = {
     text: '<del>',
     description:
       '(Löschung) – Enthält Informationen, die gelöscht wurden, als gelöscht markiert wurden oder anderweitig als überflüssig oder irreführend im Kopietext durch einen Autor, Schreiber, Annotator oder Korrektor angegeben wurden.',
+  },
+  missingParentIdWarning: {
+    text: 'Diese Aktion kann nur ausgeführt werden, wenn das übergeordnete Element ein xml:id Attribut hat. Bitte zunächst xml:ids zum Dokument hinzufügen.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Abbrechen',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Ids zu MEI hinzufügen',
   },
 
   // MIDI
@@ -1137,6 +1181,17 @@ export const lang = {
   githubMessage: { text: 'Nachricht' },
   none: { text: 'Kein' },
   commitFileNameText: { text: 'Dateiname' },
+  cloneError: { text: 'Fehler beim Klonen des Repositoriums. ' },
+  repoTooLargeError: { text: 'Das Repositorium ist zu groß zum Klonen: ' },
+  repoSizeWarning: {
+    text: 'Um die angeforderte Datei von GitHub zu öffnen, muss mei-friend dieses recht große Repositorium klonen. Möchten Sie wirklich fortfahren? Größe der herunterzuladenden Daten: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Abbrechen',
+  },
+  repoSizeWarningProceed: {
+    text: 'Fortfahren',
+  },
   forkRepository: { text: 'Repo forken' },
   forkError: { text: 'Konnte Repo leider nicht forken' },
   loadingFile: { text: 'Lade Datei' },
@@ -1194,6 +1249,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'hat extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'vermisst einen' },
   codeCheckerBecauseAlreadyDefined: { text: 'weil es im gleichen Takt bereits definiert wurde' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Überprüfung verlinkter Elemente (Referenzen über startid, endid, plist und andere Verlinkungsattribute).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Alle verlinkten Elementverweise wurden in der Kodierung gefunden.' },
+  codeCheckerLinkedElementNotFound: { text: '— Ziel in der Kodierung nicht gefunden' },
+  codeCheckerLinkingAttrEmpty: { text: '— Verlinkungsattribut hat keinen Wert' },
+  codeCheckerPlistMultipleBlanks: { text: '— enthält mehrfache oder umgebende Leerzeichen zwischen den Einträgen' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

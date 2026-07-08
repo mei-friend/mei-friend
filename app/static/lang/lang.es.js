@@ -175,6 +175,7 @@ export const lang = {
   toggleDotsText: { text: 'Alternar el punteado' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   meterConformanceText: { text: 'Verificar @metcon' },
+  checkLinkedElementsText: { text: 'Verificar elementos vinculados' },
   renumberMeasuresTestText: { text: 'Renumerar compases (prueba)' },
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },
   addIdsText: { text: 'Añadir IDs a MEI' },
@@ -258,6 +259,13 @@ export const lang = {
   verovioLoaded: { text: 'cargado' },
   convertedToPdf: { text: 'Convirtiendo a PDF' },
   statusBarCompute: { text: 'Calculando' },
+  notationStaleXmlInvalid: { text: 'Representación en pausa — esperando XML válido' },
+  notationErrorBadgeLabel: { text: 'Error de Verovio:' },
+  notationErrorBadgeLabelPlural: { text: 'Errores de Verovio:' },
+  notationWarningBadgeLabel: { text: 'Advertencia de Verovio:' },
+  notationWarningBadgeLabelPlural: { text: 'Advertencias de Verovio:' },
+  notationBadgeClickToExpand: { text: 'clic para expandir' },
+  notationBadgeClickToContract: { text: 'clic para contraer' },
   middleFooterPage: { text: 'Página' },
   middleFooterOf: { text: 'de' },
   middleFooterLoaded: { text: 'cargado' },
@@ -479,6 +487,36 @@ export const lang = {
   annotationToolsButton: { description: 'Herramientas de anotación' },
   annotationListButton: { description: 'Lista de anotaciones' },
   writeAnnotStandoffText: { text: 'Anotación Web' },
+  annotationToolDomainSelectorLegend: { text: 'Seleccionar almacenamiento de anotaciones' },
+  annotationToolTargetTypeSelectorLegend: {
+    text: 'Tipo de destino',
+    description: 'Seleccionar un tipo de destino de anotación',
+  },
+  annotationToolTargetTypeElements: {
+    description: 'Anotar los elementos MEI seleccionados usando @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Enumeración de elementos',
+    description: 'Anotar los elementos MEI seleccionados usando @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Anotar el rango de los elementos MEI seleccionados usando @startid y @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Rango de elementos',
+    description: 'Anotar el rango de los elementos MEI seleccionados usando @startid y @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description:
+      'Anotar el intervalo de tiempo correspondiente a los elementos MEI seleccionados usando @tstamp y @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Rango métrico',
+    description:
+      'Anotar el intervalo de tiempo correspondiente a los elementos MEI seleccionados usando @tstamp y @tstamp2',
+  },
+  insertInlineAnnotationLegend: { text: 'Insertar anotación' },
+  insertStandoffAnnotationLegend: { text: 'Insertar anotación stand-off' },
   annotationToolsIdentifyTitle: { text: 'Identificar' },
   annotationToolsIdentifySpan: { text: 'Identificar objeto musical' },
   annotationToolsHighlightTitle: { text: 'Resaltar' },
@@ -519,6 +557,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Lo siento, actualmente no se pueden escribir anotaciones fuera de <score>',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'No se puede escribir la anotación porque al menos un elemento de la selección carece de xml:id.',
+    text2: 'Asigna identificadores seleccionando "Manipular" -> "Añadir IDs a MEI" e inténtalo de nuevo.',
   },
   annotationWithoutIdWarning: {
     text1: 'No se puede escribir la anotación porque el punto de anclaje MEI carece de xml:id.',
@@ -614,6 +656,15 @@ export const lang = {
     text: '<del>',
     description:
       '(eliminación) – Contiene información eliminada, marcada como eliminada, o indicada como superflua o espuria en el texto copiado por un autor, escribano, anotador o corrector.',
+  },
+  missingParentIdWarning: {
+    text: 'Esta acción solo se puede realizar si el elemento padre tiene un xml:id. Primero añade xml:ids al documento.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Cancelar',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Añadir IDs a MEI',
   },
 
   // MIDI // MIDI
@@ -1127,6 +1178,17 @@ export const lang = {
   githubMessage: { text: 'Mensaje' },
   none: { text: 'Ninguno' },
   commitFileNameText: { text: 'Nombre del archivo' },
+  cloneError: { text: 'Error al clonar el repositorio. ' },
+  repoTooLargeError: { text: 'El repositorio es demasiado grande para clonarlo: ' },
+  repoSizeWarning: {
+    text: 'Para abrir el archivo solicitado desde GitHub, mei-friend necesitará clonar este repositorio bastante grande. ¿Estás seguro/a de que deseas continuar? Tamaño de los datos a descargar: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Cancelar',
+  },
+  repoSizeWarningProceed: {
+    text: 'Continuar',
+  },
   forkRepository: { text: 'Forkar repositorio' },
   forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
   loadingFile: { text: 'Cargando archivo' },
@@ -1166,6 +1228,7 @@ export const lang = {
   codeCheckerNoAccidMessagesFound: { text: 'Todos los atributos accid.ges parecen correctos.' },
   codeCheckerMeterConformanceMessage: { text: 'Todos los compases se ajustan a sus firmas métricas.' },
   codeCheckerMeasure: { text: 'Compás' },
+  codeCheckerStaff: { text: 'Pentagrama' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'tiene ambos' },
   codeCheckerAnd: { text: 'y' },
@@ -1183,6 +1246,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'tiene extra' },
   codeCheckerLacksAn: { text: 'carece de un' },
   codeCheckerBecauseAlreadyDefined: { text: 'porque ya se ha definido anteriormente en el compás' },
+
+  // Code checker: linked elements / Verificador de código: elementos vinculados
+  linkedElementsCodeCheckerTitle: {
+    text: 'Verificando elementos vinculados (referencias mediante startid, endid, plist y otros atributos de vinculación).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Se han encontrado todas las referencias a elementos vinculados en la codificación.' },
+  codeCheckerLinkedElementNotFound: { text: '— destino no encontrado en la codificación' },
+  codeCheckerLinkingAttrEmpty: { text: '— el atributo de vinculación no tiene valor' },
+  codeCheckerPlistMultipleBlanks: { text: '— contiene múltiples espacios o espacios entre elementos' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

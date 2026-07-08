@@ -170,6 +170,7 @@ export const lang = {
   toggleDotsText: { text: 'перемикання пунктиру' },
   cleanAccidText: { text: 'Перевірити @accid.ges' },
   meterConformanceText: { text: 'Перевірити @metcon' },
+  checkLinkedElementsText: { text: "Перевірити пов'язані елементи" },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },
   addIdsText: { text: 'Додати ідентифікатори до MEI' },
@@ -253,6 +254,13 @@ export const lang = {
   verovioLoaded: { text: 'завантажено' },
   convertedToPdf: { text: 'конвертовано в PDF' },
   statusBarCompute: { text: 'Обчислення' },
+  notationStaleXmlInvalid: { text: 'Рендеринг призупинено — очікування коректного XML' },
+  notationErrorBadgeLabel: { text: 'Помилка Verovio:' },
+  notationErrorBadgeLabelPlural: { text: 'Помилки Verovio:' },
+  notationWarningBadgeLabel: { text: 'Попередження Verovio:' },
+  notationWarningBadgeLabelPlural: { text: 'Попередження Verovio:' },
+  notationBadgeClickToExpand: { text: 'натисніть, щоб розгорнути' },
+  notationBadgeClickToContract: { text: 'натисніть, щоб згорнути' },
   middleFooterPage: { text: 'сторінка' },
   middleFooterOf: { text: 'з' },
   middleFooterLoaded: { text: 'завантажено' },
@@ -462,9 +470,36 @@ export const lang = {
   annotationCloseButtonText: { text: 'Закрити панель анотацій' },
   hideAnnotationPanelButton: { description: 'Закрити панель анотацій' },
   closeAnnotationPanelButton: { description: 'Закрити панель анотацій' },
+  markupToolsButton: { description: 'Інструменти розмітки' },
   annotationToolsButton: { description: 'Інструменти анотацій' },
   annotationListButton: { description: 'Список анотацій' },
   writeAnnotStandoffText: { text: 'Web анотація' },
+  annotationToolDomainSelectorLegend: { text: 'Виберіть сховище анотацій' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Тип цілі', description: 'Виберіть тип цілі анотації' },
+  annotationToolTargetTypeElements: {
+    description: "Анотувати вибрані елементи MEI за допомогою @plist.",
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Перелік елементів',
+    description: "Анотувати вибрані елементи MEI за допомогою @plist.",
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Анотувати діапазон вибраних елементів MEI за допомогою @startid та @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Діапазон елементів',
+    description: 'Анотувати діапазон вибраних елементів MEI за допомогою @startid та @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Анотувати часовий інтервал, що відповідає вибраним елементам MEI, за допомогою @tstamp та @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Метричний діапазон',
+    description: 'Анотувати часовий інтервал, що відповідає вибраним елементам MEI, за допомогою @tstamp та @tstamp2',
+  },
+
+  insertInlineAnnotationLegend: { text: 'Вставити анотацію' },
+  insertStandoffAnnotationLegend: { text: 'Вставити автономну (stand-off) анотацію' },
   annotationToolsIdentifyTitle: { text: 'Визначити' },
   annotationToolsIdentifySpan: { text: "Визначити музичний об'єкт" },
   annotationToolsHighlightTitle: { text: 'Виділити' },
@@ -505,6 +540,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'На жаль, зараз неможливо створювати анотації, розміщені поза &lt;score&gt;',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: "Неможливо створити анотацію, оскільки принаймні один елемент у виборі не має xml:id.",
+    text2: 'Будь ласка, присвойте ідентифікатори, вибравши "Маніпулювати" -> "Додати ідентифікатори до MEI" і повторіть спробу.',
   },
   annotationWithoutIdWarning: {
     text1: "Неможливо створити анотацію, оскільки як xml:id для точки прив'язки MEI відсутній.",
@@ -599,6 +638,15 @@ export const lang = {
     text: '<del>',
     description:
       '(видалення) - Містить інформацію, видалену, позначену як видалену або інакше вказану як зайву або фальшиву в копіювальному тексті автором, копістом, анотатором або виправником.',
+  },
+  missingParentIdWarning: {
+    text: 'Дію можна виконати лише якщо батьківський елемент має xml:id. Будь ласка, спочатку додайте xml:id до документа.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Скасувати',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Додати ідентифікатори до MEI',
   },
 
   // MIDI
@@ -1101,6 +1149,17 @@ export const lang = {
   githubMessage: { text: 'Повідомлення' },
   none: { text: 'Немає' },
   commitFileNameText: { text: 'Назва файлу' },
+  cloneError: { text: 'Помилка клонування сховища. ' },
+  repoTooLargeError: { text: 'Сховище занадто велике для клонування: ' },
+  repoSizeWarning: {
+    text: 'Щоб відкрити запитаний файл із GitHub, mei-friend потрібно буде клонувати це доволі велике сховище. Ви впевнені, що хочете продовжити? Розмір даних для завантаження: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Скасувати',
+  },
+  repoSizeWarningProceed: {
+    text: 'Продовжити',
+  },
   forkRepository: { text: 'Розгалужити сховище' },
   forkError: { text: 'На жаль, не вдалося розгалужити сховище' },
   loadingFile: { text: 'Завантаження файлу' },
@@ -1127,16 +1186,23 @@ export const lang = {
   accidGesCodeCheckerTitle: {
     text: "Перевірка атрибутів @accid.ges (відповідно до ключового підпису, атрибутів @accid в тактах та зв'язків).",
   },
+  metConCodeCheckerTitle: {
+    text: 'Перевірка відповідності метру (принаймні один шар на нотоносці має номер долі, вказаний у розмірі).',
+  },
   codeCheckerFix: { text: 'Виправити' },
   codeCheckerFixAll: { text: 'Виправити все' },
   codeCheckerIgnore: { text: 'Ігнорувати' },
   codeCheckerIgnoreAll: { text: 'Ігнорувати все' },
   codeCheckerCheckingCode: { text: 'Перевірка коду...' },
   codeCheckerNoAccidMessagesFound: { text: 'Всі атрибути @accid.ges виглядають правильно.' },
+  codeCheckerMeterConformanceMessage: { text: 'Усі такти відповідають своїм розмірам.' },
   codeCheckerMeasure: { text: 'Такт' },
+  codeCheckerStaff: { text: 'Нотоносець' },
   codeCheckerNote: { text: 'Нота' },
   codeCheckerHasBoth: { text: 'має обидва' },
   codeCheckerAnd: { text: 'та' },
+  codeCheckerHasADurationOf: { text: 'має тривалість' },
+  codeCheckerInsteadOf: { text: 'замість' },
   codeCheckerRemove: { text: 'Видалити' },
   codeCheckerFixTo: { text: 'Виправити на' },
   codeCheckerAdd: { text: 'Додати' },
@@ -1149,6 +1215,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'має зайвий' }, // має надмірний
   codeCheckerLacksAn: { text: 'не має' },
   codeCheckerBecauseAlreadyDefined: { text: 'оскільки він вже визначений раніше в такту' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: "Перевірка пов'язаних елементів (посилання через startid, endid, plist та інші атрибути зв'язування).",
+  },
+  codeCheckerNoLinkedElementsIssues: { text: "Усі посилання на пов'язані елементи знайдено в кодуванні." },
+  codeCheckerLinkedElementNotFound: { text: '— ціль не знайдено в кодуванні' },
+  codeCheckerLinkingAttrEmpty: { text: "— атрибут зв'язування не має значення" },
+  codeCheckerPlistMultipleBlanks: { text: '— містить декілька пробілів між елементами або пробіли на початку/в кінці' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

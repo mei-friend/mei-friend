@@ -168,6 +168,7 @@ export const lang = {
   toggleDotsText: { text: '切换附点' },
   cleanAccidText: { text: '检查 @accid.ges' },
   meterConformanceText: { text: '检查 @metcon' },
+  checkLinkedElementsText: { text: '检查链接元素' },
   renumberMeasuresTestText: { text: '重编号小节（测试）' },
   renumberMeasuresExecText: { text: '重编号小节（执行）' },
   addIdsText: { text: '为 MEI 添加 id' },
@@ -195,9 +196,7 @@ export const lang = {
   addDiminuendoHairpinText: { text: '渐弱' },
   addBeamText: { text: '符尾连线' },
   addBeamSpanText: { text: '符尾连线范围' },
-  addSuppliedText: { text: '补充' },
-  addSuppliedArticText: { text: '补充（Artic）' },
-  addSuppliedAccidText: { text: '补充（Accid）' },
+  addSuppliedText: { text: '补充', description: '包含转录者或编者出于任何原因所补充的内容。' },
   addArpeggioText: { text: '琶音' },
   addFermataText: { text: '延长' },
   addGlissandoText: { text: '滑音' },
@@ -254,6 +253,13 @@ export const lang = {
   verovioLoaded: { text: '已加载' },
   convertedToPdf: { text: '转换为 PDF' },
   statusBarCompute: { text: '计算' },
+  notationStaleXmlInvalid: { text: '渲染已暂停 — 等待有效的 XML' },
+  notationErrorBadgeLabel: { text: 'Verovio 错误：' },
+  notationErrorBadgeLabelPlural: { text: 'Verovio 错误：' },
+  notationWarningBadgeLabel: { text: 'Verovio 警告：' },
+  notationWarningBadgeLabelPlural: { text: 'Verovio 警告：' },
+  notationBadgeClickToExpand: { text: '点击展开' },
+  notationBadgeClickToContract: { text: '点击收起' },
   middleFooterPage: { text: '第' },
   middleFooterOf: { text: '页，共' },
   middleFooterLoaded: { text: '页已加载' },
@@ -284,6 +290,9 @@ export const lang = {
   breaksSelectLine: { text: '系统' },
   breaksSelectEncoded: { text: '系统和页面' },
   breaksSelectSmart: { text: '智能' },
+  choiceSelect: { description: '选择 <choice> 元素显示的内容' },
+  choiceDefault: { text: '（默认选项）' },
+  noChoice: { text: '（无可用选项）' },
   updateControlsLabel: { text: '更新', description: '在编码变化后控制乐谱更新行为' },
   liveUpdateCheckbox: { description: '在编码变化后自动更新乐谱' },
   codeManualUpdateButton: { description: '手动更新乐谱' },
@@ -443,9 +452,35 @@ export const lang = {
   annotationCloseButtonText: { text: '关闭注释面板' },
   hideAnnotationPanelButton: { description: '关闭注释面板' },
   closeAnnotationPanelButton: { description: '关闭注释面板' },
-  annotationToolsButton: { text: '工具', description: '注释工具' },
-  annotationListButton: { text: '列表', description: '列出注释' },
+  markupToolsButton: { description: '标记工具' },
+  annotationToolsButton: { description: '注释工具' },
+  annotationListButton: { description: '列出注释' },
   writeAnnotStandoffText: { text: '网络注释' },
+  annotationToolDomainSelectorLegend: { text: '选择注释存储位置' },
+  annotationToolTargetTypeSelectorLegend: { text: '目标类型', description: '选择注释目标类型' },
+  annotationToolTargetTypeElements: {
+    description: '使用 @plist 注释所选的 MEI 元素。',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: '元素枚举',
+    description: '使用 @plist 注释所选的 MEI 元素。',
+  },
+  annotationToolTargetTypeRange: {
+    description: '使用 @startid 和 @endid 注释所选 MEI 元素的范围',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: '元素范围',
+    description: '使用 @startid 和 @endid 注释所选 MEI 元素的范围',
+  },
+  annotationToolTargetTypeInterval: {
+    description: '使用 @tstamp 和 @tstamp2 注释与所选 MEI 元素对应的时间区间',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: '节拍范围',
+    description: '使用 @tstamp 和 @tstamp2 注释与所选 MEI 元素对应的时间区间',
+  },
+  insertInlineAnnotationLegend: { text: '插入注释' },
+  insertStandoffAnnotationLegend: { text: '插入独立注释' },
   annotationToolsIdentifyTitle: { text: '识别' },
   annotationToolsIdentifySpan: { text: '识别音乐对象' },
   annotationToolsHighlightTitle: { text: '高亮' },
@@ -461,6 +496,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: '请再试一次' },
   noAnnotationsToDisplay: { text: '无注释显示' },
   flipPageToAnnotationText: { description: '翻页到此注释' },
+  describeMarkup: { description: '描述此标记' },
+  deleteMarkup: { description: '删除此标记' },
+  deleteMarkupConfirmation: { text: '确定要删除此标记吗？' },
   deleteAnnotation: { description: '删除此注释' },
   deleteAnnotationConfirmation: { text: '确定要删除此注释吗？' },
   makeStandOffAnnotation: {
@@ -483,6 +521,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: '抱歉，当前无法在 &lt;score&gt; 之外的地方写注释',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: '无法写入注释，因为所选内容中至少有一个元素缺少 xml:id。',
+    text2: '请选择“操作” -> “为 MEI 添加 id”以分配标识符，然后重试。',
   },
   annotationWithoutIdWarning: {
     text1: '由于 MEI 锚点缺少 xml:id，无法写注释。',
@@ -796,17 +838,140 @@ export const lang = {
     text: '处理编辑内容',
     description: '控制 <supplied> 元素的处理',
   },
-  showSupplied: {
-    text: '显示 <supplied> 元素',
-    description: '突出显示所有包含在 <supplied> 元素中的元素',
+  showMarkup: {
+    text: '显示编辑标记元素',
+    description: '突出显示所有包含在编辑标记元素中的元素',
+  },
+  markupToPDF: {
+    text: '在 PDF 中显示标记',
+    description: '在 PDF 导出中显示编辑标记',
+  },
+  alternativeVersionContent: {
+    text: '替代编码内容',
+    description: '选择替代编码的默认内容：新建的替代编码为空，或为原始版本的副本',
+    labels: ['空', '副本'],
   },
   suppliedColor: {
     text: '选择 <supplied> 高亮颜色',
     description: '选择 <supplied> 高亮颜色',
   },
+  unclearColor: {
+    text: '选择 <unclear> 高亮颜色',
+    description: '选择 <unclear> 高亮颜色',
+  },
+  sicColor: {
+    text: '选择 <sic> 高亮颜色',
+    description: '选择 <sic> 高亮颜色',
+  },
+  corrColor: {
+    text: '选择 <corr> 高亮颜色',
+    description: '选择 <corr> 高亮颜色',
+  },
+  origColor: {
+    text: '选择 <orig> 高亮颜色',
+    description: '选择 <orig> 高亮颜色',
+  },
+  regColor: {
+    text: '选择 <reg> 高亮颜色',
+    description: '选择 <reg> 高亮颜色',
+  },
+  addColor: {
+    text: '选择 <add> 高亮颜色',
+    description: '选择 <add> 高亮颜色',
+  },
+  delColor: {
+    text: '选择 <del> 高亮颜色',
+    description: '选择 <del> 高亮颜色',
+  },
   respSelect: {
     text: '选择 <supplied> 责任',
     description: '选择责任 id',
+  },
+  selectionSelect: {
+    text: '标记的默认选区',
+    description: '选择新建标记时应包含所选元素、演奏法记号还是变音记号',
+    labels: ['所选元素', '演奏法记号', '变音记号'],
+    valuesDescriptions: [
+      '将标记添加到所选元素。',
+      '将标记添加到选区内的演奏法记号。',
+      '将标记添加到选区内的变音记号。',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: '添加替代编码',
+    description: '插入包含多个版本的标记元素。',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: '将同一文本位置的多个替代编码分组。',
+  },
+  choiceSicCorr: {
+    description: '将所选内容放入 <sic> 并添加 <corr>。',
+  },
+  choiceCorrSic: {
+    description: '将所选内容放入 <corr> 并添加 <sic>。',
+  },
+  choiceOrigReg: {
+    description: '将所选内容放入 <orig> 并添加 <reg>。',
+  },
+  choiceRegOrig: {
+    description: '将所选内容放入 <reg> 并添加 <orig>。',
+  },
+  choiceContentTarget: {
+    description: '请先将鼠标悬停在 <choice> 上以选择此元素的内容。',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description: '（替换）— 当多个转录元素的组合应被视为文本中的单一编辑干预时，将它们分组。',
+  },
+  substAddDel: {
+    description: '将所选内容放入 <add> 并添加 <del>。',
+  },
+  substDelAdd: {
+    description: '将所选内容放入 <del> 并添加 <add>。',
+  },
+  substContentTarget: {
+    description: '请先将鼠标悬停在 <subst> 上以选择此元素的内容。',
+  },
+  editInterventionsGrp: {
+    text: '添加编辑干预',
+    description: '插入用于编码编辑干预的标记元素。',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description: '包含因原始材料中难以辨认或听不清而无法确定转录的内容。',
+  },
+  addSicText: { text: '<sic>', description: '包含明显不正确或不准确的内容。' },
+  addCorrText: {
+    text: '<corr>',
+    description: '（更正）— 包含明显错误段落的正确形式。',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description: '（原文）— 包含标记为遵循原文、而非经过规范化或更正的内容。',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '（规范化）— 包含在某种意义上已被规范化或标准化的内容。',
+  },
+  descMarkupGrp: {
+    text: '添加描述性标记',
+    description: '用于编码源材料中干预的标记元素。',
+  },
+  addAddText: { text: '<add>', description: '（增补）— 标记文本中的增补内容。' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '（删除）— 包含被作者、抄写员、注释者或校对者删除、标记为删除，或以其他方式标示为多余或错误的信息。',
+  },
+  missingParentIdWarning: {
+    text: '只有当父元素具有 xml:id 时才能执行此操作。请先为文档添加 xml:id。',
+  },
+  handleMissingParentIdAbort: {
+    text: '取消',
+  },
+  handleMissingParentIdProceed: {
+    text: '为 MEI 添加 id',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS
@@ -951,6 +1116,17 @@ export const lang = {
   githubMessage: { text: '消息' },
   none: { text: '无' },
   commitFileNameText: { text: '文件名' },
+  cloneError: { text: '克隆仓库时出错。' },
+  repoTooLargeError: { text: '该仓库过大，无法克隆：' },
+  repoSizeWarning: {
+    text: '要从 GitHub 打开所请求的文件，mei-friend 需要克隆这个较大的仓库。您确定要继续吗？将要下载的数据大小：',
+  },
+  repoSizeWarningCancel: {
+    text: '取消',
+  },
+  repoSizeWarningProceed: {
+    text: '继续',
+  },
   forkRepository: { text: 'Fork 仓库' },
   forkError: { text: '抱歉，无法 fork 仓库' },
   loadingFile: { text: '正在加载文件' },
@@ -975,16 +1151,23 @@ export const lang = {
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '检查 @accid.ges 属性（针对调号、小节内音调和连音）。' },
+  metConCodeCheckerTitle: {
+    text: '正在检查节拍一致性（每个谱表至少有一个声部按照拍号给出了拍数）。',
+  },
   codeCheckerFix: { text: '修复' },
   codeCheckerFixAll: { text: '修复所有' },
   codeCheckerIgnore: { text: '忽略' },
   codeCheckerIgnoreAll: { text: '全部忽略' },
   codeCheckerCheckingCode: { text: '检查代码...' },
   codeCheckerNoAccidMessagesFound: { text: '所有 accid.ges 属性看起来都是正确的。' },
+  codeCheckerMeterConformanceMessage: { text: '所有小节均符合其拍号。' },
   codeCheckerMeasure: { text: '小节' },
+  codeCheckerStaff: { text: '谱表' },
   codeCheckerNote: { text: '音符' },
   codeCheckerHasBoth: { text: '都有' },
   codeCheckerAnd: { text: '和' },
+  codeCheckerHasADurationOf: { text: '的时值为' },
+  codeCheckerInsteadOf: { text: '而不是' },
   codeCheckerRemove: { text: '移除' },
   codeCheckerFixTo: { text: '修复为' },
   codeCheckerAdd: { text: '添加' },
@@ -997,6 +1180,15 @@ export const lang = {
   codeCheckerHasExtra: { text: '有多余的' }, // has superfluous
   codeCheckerLacksAn: { text: '缺少' },
   codeCheckerBecauseAlreadyDefined: { text: '因为它在小节中已经定义' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: '正在检查链接元素（通过 startid、endid、plist 及其他链接属性建立的引用）。',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: '编码中的所有链接元素引用均有效。' },
+  codeCheckerLinkedElementNotFound: { text: '— 在编码中未找到目标' },
+  codeCheckerLinkingAttrEmpty: { text: '— 链接属性没有值' },
+  codeCheckerPlistMultipleBlanks: { text: '— 项目之间包含多个空格或首尾多余空格' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {

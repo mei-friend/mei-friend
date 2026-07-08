@@ -179,6 +179,7 @@ export const lang = {
   toggleDotsText: { text: 'Przełączanie kropkowania' },
   cleanAccidText: { text: 'Sprawdzić @accid.ges' },
   meterConformanceText: { text: 'Sprawdzić @metcon' },
+  checkLinkedElementsText: { text: 'Sprawdź powiązane elementy' },
   renumberMeasuresTestText: { text: 'Numeruj taktowania (test)' },
   renumberMeasuresExecText: { text: 'Numeruj taktowania (wykonaj)' },
   addIdsText: { text: 'Dodaj identyfikatory do MEI' },
@@ -262,6 +263,13 @@ export const lang = {
   verovioLoaded: { text: 'wczytany' },
   convertedToPdf: { text: 'przekonwertowany na PDF' },
   statusBarCompute: { text: 'Oblicz' },
+  notationStaleXmlInvalid: { text: 'Renderowanie wstrzymane — oczekiwanie na poprawny XML' },
+  notationErrorBadgeLabel: { text: 'Błąd Verovio:' },
+  notationErrorBadgeLabelPlural: { text: 'Błędy Verovio:' },
+  notationWarningBadgeLabel: { text: 'Ostrzeżenie Verovio:' },
+  notationWarningBadgeLabelPlural: { text: 'Ostrzeżenia Verovio:' },
+  notationBadgeClickToExpand: { text: 'kliknij, aby rozwinąć' },
+  notationBadgeClickToContract: { text: 'kliknij, aby zwinąć' },
   middleFooterPage: { text: 'strona' },
   middleFooterOf: { text: 'z' },
   middleFooterLoaded: { text: 'wczytane' },
@@ -481,6 +489,32 @@ export const lang = {
   annotationToolsButton: { description: 'Narzędzia adnotacji' },
   annotationListButton: { description: 'Lista adnotacji' },
   writeAnnotStandoffText: { text: 'Adnotacja sieci Web' },
+  annotationToolDomainSelectorLegend: { text: 'Wybierz miejsce przechowywania adnotacji' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Typ celu', description: 'Wybierz typ celu adnotacji' },
+  annotationToolTargetTypeElements: {
+    description: 'Oznacz wybrane elementy MEI za pomocą @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Wyliczenie elementów',
+    description: 'Oznacz wybrane elementy MEI za pomocą @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Oznacz zakres wybranych elementów MEI za pomocą @startid i @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Zakres elementów',
+    description: 'Oznacz zakres wybranych elementów MEI za pomocą @startid i @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Oznacz interwał czasowy odpowiadający wybranym elementom MEI za pomocą @tstamp i @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Zakres metryczny',
+    description: 'Oznacz interwał czasowy odpowiadający wybranym elementom MEI za pomocą @tstamp i @tstamp2',
+  },
+
+  insertInlineAnnotationLegend: { text: 'Wstaw adnotację' },
+  insertStandoffAnnotationLegend: { text: 'Wstaw adnotację stand-off' },
   annotationToolsIdentifyTitle: { text: 'Identyfikuj' },
   annotationToolsIdentifySpan: { text: 'Identyfikuj obiekt muzyczny' },
   annotationToolsHighlightTitle: { text: 'Podświetl' },
@@ -521,6 +555,10 @@ export const lang = {
   },
   annotationsOutsideScoreWarning: {
     text: 'Przepraszamy, aktualnie nie można zapisywać adnotacji umieszczonych poza elementem &lt;score&gt;',
+  },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Nie można zapisać adnotacji, ponieważ przynajmniej jeden element w zaznaczeniu nie posiada xml:id.',
+    text2: 'Proszę przypisać identyfikatory, wybierając "Manipulate" -> "Dodaj identyfikatory do MEI" i spróbuj ponownie.',
   },
   annotationWithoutIdWarning: {
     text1: 'Nie można zapisać adnotacji, ponieważ punkt kotwiczenia MEI nie zawiera xml:id.',
@@ -619,6 +657,15 @@ export const lang = {
     text: '<del>',
     description:
       '(usunięcie) - Zawiera informacje usunięte, oznaczone jako usunięte lub w inny sposób wskazane jako zbędne lub fałszywe w tekście źródłowym przez autora, skrybę, adnotatora lub poprawiacza.',
+  },
+  missingParentIdWarning: {
+    text: 'Czynność można wykonać tylko wtedy, gdy element nadrzędny posiada xml:id. Proszę najpierw dodać xml:id do dokumentu.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Anuluj',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Dodaj identyfikatory do MEI',
   },
 
   // MIDI // MIDI
@@ -1129,6 +1176,17 @@ export const lang = {
   githubMessage: { text: 'Wiadomość' },
   none: { text: 'Brak' },
   commitFileNameText: { text: 'Nazwa pliku' },
+  cloneError: { text: 'Błąd klonowania repozytorium. ' },
+  repoTooLargeError: { text: 'Repozytorium jest zbyt duże, aby je sklonować: ' },
+  repoSizeWarning: {
+    text: 'Aby otworzyć żądany plik z GitHub, mei-friend będzie musiał sklonować to dość duże repozytorium. Czy na pewno chcesz kontynuować? Rozmiar danych do pobrania: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Anuluj',
+  },
+  repoSizeWarningProceed: {
+    text: 'Kontynuuj',
+  },
   forkRepository: { text: 'Rozgałęź repozytorium' },
   forkError: { text: 'Przepraszamy, nie można rozgałęzić repozytorium' },
   loadingFile: { text: 'Wczytywanie pliku' },
@@ -1157,16 +1215,23 @@ export const lang = {
   accidGesCodeCheckerTitle: {
     text: 'Sprawdź atrybuty @accid.ges (w stosunku do znaku klucza, akcydenckie na takt oraz wiązania).',
   },
+  metConCodeCheckerTitle: {
+    text: 'Sprawdzanie zgodności z metrum (przynajmniej jedna warstwa na pięciolinię ma liczbę miar podaną w oznaczeniu metrum).',
+  },
   codeCheckerFix: { text: 'Popraw' },
   codeCheckerFixAll: { text: 'Popraw wszystko' },
   codeCheckerIgnore: { text: 'Ignoruj' },
   codeCheckerIgnoreAll: { text: 'Zignoruj wszystko' },
   codeCheckerCheckingCode: { text: 'Sprawdzanie kodu...' },
   codeCheckerNoAccidMessagesFound: { text: 'Wszystkie atrybuty accid.ges wydają się poprawne.' },
+  codeCheckerMeterConformanceMessage: { text: 'Wszystkie takty są zgodne ze swoimi oznaczeniami metrum.' },
   codeCheckerMeasure: { text: 'Takt' },
+  codeCheckerStaff: { text: 'Pięciolinia' },
   codeCheckerNote: { text: 'Nutę' },
   codeCheckerHasBoth: { text: 'ma oba' },
   codeCheckerAnd: { text: 'i' },
+  codeCheckerHasADurationOf: { text: 'ma długość' },
+  codeCheckerInsteadOf: { text: 'zamiast' },
   codeCheckerRemove: { text: 'Usuń' },
   codeCheckerFixTo: { text: 'Popraw na' },
   codeCheckerAdd: { text: 'Dodaj' },
@@ -1179,6 +1244,15 @@ export const lang = {
   codeCheckerHasExtra: { text: 'ma dodatkowe' },
   codeCheckerLacksAn: { text: 'brakuje' },
   codeCheckerBecauseAlreadyDefined: { text: 'ponieważ zostało to już zdefiniowane wcześniej w takcie' },
+
+  // Code checker: linked elements
+  linkedElementsCodeCheckerTitle: {
+    text: 'Sprawdzanie powiązanych elementów (odniesienia poprzez startid, endid, plist i inne atrybuty łączące).',
+  },
+  codeCheckerNoLinkedElementsIssues: { text: 'Wszystkie odniesienia do powiązanych elementów znaleziono w kodowaniu.' },
+  codeCheckerLinkedElementNotFound: { text: '— cel nie został znaleziony w kodowaniu' },
+  codeCheckerLinkingAttrEmpty: { text: '— atrybut łączący nie ma wartości' },
+  codeCheckerPlistMultipleBlanks: { text: '— zawiera wielokrotne lub otaczające spacje między elementami' },
 
   // Warning for missing ids
   missingIdsWarningAlert: {
