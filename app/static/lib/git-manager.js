@@ -58,7 +58,12 @@ export default class GitManager {
       ref: this.branch,
       singleBranch: true,
     });
-    // then check the current head sha against the remote head sha
+    // then check the current head sha against the remote head sha.
+    // remoteChangedDuringRestore is a sticky latch set in #doClone when the restored
+    // content's base commit differs from the freshly-cloned remote HEAD; it is cleared
+    // once the editor content is provably based on HEAD again (after commit, branch+PR,
+    // or any loadFile() from HEAD). See ROADMAP.md "Option B" for the intended refactor
+    // that would derive this live instead of caching a boolean (issue #185).
     let localHeadSha = await this.getLocalHeadSha();
     let remoteHeadSha = await this.getRemoteHeadSha();
     return this.remoteChangedDuringRestore || localHeadSha !== remoteHeadSha;
@@ -343,30 +348,31 @@ export default class GitManager {
   }
 
   async pull() {
-    // pull is actually a fetch and merge, so need author info
+    // pull is actually a fetch and merge, so need author info.
+    // NOTE: errors are surfaced to the caller (previously they were silently swallowed,
+    // which left refs/remotes/origin/<branch> stale and made remoteChangesExist() misfire
+    // the "remote has changed" modal on the next commit - see issue #185). Callers decide
+    // how to handle a failed pull (e.g. onRemoteUpdate keeps the '!' indicator; push()
+    // tolerates it because the tracking ref is already correct after a successful push).
     let author = await this.cloud.getAuthor();
-    try {
-      await git.pull({
-        fs,
-        http,
-        dir: this.directory,
-        onAuth: this.onAuth,
-        onAuthFailure: () => {
-          console.log('auth failure');
-          return { cancel: true };
-        },
-        onAuthSuccess: () => {
-          console.log('auth success');
-        },
-        ref: this.branch,
-        remote: 'origin',
-        singleBranch: true,
-        author,
-      });
-      this.headSha = this.getLocalHeadSha();
-    } catch (err) {
-      console.warn('Conflicting change on remote: ', err);
-    }
+    await git.pull({
+      fs,
+      http,
+      dir: this.directory,
+      onAuth: this.onAuth,
+      onAuthFailure: () => {
+        console.log('auth failure');
+        return { cancel: true };
+      },
+      onAuthSuccess: () => {
+        console.log('auth success');
+      },
+      ref: this.branch,
+      remote: 'origin',
+      singleBranch: true,
+      author,
+    });
+    this.headSha = await this.getLocalHeadSha();
   }
 
   async push() {
@@ -385,8 +391,28 @@ export default class GitManager {
       ref: this.branch,
       remoteRef: 'refs/heads/' + this.branch,
     });
-    // pull to ensure we are up to date
-    await this.pull();
+    // isomorphic-git's push does NOT advance the local remote-tracking ref, so set it
+    // explicitly to the just-pushed HEAD. A successful push fast-forwards the remote
+    // branch to our HEAD, so this is the correct new value. Previously the follow-up
+    // pull() was the only thing that updated the tracking ref, and if it failed (e.g.
+    // HTTP 429, see issue #185) the ref was left stale and remoteChangesExist() then
+    // misfired the "remote has changed" modal on the next commit.
+    const headSha = await this.getLocalHeadSha();
+    await git.writeRef({
+      fs,
+      dir: this.directory,
+      ref: 'refs/remotes/origin/' + this.branch,
+      value: headSha,
+      force: true,
+    });
+    this.headSha = headSha;
+    // Try to integrate any concurrent remote changes, but a failure here must not fail
+    // the commit: the push already succeeded and the tracking ref is now up to date.
+    try {
+      await this.pull();
+    } catch (err) {
+      console.warn('Post-push pull failed; push succeeded and tracking ref is up to date: ', err);
+    }
   }
 
   async add() {
