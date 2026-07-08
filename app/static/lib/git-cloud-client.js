@@ -79,7 +79,19 @@ export default class GitCloudClient {
         await new Promise((resolve) => setTimeout(resolve, waitMs));
       }
       this.githubLastRequestTime = Date.now();
-      return fetch(proxiedUrl, options);
+      let res = await fetch(proxiedUrl, options);
+      // Retry on rate limiting only: a 429 means the request was rejected
+      // before execution, so retrying is safe for any method. All other
+      // statuses pass through unchanged, as several callers inspect them.
+      for (let attempt = 0; res.status === 429 && attempt < 2; attempt++) {
+        const retryAfter = parseInt(res.headers.get('Retry-After'), 10);
+        const retryWaitMs = Number.isNaN(retryAfter) ? 1000 * (attempt + 1) : retryAfter * 1000;
+        console.warn('githubFetch: rate limited (429), retrying in ' + retryWaitMs + ' ms: ' + url);
+        await new Promise((resolve) => setTimeout(resolve, retryWaitMs));
+        this.githubLastRequestTime = Date.now();
+        res = await fetch(proxiedUrl, options);
+      }
+      return res;
     };
     const queued = this.githubRequestQueue.then(run, run);
     this.githubRequestQueue = queued.catch(() => {});

@@ -35,6 +35,29 @@ If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.a
 * Run `. venv/bin/activate` (for Windows, use ` . venv\Scripts\activate`). Your prompt should update to show (venv) at the start.
 * Run `pip install -r requirements.txt`
 
+### Server-side session storage
+* mei-friend keeps login sessions (including GitHub OAuth tokens) server-side.
+  Session files are written to `instance/sessions/` in the repository root
+  (gitignored, never served, created automatically at startup with `0700`
+  permissions).
+* The process running the app (e.g. the gunicorn service user) therefore needs
+  **write access to the `instance/` directory only** — not to the rest of the
+  repository. For deployments where the code tree is kept read-only to the
+  service user (recommended), pre-create the directory as an administrator:
+  `mkdir -p <repo>/instance && chown <service-user> <repo>/instance` — the app
+  then manages `instance/sessions/` within it. Write access to the repository
+  root is only needed if the app must create `instance/` itself on first start.
+* If the directory cannot be created, the app refuses to start, and prints a
+  `Cannot create session directory` error — this is deliberate, so that a
+  misconfiguration is noticed at deploy time rather than sessions silently
+  landing somewhere volatile.
+* To store sessions elsewhere (e.g. a dedicated service-only directory), set
+  `SESSION_DIR` in `.env`. An explicitly provisioned directory is used with its
+  existing permissions; keep it readable by the service user only, as session
+  files contain access tokens.
+* Sessions survive service restarts and deployments. Deleting
+  `instance/sessions/` logs all users out (they simply log in again).
+
 ## Install and set up end-to-end testing with playwright
 * Run `npm install` in the mei-friend root directory to install the required packages
 * Go to tests directory:

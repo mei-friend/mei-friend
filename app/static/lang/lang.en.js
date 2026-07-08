@@ -28,19 +28,22 @@ export const lang = {
       </p>
       <p>
         Though mei-friend is a browser-based application, your personal data (including the encoding you
-        are editing, your application settings, and current login details if any) are stored in your browser's
+        are editing and your application settings) are stored in your browser's
         <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">local storage</a>
-        and are not stored on our servers.
+        and are not stored on our servers. To protect your GitHub access credentials, your GitHub login session
+        (including your access token) is kept on the mei-friend server rather than in your browser; your browser
+        holds only an opaque session identifier.
       </p>
       <p>
         Data is transmitted to GitHub only when you explicitly request it (e.g., when you log in to GitHub, load
         your encoding from or commit to a GitHub repository, or when you request a GitHub Action workflow to be
         run for you). Similarly, data is transmitted to your chosen Solid provider only when you explicitly
-        request it (e.g., when you log in to Solid, or load or save stand-off annotations).  For technical reasons,
-        certain interactions with GitHub (cloning a repository to your browser when first opening an encoding,
-        or committing changes to a repository) require data to be transmitted to a proxy server hosted by the
-        mdw &ndash; University of Music and Performing Arts Vienna. This server acts as an intermediary between your
-        browser and GitHub, and does not store any data transmitted through it.
+        request it (e.g., when you log in to Solid, or load or save stand-off annotations). To keep your access
+        credentials secure, all interactions with GitHub are routed through a proxy server hosted by the
+        mdw &ndash; University of Music and Performing Arts Vienna, which attaches your credentials to these
+        requests from your login session. This server acts as an intermediary between your browser and GitHub,
+        and does not store the content transmitted through it; as with any web server, request metadata (such as
+        the names of repositories and files you access) may appear in its technical logs.
       </p>
       <p>
         We use <a href="https://matomo.org/" target="_blank">Matomo</a>

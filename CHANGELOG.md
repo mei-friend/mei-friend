@@ -1,16 +1,18 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.4.1 develop
+### 1.4.2 Improved security for GitHub login 
+* Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
+* Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
+* Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
+* Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
+* Update splash screen privacy text (all languages) to reflect server-side credential handling
+
+### 1.4.1 patch 
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
 * Speed up schema-based hinting behavior while typing in CodeMirror editor
 * Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
-* Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), stop forwarding the session cookie to upstream providers, remove the wildcard CORS header, and no longer log the access token to the browser console
-* Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
-* Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
 * Fix commit button staying disabled when typing a commit message (regression from May 2026 on develop; checked `innerText` instead of `value` on the message input)
-* One-time token cleanup on next GitHub login: revoke the app's authorization grant (invalidating all outstanding OAuth tokens, including any issued before the token-custody hardening, which never expire on their own) and immediately re-authorize -- users see a single extra "Authorize" click once per browser and account
-* Fix GitHub Actions progress/report never appearing: stop passing the upstream `Date` header through the proxy (the server adds its own; browsers join the duplicates into a string that parses as Invalid Date, making the dispatch-time run matching reject every candidate run), and harden the client against unparseable dispatch times. Also raise the proxy rate limit (5/s per IP was too tight now that all GitHub traffic is proxied) keying it per user login, and fail loudly in `setAuthor` instead of caching an `undefined` author from an error response
 
 ### 1.4.0 Custom GitHub Action Configurations
 

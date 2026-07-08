@@ -27,10 +27,10 @@ export const lang = {
         请查阅我们的<a href="https://mei-friend.github.io" target="_blank">详细文档</a>以获取更多信息。
       </p>
       <p>
-        尽管 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码、应用程序设置以及当前的登录详细信息（如果有））存储在您浏览器的<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>中，并未存储在我们的服务器上。
+        尽管 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码和应用程序设置）存储在您浏览器的<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>中，并未存储在我们的服务器上。为保护您的 GitHub 访问凭据，您的 GitHub 登录会话（包括您的访问令牌）保存在 mei-friend 服务器上，而不是您的浏览器中；您的浏览器仅保存一个不透明的会话标识符。
       </p>
       <p>
-        仅当您明确请求时（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub Action 工作流时），数据才会传输到 GitHub。同样，仅当您明确请求时（例如，当您登录 Solid，或加载或保存独立注释时），数据才会传输到您选择的 Solid 提供商。出于技术原因，与 GitHub 的某些交互（在首次打开编码时将仓库克隆到您的浏览器，或提交更改到仓库）需要将数据传输到由维也纳音乐与表演艺术大学托管的代理服务器。该服务器充当您的浏览器和 GitHub 之间的中介，不会存储通过它传输的任何数据。
+        仅当您明确请求时（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub Action 工作流时），数据才会传输到 GitHub。同样，仅当您明确请求时（例如，当您登录 Solid，或加载或保存独立注释时），数据才会传输到您选择的 Solid 提供商。为确保您的访问凭据安全，与 GitHub 的所有交互都通过由维也纳音乐与表演艺术大学托管的代理服务器进行路由，该服务器会将您登录会话中的凭据附加到这些请求上。该服务器充当您的浏览器和 GitHub 之间的中介，不会存储通过它传输的内容；与任何 Web 服务器一样，请求元数据（例如您访问的仓库和文件的名称）可能会出现在其技术日志中。
       </p>
       <p>
         我们使用 <a href="https://matomo.org/" target="_blank">Matomo</a>

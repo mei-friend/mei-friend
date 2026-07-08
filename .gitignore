@@ -24,3 +24,4 @@ tmp
 /playwright/.cache/
 node_modules/
 ROADMAP.md
+instance/
