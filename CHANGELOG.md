@@ -4,6 +4,7 @@
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
 * Speed up schema-based hinting behavior while typing in CodeMirror editor
+* Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
 * Show linked elements in the editor (as additional selection) and the notation panel (through rounded recangles) when selecting an element with @startid/@endid/@plist or att.linking attributes (@copyof/@corresp/@follows/@next/@precedes/@prev/@sameas/@synch). When cursor of editor is on a linking attribute, the linked element(s) are highlighted in the highlight color, while all other linked elements remain highlighted in the linked color. This function can be disabled in the settings panel, default: enabled.
 
 ### 1.4.0 Custom GitHub Action Configurations
