@@ -27,19 +27,10 @@ export const lang = {
       dodatne informacije.
     </p>
     <p>
-      Iako je mei-friend aplikacija zasnovana na pretraživaču, vaši lični podaci (uključujući kodiranje koje
-      uređujete, postavke aplikacije i trenutne podatke za prijavu, ako ih ima) čuvaju se u
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnoj memoriji</a> vašeg pretraživača
-      i nisu pohranjeni na našim serverima.
+      Iako je mei-friend aplikacija zasnovana na pretraživaču, vaši lični podaci (uključujući kodiranje koje uređujete i postavke aplikacije) čuvaju se u <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnoj memoriji</a> vašeg pretraživača i nisu pohranjeni na našim serverima. Radi zaštite vaših GitHub pristupnih podataka, vaša GitHub sesija prijave (uključujući vaš pristupni token) čuva se na mei-friend serveru, a ne u vašem pretraživaču; vaš pretraživač sadrži samo neprozirni identifikator sesije.
     </p>
     <p>
-      Podaci se prenose na GitHub samo kada to izričito zatražite (npr. kada se prijavite na GitHub, učitate
-      svoje kodiranje iz ili komitujete u GitHub repozitorijum, ili kada zatražite da se za vas pokrene GitHub Action tok).
-      Slično tome, podaci se prenose vašem izabranom Solid provajderu samo kada to izričito zatražite (npr. kada se prijavite na Solid,
-      ili učitate ili sačuvate stand-off napomene). Iz tehničkih razloga, određene interakcije sa GitHub-om (kloniranje repozitorijuma
-      u vaš pretraživač prilikom prvog otvaranja kodiranja, ili komitovanje izmena u repozitorijum) zahtevaju prenos podataka na proxy server
-      hostovan od strane mdw &ndash; Univerziteta muzike i izvođačkih umetnosti u Beču. Ovaj server deluje kao posrednik između vašeg
-      pretraživača i GitHub-a, i ne pohranjuje nikakve podatke koji se prenose kroz njega.
+      Podaci se prenose na GitHub samo kada to izričito zatražite (npr. kada se prijavite na GitHub, učitate svoje kodiranje iz ili komitujete u GitHub repozitorijum, ili kada zatražite da se za vas pokrene GitHub Action tok). Slično tome, podaci se prenose vašem izabranom Solid provajderu samo kada to izričito zatražite (npr. kada se prijavite na Solid, ili učitate ili sačuvate stand-off napomene). Radi sigurnosti vaših pristupnih podataka, sve interakcije sa GitHub-om usmjeravaju se kroz proxy server hostovan od strane mdw &ndash; Univerziteta muzike i izvođačkih umetnosti u Beču, koji ovim zahtjevima prilaže vaše pristupne podatke iz vaše sesije prijave. Ovaj server deluje kao posrednik između vašeg pretraživača i GitHub-a, i ne pohranjuje sadržaj koji se prenosi kroz njega; kao i kod svakog web servera, metapodaci zahtjeva (poput naziva repozitorijuma i datoteka kojima pristupate) mogu se pojaviti u njegovim tehničkim logovima.
     </p>
     <p>
       Koristimo <a href="https://matomo.org/" target="_blank">Matomo</a>
