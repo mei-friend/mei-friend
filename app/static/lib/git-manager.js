@@ -50,6 +50,8 @@ export default class GitManager {
   }
 
   async remoteChangesExist() {
+    // don't inspect refs while a clone is still writing them
+    await this.awaitClone();
     await this.fetch({
       fs,
       http,
@@ -58,7 +60,12 @@ export default class GitManager {
       ref: this.branch,
       singleBranch: true,
     });
-    // then check the current head sha against the remote head sha
+    // then check the current head sha against the remote head sha.
+    // remoteChangedDuringRestore is a sticky latch set in #doClone when the restored
+    // content's base commit differs from the freshly-cloned remote HEAD; it is cleared
+    // once the editor content is provably based on HEAD again (after commit, branch+PR,
+    // or any loadFile() from HEAD). A future refactor is intended 
+    // that would derive this live instead of caching a boolean (issue #185).
     let localHeadSha = await this.getLocalHeadSha();
     let remoteHeadSha = await this.getRemoteHeadSha();
     return this.remoteChangedDuringRestore || localHeadSha !== remoteHeadSha;
@@ -69,14 +76,20 @@ export default class GitManager {
     // if so, call the onRemoteUpdate callback
     // first, fetch the remote, supplying the current branch appropriately
     console.log('checking remote for updates');
-    if (await this.remoteChangesExist()) {
-      // remote has been updated
-      if (this.onRemoteUpdate) {
-        console.log('Remote updated, calling onRemoteUpdate');
-        this.onRemoteUpdate();
-      } else {
-        console.warn('Remote updated, but no onRemoteUpdate callback set');
+    try {
+      if (await this.remoteChangesExist()) {
+        // remote has been updated
+        if (this.onRemoteUpdate) {
+          console.log('Remote updated, calling onRemoteUpdate');
+          this.onRemoteUpdate();
+        } else {
+          console.warn('Remote updated, but no onRemoteUpdate callback set');
+        }
       }
+    } catch (err) {
+      // e.g. transient network failure, or repo not (yet) in a usable state;
+      // log and keep polling rather than dying on an uncaught rejection
+      console.warn('checkRemote: could not check for remote changes: ', err);
     }
     // reset the timeout
     this.stopPollingForRemoteUpdates();
@@ -232,10 +245,33 @@ export default class GitManager {
     // run the clone process:
     // first run #prepareClone to check if the directory exists and delete it if it does
     // then run #doClone to actually clone the repo
-    // note: ensure both functions are run before returning
-    await this.#prepareClone(url, branch).then(async () => {
-      await this.#doClone(url, branch);
-    });
+    // note: ensure both functions are run before returning.
+    // If a clone is already in flight, join it instead of starting a competing one:
+    // a second #prepareClone would delete the directory out from under the first,
+    // and concurrent worktree writes mid-clone abort checkout with
+    // CheckoutConflictError (leaving HEAD dangling at the init default, refs/heads/master).
+    if (this.clonePromise) {
+      return await this.clonePromise;
+    }
+    this.clonePromise = (async () => {
+      try {
+        await this.#prepareClone(url, branch);
+        await this.#doClone(url, branch);
+      } finally {
+        // clear on success and failure alike, so a later retry can start a fresh clone
+        this.clonePromise = null;
+      }
+    })();
+    return await this.clonePromise;
+  }
+
+  async awaitClone() {
+    // wait for any in-flight clone to settle before touching the git filesystem.
+    // Rejects with the clone error if the clone failed, so callers surface it
+    // instead of operating on a half-cloned repository.
+    if (this.clonePromise) {
+      await this.clonePromise;
+    }
   }
 
   async getBranch() {
@@ -343,33 +379,36 @@ export default class GitManager {
   }
 
   async pull() {
-    // pull is actually a fetch and merge, so need author info
+    // pull is actually a fetch and merge, so need author info.
+    // NOTE: errors are surfaced to the caller (previously they were silently swallowed,
+    // which left refs/remotes/origin/<branch> stale and made remoteChangesExist() misfire
+    // the "remote has changed" modal on the next commit - see issue #185). Callers decide
+    // how to handle a failed pull (e.g. onRemoteUpdate keeps the '!' indicator; push()
+    // tolerates it because the tracking ref is already correct after a successful push).
+    await this.awaitClone();
     let author = await this.cloud.getAuthor();
-    try {
-      await git.pull({
-        fs,
-        http,
-        dir: this.directory,
-        onAuth: this.onAuth,
-        onAuthFailure: () => {
-          console.log('auth failure');
-          return { cancel: true };
-        },
-        onAuthSuccess: () => {
-          console.log('auth success');
-        },
-        ref: this.branch,
-        remote: 'origin',
-        singleBranch: true,
-        author,
-      });
-      this.headSha = this.getLocalHeadSha();
-    } catch (err) {
-      console.warn('Conflicting change on remote: ', err);
-    }
+    await git.pull({
+      fs,
+      http,
+      dir: this.directory,
+      onAuth: this.onAuth,
+      onAuthFailure: () => {
+        console.log('auth failure');
+        return { cancel: true };
+      },
+      onAuthSuccess: () => {
+        console.log('auth success');
+      },
+      ref: this.branch,
+      remote: 'origin',
+      singleBranch: true,
+      author,
+    });
+    this.headSha = await this.getLocalHeadSha();
   }
 
   async push() {
+    await this.awaitClone();
     await git.push({
       fs,
       http,
@@ -385,8 +424,28 @@ export default class GitManager {
       ref: this.branch,
       remoteRef: 'refs/heads/' + this.branch,
     });
-    // pull to ensure we are up to date
-    await this.pull();
+    // isomorphic-git's push does NOT advance the local remote-tracking ref, so set it
+    // explicitly to the just-pushed HEAD. A successful push fast-forwards the remote
+    // branch to our HEAD, so this is the correct new value. Previously the follow-up
+    // pull() was the only thing that updated the tracking ref, and if it failed (e.g.
+    // HTTP 429, see issue #185) the ref was left stale and remoteChangesExist() then
+    // misfired the "remote has changed" modal on the next commit.
+    const headSha = await this.getLocalHeadSha();
+    await git.writeRef({
+      fs,
+      dir: this.directory,
+      ref: 'refs/remotes/origin/' + this.branch,
+      value: headSha,
+      force: true,
+    });
+    this.headSha = headSha;
+    // Try to integrate any concurrent remote changes, but a failure here must not fail
+    // the commit: the push already succeeded and the tracking ref is now up to date.
+    try {
+      await this.pull();
+    } catch (err) {
+      console.warn('Post-push pull failed; push succeeded and tracking ref is up to date: ', err);
+    }
   }
 
   async add() {
@@ -407,6 +466,7 @@ export default class GitManager {
   }
 
   async commit(message) {
+    await this.awaitClone();
     await this.add(this.filepath);
     await git.commit({
       fs,
@@ -588,6 +648,10 @@ export default class GitManager {
     if (!path.startsWith('/')) {
       path = '/' + path;
     }
+    // wait for any in-flight clone first: the existence check below cannot tell a
+    // completed clone from a half-finished one, and writing into the worktree between
+    // clone's fetch and checkout phases aborts the checkout (CheckoutConflictError)
+    await this.awaitClone();
     // ensure that we have cloned the repo
     if (!(await this.pfsDirExists())) {
       console.log('repo not cloned, cloning');

@@ -340,6 +340,11 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
       setFileNameAfterLoad();
       updateFileStatusDisplay();
       setFileChangedState(await gm.fileChanged());
+      // The editor content is now read from the current clone HEAD, so it is no longer
+      // "restored stale content" - clear the latch. This is the general recovery path
+      // (any file (re)load from HEAD), not just handlePullCompleted()'s !fileChanged case,
+      // and lets a user trapped by a stale latch recover simply by reloading the file (#185).
+      gm.remoteChangedDuringRestore = false;
       updateGithubInLocalStorage();
       setFileLocationType('github');
       setStandoffAnnotationEnabledStatus();
@@ -1249,7 +1254,14 @@ async function handleClickGithubAction(e, gm) {
                       runBtn.onclick = async () => {
                         ghLogo.classList.add('clockwise');
                         // do a pull to refresh the file
-                        await gm.pull();
+                        try {
+                          await gm.pull();
+                        } catch (e) {
+                          console.warn('Pull failed during workflow reload: ', e);
+                          ghLogo.classList.remove('clockwise');
+                          v.showAlert("Couldn't pull latest changes from GitHub: " + e);
+                          return;
+                        }
                         // redraw github menu to reflect changes in git log
                         fillInCommitLog('withRefresh');
                         console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
@@ -1498,7 +1510,20 @@ async function doCommit() {
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   // are there unmerged changes on the remote?
-  if (await gm.remoteChangesExist()) {
+  // Guard the check itself: if it throws (e.g. repo in an unusable state after a failed
+  // clone, or a network error), fail the commit visibly instead of leaving the spinner
+  // running forever on an uncaught rejection.
+  let remoteChanges;
+  try {
+    remoteChanges = await gm.remoteChangesExist();
+  } catch (e) {
+    githubLoadingIndicator.classList.remove('clockwise');
+    cm.setOption('readOnly', false);
+    console.error("Couldn't check remote for changes before commit: ", e);
+    v.showAlert("Couldn't commit - unable to check remote for changes: " + e);
+    return;
+  }
+  if (remoteChanges) {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push due to remote changes");
@@ -1550,6 +1575,11 @@ async function doCommit() {
       await gm.commit(message);
       await gm.push();
       gm.remoteChangedDuringRestore = false;
+      // Persist the new HEAD so the restored session's stored headSha tracks the remote.
+      // Without this, storage.github.headSha lags the just-pushed commit; on the next
+      // reload #doClone sees a mismatch and falsely re-arms remoteChangedDuringRestore,
+      // trapping the user in the "remote has changed" modal (issue #185).
+      updateGithubInLocalStorage();
       console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
       messageInput.value = '';
       console.log('Status after commit: ', await gm.status());
