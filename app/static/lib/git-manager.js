@@ -64,7 +64,7 @@ export default class GitManager {
     // remoteChangedDuringRestore is a sticky latch set in #doClone when the restored
     // content's base commit differs from the freshly-cloned remote HEAD; it is cleared
     // once the editor content is provably based on HEAD again (after commit, branch+PR,
-    // or any loadFile() from HEAD). See ROADMAP.md "Option B" for the intended refactor
+    // or any loadFile() from HEAD). A future refactor is intended 
     // that would derive this live instead of caching a boolean (issue #185).
     let localHeadSha = await this.getLocalHeadSha();
     let remoteHeadSha = await this.getRemoteHeadSha();
