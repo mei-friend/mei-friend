@@ -1510,7 +1510,20 @@ async function doCommit() {
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   // are there unmerged changes on the remote?
-  if (await gm.remoteChangesExist()) {
+  // Guard the check itself: if it throws (e.g. repo in an unusable state after a failed
+  // clone, or a network error), fail the commit visibly instead of leaving the spinner
+  // running forever on an uncaught rejection.
+  let remoteChanges;
+  try {
+    remoteChanges = await gm.remoteChangesExist();
+  } catch (e) {
+    githubLoadingIndicator.classList.remove('clockwise');
+    cm.setOption('readOnly', false);
+    console.error("Couldn't check remote for changes before commit: ", e);
+    v.showAlert("Couldn't commit - unable to check remote for changes: " + e);
+    return;
+  }
+  if (remoteChanges) {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push due to remote changes");

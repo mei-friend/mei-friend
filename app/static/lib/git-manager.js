@@ -50,6 +50,8 @@ export default class GitManager {
   }
 
   async remoteChangesExist() {
+    // don't inspect refs while a clone is still writing them
+    await this.awaitClone();
     await this.fetch({
       fs,
       http,
@@ -74,14 +76,20 @@ export default class GitManager {
     // if so, call the onRemoteUpdate callback
     // first, fetch the remote, supplying the current branch appropriately
     console.log('checking remote for updates');
-    if (await this.remoteChangesExist()) {
-      // remote has been updated
-      if (this.onRemoteUpdate) {
-        console.log('Remote updated, calling onRemoteUpdate');
-        this.onRemoteUpdate();
-      } else {
-        console.warn('Remote updated, but no onRemoteUpdate callback set');
+    try {
+      if (await this.remoteChangesExist()) {
+        // remote has been updated
+        if (this.onRemoteUpdate) {
+          console.log('Remote updated, calling onRemoteUpdate');
+          this.onRemoteUpdate();
+        } else {
+          console.warn('Remote updated, but no onRemoteUpdate callback set');
+        }
       }
+    } catch (err) {
+      // e.g. transient network failure, or repo not (yet) in a usable state;
+      // log and keep polling rather than dying on an uncaught rejection
+      console.warn('checkRemote: could not check for remote changes: ', err);
     }
     // reset the timeout
     this.stopPollingForRemoteUpdates();
@@ -237,10 +245,33 @@ export default class GitManager {
     // run the clone process:
     // first run #prepareClone to check if the directory exists and delete it if it does
     // then run #doClone to actually clone the repo
-    // note: ensure both functions are run before returning
-    await this.#prepareClone(url, branch).then(async () => {
-      await this.#doClone(url, branch);
-    });
+    // note: ensure both functions are run before returning.
+    // If a clone is already in flight, join it instead of starting a competing one:
+    // a second #prepareClone would delete the directory out from under the first,
+    // and concurrent worktree writes mid-clone abort checkout with
+    // CheckoutConflictError (leaving HEAD dangling at the init default, refs/heads/master).
+    if (this.clonePromise) {
+      return await this.clonePromise;
+    }
+    this.clonePromise = (async () => {
+      try {
+        await this.#prepareClone(url, branch);
+        await this.#doClone(url, branch);
+      } finally {
+        // clear on success and failure alike, so a later retry can start a fresh clone
+        this.clonePromise = null;
+      }
+    })();
+    return await this.clonePromise;
+  }
+
+  async awaitClone() {
+    // wait for any in-flight clone to settle before touching the git filesystem.
+    // Rejects with the clone error if the clone failed, so callers surface it
+    // instead of operating on a half-cloned repository.
+    if (this.clonePromise) {
+      await this.clonePromise;
+    }
   }
 
   async getBranch() {
@@ -354,6 +385,7 @@ export default class GitManager {
     // the "remote has changed" modal on the next commit - see issue #185). Callers decide
     // how to handle a failed pull (e.g. onRemoteUpdate keeps the '!' indicator; push()
     // tolerates it because the tracking ref is already correct after a successful push).
+    await this.awaitClone();
     let author = await this.cloud.getAuthor();
     await git.pull({
       fs,
@@ -376,6 +408,7 @@ export default class GitManager {
   }
 
   async push() {
+    await this.awaitClone();
     await git.push({
       fs,
       http,
@@ -433,6 +466,7 @@ export default class GitManager {
   }
 
   async commit(message) {
+    await this.awaitClone();
     await this.add(this.filepath);
     await git.commit({
       fs,
@@ -614,6 +648,10 @@ export default class GitManager {
     if (!path.startsWith('/')) {
       path = '/' + path;
     }
+    // wait for any in-flight clone first: the existence check below cannot tell a
+    // completed clone from a half-finished one, and writing into the worktree between
+    // clone's fetch and checkout phases aborts the checkout (CheckoutConflictError)
+    await this.awaitClone();
     // ensure that we have cloned the repo
     if (!(await this.pfsDirExists())) {
       console.log('repo not cloned, cloning');
