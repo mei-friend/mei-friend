@@ -6,6 +6,7 @@
 * Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
 * Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
 * Update splash screen privacy text (all languages) to reflect server-side credential handling
+* Force `Cache-Control: no-store` on all proxy responses and strip upstream caching headers: GitHub marks some API responses (e.g. the commit list) publicly cacheable, which — now that they flow same-origin through the proxy — could leave the Git Log stale for up to a minute after a commit and risk a shared cache serving one user's authenticated response to another
 
 ### 1.4.1 patch 
 * Add selection for Verovio 6.2.1 instead of 6.2.0

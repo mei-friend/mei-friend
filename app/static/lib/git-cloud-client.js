@@ -171,6 +171,7 @@ export default class GitCloudClient {
           {
             method: 'GET',
             headers: this.apiHeaders,
+            cache: 'no-store',
           }
         ).then((res) => res.json());
       case 'gitlab':

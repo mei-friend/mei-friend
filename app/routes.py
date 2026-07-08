@@ -266,9 +266,21 @@ def proxy(url):
     # not be passed through: our own HTTP layer (Werkzeug/gunicorn) adds its
     # own, and duplicate Date headers are joined by browsers into a string
     # that parses as Invalid Date, breaking date-based client logic.
+    #
+    # Upstream caching headers must NOT be forwarded either. GitHub marks many
+    # API responses (e.g. GET /repos/.../commits) 'Cache-Control: public,
+    # max-age=60, s-maxage=60'. When these flowed cross-origin straight to
+    # api.github.com that was harmless, but they now come back same-origin
+    # through this proxy, so any shared cache in front of us would honour
+    # s-maxage and (a) serve a stale commit log for up to a minute after a
+    # push, and (b) risk handing one user's authenticated response to another
+    # on the same /proxy path. Strip them and force no-store: these are
+    # per-request, per-user authenticated relays and must never be cached.
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection',
-                        'www-authenticate', 'date', 'server']
+                        'www-authenticate', 'date', 'server',
+                        'cache-control', 'expires', 'pragma', 'etag', 'last-modified', 'age']
     headers = [(name, value) for name, value in response.raw.headers.items() if name.lower() not in excluded_headers]
+    headers.append(('Cache-Control', 'no-store'))
 
     return (response.content, response.status_code, headers)
 
