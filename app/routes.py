@@ -189,15 +189,12 @@ def authorize():
 
 @app.route("/authorize/<provider>")
 def authorizeProvider(provider):
-    redirect_uri = url_for('authorize', provider=provider, _external=True)
-    if provider == "github":
-        return github.authorize_access_token(redirect_uri)
-#    elif provider == "gitlab":
-#        return gitlab.authorize_access_token(redirect_uri)
-#    elif provider == "bitbucket":
-#        return bitbucket.authorize_access_token(redirect_uri)
-    else:
-        return 'Unsupported provider', 400
+    # Stub for future multi-provider support (gitlab, codeberg/forgejo, ...).
+    # SECURITY NOTE for the implementer: mirror authorize() above -- exchange
+    # the code server-side, store the token ONLY in the server-side session,
+    # and redirect. Never return the token response to the browser (an earlier
+    # version of this stub echoed authorize_access_token() to the client).
+    return 'Unsupported provider', 501
 
 @app.route("/help")
 def show_help():
