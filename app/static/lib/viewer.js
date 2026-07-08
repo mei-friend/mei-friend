@@ -670,17 +670,21 @@ export default class Viewer {
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
       if (id) {
-        if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-        let fl = document.getElementById('flipCheckbox');
-        if (
-          !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
-          ((fl && fl.checked) || forceFlip)
-        ) {
-          this.updatePage(cm, '', id, false);
-        } else {
-          // on current page
-          this.scrollSvgTo(cm);
-          this.updateHighlight(cm);
+        const xmlEl = this.xmlDoc?.querySelector('[*|id="' + id + '"]');
+        const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
+        if (!isHeaderElement) { // avoid attempting page flip to header elements
+          if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
+          let fl = document.getElementById('flipCheckbox');
+          if (
+            !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
+            ((fl && fl.checked) || forceFlip)
+          ) {
+            this.updatePage(cm, '', id, false);
+          } else {
+            // on current page
+            this.scrollSvgTo(cm);
+            this.updateHighlight(cm);
+          }
         }
 
         // check if id is inside a markup element, if panel visible

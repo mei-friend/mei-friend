@@ -11,20 +11,20 @@ export default class GitCloudClient {
     this.providerType = conf.providerType; // e.g. 'github'
     this.githubDispatchGraceMs = 1000;
     this.MAX_RUN_FETCH_ATTEMPTS = 10;
-    if (!(this.token && this.provider && this.providerType)) {
+    // For GitHub, no token is held in the browser: authenticated requests are
+    // routed through the server-side /proxy, which attaches the OAuth token
+    // from the user's session (see githubFetch()).
+    if (!(this.provider && this.providerType) || (this.providerType !== 'github' && !this.token)) {
       throw new Error('Missing required configuration');
     }
     // Provider-specific configuration
     switch (this.providerType) {
       case 'github':
         this.apiHeaders = {
-          Authorization: `token ${conf.token}`,
           Accept: 'application/vnd.github.v3+json',
         };
         this.actionsHeaders = new Headers({
           // FIXME needs to be adjusted for other providers
-          // Particularly, note the current explicit GitHub assumption in userLogin (passed from flask)
-          Authorization: 'Basic ' + btoa(userLogin + ':' + this.token),
           Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
         });
@@ -60,7 +60,7 @@ export default class GitCloudClient {
     }
     this.githubRequestQueue = Promise.resolve();
     this.githubLastRequestTime = 0;
-    this.githubMinIntervalMs = 500; // 2 requests per second
+    this.githubMinIntervalMs = 150; // ~6-7 requests/second, serialized -- well within GitHub's 5000/hr and respects the "no concurrent requests" secondary-rate-limit rule
   }
 
   isGithubApiUrl(url) {
@@ -69,6 +69,9 @@ export default class GitCloudClient {
 
   githubFetch(url, options) {
     if (!this.isGithubApiUrl(url)) return fetch(url, options);
+    // route GitHub API calls through the server-side proxy, which authenticates
+    // them from the session -- the OAuth token never reaches the browser
+    const proxiedUrl = '/proxy/' + url.replace(/^https:\/\//, '');
     const run = async () => {
       const now = Date.now();
       const waitMs = Math.max(0, this.githubMinIntervalMs - (now - this.githubLastRequestTime));
@@ -76,7 +79,19 @@ export default class GitCloudClient {
         await new Promise((resolve) => setTimeout(resolve, waitMs));
       }
       this.githubLastRequestTime = Date.now();
-      return fetch(url, options);
+      let res = await fetch(proxiedUrl, options);
+      // Retry on rate limiting only: a 429 means the request was rejected
+      // before execution, so retrying is safe for any method. All other
+      // statuses pass through unchanged, as several callers inspect them.
+      for (let attempt = 0; res.status === 429 && attempt < 2; attempt++) {
+        const retryAfter = parseInt(res.headers.get('Retry-After'), 10);
+        const retryWaitMs = Number.isNaN(retryAfter) ? 1000 * (attempt + 1) : retryAfter * 1000;
+        console.warn('githubFetch: rate limited (429), retrying in ' + retryWaitMs + ' ms: ' + url);
+        await new Promise((resolve) => setTimeout(resolve, retryWaitMs));
+        this.githubLastRequestTime = Date.now();
+        res = await fetch(proxiedUrl, options);
+      }
+      return res;
     };
     const queued = this.githubRequestQueue.then(run, run);
     this.githubRequestQueue = queued.catch(() => {});
@@ -156,6 +171,7 @@ export default class GitCloudClient {
           {
             method: 'GET',
             headers: this.apiHeaders,
+            cache: 'no-store',
           }
         ).then((res) => res.json());
       case 'gitlab':
@@ -267,6 +283,12 @@ export default class GitCloudClient {
   }
 
   setAuthor(user) {
+    if (!user || !user.login) {
+      // error response (e.g. rate-limited or unauthenticated) -- caching it
+      // would poison every subsequent author-dependent request with
+      // 'undefined', so fail loudly and leave the cache empty for a retry
+      throw new Error('Could not determine author from user profile response: ' + JSON.stringify(user));
+    }
     let author = {};
     // set the author object to the provided object
     author.name = user.name || user.login;
@@ -627,7 +649,13 @@ export default class GitCloudClient {
     }).then(async (res) => {
       // return body as JSON object, but retain response status (for error detection)
       console.log('::::::', res);
-      const dispatchTime = res.headers?.get('Date') || new Date().toISOString();
+      let dispatchTime = res.headers?.get('Date');
+      if (!dispatchTime || Number.isNaN(new Date(dispatchTime).getTime())) {
+        // e.g. duplicated Date headers get joined by the browser and parse as
+        // Invalid Date; fall back to the local clock rather than poisoning
+        // the run-matching comparisons downstream
+        dispatchTime = new Date().toISOString();
+      }
       if (res.status === 204) {
         // no body on github 204 responses
         return { status: res.status, dispatchTime };
@@ -682,6 +710,11 @@ export default class GitCloudClient {
               new Date(dispatchTime).getTime() - (new Date(dispatchTime).getTime() % 1000)
             );
             const dispatchTimeMs = dispatchTimestamp.getTime();
+            if (Number.isNaN(dispatchTimeMs)) {
+              // unusable dispatch time: rely on the actor/branch/head_sha
+              // query filters rather than rejecting every candidate run
+              return true;
+            }
             const runTimestamp = new Date(w.run_started_at);
             const runTimeMs = runTimestamp.getTime();
             const runTimePlusGrace = runTimeMs + this.githubDispatchGraceMs;

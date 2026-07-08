@@ -1,7 +1,7 @@
 // mei-friend version and date
 export const version = '1.4.1';
-export const versionDate = '15 June 2026'; // use full or 3-character english months, will be translated
-export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
+export const versionDate = '8 July 2026'; // use full or 3-character english months, will be translated
+export const splashDate = '8 July 2026'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
 var spdWorker;
@@ -133,6 +133,7 @@ import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
 import GitManager from './git-manager.js';
+import { completeAfter, completeIfAfterLt, completeIfInTag } from './codemirror-hints.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -374,7 +375,6 @@ export async function updateGithubInLocalStorage() {
     const author = await gm.getAuthor();
     storage.github = {
       githubRepo: gm.repo,
-      githubToken: gm.token,
       branch: gm.branch,
       headSha: gm.headSha,
       filepath: gm.filepath,
@@ -383,34 +383,6 @@ export async function updateGithubInLocalStorage() {
       userEmail: author.email,
     };
   }
-}
-
-function completeAfter(cm, pred) {
-  if (!pred || pred())
-    setTimeout(function () {
-      if (!cm.state.completionActive)
-        cm.showHint({
-          completeSingle: false,
-        });
-    }, 100);
-  return CodeMirror.Pass;
-}
-
-function completeIfAfterLt(cm) {
-  return completeAfter(cm, function () {
-    var cur = cm.getCursor();
-    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === '<';
-  });
-}
-
-function completeIfInTag(cm) {
-  return completeAfter(cm, function () {
-    var tok = cm.getTokenAt(cm.getCursor());
-    if (tok.type === 'string' && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1))
-      return false;
-    var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
-    return inner.tagName;
-  });
 }
 
 /**
@@ -648,7 +620,8 @@ async function completeInitialLoad() {
   if (storage.supported) {
     if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      gm = new GitManager('github', 'github', storage.github.githubToken, {
+      // (no token: authenticated GitHub traffic is proxied via the server session)
+      gm = new GitManager('github', 'github', null, {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
@@ -667,13 +640,11 @@ async function completeInitialLoad() {
       // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
       // console.log('Registered git manager: ', msg);
 
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
       gm.getAuthor()
         .then((author) => {
-          //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
           storage.github = {
             githubRepo: gm.repo,
-            githubToken: gm.token,
             branch: gm.branch,
             headSha: gm.headSha,
             filepath: gm.filepath,
@@ -792,8 +763,7 @@ async function completeInitialLoad() {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
-      //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -929,7 +899,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 
       if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
-        gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+        gm = new GitManager('github', 'github', null, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
 

@@ -1,8 +1,19 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.4.1 develop
+### 1.4.2 Improved security for GitHub login 
+* Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
+* Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
+* Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
+* Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
+* Update splash screen privacy text (all languages) to reflect server-side credential handling
+* Force `Cache-Control: no-store` on all proxy responses and strip upstream caching headers: GitHub marks some API responses (e.g. the commit list) publicly cacheable, which — now that they flow same-origin through the proxy — could leave the Git Log stale for up to a minute after a commit and risk a shared cache serving one user's authenticated response to another
+
+### 1.4.1 patch 
 * Add selection for Verovio 6.2.1 instead of 6.2.0
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
+* Speed up schema-based hinting behavior while typing in CodeMirror editor
+* Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
+* Fix commit button staying disabled when typing a commit message (regression from May 2026 on develop; checked `innerText` instead of `value` on the message input)
 
 ### 1.4.0 Custom GitHub Action Configurations
 

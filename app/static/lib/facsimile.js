@@ -461,7 +461,7 @@ function createImageName(zoneId) {
     fileLocationType === 'github' &&
     imgName.startsWith('https://raw.githubusercontent.com/') &&
     gm &&
-    gm.token &&
+    isLoggedIn &&
     gm.branch &&
     gm.filepath
   ) {
