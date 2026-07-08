@@ -123,10 +123,12 @@ import {
   defaultNotationOrientation,
   defaultNotationProportion,
   defaultVerovioOptions,
+  defaultVerovioVersion,
   guidelinesBase,
   platform,
   isSafari,
   supportedLanguages,
+  supportedVerovioVersions,
 } from './defaults.js';
 import Translator from './translator.js';
 import { luteconv } from './luteconv.js';
@@ -2566,13 +2568,48 @@ export function drawRightFooter() {
   rf.innerHTML = versionHtml;
   // also update version string in splash screen
   document.getElementById('splashVersionNumber').innerHTML = versionHtml;
+
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     if (tkVersion.includes('dev')) {
       // current develop version, no release yet...
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }
-    rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
+    // hidden <select> offering the same version options as the settings panel;
+    // only its dropdown arrow (::after in CSS) is visible, next to the version link
+    let storage = window.localStorage;
+    let currentVerovioKey =
+      document.getElementById('selectToolkitVersion')?.value ||
+      (storage.hasOwnProperty('mf-selectToolkitVersion') ? storage['mf-selectToolkitVersion'] : defaultVerovioVersion);
+    const optionsHtml = Object.keys(supportedVerovioVersions)
+      .map((key) => {
+        let desc = supportedVerovioVersions[key].description;
+        if (supportedVerovioVersions[key].hasOwnProperty('releaseDate')) {
+          desc += ' (' + supportedVerovioVersions[key].releaseDate + ')';
+        }
+        return `<option value="${key}" title="${desc}"${key === currentVerovioKey ? ' selected' : ''}>${key}</option>`;
+      })
+      .join('');
+    rf.innerHTML +=
+      `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>` +
+      `<span class="verovioVersionSelectWrapper" title="${translator.lang.selectToolkitVersion.text}">` +
+      `<select id="rightFooterVerovioVersion">${optionsHtml}</select></span>`;
+
+    // switching the version here mirrors picking it in the mei-friend settings panel
+    document.getElementById('rightFooterVerovioVersion').addEventListener('change', (ev) => {
+      const newVersion = ev.target.value;
+      const settingsSelect = document.getElementById('selectToolkitVersion');
+      if (settingsSelect) {
+        settingsSelect.value = newVersion;
+        settingsSelect.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        vrvWorker.postMessage({
+          cmd: 'loadVerovio',
+          msg: newVersion,
+          url: supportedVerovioVersions[newVersion].url,
+        });
+      }
+    });
   }
 }
 
