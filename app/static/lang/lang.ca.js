@@ -1130,6 +1130,9 @@ export const lang = {
   commitFileNameText: { text: 'Nom del fitxer' },
   forkRepository: { text: 'Bifurcar el repositori' },
   forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
+  forkBranchMissingError: {
+    text: "Ho sentim, el teu fork existent no conté la branca sol·licitada i no s'hi ha pogut crear. Actualitza o elimina el teu fork i torna-ho a provar. Branca",
+  },
   loadingFile: { text: 'Carregant fitxer' },
   loadingFromGithub: { text: 'Carregant des de Github' },
   logOut: { text: 'Tancar sessió' },

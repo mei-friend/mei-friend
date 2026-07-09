@@ -980,6 +980,9 @@ export const lang = {
   commitFileNameText: { text: 'Име фајла' },
   forkRepository: { text: 'Форкуј репозиторијум' },
   forkError: { text: 'Извињавамо се, није могуће форковање репозиторијума' },
+  forkBranchMissingError: {
+    text: 'Извињавамо се, ваш постојећи форк не садржи тражену грану и није је било могуће тамо креирати. Молимо ажурирајте или избришите свој форк и покушајте поново. Грана',
+  },
   loadingFile: { text: 'Учитавање фајла' },
   loadingFromGithub: { text: 'Учитавање са GitHub-а' },
   logOut: { text: 'Одјави се' },

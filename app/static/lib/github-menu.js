@@ -137,17 +137,21 @@ export async function forkRepoClicked() {
           const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
           const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
           gm.filepath = _filepath;
-          setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+          // n.b. no setMeiFileInfo() here: loadFile() calls it with the same values
+          // once the clone is done; setting meiFileLocation to a repo name while
+          // fileLocationType still says 'url' crashes facsimile redraws in between
+          // a pre-existing fork may lack the requested branch (created upstream
+          // after forking); try to create it on the fork before cloning
+          try {
+            await gm.ensureBranchOnFork(githubRepo, gm.branch);
+          } catch (e) {
+            console.warn("Couldn't create branch " + gm.branch + ' on fork ' + gm.repo + ': ', e);
+            document.getElementById('GithubLogo').classList.remove('clockwise');
+            v.showAlert(translator.lang.forkBranchMissingError.text + ': ' + gm.branch);
+            return;
+          }
           // clone and load the file
-          await checkAndClone(`https://github.com/${gm.repo}.git`, gm.branch);
-          /*
-            .then(() => {
-              loadFile(_file);
-              updateFileStatusDisplay();
-            })
-            .catch((e) => {
-              showCloneErrorAlert(e);
-            });*/
+          await checkAndClone(_file, gm.cloud.getCloneURL(), gm.branch);
         }
       }, forkRepositoryToSelector.value)
       .catch((e) => {
@@ -336,6 +340,10 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
         gm.repo, // meiFileLocation
         gm.repo + ':' // meiFileLocationPrintable
       );
+      // set location type together with the location itself, before handleEncoding()
+      // triggers a render: a facsimile redraw arriving while meiFileLocation is a
+      // repo name but fileLocationType still says 'url' crashes createImageName()
+      setFileLocationType('github');
       handleEncoding(content, true, true, clearBeforeLoading); // retains current page and selection after commit
       setFileNameAfterLoad();
       updateFileStatusDisplay();
@@ -346,7 +354,6 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
       // and lets a user trapped by a stale latch recover simply by reloading the file (#185).
       gm.remoteChangedDuringRestore = false;
       updateGithubInLocalStorage();
-      setFileLocationType('github');
       setStandoffAnnotationEnabledStatus();
       fillInCommitLog('withRefresh');
       const fnStatus = document.getElementById('fileName');
@@ -600,8 +607,19 @@ export async function fillInBranchContents(e) {
   githubLoadingIndicator.classList.add('clockwise');
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById('contentsHeader');
+  // remember gm state at request time: if it changes while listContents is in
+  // flight (e.g. openUrlProcess() clearing branch/filepath), our response is
+  // stale and rendering it would clobber the menu built for the new state
+  const requestedRepo = gm.repo;
+  const requestedBranch = gm.branch;
+  const requestedFilepath = gm.filepath;
   gm.listContents(gm.filepath)
     .then(async (branchContents) => {
+      if (gm.repo !== requestedRepo || gm.branch !== requestedBranch || gm.filepath !== requestedFilepath) {
+        console.log('fillInBranchContents(): gm changed while listing contents, abandoning stale response');
+        githubLoadingIndicator.classList.remove('clockwise');
+        return;
+      }
       console.log('fillInBranchContents() got contents: ', branchContents);
       let githubMenu = document.getElementById('GithubMenu');
       githubMenu.innerHTML = `
@@ -701,6 +719,7 @@ export async function fillInBranchContents(e) {
     })
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
+      githubLoadingIndicator.classList.remove('clockwise');
     });
 } // fillInBranchContents()
 

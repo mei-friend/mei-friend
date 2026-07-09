@@ -1139,6 +1139,9 @@ export const lang = {
   commitFileNameText: { text: 'Dateiname' },
   forkRepository: { text: 'Repo forken' },
   forkError: { text: 'Konnte Repo leider nicht forken' },
+  forkBranchMissingError: {
+    text: 'Leider enthält Ihr bestehender Fork den angeforderten Branch nicht, und er konnte dort nicht angelegt werden. Bitte aktualisieren oder löschen Sie Ihren Fork und versuchen Sie es erneut. Branch',
+  },
   loadingFile: { text: 'Lade Datei' },
   loadingFromGithub: { text: 'Lade von Github' },
   logOut: { text: 'Abmelden' },

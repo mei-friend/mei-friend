@@ -1139,6 +1139,9 @@ export const lang = {
   commitFileNameText: { text: 'Nom du fichier' },
   forkRepository: { text: 'Créer une copie du répertoire' },
   forkError: { text: 'Désolé, impossible de créer une copie du répertoire' },
+  forkBranchMissingError: {
+    text: "Désolé, votre copie existante du répertoire ne contient pas la branche demandée, et celle-ci n'a pas pu y être créée. Veuillez mettre à jour ou supprimer votre copie et réessayer. Branche",
+  },
   loadingFile: { text: 'Chargement du fichier' },
   loadingFromGithub: { text: 'Chargement depuis Github' },
   logOut: { text: 'Déconnexion' },

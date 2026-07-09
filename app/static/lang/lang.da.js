@@ -988,6 +988,9 @@ export const lang = {
   commitFileNameText: { text: 'Filnavn' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Beklager, kunne ikke fork repository' },
+  forkBranchMissingError: {
+    text: 'Beklager, din eksisterende fork indeholder ikke den ønskede gren, og den kunne ikke oprettes der. Opdater eller slet venligst din fork og prøv igen. Gren',
+  },
   loadingFile: { text: 'Indlæser fil' },
   loadingFromGithub: { text: 'Indlæser fra Github' },
   logOut: { text: 'Log ud' },

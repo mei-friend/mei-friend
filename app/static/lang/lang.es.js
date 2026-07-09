@@ -1129,6 +1129,9 @@ export const lang = {
   commitFileNameText: { text: 'Nombre del archivo' },
   forkRepository: { text: 'Forkar repositorio' },
   forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
+  forkBranchMissingError: {
+    text: 'Lo sentimos, tu fork existente no contiene la rama solicitada y no se pudo crear allí. Por favor, actualiza o elimina tu fork y vuelve a intentarlo. Rama',
+  },
   loadingFile: { text: 'Cargando archivo' },
   loadingFromGithub: { text: 'Cargando desde Github' },
   logOut: { text: 'Cerrar sesión' },

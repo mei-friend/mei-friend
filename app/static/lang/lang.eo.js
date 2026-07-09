@@ -1109,6 +1109,9 @@ export const lang = {
   commitFileNameText: { text: 'Dosiernomo' },
   forkRepository: { text: 'Forki deponejon' },
   forkError: { text: 'Pardonu, ne povis forki deponejon' },
+  forkBranchMissingError: {
+    text: 'Pardonu, via ekzistanta forko ne enhavas la petitan branĉon, kaj ĝi ne povis esti kreita tie. Bonvolu ĝisdatigi aŭ forigi vian forkon kaj reprovi. Branĉo',
+  },
   loadingFile: { text: 'Ŝargante dosieron' },
   loadingFromGithub: { text: 'Ŝargante el GitHub' },
   logOut: { text: 'Elsaluti' },

@@ -444,6 +444,34 @@ export default class GitCloudClient {
     return result.replace('application/vnd.github.raw', uriSuffixToMimetype(fileContentsUrl));
   }
 
+  async ensureBranchOnFork(upstreamRepo, branch) {
+    // Pre-existing forks may lack branches created upstream after forking
+    // (e.g. after a default-branch rename). Since forks share the parent's
+    // object network, a missing branch can be created directly on the fork
+    // as a ref pointing at the upstream branch head, without cloning.
+    if (this.providerType !== 'github') return;
+    const forkBranchUrl = `https://api.github.com/repos/${this.gm.repo}/branches/${branch}`;
+    const forkBranch = await this.githubFetch(forkBranchUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    });
+    if (forkBranch.status < 400) return; // branch already exists on fork
+    const upstreamBranch = await this.githubFetch(`https://api.github.com/repos/${upstreamRepo}/branches/${branch}`, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+      return res.json();
+    });
+    await this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/git/refs`, {
+      method: 'POST',
+      headers: this.apiHeaders,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: upstreamBranch.commit.sha }),
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+    });
+  }
+
   async fork(callback, forkTo = this.userLogin) {
     let forksUrl;
     switch (this.providerType) {

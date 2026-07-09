@@ -1131,6 +1131,9 @@ export const lang = {
   commitFileNameText: { text: 'Nazwa pliku' },
   forkRepository: { text: 'Rozgałęź repozytorium' },
   forkError: { text: 'Przepraszamy, nie można rozgałęzić repozytorium' },
+  forkBranchMissingError: {
+    text: 'Przepraszamy, Twój istniejący fork nie zawiera żądanej gałęzi i nie udało się jej tam utworzyć. Zaktualizuj lub usuń swój fork i spróbuj ponownie. Gałąź',
+  },
   loadingFile: { text: 'Wczytywanie pliku' },
   loadingFromGithub: { text: 'Wczytywanie z GitHub' },
   logOut: { text: 'Wyloguj się' },
