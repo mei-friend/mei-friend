@@ -773,8 +773,10 @@ async function completeInitialLoad() {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (gm.repo && gm.branch && gm.filepath) {
+    if (gm.repo && gm.branch && gm.filepath && !urlFetchInProgress) {
       // preset github menu to where the user left off, if we can
+      // (skipped when a ?file= URL fetch is in flight: openUrlProcess() will
+      // clear gm's branch/filepath, so presetting would race against it)
       fillInBranchContents();
     }
   }

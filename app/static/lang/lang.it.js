@@ -1140,6 +1140,9 @@ export const lang = {
   commitFileNameText: { text: 'Nome del file' },
   forkRepository: { text: 'Fork del repository' },
   forkError: { text: 'Spiacenti, non è possibile eseguire il fork del repository' },
+  forkBranchMissingError: {
+    text: 'Spiacenti, il tuo fork esistente non contiene il ramo richiesto e non è stato possibile crearlo lì. Aggiorna o elimina il tuo fork e riprova. Ramo',
+  },
   loadingFile: { text: 'Caricamento file' },
   loadingFromGithub: { text: 'Caricamento da Github' },
   logOut: { text: 'Esci' },

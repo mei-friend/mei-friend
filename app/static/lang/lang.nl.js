@@ -993,6 +993,9 @@ export const lang = {
   commitFileNameText: { text: 'Bestandsnaam' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, kon repository niet fork' },
+  forkBranchMissingError: {
+    text: 'Sorry, uw bestaande fork bevat de gevraagde tak niet, en deze kon daar niet worden aangemaakt. Werk uw fork bij of verwijder deze en probeer het opnieuw. Tak',
+  },
   loadingFile: { text: 'Bestand laden' },
   loadingFromGithub: { text: 'Laden van Github' },
   logOut: { text: 'Uitloggen' },
