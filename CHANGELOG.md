@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.5.0 develop
+
 ### 1.4.2 Improved security for GitHub login 
 * Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
 * Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
