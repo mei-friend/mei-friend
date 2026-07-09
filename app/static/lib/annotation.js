@@ -327,7 +327,11 @@ export function readAnnots(flagLimit = false) {
     if (annot.hasAttributeNS(xmlNameSpace, 'id')) {
       annotation.id = annot.getAttributeNS(xmlNameSpace, 'id');
     } else {
-      annotation.id = 'None';
+      // Mint a fresh id in the user's chosen style and write it back to
+      // the element so each annotation is uniquely identified and dedupes
+      // correctly when readAnnots() runs again (e.g. on editor changes).
+      annotation.id = generateXmlId('annot', v.xmlIdStyle);
+      annot.setAttributeNS(xmlNameSpace, 'xml:id', annotation.id);
     }
     annotation.isInline = true;
     if (annot.hasAttribute('startid') && annot.hasAttribute('endid')) {
@@ -631,7 +635,7 @@ async function writeStandoffIfRequested(a) {
           establishContainerResource(annotationContainer).then((annotationContainerResource) => {
             establishDiscoveryResource(currentFileUri)
               .then((dataCatalogResource) => {
-                let discoveryUri = dataCatalogResource.url;
+                let discoveryUri = dataCatalogResource;
                 // generate a web annotation JSON-LD object
                 let webAnno = new Object();
                 let body = new Object();

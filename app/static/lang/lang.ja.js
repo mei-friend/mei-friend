@@ -25,10 +25,10 @@ export const lang = {
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
-        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディング、アプリケーション設定、および現在のログイン情報など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、ホストのサーバーには保存されません。
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディングやアプリケーション設定など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、ホストのサーバーには保存されません。GitHubアクセス資格情報を保護するため、GitHubログインセッション（アクセストークンを含む）はブラウザではなくmei-friendサーバー上に保持され、ブラウザには不透明なセッション識別子のみが保存されます。
       </p>
       <p>
-        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。技術的な理由から、GitHubとの特定のやり取り（エンコーディングを最初に開くときにリポジトリをブラウザにクローンする、またはリポジトリに変更をコミットする）には、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーにデータを送信する必要があります。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するデータは保存されません。
+        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。アクセス資格情報を安全に保つため、GitHubとのすべてのやり取りは、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーを経由して行われ、このサーバーがログインセッションからの資格情報をこれらのリクエストに付加します。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するコンテンツは保存されません。ただし、他のWebサーバーと同様に、リクエストのメタデータ（アクセスしたリポジトリやファイルの名前など）が技術ログに記録されることがあります。
       </p>
       <p>
 
@@ -361,19 +361,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHubアクションワークフローをリクエスト:' },
-  githubActionsDescription: {
-    text: '上記の設定を使用してGitHub APIにワークフローを実行するために「ワークフローを実行」をクリックしてください。ワークフロー実行が完了すると、エンコーディングが最新バージョンにリロードされます。',
-  },
-  githubActionStatusMsgPrompt: { text: 'ワークフローの実行に失敗しました - GitHubの応答:' },
   githubActionStatusMsgWaiting: { text: 'GitHubがワークフローを処理している間お待ちください...' },
-  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubの応答:' },
-  githubActionStatusMsgSuccess: { text: 'ワークフローの実行が完了しました - GitHubの応答:' },
+  githubActionStatusMsgFailure: { text: 'ワークフローの実行に失敗しました - GitHubステータス' },
+  githubActionsRunCompletedMsg: { text: 'ワークフローの実行が完了しました：' },
+  githubActionsRunFailedMsg: { text: 'ワークフローの実行を完了できませんでした：' },
+  githubActionsGitHubStatusLink: { text: 'GitHub ステータス' },
   githubActionsRunButton: { text: 'ワークフローを実行' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'ワークパッケージ定義を指定' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'この GitHub Action にはワークパッケージ定義が必要です。mei-friend 設定で定義（定義 JSON オブジェクトの URL）を指定してください。',
+  },
   githubActionsRunButtonReload: { text: 'MEIファイルを再読み込み' },
   githubActionsCancelButton: { text: 'キャンセル' },
   githubActionsInputSetterFilepath: { text: '現在のファイルパスを入力にコピー' },
   githubActionsInputSetterSelection: { text: '現在のMEI選択範囲を入力にコピー' },
-  githubActionsInputContainerHeader: { text: '入力設定' },
+  githubActionsNoSummaryProvided: {
+    text: '要約はありません。詳細については上記の GitHub ステータスリンクを参照してください。',
+  },
+  githubActionsWaitingOpenLink: { text: 'GitHub でワークフローの状態を確認' },
+  githubActionsDisabledTooltip: {
+    text: 'このリポジトリのエンコーディングを開いて GitHub Actions のワークフローを実行してください。',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'GitHub Actions のワークフローを実行するにはローカルの変更をコミットしてください。',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: '指定された JSON 設定ファイルは予期されるスキーマに準拠していません。詳細はドキュメントをご確認ください。',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions を使用',
+    description: 'リポジトリで利用可能な場合に GitHub Actions と連携する',
+  },
+  enableGithubActions: {
+    text: '利用可能な GitHub Actions を表示',
+    description: 'GitHub メニューでリポジトリ内をナビゲートする際に利用可能な GitHub Actions を一覧表示',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'ワークパッケージ定義',
+    description: 'GitHub Actions ワークパッケージ定義ファイルを使用',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'GitHubリポジトリをフォーク' },
@@ -1065,7 +1091,11 @@ export const lang = {
   commitFileNameText: { text: 'ファイル名' },
   forkRepository: { text: 'リポジトリをフォーク' },
   forkError: { text: '申し訳ありません、リポジトリをフォークできませんでした' },
+  forkBranchMissingError: {
+    text: '申し訳ありません、既存のフォークにはリクエストされたブランチが含まれておらず、そこに作成することもできませんでした。フォークを更新または削除して、もう一度お試しください。ブランチ',
+  },
   loadingFile: { text: 'ファイルを読み込み中' },
+  loadFileError: { text: '申し訳ありません、リポジトリからファイルを読み込めませんでした' },
   loadingFromGithub: { text: 'GitHubから読み込み中' },
   logOut: { text: 'ログアウト' },
   githubLogout: { text: 'ログアウト' },

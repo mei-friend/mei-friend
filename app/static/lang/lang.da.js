@@ -27,10 +27,10 @@ export const lang = {
         yderligere information.
       </p>
       <p>
-        Selvom mei-friend er en browserbaseret applikation, gemmes dine personlige data (inklusive den kodning, du redigerer, dine applikationsindstillinger og aktuelle loginoplysninger, hvis nogen) i din browsers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale lager</a> og gemmes ikke på vores servere.
+        Selvom mei-friend er en browserbaseret applikation, gemmes dine personlige data (inklusive den kodning, du redigerer, og dine applikationsindstillinger) i din browsers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale lager</a> og gemmes ikke på vores servere. For at beskytte dine GitHub-adgangsoplysninger opbevares din GitHub-loginsession (inklusive dit adgangstoken) på mei-friend-serveren i stedet for i din browser; din browser indeholder kun en uigennemsigtig sessionsidentifikator.
       </p>
       <p>
-        Data overføres kun til GitHub, når du eksplicit anmoder om det (f.eks. når du logger ind på GitHub, indlæser din kodning fra eller committer til et GitHub-repository, eller når du anmoder om, at en GitHub Action workflow køres for dig). Tilsvarende overføres data kun til din valgte Solid-udbyder, når du eksplicit anmoder om det (f.eks. når du logger ind på Solid, eller indlæser eller gemmer stand-off-annotationer). Af tekniske årsager kræver visse interaktioner med GitHub (kloning af et repository til din browser, når du først åbner en kodning, eller committer ændringer til et repository) dataoverførsel til en proxyserver hostet af mdw – Universität für Musik und darstellende Kunst Wien. Denne server fungerer som en mellemmand mellem din browser og GitHub og gemmer ikke nogen data, der overføres gennem den.
+        Data overføres kun til GitHub, når du eksplicit anmoder om det (f.eks. når du logger ind på GitHub, indlæser din kodning fra eller committer til et GitHub-repository, eller når du anmoder om, at en GitHub Action workflow køres for dig). Tilsvarende overføres data kun til din valgte Solid-udbyder, når du eksplicit anmoder om det (f.eks. når du logger ind på Solid, eller indlæser eller gemmer stand-off-annotationer). For at holde dine adgangsoplysninger sikre dirigeres alle interaktioner med GitHub gennem en proxyserver hostet af mdw – Universität für Musik und darstellende Kunst Wien, som vedhæfter dine adgangsoplysninger til disse forespørgsler fra din loginsession. Denne server fungerer som en mellemmand mellem din browser og GitHub og gemmer ikke det indhold, der overføres gennem den; som med enhver webserver kan forespørgselsmetadata (såsom navnene på de repositories og filer, du tilgår) optræde i dens tekniske logfiler.
       </p>
       <p>
         Vi bruger <a href="https://matomo.org/" target="_blank">Matomo</a> til at indsamle anonyme brugsstatistikker.
@@ -374,19 +374,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Anmod GitHub Action workflow:' },
-  githubActionsDescription: {
-    text: 'Klik på "Kør workflow" for at bede GitHub API om at køre ovenstående workflow for dig, ved hjælp af den specificerede inputkonfiguration nedenfor. Din kodning vil blive genindlæst i sin seneste version, når workflow-kørslen er færdig. ',
-  },
-  githubActionStatusMsgPrompt: { text: 'Kunne ikke køre workflow - GitHub siger' },
   githubActionStatusMsgWaiting: { text: 'Vær tålmodig, mens GitHub behandler din workflow...' },
-  githubActionStatusMsgFailure: { text: 'Kunne ikke køre workflow - GitHub siger' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-kørsel færdig - GitHub siger' },
+  githubActionStatusMsgFailure: { text: 'Kunne ikke køre workflow - GitHub-status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow-kørsel afsluttet:' },
+  githubActionsRunFailedMsg: { text: 'Workflow-kørsel kunne ikke afsluttes:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-status' },
   githubActionsRunButton: { text: 'Kør workflow' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Angiv arbejdspakkedefinition' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Denne GitHub Action kræver en arbejdspakkedefinition. Angiv venligst en (URL til et JSON-definitionsobjekt) i mei-friend-indstillingerne.',
+  },
   githubActionsRunButtonReload: { text: 'Genindlæs MEI fil' },
   githubActionsCancelButton: { text: 'Annuller' },
   githubActionsInputSetterFilepath: { text: 'Kopier nuværende filsti til input' },
   githubActionsInputSetterSelection: { text: 'Kopier nuværende MEI markering til input' },
-  githubActionsInputContainerHeader: { text: 'Inputkonfiguration' },
+  githubActionsNoSummaryProvided: { text: 'Ingen oversigt tilgængelig. Se GitHub-statuslinket ovenfor for detaljer.' },
+  githubActionsWaitingOpenLink: { text: 'Følg workflow-status på GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Åbn en kodning fra dette repository for at køre GitHub Actions-workflows.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commit dine lokale ændringer for at køre GitHub Actions-workflows.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Den angivne JSON-konfigurationsfil overholder ikke det forventede skema. Se dokumentationen for detaljer.',
+  },
+  titleGithubActions: {
+    text: 'Brug GitHub Actions',
+    description: 'Arbejd med GitHub Actions, når de er tilgængelige i et repository',
+  },
+  enableGithubActions: {
+    text: 'Vis tilgængelige GitHub Actions',
+    description: 'Vis tilgængelige GitHub Actions ved navigation i repository i GitHub-menuen',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Arbejdspakkedefinition',
+    description: 'Brug en GitHub Actions arbejdspakkedefinitionsfil',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github repository' },
@@ -964,7 +988,11 @@ export const lang = {
   commitFileNameText: { text: 'Filnavn' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Beklager, kunne ikke fork repository' },
+  forkBranchMissingError: {
+    text: 'Beklager, din eksisterende fork indeholder ikke den ønskede gren, og den kunne ikke oprettes der. Opdater eller slet venligst din fork og prøv igen. Gren',
+  },
   loadingFile: { text: 'Indlæser fil' },
+  loadFileError: { text: 'Beklager, filen kunne ikke læses fra repositoriet' },
   loadingFromGithub: { text: 'Indlæser fra Github' },
   logOut: { text: 'Log ud' },
   githubLogout: { text: 'Log ud' },

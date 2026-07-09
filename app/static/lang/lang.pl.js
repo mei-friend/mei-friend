@@ -28,10 +28,10 @@ export const lang = {
         dla dalszych informacji.
       </p>
       <p>
-        Chociaż mei-friend jest aplikacją przeglądarkową, twoje dane osobowe (w tym kodowanie, które edytujesz, ustawienia aplikacji i bieżące dane logowania, jeśli takie istnieją) są przechowywane w <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnej pamięci</a> twojej przeglądarki i nie są przechowywane na naszych serwerach.
+        Chociaż mei-friend jest aplikacją przeglądarkową, twoje dane osobowe (w tym kodowanie, które edytujesz, oraz ustawienia aplikacji) są przechowywane w <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnej pamięci</a> twojej przeglądarki i nie są przechowywane na naszych serwerach. Aby chronić twoje dane dostępowe do GitHub, twoja sesja logowania GitHub (w tym token dostępu) jest przechowywana na serwerze mei-friend, a nie w przeglądarce; twoja przeglądarka przechowuje jedynie nieprzejrzysty identyfikator sesji.
       </p>
       <p>
-        Dane są przesyłane do GitHub tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do GitHub, ładujesz swoje kodowanie z repozytorium GitHub lub zatwierdzasz zmiany do repozytorium GitHub, lub gdy prosisz o uruchomienie przepływu pracy GitHub Action). Podobnie, dane są przesyłane do wybranego przez ciebie dostawcy Solid tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do Solid, lub ładujesz lub zapisujesz adnotacje stand-off). Ze względów technicznych, niektóre interakcje z GitHub (klonowanie repozytorium do twojej przeglądarki przy pierwszym otwarciu kodowania lub zatwierdzanie zmian do repozytorium) wymagają przesyłania danych do serwera proxy hostowanego przez mdw – Uniwersytet Muzyczny i Sztuk Widowiskowych w Wiedniu. Ten serwer działa jako pośrednik między twoją przeglądarką a GitHub i nie przechowuje żadnych danych przesyłanych przez niego.
+        Dane są przesyłane do GitHub tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do GitHub, ładujesz swoje kodowanie z repozytorium GitHub lub zatwierdzasz zmiany do repozytorium GitHub, lub gdy prosisz o uruchomienie przepływu pracy GitHub Action). Podobnie, dane są przesyłane do wybranego przez ciebie dostawcy Solid tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do Solid, lub ładujesz lub zapisujesz adnotacje stand-off). Aby zapewnić bezpieczeństwo twoich danych dostępowych, wszystkie interakcje z GitHub są kierowane przez serwer proxy hostowany przez mdw – Uniwersytet Muzyczny i Sztuk Widowiskowych w Wiedniu, który dołącza do tych żądań twoje dane dostępowe z twojej sesji logowania. Ten serwer działa jako pośrednik między twoją przeglądarką a GitHub i nie przechowuje treści przesyłanych przez niego; jak w przypadku każdego serwera WWW, metadane żądań (takie jak nazwy repozytoriów i plików, do których uzyskujesz dostęp) mogą pojawić się w jego logach technicznych.
       </p>
       <p>
         Używamy <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -379,19 +379,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Zażądaj pracy akcji GitHub:' },
-  githubActionsDescription: {
-    text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
-  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
-  githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - GitHub mówi' },
+  githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - Status GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Wykonanie zadania zakończone:' },
+  githubActionsRunFailedMsg: { text: 'Nie udało się ukończyć zadania:' },
+  githubActionsGitHubStatusLink: { text: 'Status GitHub' },
   githubActionsRunButton: { text: 'Uruchom zadanie' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Podaj definicję pakietu pracy' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ta akcja GitHub wymaga definicji pakietu pracy. Podaj jedną (URL obiektu JSON definicji) w ustawieniach mei-friend.',
+  },
   githubActionsRunButtonReload: { text: 'Przeładuj plik MEI' },
   githubActionsCancelButton: { text: 'Anuluj' },
   githubActionsInputSetterFilepath: { text: 'Kopiuj bieżącą ścieżkę pliku do wejścia' },
   githubActionsInputSetterSelection: { text: 'Kopiuj bieżący wybór MEI do wejścia' },
-  githubActionsInputContainerHeader: { text: 'Konfiguracja wejścia' },
+  githubActionsNoSummaryProvided: {
+    text: 'Nie podano podsumowania. Zobacz powyższy link do statusu GitHub, aby uzyskać szczegóły.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Śledź status workflow na GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Otwórz kodowanie z tego repozytorium, aby uruchomić workflowy GitHub Actions.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Zatwierdź lokalne zmiany, aby uruchomić przepływy pracy GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Określony plik konfiguracji JSON nie jest zgodny z oczekiwanym schematem. Zapoznaj się z dokumentacją, aby uzyskać szczegóły.',
+  },
+  titleGithubActions: {
+    text: 'Używaj GitHub Actions',
+    description: 'Pracuj z GitHub Actions, gdy są dostępne w repozytorium',
+  },
+  enableGithubActions: {
+    text: 'Pokaż dostępne GitHub Actions',
+    description: 'Wyświetl dostępne GitHub Actions podczas nawigacji po repozytorium w menu GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definicja pakietu pracy',
+    description: 'Użyj pliku definicji pakietu pracy dla GitHub Actions',
+  },
 
   // Fork modals // Okna modalne fork
   forkRepoGithubText: { text: 'Forkuj Repozytorium Github' },
@@ -1105,7 +1131,11 @@ export const lang = {
   commitFileNameText: { text: 'Nazwa pliku' },
   forkRepository: { text: 'Rozgałęź repozytorium' },
   forkError: { text: 'Przepraszamy, nie można rozgałęzić repozytorium' },
+  forkBranchMissingError: {
+    text: 'Przepraszamy, Twój istniejący fork nie zawiera żądanej gałęzi i nie udało się jej tam utworzyć. Zaktualizuj lub usuń swój fork i spróbuj ponownie. Gałąź',
+  },
   loadingFile: { text: 'Wczytywanie pliku' },
+  loadFileError: { text: 'Przepraszamy, nie udało się odczytać pliku z repozytorium' },
   loadingFromGithub: { text: 'Wczytywanie z GitHub' },
   logOut: { text: 'Wyloguj się' },
   githubLogout: { text: 'Wyloguj się' },

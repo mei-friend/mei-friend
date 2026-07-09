@@ -1,7 +1,7 @@
 // mei-friend version and date
-export const version = '1.3.0';
-export const versionDate = '22 May 2026'; // use full or 3-character english months, will be translated
-export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
+export const version = '1.4.1';
+export const versionDate = '9 July 2026'; // use full or 3-character english months, will be translated
+export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
 var spdWorker;
@@ -133,6 +133,7 @@ import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
 import GitManager from './git-manager.js';
+import { completeAfter, completeIfAfterLt, completeIfInTag } from './codemirror-hints.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -201,13 +202,43 @@ export async function setFileChangedState(fileChangedState) {
     let actionsWorkflows = document.querySelectorAll('.workflow');
     if (commitUI) setCommitUIEnabledStatus();
     if (actionsWorkflows) {
-      if (await gm.fileChanged()) {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
-      } else {
-        actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
-        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.remove('notAllowed'));
-      }
+      const hasMatchingGithubEncoding = fileLocationType === 'github' && meiFileLocation === gm.repo;
+      const disabledWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledTooltip?.text ||
+        'Open an encoding from this repository to run GitHub Actions workflows.';
+      const dirtyWorkflowTooltip =
+        translator?.lang?.githubActionsDisabledDirtyTooltip?.text ||
+        'Commit your local changes to run GitHub Actions workflows.';
+      const hasUncommittedChanges =
+        typeof gm.hasUncommittedChanges === 'function' ? await gm.hasUncommittedChanges() : await gm.fileChanged();
+      const disableForRepo = !hasMatchingGithubEncoding;
+      const disableForDirty = hasMatchingGithubEncoding && hasUncommittedChanges;
+      const disableActions = disableForRepo || disableForDirty;
+      actionsWorkflows.forEach((el) => {
+        const container = el.parentElement;
+        const actionsContainer = container?.parentElement;
+        if (disableActions) {
+          const tooltipText = disableForRepo ? disabledWorkflowTooltip : dirtyWorkflowTooltip;
+          if (container) {
+            container.classList.add('workflow-disabled');
+            container.classList.remove('disabled');
+            container.setAttribute('aria-disabled', 'true');
+            container.title = tooltipText;
+          }
+          el.classList.add('disabled');
+          el.title = tooltipText;
+        } else {
+          if (container) {
+            container.classList.remove('workflow-disabled');
+            container.classList.remove('disabled');
+            container.removeAttribute('aria-disabled');
+            container.removeAttribute('title');
+          }
+          el.classList.remove('disabled');
+          el.title = el.dataset?.url || '';
+        }
+        if (actionsContainer) actionsContainer.classList.toggle('notAllowed', disableActions);
+      });
     }
   }
   if (storage.supported) {
@@ -344,7 +375,6 @@ export async function updateGithubInLocalStorage() {
     const author = await gm.getAuthor();
     storage.github = {
       githubRepo: gm.repo,
-      githubToken: gm.token,
       branch: gm.branch,
       headSha: gm.headSha,
       filepath: gm.filepath,
@@ -353,34 +383,6 @@ export async function updateGithubInLocalStorage() {
       userEmail: author.email,
     };
   }
-}
-
-function completeAfter(cm, pred) {
-  if (!pred || pred())
-    setTimeout(function () {
-      if (!cm.state.completionActive)
-        cm.showHint({
-          completeSingle: false,
-        });
-    }, 100);
-  return CodeMirror.Pass;
-}
-
-function completeIfAfterLt(cm) {
-  return completeAfter(cm, function () {
-    var cur = cm.getCursor();
-    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === '<';
-  });
-}
-
-function completeIfInTag(cm) {
-  return completeAfter(cm, function () {
-    var tok = cm.getTokenAt(cm.getCursor());
-    if (tok.type === 'string' && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1))
-      return false;
-    var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
-    return inner.tagName;
-  });
 }
 
 /**
@@ -533,6 +535,17 @@ async function completeInitialLoad() {
     selectParam = selectParam.map((e) => e.split(',')).reduce((a1, a2) => a1.concat(a2));
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
+  let automationParam = searchParams.get('automation');
+
+  // Must be written before addMeiFriendOptionsToSettingsPanel() reads storage to populate the input.
+  if (automationParam !== null) {
+    try {
+      window.localStorage['mf-supplyWorkpackageGithubActionsConfiguration'] = automationParam;
+      window.localStorage['mf-enableGithubActions'] = 'true';
+    } catch (err) {
+      console.warn('Could not save automation URL to localStorage: ', err);
+    }
+  }
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
   createEncodingPanel();
@@ -607,7 +620,8 @@ async function completeInitialLoad() {
   if (storage.supported) {
     if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      gm = new GitManager('github', 'github', storage.github.githubToken, {
+      // (no token: authenticated GitHub traffic is proxied via the server session)
+      gm = new GitManager('github', 'github', null, {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
@@ -626,13 +640,11 @@ async function completeInitialLoad() {
       // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
       // console.log('Registered git manager: ', msg);
 
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
       gm.getAuthor()
         .then((author) => {
-          //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
           storage.github = {
             githubRepo: gm.repo,
-            githubToken: gm.token,
             branch: gm.branch,
             headSha: gm.headSha,
             filepath: gm.filepath,
@@ -751,8 +763,7 @@ async function completeInitialLoad() {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
-      //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      gm = new GitManager('github', 'github', null, { onRemoteUpdate });
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -762,8 +773,10 @@ async function completeInitialLoad() {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (gm.repo && gm.branch && gm.filepath) {
+    if (gm.repo && gm.branch && gm.filepath && !urlFetchInProgress) {
       // preset github menu to where the user left off, if we can
+      // (skipped when a ?file= URL fetch is in flight: openUrlProcess() will
+      // clear gm's branch/filepath, so presetting would race against it)
       fillInBranchContents();
     }
   }
@@ -868,7 +881,22 @@ async function completeInitialLoad() {
     if (remoteFileChanged) {
       remoteFileChanged.innerHTML = '';
     }
-    gm.clone();
+    gm.clone()
+      .then(async () => {
+        // the clone checked out HEAD, but the restored editor content may carry
+        // uncommitted changes (loadDataInEditor blocks CM change events, so
+        // handleEditorChanges never writes the restored content to the worktree).
+        // Re-sync the worktree from the editor and derive changed/commit-UI state
+        // from real git status; if editor == HEAD this rightly clears a stale flag.
+        if (gm.filepath) {
+          const status = await gm.writeAndReturnStatus(cm.getValue());
+          setFileChangedState(await gm.fileChanged(gm.filepath, status));
+          setCommitUIEnabledStatus();
+        }
+      })
+      .catch((err) => {
+        console.warn("Couldn't clone repository on session restore: ", err);
+      });
   }
 } // completeInitialLoad()
 
@@ -888,7 +916,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 
       if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
-        gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
+        gm = new GitManager('github', 'github', null, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
 
@@ -1939,6 +1967,10 @@ export let cmd = {
     // hide overlays
     // TODO refactor logic for all overlays below. For now only splash overlay...
     document.getElementById('splashOverlay').style.display = 'none';
+    const githubActionsOverlay = document.getElementById('githubActionsOverlay');
+    if (githubActionsOverlay && githubActionsOverlay.style.display !== 'none') {
+      githubActionsOverlay.style.display = 'none';
+    }
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
@@ -2574,6 +2606,20 @@ export async function handleEditorChanges() {
   // fileChanged flag may have been set from storage
   let changeIndicator = true;
   let meiXml = cm.getValue();
+  if (storage.supported) {
+    // save editor content to storage BEFORE the git write below: writeAndReturnStatus()
+    // may block for seconds behind an in-flight clone (awaitClone), and a page reload
+    // during that wait must not lose this edit - storage.content is what a reload restores.
+    updateLocalStorage(meiXml);
+    if (!freshlyLoaded) {
+      // optimistically persist the changed flag alongside the content, so a reload
+      // during the git write also restores the "changed" state; the regular
+      // setFileChangedState() calls below correct it from actual git status.
+      // (Not calling setFileChangedState() here: it consults git status, which would
+      // block on the same in-flight clone.)
+      storage.fileChanged = 1;
+    }
+  }
   if (isLoggedIn && gm.filepath) {
     // if it's a git file, write to git
     console.log('Writing to git...');
@@ -2589,10 +2635,6 @@ export async function handleEditorChanges() {
     freshlyLoaded = false;
   } else {
     setFileChangedState(changeIndicator);
-  }
-  if (storage.supported) {
-    // on every set of changes, save editor content
-    updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readListItemsFromXML(true); // readAnnots(); from annotation.js

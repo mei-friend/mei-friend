@@ -77,6 +77,61 @@ export function findNotes(elId) {
 } // findNotes()
 
 /**
+ * Check whether a URL resolves to a JSON resource, update an input element's state classes,
+ * and store the parsed JSON in el.dataset.jsonResponse.
+ * @param {HTMLInputElement} el
+ * @param {number} delay
+ * @returns {number|null} timeout id
+ */
+export function checkAndRetrieveJson(el, delay = 600) {
+  if (!el) return null;
+  return setTimeout(async () => {
+    // Clear prior state: classList.add is not exclusive, and the CSS rules
+    // for these classes have equal specificity, so a stale 'urlResolves'
+    // would otherwise mask a freshly added 'urlDoesNotResolve'.
+    el.classList.remove('urlResolves', 'urlDoesNotResolve');
+    if (!el.value) {
+      delete el.dataset.jsonResponse;
+      return;
+    }
+    let resolves = false;
+    try {
+      let url;
+      try {
+        url = new URL(el.value);
+      } catch {
+        el.classList.add('urlDoesNotResolve');
+        delete el.dataset.jsonResponse;
+        return;
+      }
+      const resp = await fetch(el.value);
+      resolves = resp.ok;
+      if (resolves) {
+        try {
+          const json = await resp.json();
+          el.dataset.jsonResponse = JSON.stringify(json);
+          console.log('Dataset jsonResponse set to: ', el.dataset.jsonResponse);
+        } catch (err) {
+          console.warn('checkAndRetrieveJson: could not parse JSON response', err, resp);
+          delete el.dataset.jsonResponse;
+          el.classList.add('urlDoesNotResolve');
+          resolves = false;
+        }
+      } else {
+        delete el.dataset.jsonResponse;
+      }
+    } catch (err) {
+      resolves = false;
+      delete el.dataset.jsonResponse;
+      el.classList.add('urlDoesNotResolve');
+    }
+    if (el.value) {
+      el.classList.add(resolves ? 'urlResolves' : 'urlDoesNotResolve');
+    }
+  }, delay);
+}
+
+/**
  * CodeMirror search: look for elementname (e.g., 'staff') upwards
  * in the xml file and return attribute value (searchString defaults
  * to the "@n" attribute).

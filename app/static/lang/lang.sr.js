@@ -27,10 +27,10 @@ export const lang = {
       додатне информације.
     </p>
     <p>
-      Иако је mei-friend апликација заснована на прегледачу, ваши лични подаци (укључујући кодирање које уређујете, подешавања апликације и тренутне податке за пријаву, ако их има) се чувају у <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">локалној меморији</a> вашег прегледача и нису сачувани на нашим серверима.
+      Иако је mei-friend апликација заснована на прегледачу, ваши лични подаци (укључујући кодирање које уређујете и подешавања апликације) се чувају у <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">локалној меморији</a> вашег прегледача и нису сачувани на нашим серверима. Ради заштите ваших GitHub приступних података, ваша GitHub сесија пријаве (укључујући ваш приступни токен) чува се на mei-friend серверу, а не у вашем прегледачу; ваш прегледач садржи само непрозирни идентификатор сесије.
     </p>
     <p>
-      Подаци се преносе на GitHub само када то изричито затражите (нпр. када се пријавите на GitHub, учитате своје кодирање из или комитујете у GitHub репозиторијум, или када затражите да се за вас покрене GitHub Action радни ток). Слично томе, подаци се преносе вашем изабраном Solid провајдеру само када то изричито затражите (нпр. када се пријавите на Solid, или учитате или сачувате stand-off напомене). Из техничких разлога, одређене интеракције са GitHub-ом (клонирање репозиторијума у ваш прегледач при првом отварању кодирања, или комитовање промена у репозиторијум) захтевају пренос података на прокси сервер хостован од стране mdw – Универзитета музике и извођачких уметности у Бечу. Овај сервер делује као посредник између вашег прегледача и GitHub-а, и не чува никакве податке који се преносе кроз њега.
+      Подаци се преносе на GitHub само када то изричито затражите (нпр. када се пријавите на GitHub, учитате своје кодирање из или комитујете у GitHub репозиторијум, или када затражите да се за вас покрене GitHub Action радни ток). Слично томе, подаци се преносе вашем изабраном Solid провајдеру само када то изричито затражите (нпр. када се пријавите на Solid, или учитате или сачувате stand-off напомене). Ради сигурности ваших приступних података, све интеракције са GitHub-ом усмеравају се кроз прокси сервер хостован од стране mdw – Универзитета музике и извођачких уметности у Бечу, који овим захтевима прилаже ваше приступне податке из ваше сесије пријаве. Овај сервер делује као посредник између вашег прегледача и GitHub-а, и не чува садржај који се преноси кроз њега; као и код сваког веб сервера, метаподаци захтева (попут назива репозиторијума и датотека којима приступате) могу се појавити у његовим техничким логовима.
     </p>
     <p>
       Користимо <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -366,19 +366,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Захтев за GitHub акцијски радни ток:' },
-  githubActionsDescription: {
-    text: 'Кликните на "Покрени радни ток" како бисте затражили од GitHub API-ја да изврши радни ток за вас, користећи конфигурацију уноса наведену испод. Ваше енкодирање ће се учитати у својој најновијој верзији након што се радни ток заврши.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Ток се није могао извршити - GitHub обавештава' },
   githubActionStatusMsgWaiting: { text: 'Молимо вас да будете стрпљиви док GitHub обрађује ваш ток...' },
-  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub обавештава' },
-  githubActionStatusMsgSuccess: { text: 'Извршен је ток - GitHub обавештава' },
+  githubActionStatusMsgFailure: { text: 'Ток се није могао извршити - GitHub статус' },
+  githubActionsRunCompletedMsg: { text: 'Извршавање тока рада завршено:' },
+  githubActionsRunFailedMsg: { text: 'Није могуће завршити извршавање тока рада:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub статус' },
   githubActionsRunButton: { text: 'Покрени радни ток' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Доставите дефиницију радног пакета' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ова GitHub Action захтева дефиницију радног пакета. Молимо доставите једну (URL JSON објекта дефиниције) у mei-friend подешавањима.',
+  },
   githubActionsRunButtonReload: { text: 'Учитај MEI фајл поново' },
   githubActionsCancelButton: { text: 'Откажи' },
   githubActionsInputSetterFilepath: { text: 'Копирај тренутну путању фајла у унос' },
   githubActionsInputSetterSelection: { text: 'Копирај тренутну MEI селекцију у унос' },
-  githubActionsInputContainerHeader: { text: 'Конфигурација уноса' },
+  githubActionsNoSummaryProvided: { text: 'Није достављен сажетак. Погледајте горњи GitHub статус линк за детаље.' },
+  githubActionsWaitingOpenLink: { text: 'Пратите статус тока рада на GitHub-у' },
+  githubActionsDisabledTooltip: {
+    text: 'Отворите кодирање из овог репозиторијума да бисте покренули GitHub Actions токове рада.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Комитујте локалне измене да бисте покренули GitHub Actions токове рада.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Наведена JSON конфигурациона датотека није у складу са очекиваном схемом. Молимо проверите документацију за детаље.',
+  },
+  titleGithubActions: {
+    text: 'Користи GitHub Actions',
+    description: 'Радите са GitHub Actions када су доступне у репозиторијуму',
+  },
+  enableGithubActions: {
+    text: 'Прикажи доступне GitHub Actions',
+    description: 'Прикажи доступне GitHub Actions при навигацији унутар репозиторијума у GitHub менију',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Дефиниција радног пакета',
+    description: 'Користите датотеку дефиниције радног пакета за GitHub Actions',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Направи копију GitHub репозиторијума' },
@@ -956,7 +980,11 @@ export const lang = {
   commitFileNameText: { text: 'Име фајла' },
   forkRepository: { text: 'Форкуј репозиторијум' },
   forkError: { text: 'Извињавамо се, није могуће форковање репозиторијума' },
+  forkBranchMissingError: {
+    text: 'Извињавамо се, ваш постојећи форк не садржи тражену грану и није је било могуће тамо креирати. Молимо ажурирајте или избришите свој форк и покушајте поново. Грана',
+  },
   loadingFile: { text: 'Учитавање фајла' },
+  loadFileError: { text: 'Извињавамо се, није могуће прочитати фајл из репозиторијума' },
   loadingFromGithub: { text: 'Учитавање са GitHub-а' },
   logOut: { text: 'Одјави се' },
   githubLogout: { text: 'Одјави се' },

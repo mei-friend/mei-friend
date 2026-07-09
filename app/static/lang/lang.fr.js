@@ -27,10 +27,10 @@ export const lang = {
         plus d'informations.
       </p>
       <p>
-        Bien que mei-friend soit une application basée sur un navigateur, vos données personnelles (y compris l'encodage que vous éditez, vos paramètres d'application et vos détails de connexion actuels, le cas échéant) sont stockées dans le <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">stockage local</a> de votre navigateur et ne sont pas stockées sur nos serveurs.
+        Bien que mei-friend soit une application basée sur un navigateur, vos données personnelles (y compris l'encodage que vous éditez et vos paramètres d'application) sont stockées dans le <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">stockage local</a> de votre navigateur et ne sont pas stockées sur nos serveurs. Afin de protéger vos identifiants d'accès GitHub, votre session de connexion GitHub (y compris votre jeton d'accès) est conservée sur le serveur mei-friend plutôt que dans votre navigateur ; votre navigateur ne détient qu'un identifiant de session opaque.
       </p>
       <p>
-        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à GitHub, chargez votre encodage depuis ou validez dans un dépôt GitHub, ou lorsque vous demandez l'exécution d'un flux de travail GitHub Action). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations stand-off). Pour des raisons techniques, certaines interactions avec GitHub (clonage d'un dépôt dans votre navigateur lors de la première ouverture d'un encodage, ou validation de modifications dans un dépôt) nécessitent la transmission de données à un serveur proxy hébergé par le mdw – Université de Musique et des Arts du Spectacle de Vienne. Ce serveur agit comme un intermédiaire entre votre navigateur et GitHub, et ne stocke aucune donnée transmise par son intermédiaire.
+        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à GitHub, chargez votre encodage depuis ou validez dans un dépôt GitHub, ou lorsque vous demandez l'exécution d'un flux de travail GitHub Action). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations stand-off). Afin de garantir la sécurité de vos identifiants d'accès, toutes les interactions avec GitHub sont acheminées via un serveur proxy hébergé par le mdw – Université de Musique et des Arts du Spectacle de Vienne, qui joint vos identifiants à ces requêtes à partir de votre session de connexion. Ce serveur agit comme un intermédiaire entre votre navigateur et GitHub, et ne stocke pas le contenu transmis par son intermédiaire ; comme pour tout serveur web, des métadonnées de requête (telles que les noms des dépôts et des fichiers auxquels vous accédez) peuvent apparaître dans ses journaux techniques.
       </p>
       <p>
         Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -377,19 +377,45 @@ export const lang = {
 
   // Modal GitHub actions
   githubActionsHeadingText: { text: 'Demander le flux de travail GitHub :' },
-  githubActionsDescription: {
-    text: "Cliquez sur \"Exécuter le flux de travail\" pour demander à l'API GitHub d'exécuter le flux de travail ci-dessus pour vous, en utilisant la configuration d'entrée spécifiée ci-dessous. Votre encodage sera rechargé dans sa dernière version une fois que l'exécution du flux de travail sera terminée.",
-  },
-  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
   githubActionStatusMsgWaiting: { text: 'Veuillez patienter pendant que GitHub traite votre flux de travail...' },
-  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
-  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - GitHub dit :' },
+  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - Statut GitHub" },
+  githubActionsRunCompletedMsg: { text: 'Exécution du flux de travail terminée :' },
+  githubActionsRunFailedMsg: { text: "Impossible de terminer l'exécution du flux de travail :" },
+  githubActionsGitHubStatusLink: { text: 'Statut GitHub' },
   githubActionsRunButton: { text: 'Exécuter le flux de travail' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Fournir la définition du lot de travail' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Cette GitHub Action nécessite une définition de lot de travail. Veuillez en fournir une (URL d'un objet JSON de définition) dans les paramètres mei-friend.",
+  },
   githubActionsRunButtonReload: { text: 'Recharger le fichier MEI' },
   githubActionsCancelButton: { text: 'Annuler' },
   githubActionsInputSetterFilepath: { text: "Copier le chemin du fichier actuel dans l'entrée" },
   githubActionsInputSetterSelection: { text: "Copier la sélection MEI actuelle dans l'entrée" },
-  githubActionsInputContainerHeader: { text: "Configuration d'entrée" },
+  githubActionsNoSummaryProvided: {
+    text: 'Aucun résumé fourni. Veuillez consulter le lien de statut GitHub ci-dessus pour plus de détails.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Suivre le statut du workflow sur GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Ouvrez un encodage de ce dépôt pour exécuter des workflows GitHub Actions.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Validez vos modifications locales pour exécuter des workflows GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: "Le fichier de configuration JSON que vous avez spécifié n'est pas conforme au schéma attendu. Veuillez consulter la documentation pour plus de détails.",
+  },
+  titleGithubActions: {
+    text: 'Utiliser GitHub Actions',
+    description: "Travailler avec GitHub Actions lorsqu'elles sont disponibles dans un dépôt",
+  },
+  enableGithubActions: {
+    text: 'Afficher les GitHub Actions disponibles',
+    description: 'Lister les GitHub Actions disponibles lors de la navigation dans le dépôt depuis le menu GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Définition du lot de travail',
+    description: 'Utiliser un fichier de définition de lot de travail GitHub Actions',
+  },
 
   // fork modals / fenêtres modales de fork
   forkRepoGithubText: { text: 'Créer une copie du dépôt Github' },
@@ -1113,7 +1139,11 @@ export const lang = {
   commitFileNameText: { text: 'Nom du fichier' },
   forkRepository: { text: 'Créer une copie du répertoire' },
   forkError: { text: 'Désolé, impossible de créer une copie du répertoire' },
+  forkBranchMissingError: {
+    text: "Désolé, votre copie existante du répertoire ne contient pas la branche demandée, et celle-ci n'a pas pu y être créée. Veuillez mettre à jour ou supprimer votre copie et réessayer. Branche",
+  },
   loadingFile: { text: 'Chargement du fichier' },
+  loadFileError: { text: 'Désolé, impossible de lire le fichier depuis le répertoire' },
   loadingFromGithub: { text: 'Chargement depuis Github' },
   logOut: { text: 'Déconnexion' },
   githubLogout: { text: 'Déconnexion de Github' },

@@ -27,10 +27,10 @@ export const lang = {
       отримання додаткової інформації.
     </p>
     <p>
-      Хоча mei-friend є додатком на основі браузера, ваші особисті дані (включаючи кодування, яке ви редагуєте, налаштування додатку та поточні дані для входу, якщо такі є) зберігаються у <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">локальному сховищі</a> вашого браузера і не зберігаються на наших серверах.
+      Хоча mei-friend є додатком на основі браузера, ваші особисті дані (включаючи кодування, яке ви редагуєте, та налаштування додатку) зберігаються у <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">локальному сховищі</a> вашого браузера і не зберігаються на наших серверах. Для захисту ваших облікових даних GitHub ваша сесія входу GitHub (включаючи ваш токен доступу) зберігається на сервері mei-friend, а не у вашому браузері; ваш браузер містить лише непрозорий ідентифікатор сесії.
     </p>
     <p>
-      Дані передаються на GitHub лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в GitHub, завантажуєте своє кодування з або фіксуєте в репозиторій GitHub, або коли ви запитуєте виконання робочого процесу GitHub Action для вас). Аналогічно, дані передаються до обраного вами постачальника Solid лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в Solid, або завантажуєте чи зберігаєте stand-off анотації). З технічних причин, певні взаємодії з GitHub (клонування репозиторію у ваш браузер при першому відкритті кодування або фіксація змін у репозиторій) вимагають передачі даних на проксі-сервер, розміщений mdw – Університетом музики та виконавських мистецтв у Відні. Цей сервер діє як посередник між вашим браузером і GitHub і не зберігає жодних даних, що передаються через нього.
+      Дані передаються на GitHub лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в GitHub, завантажуєте своє кодування з або фіксуєте в репозиторій GitHub, або коли ви запитуєте виконання робочого процесу GitHub Action для вас). Аналогічно, дані передаються до обраного вами постачальника Solid лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в Solid, або завантажуєте чи зберігаєте stand-off анотації). Для безпеки ваших облікових даних усі взаємодії з GitHub спрямовуються через проксі-сервер, розміщений mdw – Університетом музики та виконавських мистецтв у Відні, який додає до цих запитів ваші облікові дані з вашої сесії входу. Цей сервер діє як посередник між вашим браузером і GitHub і не зберігає вміст, що передається через нього; як і у випадку будь-якого веб-сервера, метадані запитів (наприклад, назви репозиторіїв і файлів, до яких ви звертаєтеся) можуть з'являтися в його технічних журналах.
     </p>
     <p>
       Ми використовуємо <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -367,19 +367,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Запит на виконання дії GitHub:' },
-  githubActionsDescription: {
-    text: 'Клацніть "Виконати дію" для запиту API GitHub на виконання вищезазначеної дії з використанням конфігурації введеної нижче. Ваше кодування буде перезавантажено в останній версії після завершення виконання дії.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Не вдалося виконати дію - GitHub повідомляє' },
   githubActionStatusMsgWaiting: { text: 'Будь ласка, будьте терплячими, поки GitHub обробляє вашу дію...' },
-  githubActionStatusMsgFailure: { text: 'Не вдалося виконати дію - GitHub повідомляє' },
-  githubActionStatusMsgSuccess: { text: 'Виконання дії завершено - GitHub повідомляє' },
+  githubActionStatusMsgFailure: { text: 'Не вдалося виконати дію - Статус GitHub' },
+  githubActionsRunCompletedMsg: { text: 'Виконання робочого процесу завершено:' },
+  githubActionsRunFailedMsg: { text: 'Не вдалося завершити виконання робочого процесу:' },
+  githubActionsGitHubStatusLink: { text: 'Статус GitHub' },
   githubActionsRunButton: { text: 'Виконати дію' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Надайте визначення робочого пакета' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Ця GitHub Action потребує визначення робочого пакета. Будь ласка, надайте його (URL JSON-об'єкта визначення) в налаштуваннях mei-friend.",
+  },
   githubActionsRunButtonReload: { text: 'Перезавантажити файл MEI' },
   githubActionsCancelButton: { text: 'Скасувати' },
   githubActionsInputSetterFilepath: { text: 'Скопіювати поточний шлях до файлу у вхідні дані' },
   githubActionsInputSetterSelection: { text: 'Скопіювати поточний вибір MEI до вхідних даних' },
-  githubActionsInputContainerHeader: { text: 'Конфігурація вхідних даних' },
+  githubActionsNoSummaryProvided: { text: 'Підсумок не надано. Дивіться посилання на статус GitHub вище для деталей.' },
+  githubActionsWaitingOpenLink: { text: 'Відстежувати статус робочого процесу на GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Відкрийте кодування з цього репозиторію, щоб запустити робочі процеси GitHub Actions.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Зафіксуйте локальні зміни, щоб запускати робочі процеси GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Вказаний файл конфігурації JSON не відповідає очікуваній схемі. Зверніться до документації для отримання деталей.',
+  },
+  titleGithubActions: {
+    text: 'Використовувати GitHub Actions',
+    description: 'Працювати з GitHub Actions, коли вони доступні в репозиторії',
+  },
+  enableGithubActions: {
+    text: 'Показати доступні GitHub Actions',
+    description: 'Показати доступні GitHub Actions під час навігації репозиторієм у меню GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Визначення робочого пакета',
+    description: 'Використовуйте файл визначення робочого пакета для GitHub Actions',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Створити репозиторій на GitHub' },
@@ -1079,7 +1103,11 @@ export const lang = {
   commitFileNameText: { text: 'Назва файлу' },
   forkRepository: { text: 'Розгалужити сховище' },
   forkError: { text: 'На жаль, не вдалося розгалужити сховище' },
+  forkBranchMissingError: {
+    text: 'На жаль, ваш наявний форк не містить запитаної гілки, і її не вдалося там створити. Будь ласка, оновіть або видаліть свій форк і спробуйте ще раз. Гілка',
+  },
   loadingFile: { text: 'Завантаження файлу' },
+  loadFileError: { text: 'На жаль, не вдалося прочитати файл зі сховища' },
   loadingFromGithub: { text: 'Завантаження з GitHub' },
   logOut: { text: 'Вийти' },
   githubLogout: { text: 'Вийти' },

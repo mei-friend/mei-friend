@@ -27,10 +27,10 @@ export const lang = {
         请查阅我们的<a href="https://mei-friend.github.io" target="_blank">详细文档</a>以获取更多信息。
       </p>
       <p>
-        尽管 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码、应用程序设置以及当前的登录详细信息（如果有））存储在您浏览器的<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>中，并未存储在我们的服务器上。
+        尽管 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码和应用程序设置）存储在您浏览器的<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>中，并未存储在我们的服务器上。为保护您的 GitHub 访问凭据，您的 GitHub 登录会话（包括您的访问令牌）保存在 mei-friend 服务器上，而不是您的浏览器中；您的浏览器仅保存一个不透明的会话标识符。
       </p>
       <p>
-        仅当您明确请求时（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub Action 工作流时），数据才会传输到 GitHub。同样，仅当您明确请求时（例如，当您登录 Solid，或加载或保存独立注释时），数据才会传输到您选择的 Solid 提供商。出于技术原因，与 GitHub 的某些交互（在首次打开编码时将仓库克隆到您的浏览器，或提交更改到仓库）需要将数据传输到由维也纳音乐与表演艺术大学托管的代理服务器。该服务器充当您的浏览器和 GitHub 之间的中介，不会存储通过它传输的任何数据。
+        仅当您明确请求时（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub Action 工作流时），数据才会传输到 GitHub。同样，仅当您明确请求时（例如，当您登录 Solid，或加载或保存独立注释时），数据才会传输到您选择的 Solid 提供商。为确保您的访问凭据安全，与 GitHub 的所有交互都通过由维也纳音乐与表演艺术大学托管的代理服务器进行路由，该服务器会将您登录会话中的凭据附加到这些请求上。该服务器充当您的浏览器和 GitHub 之间的中介，不会存储通过它传输的内容；与任何 Web 服务器一样，请求元数据（例如您访问的仓库和文件的名称）可能会出现在其技术日志中。
       </p>
       <p>
         我们使用 <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -355,19 +355,43 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: '请求 GitHub Action 工作流：' },
-  githubActionsDescription: {
-    text: '点击“运行工作流”以请求 GitHub API 为您运行上述工作流，使用下面指定的输入配置。工作流运行完成后，您的编码将重新加载为最新版本。',
-  },
-  githubActionStatusMsgPrompt: { text: '无法运行工作流 - GitHub 显示' },
   githubActionStatusMsgWaiting: { text: '请耐心等待 GitHub 处理您的工作流...' },
-  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 显示' },
-  githubActionStatusMsgSuccess: { text: '工作流运行完成 - GitHub 显示' },
+  githubActionStatusMsgFailure: { text: '无法运行工作流 - GitHub 状态' },
+  githubActionsRunCompletedMsg: { text: '工作流运行完成：' },
+  githubActionsRunFailedMsg: { text: '无法完成工作流运行：' },
+  githubActionsGitHubStatusLink: { text: 'GitHub 状态' },
   githubActionsRunButton: { text: '运行工作流' },
+  githubActionsSupplyWorkpackageDefinition: { text: '提供工作包定义' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: '此 GitHub Action 需要工作包定义。请在 mei-friend 设置中提供一个（定义 JSON 对象的 URL）。',
+  },
   githubActionsRunButtonReload: { text: '重新加载 MEI 文件' },
   githubActionsCancelButton: { text: '取消' },
   githubActionsInputSetterFilepath: { text: '复制当前文件路径到输入' },
   githubActionsInputSetterSelection: { text: '复制当前 MEI 选择到输入' },
-  githubActionsInputContainerHeader: { text: '输入配置' },
+  githubActionsNoSummaryProvided: { text: '未提供摘要。请参阅上面的 GitHub 状态链接以获取详细信息。' },
+  githubActionsWaitingOpenLink: { text: '在 GitHub 上跟踪工作流状态' },
+  githubActionsDisabledTooltip: {
+    text: '请打开此仓库中的编码以运行 GitHub Actions 工作流。',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: '请提交本地更改以运行 GitHub Actions 工作流。',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: '您指定的 JSON 配置文件不符合预期的架构。请查阅文档以了解详细信息。',
+  },
+  titleGithubActions: {
+    text: '使用 GitHub Actions',
+    description: '在仓库中可用时使用 GitHub Actions',
+  },
+  enableGithubActions: {
+    text: '显示可用的 GitHub Actions',
+    description: '在 GitHub 菜单中浏览仓库时列出可用的 GitHub Actions',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: '工作包定义',
+    description: '使用 GitHub Actions 工作包定义文件',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github 仓库' },
@@ -929,7 +953,11 @@ export const lang = {
   commitFileNameText: { text: '文件名' },
   forkRepository: { text: 'Fork 仓库' },
   forkError: { text: '抱歉，无法 fork 仓库' },
+  forkBranchMissingError: {
+    text: '抱歉，您现有的 fork 不包含所请求的分支，且无法在其中创建该分支。请更新或删除您的 fork 后重试。分支',
+  },
   loadingFile: { text: '正在加载文件' },
+  loadFileError: { text: '抱歉，无法从仓库读取文件' },
   loadingFromGithub: { text: '正在从 Github 加载' },
   logOut: { text: '登出' },
   githubLogout: { text: '登出' },

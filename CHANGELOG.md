@@ -1,5 +1,26 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.4.2 Improved security for GitHub login 
+* Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
+* Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
+* Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
+* Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
+* Update splash screen privacy text (all languages) to reflect server-side credential handling
+* Force `Cache-Control: no-store` on all proxy responses and strip upstream caching headers: GitHub marks some API responses (e.g. the commit list) publicly cacheable, which — now that they flow same-origin through the proxy — could leave the Git Log stale for up to a minute after a commit and risk a shared cache serving one user's authenticated response to another
+* Fix spurious "The remote file has changed since your last commit" warnings when committing ([#185](https://github.com/mei-friend/mei-friend/issues/185)): the last-committed state is now correctly remembered across page reloads and the remote tracking state updated after each push. Also fix related start-up race conditions that could corrupt the in-browser repository clone, leave the commit spinner hanging indefinitely, or lose an edit made in the first moments after a page reload
+* Several other small GitHub fixes and improvements
+
+### 1.4.1 patch 
+* Add selection for Verovio 6.2.1 instead of 6.2.0
+* Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
+* Speed up schema-based hinting behavior while typing in CodeMirror editor
+* Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
+* Fix commit button staying disabled when typing a commit message (regression from May 2026 on develop; checked `innerText` instead of `value` on the message input)
+
+### 1.4.0 Custom GitHub Action Configurations
+
+- Implement [#140](https://github.com/mei-friend/mei-friend/issues/140) to support custom GitHub Actions configurations
+
 ### 1.3.0 patch: Verovio 6 expansion support and improvements (released on 22 May 2026)
 * Adjust expansion behaviour for Verovio 6+: MIDI follows the expansion while the SVG remains unexpanded by default; renditions ≥ 2 now highlight and page-follow correctly via the expansion map. Fixes [#187](https://github.com/mei-friend/mei-friend/issues/187).
 * Selecting "No expansion" in MIDI player dropdown sets `expandNever`; selecting any expansion sets `expand` to that id and clears `expandNever`
@@ -14,84 +35,97 @@
 * Surface Verovio render-time warnings and errors as small  badges under the Verovio logo, with full messages available on click.
 
 ### 1.2.12 patch
-* Fix issue with GitHub-resource-URIs posted to Solid missing their branch 
-* Include Verovio version 6.1.0
-* Comprehensive improvements of e2e tests to reduce flakiness
+
+- Fix issue with GitHub-resource-URIs posted to Solid missing their branch
+- Include Verovio version 6.1.0
+- Comprehensive improvements of e2e tests to reduce flakiness
 
 ### 1.2.11 patch
-* Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
-* Restrict ALT + arrow key bindings for shifting visual offset to notation panel
-* Include Verovio version 6.0.1
+
+- Fix [#122](https://github.com/mei-friend/mei-friend/issues/122) to implement menu overflow functionality when buttons are occluded from notation / facsimile control bars due to lack of space.
+- Restrict ALT + arrow key bindings for shifting visual offset to notation panel
+- Include Verovio version 6.0.1
 
 ### 1.2.10 patch
-* Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
-* Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)
-* Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
-* Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF 
-* Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201) 
-* Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
-* Include Verovio version 5.7.0
-* Support for altering @ho/@vo with ALT + arrow keys
-* Massively reduce editor changes when editing with annotation panel visible
+
+- Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
+- Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)
+- Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
+- Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF
+- Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201)
+- Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
+- Include Verovio version 5.7.0
+- Support for altering @ho/@vo with ALT + arrow keys
+- Massively reduce editor changes when editing with annotation panel visible
 
 ### 1.2.9 patch
-* Fix auto indentation when adding a zone to facsimile
-* Insertion of application info improved (without adding xml:id to meiHead)
-* In facsimile zone rectangles, show zone@label, element@n, or nothing [#167](https://github.com/mei-friend/mei-friend/issues/167)
-* Update Verovio version 5.6.0
+
+- Fix auto indentation when adding a zone to facsimile
+- Insertion of application info improved (without adding xml:id to meiHead)
+- In facsimile zone rectangles, show zone@label, element@n, or nothing [#167](https://github.com/mei-friend/mei-friend/issues/167)
+- Update Verovio version 5.6.0
 
 ### 1.2.8 patch
-* Fix new GitHub API incompatibility bug with subdirectories [#166](https://github.com/mei-friend/mei-friend/issues/166)
-* Update Verovio version 5.5.0
+
+- Fix new GitHub API incompatibility bug with subdirectories [#166](https://github.com/mei-friend/mei-friend/issues/166)
+- Update Verovio version 5.5.0
 
 ### 1.2.7 patch
-* Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
-* Include MEI header when adding xml:ids to the document (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
-* Make markup coloring more general (in part addresses [#159](https://github.com/mei-friend/mei-friend/issues/159))
-* Update Verovio versions until 5.4.0
+
+- Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
+- Include MEI header when adding xml:ids to the document (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
+- Make markup coloring more general (in part addresses [#159](https://github.com/mei-friend/mei-friend/issues/159))
+- Update Verovio versions until 5.4.0
 
 ### 1.2.6 patch
-* Initial implementation of Annote integration for ranged annotations ([#149](https://github.com/mei-friend/mei-friend/issues/149))
-* Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
-* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks [@aaaaalbert](https://github.com/aaaaalbert) for [#150](https://github.com/mei-friend/mei-friend/issues/150), [#151](https://github.com/mei-friend/mei-friend/issues/151), [#152](https://github.com/mei-friend/mei-friend/issues/152), [#153](https://github.com/mei-friend/mei-friend/issues/153))
-* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to [@annplaksin](https://github.com/annplaksin) for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)), 
+
+- Initial implementation of Annote integration for ranged annotations ([#149](https://github.com/mei-friend/mei-friend/issues/149))
+- Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
+- Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks [@aaaaalbert](https://github.com/aaaaalbert) for [#150](https://github.com/mei-friend/mei-friend/issues/150), [#151](https://github.com/mei-friend/mei-friend/issues/151), [#152](https://github.com/mei-friend/mei-friend/issues/152), [#153](https://github.com/mei-friend/mei-friend/issues/153))
+- Support for import of CMME files (Computerized Mensural Music Editing, thanks to [@annplaksin](https://github.com/annplaksin) for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)),
   with dedicated warning when using Verovio before version 5.3.1
-* Do not add applicationInfo to files with MEI Basic schema ([#156](https://github.com/mei-friend/mei-friend/issues/156))
-* Fix bug with mensural files (without measure elements) that prevented page turning
+- Do not add applicationInfo to files with MEI Basic schema ([#156](https://github.com/mei-friend/mei-friend/issues/156))
+- Fix bug with mensural files (without measure elements) that prevented page turning
 
 ### 1.2.5 patch (released 7 May 2025)
-* Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
-* Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
-* Change error icon to alert-fill octicon ([#147](https://github.com/mei-friend/mei-friend/issues/147) thanks [@ahankinson](https://github.com/ahankinson))
+
+- Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
+- Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
+- Change error icon to alert-fill octicon ([#147](https://github.com/mei-friend/mei-friend/issues/147) thanks [@ahankinson](https://github.com/ahankinson))
 
 ### 1.2.4 patch
-* Add meter conformance checker ([#142](https://github.com/mei-friend/mei-friend/issues/142)) that inspects the duration of each staff within a measure relative to the current time signature
-  * Known shortcomings: 
-      - missing support for markup elements `choice`, `subst`
-      - `meterSigGrp` not handled (`func="mixed,alternating"`)
-* Improve handling of remote changes to Git-managed files
+
+- Add meter conformance checker ([#142](https://github.com/mei-friend/mei-friend/issues/142)) that inspects the duration of each staff within a measure relative to the current time signature
+  - Known shortcomings:
+    - missing support for markup elements `choice`, `subst`
+    - `meterSigGrp` not handled (`func="mixed,alternating"`)
+- Improve handling of remote changes to Git-managed files
 
 ### 1.2.3 patch
-* Add latest Vervio release 5.1.0
-* Better accommodate Solid Pods hosted on providers running Community Solid Server
+
+- Add latest Vervio release 5.1.0
+- Better accommodate Solid Pods hosted on providers running Community Solid Server
 
 ### 1.2.2 patch
-* Avoid multiple search dialogs and ensure focus on search dialog (thx [@maxrothman](https://github.com/maxrothman) for spotting the bug)
-* Reload expansion options on toggle of MIDI playback control bar (thx [@maxrothman](https://github.com/maxrothman) for the suggestion)
-* Fix undo behavior after using surrounding with tag function (thx [@maxrothman](https://github.com/maxrothman), fixes [#135](https://github.com/mei-friend/mei-friend/issues/135))
-* Add latest releases of Verovio (4.5.1, 4.5.0)
+
+- Avoid multiple search dialogs and ensure focus on search dialog (thx [@maxrothman](https://github.com/maxrothman) for spotting the bug)
+- Reload expansion options on toggle of MIDI playback control bar (thx [@maxrothman](https://github.com/maxrothman) for the suggestion)
+- Fix undo behavior after using surrounding with tag function (thx [@maxrothman](https://github.com/maxrothman), fixes [#135](https://github.com/mei-friend/mei-friend/issues/135))
+- Add latest releases of Verovio (4.5.1, 4.5.0)
 
 ### 1.2.1 patch
-* Improve key bindings mechanism and scope 
-* Fix switch focus and lookup guidelines key bindings in editor (and others)
-* Fix broken tests for facsimile and MIDI playback
-* Ensure focus of search field in persistent search
+
+- Improve key bindings mechanism and scope
+- Fix switch focus and lookup guidelines key bindings in editor (and others)
+- Fix broken tests for facsimile and MIDI playback
+- Ensure focus of search field in persistent search
 
 ## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
-- Release of major new functionalities: 
 
+- Release of major new functionalities:
   - expansion of mei-friend's facilities for editorial mark-up through a re-worked annotation panel (now renamed to enrichment panel). Thanks to [@annplaksin](https://github.com/annplaksin)!
   - redevelopment of git integration for more stable and sustainable collaborative editing.
+
 - Changes to splash screen text – extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions: commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4) (english text) and commit [`ac94ef1`](https://github.com/mei-friend/mei-friend/commit/ac94ef1309bcd728f6c107027b20cb857744bcf8) (translations):
 
 > For technical reasons, certain interactions with GitHub (cloning a repository to your browser when first opening an encoding, or committing changes to a repository) require data to be transmitted to a proxy server hosted by the mdw – University of Music and Performing Arts Vienna. This server acts as an intermediary between your browser and GitHub, and does not store any data transmitted through it.
@@ -165,10 +199,11 @@
 - Implement branching-on-conflict and automatic pull requests to improve safe collaborative editing
 - Prepare for future implementation of non-GitHub cloud providers
 
-### 1.0.16 Patch 
-* Fix infinite loop when having an incomplete choice element ([#109](https://github.com/mei-friend/mei-friend/issues/109), thx [@maxrothman](https://github.com/maxrothman))
-* Implement persistent search bar behavior (#110, thx [@maxrothman](https://github.com/maxrothman)) with checkbox to toggle
-* Update Verovio release version list
+### 1.0.16 Patch
+
+- Fix infinite loop when having an incomplete choice element ([#109](https://github.com/mei-friend/mei-friend/issues/109), thx [@maxrothman](https://github.com/maxrothman))
+- Implement persistent search bar behavior (#110, thx [@maxrothman](https://github.com/maxrothman)) with checkbox to toggle
+- Update Verovio release version list
 
 ### 1.0.15 Patch
 

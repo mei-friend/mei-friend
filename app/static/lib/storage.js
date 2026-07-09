@@ -39,6 +39,12 @@ export default class Storage {
       this._fileLocation = this.storage.getItem('meiFileLocation');
       this._fileLocationType = this.storage.getItem('fileLocationType');
       this._github = JSON.parse(this.storage.getItem('github'));
+      if (this._github && 'githubToken' in this._github) {
+        // migration: scrub OAuth tokens persisted by earlier versions --
+        // the token is now kept server-side only and never stored in the browser
+        delete this._github.githubToken;
+        this.safelySetStorageItem('github', this._github);
+      }
       this._fileChanged = this.storage.getItem('fileChanged');
       this._isMEI = this.storage.getItem('isMEI');
       this._orientation = this.storage.getItem('orientation');

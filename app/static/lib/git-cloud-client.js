@@ -9,20 +9,22 @@ export default class GitCloudClient {
     this.token = conf.token;
     this.provider = conf.provider; // e.g. 'github'
     this.providerType = conf.providerType; // e.g. 'github'
-    if (!(this.token && this.provider && this.providerType)) {
+    this.githubDispatchGraceMs = 1000;
+    this.MAX_RUN_FETCH_ATTEMPTS = 10;
+    // For GitHub, no token is held in the browser: authenticated requests are
+    // routed through the server-side /proxy, which attaches the OAuth token
+    // from the user's session (see githubFetch()).
+    if (!(this.provider && this.providerType) || (this.providerType !== 'github' && !this.token)) {
       throw new Error('Missing required configuration');
     }
     // Provider-specific configuration
     switch (this.providerType) {
       case 'github':
         this.apiHeaders = {
-          Authorization: `token ${conf.token}`,
           Accept: 'application/vnd.github.v3+json',
         };
         this.actionsHeaders = new Headers({
           // FIXME needs to be adjusted for other providers
-          // Particularly, note the current explicit GitHub assumption in userLogin (passed from flask)
-          Authorization: 'Basic ' + btoa(userLogin + ':' + this.token),
           Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
         });
@@ -56,11 +58,49 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
+    this.githubRequestQueue = Promise.resolve();
+    this.githubLastRequestTime = 0;
+    this.githubMinIntervalMs = 150; // ~6-7 requests/second, serialized -- well within GitHub's 5000/hr and respects the "no concurrent requests" secondary-rate-limit rule
+  }
+
+  isGithubApiUrl(url) {
+    return this.providerType === 'github' && typeof url === 'string' && url.startsWith('https://api.github.com/');
+  }
+
+  githubFetch(url, options) {
+    if (!this.isGithubApiUrl(url)) return fetch(url, options);
+    // route GitHub API calls through the server-side proxy, which authenticates
+    // them from the session -- the OAuth token never reaches the browser
+    const proxiedUrl = '/proxy/' + url.replace(/^https:\/\//, '');
+    const run = async () => {
+      const now = Date.now();
+      const waitMs = Math.max(0, this.githubMinIntervalMs - (now - this.githubLastRequestTime));
+      if (waitMs) {
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+      this.githubLastRequestTime = Date.now();
+      let res = await fetch(proxiedUrl, options);
+      // Retry on rate limiting only: a 429 means the request was rejected
+      // before execution, so retrying is safe for any method. All other
+      // statuses pass through unchanged, as several callers inspect them.
+      for (let attempt = 0; res.status === 429 && attempt < 2; attempt++) {
+        const retryAfter = parseInt(res.headers.get('Retry-After'), 10);
+        const retryWaitMs = Number.isNaN(retryAfter) ? 1000 * (attempt + 1) : retryAfter * 1000;
+        console.warn('githubFetch: rate limited (429), retrying in ' + retryWaitMs + ' ms: ' + url);
+        await new Promise((resolve) => setTimeout(resolve, retryWaitMs));
+        this.githubLastRequestTime = Date.now();
+        res = await fetch(proxiedUrl, options);
+      }
+      return res;
+    };
+    const queued = this.githubRequestQueue.then(run, run);
+    this.githubRequestQueue = queued.catch(() => {});
+    return queued;
   }
 
   async getOrgs() {
     // fetch all organizations the user belongs to from the cloud provider
-    return fetch(this.orgsUrl, {
+    return this.githubFetch(this.orgsUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -84,7 +124,7 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
-    return fetch(reposUrl, {
+    return this.githubFetch(reposUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -92,7 +132,7 @@ export default class GitCloudClient {
 
   async getRepos(per_page = 30, page = 1) {
     const reposUrl = `https://api.github.com/user/repos?per_page=${per_page}&page=${page}`;
-    return fetch(reposUrl, {
+    return this.githubFetch(reposUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -100,7 +140,7 @@ export default class GitCloudClient {
 
   async getRepoSize(repo) {
     const sizeUrl = `https://api.github.com/repos/${repo}`;
-    let size = await fetch(sizeUrl, {
+    let size = await this.githubFetch(sizeUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -110,7 +150,7 @@ export default class GitCloudClient {
   async getBranches(per_page = 30, page = 1, repo = this.repo) {
     // fetch all branches of the current repository from the cloud provider
     const branchesUrl = `https://api.github.com/repos/${repo}/branches?per_page=${per_page}&page=${page}`;
-    return fetch(branchesUrl, {
+    return this.githubFetch(branchesUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
@@ -126,10 +166,14 @@ export default class GitCloudClient {
     // this is a hack to get around the GitHub API caching (URL is unique every time)
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`, {
-          method: 'GET',
-          headers: this.apiHeaders,
-        }).then((res) => res.json());
+        return this.githubFetch(
+          `https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`,
+          {
+            method: 'GET',
+            headers: this.apiHeaders,
+            cache: 'no-store',
+          }
+        ).then((res) => res.json());
       case 'gitlab':
         return fetch(`https://gitlab.com/api/v4/projects/${repo}/repository/commits?ref_name=${branch}`, {
           method: 'GET',
@@ -166,7 +210,7 @@ export default class GitCloudClient {
     switch (this.providerType) {
       case 'github':
         // remove trailng slash from path
-        return fetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
+        return this.githubFetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());
@@ -203,7 +247,7 @@ export default class GitCloudClient {
     switch (this.providerType) {
       case 'github':
         // fetch the user's name and email from the GitHub API
-        return fetch('https://api.github.com/user', {
+        return this.githubFetch('https://api.github.com/user', {
           method: 'GET',
           headers: this.apiHeaders,
         })
@@ -239,6 +283,12 @@ export default class GitCloudClient {
   }
 
   setAuthor(user) {
+    if (!user || !user.login) {
+      // error response (e.g. rate-limited or unauthenticated) -- caching it
+      // would poison every subsequent author-dependent request with
+      // 'undefined', so fail loudly and leave the cache empty for a retry
+      throw new Error('Could not determine author from user profile response: ' + JSON.stringify(user));
+    }
     let author = {};
     // set the author object to the provided object
     author.name = user.name || user.login;
@@ -315,7 +365,7 @@ export default class GitCloudClient {
     let body = 'This PR was automatically created using mei-friend';
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${this.gm.repo}/pulls`, {
+        return this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/pulls`, {
           method: 'POST',
           headers: this.apiHeaders,
           body: JSON.stringify({
@@ -380,7 +430,7 @@ export default class GitCloudClient {
       const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
       console.log('fetchFileContents: attempting to use fileContentsUrl ', fileContentsUrl);
       console.log('Using headers ', headers);
-      return await fetch(fileContentsUrl, {
+      return await this.githubFetch(fileContentsUrl, {
         method: 'GET',
         headers: headers,
       });
@@ -392,6 +442,49 @@ export default class GitCloudClient {
   async replaceContentType(fileContentsUrl, result) {
     // TODO make this work for other git providers
     return result.replace('application/vnd.github.raw', uriSuffixToMimetype(fileContentsUrl));
+  }
+
+  async ensureBranchSyncedOnFork(upstreamRepo, branch) {
+    // Pre-existing forks may lack branches created upstream after forking
+    // (e.g. after a default-branch rename), or have them but trail upstream
+    // (e.g. missing a file added there after forking). Since forks share the
+    // parent's object network, a missing branch can be created directly on
+    // the fork as a ref pointing at the upstream branch head, without
+    // cloning; an existing branch can be synced via merge-upstream.
+    if (this.providerType !== 'github') return;
+    const forkBranchUrl = `https://api.github.com/repos/${this.gm.repo}/branches/${branch}`;
+    const forkBranch = await this.githubFetch(forkBranchUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    });
+    if (forkBranch.status < 400) {
+      // branch already exists on fork: sync it with upstream. Tolerate
+      // failure (e.g. 409 on divergent histories) -- the user's own fork
+      // commits take precedence, so proceed with the fork as-is.
+      const mergeRes = await this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/merge-upstream`, {
+        method: 'POST',
+        headers: this.apiHeaders,
+        body: JSON.stringify({ branch: branch }),
+      });
+      if (mergeRes.status >= 400) {
+        console.warn("Couldn't sync fork branch " + branch + ' with upstream: ', mergeRes.status, mergeRes.statusText);
+      }
+      return;
+    }
+    const upstreamBranch = await this.githubFetch(`https://api.github.com/repos/${upstreamRepo}/branches/${branch}`, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+      return res.json();
+    });
+    await this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/git/refs`, {
+      method: 'POST',
+      headers: this.apiHeaders,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: upstreamBranch.commit.sha }),
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+    });
   }
 
   async fork(callback, forkTo = this.userLogin) {
@@ -412,7 +505,7 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
-    await fetch(forksUrl, {
+    await this.githubFetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     })
@@ -438,7 +531,7 @@ export default class GitCloudClient {
               organization: forkTo,
             });
           }
-          await fetch(forksUrl, fetchRequestObject).then((res) => {
+          await this.githubFetch(forksUrl, fetchRequestObject).then((res) => {
             if (res.status <= 400) {
               res.json().then((userFork) => {
                 // switch to newly created fork
@@ -503,18 +596,59 @@ export default class GitCloudClient {
           'inputs' in asJson.on.workflow_dispatch &&
           asJson.on.workflow_dispatch.inputs
         ) {
-          return asJson.on.workflow_dispatch.inputs;
+          let showWorkPackageUI = false;
+          if ('env' in asJson && 'mei-friend' in asJson.env && asJson.env['mei-friend'] === true) {
+            showWorkPackageUI = true;
+          }
+          return {
+            inputs: asJson.on.workflow_dispatch.inputs,
+            showWorkPackageUI,
+          };
         } else return null;
       });
   }
 
   // obtain details for a specified workflow run
   async getWorkflowRun(runUrl) {
-    return fetch(runUrl, {
+    return this.githubFetch(runUrl, {
       method: 'GET',
       headers: this.actionsHeaders,
     }).then((res) => res.json());
   } // getWorkflowRun()
+
+  async getWorkflowJobs(runId) {
+    const jobsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/runs/${runId}/jobs`;
+    return this.githubFetch(jobsUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+      cache: 'no-store',
+    }).then((res) => res.json());
+  } // getWorkflowJobs()
+
+  async getWorkflowJobLogs(jobId) {
+    const logsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/jobs/${jobId}/logs`;
+    return this.githubFetch(logsUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+      cache: 'no-store',
+    }).then(async (res) => {
+      const contentType = res.headers?.get('content-type') || '';
+      // if (contentType.includes('zip') || contentType.includes('octet-stream')) // apparently the octet-stream causes logs to not show up
+      if (contentType.includes('zip')) {
+        return { type: 'binary', text: null };
+      }
+      const text = await res.text();
+      return { type: 'text', text };
+    });
+  } // getWorkflowJobLogs()
+
+  async cancelWorkflowRun(runId) {
+    const cancelUrl = `https://api.github.com/repos/${this.gm.repo}/actions/runs/${runId}/cancel`;
+    return this.githubFetch(cancelUrl, {
+      method: 'POST',
+      headers: this.actionsHeaders,
+    }).then((res) => res);
+  } // cancelWorkflowRun()
 
   async getActionWorkflowsList(per_page = 30, page = 1) {
     // TODO make this work for other git providers
@@ -523,7 +657,7 @@ export default class GitCloudClient {
       return;
     }
     const actionsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
-    return fetch(actionsUrl, {
+    return this.githubFetch(actionsUrl, {
       method: 'GET',
       headers: this.actionsHeaders,
     })
@@ -548,32 +682,130 @@ export default class GitCloudClient {
 
   async requestActionWorkflowRun(workflowId, inputs = {}) {
     const dispatchUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/dispatches`;
-    return fetch(dispatchUrl, {
+    return this.githubFetch(dispatchUrl, {
       method: 'POST',
       headers: this.actionsHeaders,
       body: JSON.stringify({
         ref: this.gm.branch,
         inputs: inputs,
       }),
-    }).then((res) => {
+    }).then(async (res) => {
       // return body as JSON object, but retain response status (for error detection)
       console.log('::::::', res);
+      let dispatchTime = res.headers?.get('Date');
+      if (!dispatchTime || Number.isNaN(new Date(dispatchTime).getTime())) {
+        // e.g. duplicated Date headers get joined by the browser and parse as
+        // Invalid Date; fall back to the local clock rather than poisoning
+        // the run-matching comparisons downstream
+        dispatchTime = new Date().toISOString();
+      }
       if (res.status === 204) {
         // no body on github 204 responses
-        return res;
-      } else {
-        res.json().then((data) => {
-          return { status: res.status, body: data };
-        });
+        return { status: res.status, dispatchTime };
       }
+      let data;
+      try {
+        data = await res.json();
+      } catch (err) {
+        data = null;
+      }
+      return { status: res.status, body: data, dispatchTime };
     });
   }
 
-  async awaitActionWorkflowCompletion(workflowId, runStartAt = null) {
+  async awaitActionWorkflowStart(workflowId, dispatchTime) {
+    if (!this.providerType === 'github') {
+      console.warn('awaitActionWorkflowStart() only works for GitHub');
+      return;
+    }
+    const runsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/runs`;
+    const author = await this.getAuthor();
+    const head_sha = await this.gm.getLocalHeadSha();
+    // Fetch the current runs.
+    // If any run exists with the current head_sha, branch and user, and was created after the dispatchTime, we assume the earliest one was the one created by our dispatch, and return it.
+    // If not, we wait for a short delay and try again, until we find it (or encounter an error).
+    let numTries = 0;
+    let currentRuns = [];
+    while (currentRuns.length === 0 && numTries < this.MAX_RUN_FETCH_ATTEMPTS) {
+      if (numTries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      let runs = await this.githubFetch(
+        runsUrl +
+          '?' +
+          new URLSearchParams({
+            actor: author.username,
+            branch: this.gm.branch,
+            head_sha,
+          }),
+        {
+          method: 'GET',
+          headers: this.actionsHeaders,
+          cache: 'no-store',
+        }
+      );
+      let resJson = await runs.json();
+      if ('workflow_runs' in resJson) {
+        currentRuns = resJson.workflow_runs.filter((w) => {
+          if (w.event === 'workflow_dispatch' && dispatchTime) {
+            // convert dispatchTime to timestamp, stripping ms:
+            const dispatchTimestamp = new Date(
+              new Date(dispatchTime).getTime() - (new Date(dispatchTime).getTime() % 1000)
+            );
+            const dispatchTimeMs = dispatchTimestamp.getTime();
+            if (Number.isNaN(dispatchTimeMs)) {
+              // unusable dispatch time: rely on the actor/branch/head_sha
+              // query filters rather than rejecting every candidate run
+              return true;
+            }
+            const runTimestamp = new Date(w.run_started_at);
+            const runTimeMs = runTimestamp.getTime();
+            const runTimePlusGrace = runTimeMs + this.githubDispatchGraceMs;
+
+            let decision = runTimePlusGrace >= dispatchTimeMs;
+            console.log(
+              'Decision: runTimeMs + grace >= dispatchTimeMs? ',
+              runTimePlusGrace,
+              ' >= ',
+              dispatchTimeMs,
+              ' decision: ',
+              decision
+            );
+            return decision;
+          }
+          return false;
+        });
+      }
+      numTries++;
+    }
+    if (currentRuns.length) {
+      console.log('Found candidate runs created after dispatch: ', currentRuns, 'dispatchTime: ', dispatchTime);
+      return currentRuns.sort((a, b) => new Date(a.run_started_at).getTime() - new Date(b.run_started_at).getTime())[0];
+    } else {
+      console.warn('Failed to find workflow run after dispatch after ' + this.MAX_RUN_FETCH_ATTEMPTS + ' tries');
+      return false;
+    }
+  }
+
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null, dispatchTime = null, runUrl = null) {
     // TODO make this work for other git providers
     if (!this.providerType === 'github') {
       console.warn('awaitActionWorkflowCompletion() only works for GitHub');
       return;
+    }
+    if (runUrl) {
+      return this.githubFetch(runUrl, {
+        method: 'GET',
+        headers: this.actionsHeaders,
+        cache: 'no-store',
+      })
+        .then((res) => res.json())
+        .then((run) => {
+          if (run && 'status' in run && run.status === 'completed') {
+            return run;
+          }
+          return this.awaitActionWorkflowCompletion(workflowId, runStartAt, dispatchTime, runUrl);
+        });
     }
     // Wait until the created workflow has completed or failed
     // n.b.: unfortunately, because workflow dispatch is implemented as a Web Hook on the GitHub side,
@@ -585,7 +817,7 @@ export default class GitCloudClient {
     const author = await this.getAuthor();
     const head_sha = await this.gm.getLocalHeadSha();
     console.log('head_sha: ', head_sha);
-    return fetch(
+    return this.githubFetch(
       runsUrl +
         '?' +
         new URLSearchParams({
@@ -603,16 +835,27 @@ export default class GitCloudClient {
       .then((resJson) => {
         let run;
         if ('workflow_runs' in resJson) {
+          let runs = resJson.workflow_runs.filter((w) => w.event === 'workflow_dispatch');
+          if (dispatchTime) {
+            const dispatchMs = new Date(dispatchTime).getTime();
+            if (!Number.isNaN(dispatchMs)) {
+              const lowerBound = dispatchMs - this.githubDispatchGraceMs;
+              const filtered = runs.filter((w) => new Date(w.created_at).getTime() >= lowerBound);
+              if (filtered.length) {
+                runs = filtered;
+              }
+            }
+          }
           if (runStartAt) {
             // start time specified -- use it to find our run of interest
-            let runsAt = resJson.workflow_runs.filter((w) => w.run_started_at === runStartAt);
+            let runsAt = runs.filter((w) => w.run_started_at === runStartAt);
             if (runsAt.length) {
               run = runsAt[0];
               console.log('Got run with starttime specified, first entry of: ', runsAt);
             }
           } else {
             // no start time specified -- pick the most recent one
-            let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number);
+            let runsSorted = runs.sort((a, b) => b.run_number - a.run_number);
             console.log('Got run WITHOUT starttime specified, first entry of: ', runsSorted);
             if (runsSorted.length) {
               run = runsSorted[0];
@@ -622,10 +865,10 @@ export default class GitCloudClient {
             return run; // done
           } else if (run && 'status' in run) {
             // recur
-            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
+            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at, dispatchTime, null);
           } else {
             console.error('Received unexpected response to workflow runs request, retrying:', resJson);
-            return this.awaitActionWorkflowCompletion(workflowId);
+            return this.awaitActionWorkflowCompletion(workflowId, null, dispatchTime, null);
           }
         } else {
           console.error('Received unexpected response to workflow runs request:', resJson);

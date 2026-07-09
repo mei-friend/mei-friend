@@ -27,10 +27,10 @@ export const lang = {
       pliaj informoj.
     </p>
     <p>
-      Kvankam mei-friend estas retumila aplikaĵo, viaj personaj datumoj (inkluzive de la kodado, kiun vi redaktas, viaj aplikaĵaj agordoj, kaj aktualaj ensalutaj detaloj, se ekzistas) estas konservitaj en via retumilo <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokan stokadon</a> kaj ne estas konservitaj en niaj serviloj.
+      Kvankam mei-friend estas retumila aplikaĵo, viaj personaj datumoj (inkluzive de la kodado, kiun vi redaktas, kaj viaj aplikaĵaj agordoj) estas konservitaj en la <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">loka stokado</a> de via retumilo kaj ne estas konservitaj en niaj serviloj. Por protekti viajn GitHub-alirajn akreditaĵojn, via GitHub-ensaluta seanco (inkluzive de via alira ĵetono) estas konservata en la servilo de mei-friend anstataŭ en via retumilo; via retumilo tenas nur netravideblan seancan identigilon.
     </p>
     <p>
-      Datumoj estas transdonitaj al GitHub nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al GitHub, ŝarĝas vian kodadon de aŭ kontribuas al GitHub deponejo, aŭ kiam vi petas GitHub Ago-fluon por esti ruliĝita por vi). Simile, datumoj estas transdonitaj al via elektita Solid provizanto nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al Solid, aŭ ŝarĝas aŭ konservas standoff-notojn). Pro teknikaj kialoj, certaj interagoj kun GitHub (klonante deponejon al via retumilo kiam unue malfermas kodadon, aŭ kontribuante ŝanĝojn al deponejo) postulas datumojn esti transdonitaj al prokura servilo gastigita de mdw – Universitato de Muziko kaj Prezentartoj de Vieno. Ĉi tiu servilo agas kiel peranto inter via retumilo kaj GitHub, kaj ne konservas iujn ajn datumojn transdonitajn tra ĝi.
+      Datumoj estas transdonitaj al GitHub nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al GitHub, ŝarĝas vian kodadon de aŭ kontribuas al GitHub-deponejo, aŭ kiam vi petas, ke GitHub Action-fluo estu rulita por vi). Simile, datumoj estas transdonitaj al via elektita Solid-provizanto nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al Solid, aŭ ŝarĝas aŭ konservas standoff-notojn). Por sekurigi viajn alirajn akreditaĵojn, ĉiuj interagoj kun GitHub estas direktataj tra prokura servilo gastigita de mdw – Universitato de Muziko kaj Prezentartoj de Vieno, kiu aldonas viajn akreditaĵojn al tiuj petoj el via ensaluta seanco. Ĉi tiu servilo agas kiel peranto inter via retumilo kaj GitHub, kaj ne konservas la enhavon transdonitan tra ĝi; kiel ĉe iu ajn retservilo, pet-metadatumoj (kiel la nomoj de deponejoj kaj dosieroj, kiujn vi aliras) povas aperi en ĝiaj teknikaj protokoloj.
     </p>
     <p>
       Ni uzas <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -369,19 +369,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Peti GitHub ago-fluon:' },
-  githubActionsDescription: {
-    text: 'Alklaku "Ruli fluon" por peti de la GitHub API ruli la supran fluon por vi, uzante la enigan konfiguradon indikitaj sube. Via kodo estos reŝutita en ĝia plej lasta versio post la kompletigo de la fluo.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Ne povis ruli la fluon - GitHub diras' },
   githubActionStatusMsgWaiting: { text: 'Bonvolu esti pacienca dum GitHub pritraktas vian fluon...' },
-  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub diras' },
-  githubActionStatusMsgSuccess: { text: 'Fluo estas kompletigita - GitHub diras' },
+  githubActionStatusMsgFailure: { text: 'Ne povis ruli la fluon - GitHub-stato' },
+  githubActionsRunCompletedMsg: { text: 'Plenumado de laborfluo finita:' },
+  githubActionsRunFailedMsg: { text: 'Ne eblis fini plenumadon de laborfluo:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-stato' },
   githubActionsRunButton: { text: 'Ruli fluon' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Provizu laborkapsulan difinon' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Ĉi tiu GitHub Action postulas laborkapsulan difinon. Bonvolu provizi unu (URL de difino-JSON-objekto) en la mei-friend-agordoj.',
+  },
   githubActionsRunButtonReload: { text: 'Reŝargi MEI-dosieron' },
   githubActionsCancelButton: { text: 'Malfari' },
   githubActionsInputSetterFilepath: { text: 'Kopii nunan dosieran vojon al enigo' },
   githubActionsInputSetterSelection: { text: 'Kopii nunan MEI-elekton al enigo' },
-  githubActionsInputContainerHeader: { text: 'Eniga agordo' },
+  githubActionsNoSummaryProvided: {
+    text: 'Neniu resumo provizita. Bonvolu vidi la supre GitHub-statan ligilon por detaloj.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Sekvi la staton de la laborfluo en GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Malfermu kodigon el ĉi tiu deponejo por ruli GitHub Actions-laborfluojn.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Enmetu viajn lokajn ŝanĝojn por ruli GitHub Actions-laborfluojn.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'La specifita JSON-agorda dosiero ne konformas al la atendita skemo. Bonvolu konsulti la dokumentadon por detaloj.',
+  },
+  titleGithubActions: {
+    text: 'Uzi GitHub Actions',
+    description: 'Labori kun GitHub Actions kiam disponeblaj en deponejo',
+  },
+  enableGithubActions: {
+    text: 'Montri disponeblajn GitHub Actions',
+    description: 'Listigi disponeblajn GitHub Actions dum navigado en deponejo en GitHub-menuo',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Laborkapsula difino',
+    description: 'Uzi GitHub Actions laborkapsulan difinan dosieron',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Branĉi GitHub deponejon' },
@@ -1083,7 +1109,11 @@ export const lang = {
   commitFileNameText: { text: 'Dosiernomo' },
   forkRepository: { text: 'Forki deponejon' },
   forkError: { text: 'Pardonu, ne povis forki deponejon' },
+  forkBranchMissingError: {
+    text: 'Pardonu, via ekzistanta forko ne enhavas la petitan branĉon, kaj ĝi ne povis esti kreita tie. Bonvolu ĝisdatigi aŭ forigi vian forkon kaj reprovi. Branĉo',
+  },
   loadingFile: { text: 'Ŝargante dosieron' },
+  loadFileError: { text: 'Pardonu, ne eblis legi dosieron el la deponejo' },
   loadingFromGithub: { text: 'Ŝargante el GitHub' },
   logOut: { text: 'Elsaluti' },
   githubLogout: { text: 'Elsaluti' },

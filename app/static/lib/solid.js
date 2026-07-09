@@ -99,9 +99,10 @@ export async function postResource(containerUri, resource) {
  * but while the implementation of this in Solid is still under discussion,
  * we do this instead.
  */
-export async function safelyPatchResource(uri, patch) {
+export async function safelyPatchResource(uri, patch, attempt = 0) {
+  const maxRetries = 5;
   let etag;
-  solid
+  return solid
     .fetch(uri, {
       headers: {
         Accept: 'application/ld+json',
@@ -109,11 +110,18 @@ export async function safelyPatchResource(uri, patch) {
     })
     .then((resp) => {
       etag = resp.headers.get('ETag');
+      // Community Solid Server emits weak ETags (W/"..."), but its If-Match check strips exactly the
+      // surrounding quotes (slice(1, -1)); the weak prefix breaks that parse, so echoing it back always
+      // yields 412. Send the strong form instead. NSS ignores If-Match entirely (it only checks
+      // If-None-Match: *), so stripping is a no-op there - don't "simplify" this away.
+      if (etag && etag.startsWith('W/')) {
+        etag = etag.slice(2);
+      }
       return resp.json();
     })
     .then((freshlyFetched) => {
       const patched = jsonpatch.applyPatch(freshlyFetched, patch).newDocument;
-      solid
+      return solid
         .fetch(uri, {
           method: 'PUT',
           headers: {
@@ -123,18 +131,27 @@ export async function safelyPatchResource(uri, patch) {
           body: JSON.stringify(patched),
         })
         .then((putResp) => {
-          if (putResp.status === 412) {
-            console.info('Precondition failed: resource has changed while we were trying to patch it. Retrying...');
-            setTimeout(safelyPatchResource(uri, patch), politeness);
+          if (putResp.status === 412 || putResp.status === 429) {
+            if (attempt >= maxRetries) {
+              console.warn(`Giving up patching resource after ${maxRetries} retries (last status ${putResp.status}): `, uri);
+              return;
+            }
+            // exponential backoff gives the server time to recover (and any concurrent writer time to finish)
+            const backoff = politeness * Math.pow(2, attempt);
+            console.info(
+              `Patch precondition/rate-limit (status ${putResp.status}); retry ${attempt + 1}/${maxRetries} in ${backoff}ms: `,
+              uri
+            );
+            setTimeout(() => safelyPatchResource(uri, patch, attempt + 1), backoff);
           } else if (putResp.status >= 400) {
             console.warn("Couldn't PUT patched resource: ", putResp);
           } else {
             console.log('Patched successfully: ', uri);
           }
-        })
-        .catch((e) => {
-          console.warn('Failed to apply patch to resource: ', uri, patch, e);
         });
+    })
+    .catch((e) => {
+      console.warn('Failed to apply patch to resource: ', uri, patch, e);
     });
 }
 
@@ -238,7 +255,7 @@ export async function establishDiscoveryResource(currentFileUri) {
       [nsp.SCHEMA + 'description']: 'Collection of datasets about ' + currentFileUri,
       [nsp.SCHEMA + 'about']: { '@id': currentFileUri },
       [nsp.SCHEMA + 'dataset']: [],
-    });
+    }).then(() => discoveryUri); // return our canonical (%2F-encoded) URI, NOT Response.url (which is decoded)
   });
 }
 
@@ -257,18 +274,18 @@ export async function createMAOMusicalObject(selectedElements, label = '') {
     })
     .then(async (dataCatalogResource) => {
       return establishContainerResource(musicalObjectContainer).then(async () => {
-        return createMAOSelection(selectedElements, currentFileUri, dataCatalogResource.url, label).then(
+        return createMAOSelection(selectedElements, currentFileUri, dataCatalogResource, label).then(
           async (selectionResource) => {
-            return createMAOExtract(selectionResource, currentFileUri, dataCatalogResource.url, label).then(
+            return createMAOExtract(selectionResource, currentFileUri, dataCatalogResource, label).then(
               async (extractResource) => {
-                return createMAOMusicalMaterial(extractResource, currentFileUri, dataCatalogResource.url, label).then(
+                return createMAOMusicalMaterial(extractResource, currentFileUri, dataCatalogResource, label).then(
                   async (musMatResource) => {
                     let origin = new URL(storageResource).origin;
                     let musMatUri = origin + ensureRelativeURL(musMatResource.headers.get('Location'));
                     let extractUri = origin + ensureRelativeURL(extractResource.headers.get('Location'));
                     let selectionUri = origin + ensureRelativeURL(selectionResource.headers.get('Location'));
                     // patch the now-established discovery resource with our new MAO objects
-                    return safelyPatchResource(dataCatalogResource.url, [
+                    return safelyPatchResource(dataCatalogResource, [
                       {
                         op: 'add',
                         // escape ~ and / characters according to JSON POINTER spec

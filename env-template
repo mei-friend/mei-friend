@@ -1,7 +1,14 @@
 CLIENT_ID=""
 SECRET_ID=""
 FLASK_SECRET=""
+# set FLASK_ENV="development" for local http development
+# (otherwise the session cookie is marked Secure and requires https)
 FLASK_ENV=""
+# optional override for the server-side session file directory (shared between
+# gunicorn workers); defaults to instance/sessions in the repository, created
+# at startup with 0700 permissions. The app refuses to start if the directory
+# cannot be created.
+SESSION_DIR=""
 REDIRECT_URL=""
 STATIC_URL_PATH=""
 STATIC_FOLDER=""

@@ -27,10 +27,10 @@ export const lang = {
         meer informatie.
       </p>
       <p>
-        Hoewel mei-friend een browsergebaseerde applicatie is, worden uw persoonlijke gegevens (inclusief de codering die u bewerkt, uw applicatie-instellingen en huidige inloggegevens indien aanwezig) opgeslagen in de <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale opslag</a> van uw browser en niet op onze servers.
+        Hoewel mei-friend een browsergebaseerde applicatie is, worden uw persoonlijke gegevens (inclusief de codering die u bewerkt en uw applicatie-instellingen) opgeslagen in de <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale opslag</a> van uw browser en niet op onze servers. Om uw GitHub-toegangsgegevens te beschermen, wordt uw GitHub-loginsessie (inclusief uw toegangstoken) bewaard op de mei-friend-server in plaats van in uw browser; uw browser bevat slechts een ondoorzichtige sessie-identificatie.
       </p>
       <p>
-        Gegevens worden alleen naar GitHub verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij GitHub, uw codering laadt vanuit of commit naar een GitHub-repository, of wanneer u een GitHub Action workflow aanvraagt). Evenzo worden gegevens alleen naar uw gekozen Solid-provider verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij Solid, of stand-off annotaties laadt of opslaat). Om technische redenen vereisen bepaalde interacties met GitHub (zoals het klonen van een repository naar uw browser bij het eerste openen van een codering, of het committen van wijzigingen naar een repository) dat gegevens worden verzonden naar een proxyserver gehost door de mdw – Universiteit voor Muziek en Podiumkunsten Wenen. Deze server fungeert als tussenpersoon tussen uw browser en GitHub, en slaat geen gegevens op die erdoor worden verzonden.
+        Gegevens worden alleen naar GitHub verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij GitHub, uw codering laadt vanuit of commit naar een GitHub-repository, of wanneer u een GitHub Action workflow aanvraagt). Evenzo worden gegevens alleen naar uw gekozen Solid-provider verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij Solid, of stand-off annotaties laadt of opslaat). Om uw toegangsgegevens veilig te houden, worden alle interacties met GitHub geleid via een proxyserver gehost door de mdw – Universiteit voor Muziek en Podiumkunsten Wenen, die uw toegangsgegevens vanuit uw loginsessie aan deze verzoeken toevoegt. Deze server fungeert als tussenpersoon tussen uw browser en GitHub, en slaat de inhoud die erdoor wordt verzonden niet op; zoals bij elke webserver kunnen verzoekmetadata (zoals de namen van de repositories en bestanden die u opent) in de technische logbestanden verschijnen.
       </p>
       <p>
         We gebruiken <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -370,19 +370,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Vraag GitHub Action workflow aan:' },
-  githubActionsDescription: {
-    text: 'Klik op "Workflow uitvoeren" om de GitHub API te vragen de bovenstaande workflow voor u uit te voeren, met gebruik van de hieronder gespecificeerde invoerconfiguratie. Uw codering wordt opnieuw geladen in de nieuwste versie zodra de workflow is voltooid.',
-  },
-  githubActionStatusMsgPrompt: { text: 'Kon workflow niet uitvoeren - GitHub zegt' },
   githubActionStatusMsgWaiting: { text: 'Even geduld terwijl GitHub uw workflow verwerkt...' },
-  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub zegt' },
-  githubActionStatusMsgSuccess: { text: 'Workflow voltooid - GitHub zegt' },
+  githubActionStatusMsgFailure: { text: 'Kon workflow niet uitvoeren - GitHub-status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow voltooid:' },
+  githubActionsRunFailedMsg: { text: 'Workflow kon niet worden voltooid:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-status' },
   githubActionsRunButton: { text: 'Workflow uitvoeren' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Werkpakketdefinitie aanleveren' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Deze GitHub Action vereist een werkpakketdefinitie. Geef er een op (URL van een JSON-definitieobject) in de mei-friend-instellingen.',
+  },
   githubActionsRunButtonReload: { text: 'MEI-bestand opnieuw laden' },
   githubActionsCancelButton: { text: 'Annuleren' },
   githubActionsInputSetterFilepath: { text: 'Huidig bestandspad naar invoer kopiëren' },
   githubActionsInputSetterSelection: { text: 'Huidige MEI-selectie naar invoer kopiëren' },
-  githubActionsInputContainerHeader: { text: 'Invoerconfiguratie' },
+  githubActionsNoSummaryProvided: {
+    text: 'Geen samenvatting beschikbaar. Raadpleeg de GitHub-statuslink hierboven voor details.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Workflowstatus volgen op GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Open een codering uit deze repository om GitHub Actions-workflows uit te voeren.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Commit uw lokale wijzigingen om GitHub Actions-workflows uit te voeren.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Het opgegeven JSON-configuratiebestand voldoet niet aan het verwachte schema. Raadpleeg de documentatie voor details.',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions gebruiken',
+    description: 'Werken met GitHub Actions wanneer beschikbaar in een repository',
+  },
+  enableGithubActions: {
+    text: 'Beschikbare GitHub Actions tonen',
+    description: 'Beschikbare GitHub Actions weergeven bij navigeren binnen repository in GitHub-menu',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Werkpakketdefinitie',
+    description: 'Een GitHub Actions-werkpakketdefinitiebestand gebruiken',
+  },
 
   // Fork modals
   forkRepoGithubText: { text: 'Fork Github-repository' },
@@ -967,7 +993,11 @@ export const lang = {
   commitFileNameText: { text: 'Bestandsnaam' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, kon repository niet fork' },
+  forkBranchMissingError: {
+    text: 'Sorry, uw bestaande fork bevat de gevraagde tak niet, en deze kon daar niet worden aangemaakt. Werk uw fork bij of verwijder deze en probeer het opnieuw. Tak',
+  },
   loadingFile: { text: 'Bestand laden' },
+  loadFileError: { text: 'Sorry, kan bestand niet lezen uit repository' },
   loadingFromGithub: { text: 'Laden van Github' },
   logOut: { text: 'Uitloggen' },
   githubLogout: { text: 'Uitloggen' },

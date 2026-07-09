@@ -27,10 +27,10 @@ export const lang = {
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
     </p>
     <p>
-      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre persönlichen Daten (einschließlich der Kodierung, die Sie bearbeiten, Ihrer Anwendungseinstellungen und aktuellen Anmeldedaten, falls vorhanden) im <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher</a> Ihres Browsers und nicht auf unseren Servern gespeichert.
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre persönlichen Daten (einschließlich der Kodierung, die Sie bearbeiten, und Ihrer Anwendungseinstellungen) im <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher</a> Ihres Browsers und nicht auf unseren Servern gespeichert. Zum Schutz Ihrer GitHub-Zugangsdaten wird Ihre GitHub-Anmeldesitzung (einschließlich Ihres Zugriffstokens) auf dem mei-friend-Server und nicht in Ihrem Browser aufbewahrt; Ihr Browser speichert lediglich eine nicht interpretierbare Sitzungskennung.
     </p>
     <p>
-      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder in ein solches committen, oder wenn Sie einen GitHub Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren gewählten Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder Stand-off-Annotationen laden oder speichern). Aus technischen Gründen erfordern bestimmte Interaktionen mit GitHub (z.B. das Klonen eines Repositorys in Ihren Browser beim ersten Öffnen einer Kodierung oder das Committen von Änderungen in ein Repository), dass Daten an einen Proxy-Server der mdw – Universität für Musik und darstellende Kunst Wien übertragen werden. Dieser Server fungiert als Vermittler zwischen Ihrem Browser und GitHub und speichert keine durch ihn übertragenen Daten.
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder in ein solches committen, oder wenn Sie einen GitHub Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren gewählten Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder Stand-off-Annotationen laden oder speichern). Zum Schutz Ihrer Zugangsdaten werden sämtliche Interaktionen mit GitHub über einen Proxy-Server der mdw – Universität für Musik und darstellende Kunst Wien geleitet, der Ihre Zugangsdaten aus Ihrer Anmeldesitzung an diese Anfragen anfügt. Dieser Server fungiert als Vermittler zwischen Ihrem Browser und GitHub und speichert die durch ihn übertragenen Inhalte nicht; wie bei jedem Webserver können Anfrage-Metadaten (etwa die Namen der Repositories und Dateien, auf die Sie zugreifen) in seinen technischen Protokollen aufscheinen.
     </p>
     <p>
       Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
@@ -375,19 +375,45 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
-  githubActionsDescription: {
-    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
-  },
-  githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
-  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
-  githubActionStatusMsgSuccess: { text: 'Workflow-Lauf abgeschlossen - GitHub meldet' },
+  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub-Status' },
+  githubActionsRunCompletedMsg: { text: 'Workflow-Ausführung abgeschlossen:' },
+  githubActionsRunFailedMsg: { text: 'Workflow-Ausführung konnte nicht abgeschlossen werden:' },
+  githubActionsGitHubStatusLink: { text: 'GitHub-Status' },
   githubActionsRunButton: { text: 'Workflow ausführen' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Arbeitspaketdefinition bereitstellen' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: 'Diese GitHub Action erfordert eine Arbeitspaketdefinition. Bitte stellen Sie eine bereit (URL eines JSON-Definitionsobjekts) in den mei-friend-Einstellungen.',
+  },
   githubActionsRunButtonReload: { text: 'MEI-Datei neu laden' },
   githubActionsCancelButton: { text: 'Abbrechen' },
   githubActionsInputSetterFilepath: { text: 'Aktuellen Dateipfad in Eingabe kopieren' },
   githubActionsInputSetterSelection: { text: 'Aktuelle MEI-Auswahl in Eingabe kopieren' },
-  githubActionsInputContainerHeader: { text: 'Eingabekonfiguration' },
+  githubActionsNoSummaryProvided: {
+    text: 'Keine Zusammenfassung verfügbar. Weitere Informationen finden Sie beim dem GitHub-Status-Link.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Workflow-Status auf GitHub verfolgen' },
+  githubActionsDisabledTooltip: {
+    text: 'Öffnen Sie eine Kodierung aus diesem Repository, um GitHub-Actions-Workflows auszuführen.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Committen Sie Ihre lokalen Änderungen, um GitHub Actions-Workflows auszuführen.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: 'Die angegebene JSON-Konfigurationsdatei entspricht nicht dem erwarteten Schema. Bitte konsultieren Sie die Dokumentation für Details.',
+  },
+  titleGithubActions: {
+    text: 'GitHub Actions verwenden',
+    description: 'Mit GitHub Actions arbeiten, wenn in einem Repository verfügbar',
+  },
+  enableGithubActions: {
+    text: 'Verfügbare GitHub Actions anzeigen',
+    description: 'Verfügbare GitHub Actions auflisten beim Navigieren im Repository im GitHub-Menü',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Arbeitspaketdefinition',
+    description: 'Eine GitHub-Actions-Arbeitspaketdefinitionsdatei verwenden',
+  },
 
   // fork modals
   forkRepoGithubText: { text: 'Github Repositorium Forken' },
@@ -1113,7 +1139,11 @@ export const lang = {
   commitFileNameText: { text: 'Dateiname' },
   forkRepository: { text: 'Repo forken' },
   forkError: { text: 'Konnte Repo leider nicht forken' },
+  forkBranchMissingError: {
+    text: 'Leider enthält Ihr bestehender Fork den angeforderten Branch nicht, und er konnte dort nicht angelegt werden. Bitte aktualisieren oder löschen Sie Ihren Fork und versuchen Sie es erneut. Branch',
+  },
   loadingFile: { text: 'Lade Datei' },
+  loadFileError: { text: 'Die Datei konnte leider nicht aus dem Repository gelesen werden' },
   loadingFromGithub: { text: 'Lade von Github' },
   logOut: { text: 'Abmelden' },
   githubLogout: { text: 'Abmelden' },

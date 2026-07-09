@@ -670,17 +670,21 @@ export default class Viewer {
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
       if (id) {
-        if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-        let fl = document.getElementById('flipCheckbox');
-        if (
-          !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
-          ((fl && fl.checked) || forceFlip)
-        ) {
-          this.updatePage(cm, '', id, false);
-        } else {
-          // on current page
-          this.scrollSvgTo(cm);
-          this.updateHighlight(cm);
+        const xmlEl = this.xmlDoc?.querySelector('[*|id="' + id + '"]');
+        const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
+        if (!isHeaderElement) { // avoid attempting page flip to header elements
+          if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
+          let fl = document.getElementById('flipCheckbox');
+          if (
+            !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
+            ((fl && fl.checked) || forceFlip)
+          ) {
+            this.updatePage(cm, '', id, false);
+          } else {
+            // on current page
+            this.scrollSvgTo(cm);
+            this.updateHighlight(cm);
+          }
         }
 
         // check if id is inside a markup element, if panel visible
@@ -1846,6 +1850,12 @@ export default class Viewer {
               'renumberMeasuresUseSuffixAtMeasures'
             );
             break;
+          case 'supplyWorkpackageGithubActionsConfiguration':
+            console.log('Update to GitHub Actions configuration URL');
+            if (this.urlResolveTimeout) clearTimeout(this.urlResolveTimeout);
+            const workpackageParams = 'githubActionsWorkpackageConfigParams';
+            this.urlResolveTimeout = utils.checkAndRetrieveJson(ev.target);
+            break;
         }
         if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
@@ -1887,6 +1897,10 @@ export default class Viewer {
             break;
         }
       });
+    }
+    const customConfigInput = document.getElementById('supplyWorkpackageGithubActionsConfiguration');
+    if (customConfigInput && customConfigInput.value) {
+      utils.checkAndRetrieveJson(customConfigInput, 0);
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
@@ -2318,6 +2332,23 @@ export default class Viewer {
         input.setAttribute('value', o.title);
         input.setAttribute('title', o.description);
         break;
+      case 'string':
+        input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        if (opt === 'supplyWorkpackageGithubActionsConfiguration') {
+          input.classList.add('preventKeyBindings');
+        }
+        const normalizedStringValue =
+          optDefault === false || optDefault === 'false' || optDefault == null ? '' : optDefault;
+        input.setAttribute('value', normalizedStringValue);
+        input.setAttribute('placeholder', o.placeholder ? o.placeholder : '');
+        input.setAttribute('size', o.size ? o.size : '30');
+        if (opt === 'supplyWorkpackageGithubActionsConfiguration' && normalizedStringValue) {
+          utils.checkAndRetrieveJson(input, 0);
+        }
+        break;
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
@@ -2640,9 +2671,7 @@ export default class Viewer {
       const current = settingsSel?.value ?? barSel?.value ?? this.expansionId ?? '';
       if (!current) {
         const pickFrom = settingsSel || barSel;
-        const firstReal = pickFrom
-          ? Array.from(pickFrom.options).find((o) => o.value)
-          : null;
+        const firstReal = pickFrom ? Array.from(pickFrom.options).find((o) => o.value) : null;
         if (firstReal) {
           this.expansionId = firstReal.value;
           if (settingsSel) settingsSel.value = firstReal.value;

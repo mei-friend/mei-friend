@@ -26,11 +26,11 @@ export const lang = {
         Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
         més informació.
       </p>
-      <p> 
-        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent-hi la codificació que estàs editant, la configuració de l'aplicació i els detalls d'inici de sessió actuals, si n'hi ha) s'emmagatzemen en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">emmagatzematge local</a> del teu navegador i no s'emmagatzemen als nostres servidors. 
+      <p>
+        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent-hi la codificació que estàs editant i la configuració de l'aplicació) s'emmagatzemen en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">emmagatzematge local</a> del teu navegador i no s'emmagatzemen als nostres servidors. Per protegir les teves credencials d'accés a GitHub, la teva sessió d'inici de sessió de GitHub (incloent-hi el teu testimoni d'accés) es manté al servidor de mei-friend en lloc del teu navegador; el teu navegador només conserva un identificador de sessió opac.
       </p>
-      <p> 
-        Les dades es transmeten a GitHub només quan ho sol·licites explícitament (per exemple, quan inicies sessió a GitHub, carregues la teva codificació des d'un repositori de GitHub o hi confirmes canvis, o quan sol·licites que s'executi un flux de treball de GitHub Action per a tu). De la mateixa manera, les dades es transmeten al proveïdor de Solid que hagis triat només quan ho sol·licites explícitament (per exemple, quan inicies sessió a Solid, o carregues o deses anotacions desacoblades). Per raons tècniques, certes interaccions amb GitHub (clonar un repositori al teu navegador quan obres una codificació per primera vegada, o confirmar canvis en un repositori) requereixen que les dades es transmetin a un servidor intermediari allotjat per la mdw – Universitat de Música i Arts Escèniques de Viena. Aquest servidor actua com a intermediari entre el teu navegador i GitHub, i no emmagatzema cap dada transmesa a través seu. 
+      <p>
+        Les dades es transmeten a GitHub només quan ho sol·licites explícitament (per exemple, quan inicies sessió a GitHub, carregues la teva codificació des d'un repositori de GitHub o hi confirmes canvis, o quan sol·licites que s'executi un flux de treball de GitHub Action per a tu). De la mateixa manera, les dades es transmeten al proveïdor de Solid que hagis triat només quan ho sol·licites explícitament (per exemple, quan inicies sessió a Solid, o carregues o deses anotacions desacoblades). Per mantenir segures les teves credencials d'accés, totes les interaccions amb GitHub s'encaminen a través d'un servidor intermediari allotjat per la mdw – Universitat de Música i Arts Escèniques de Viena, que adjunta les teves credencials a aquestes sol·licituds a partir de la teva sessió d'inici de sessió. Aquest servidor actua com a intermediari entre el teu navegador i GitHub, i no emmagatzema el contingut transmès a través seu; com passa amb qualsevol servidor web, les metadades de les sol·licituds (com ara els noms dels repositoris i fitxers als quals accedeixes) poden aparèixer als seus registres tècnics.
       </p>
       <p>
         Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -380,21 +380,47 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Sol·licita el flux de treball de GitHub:' },
-  githubActionsDescription: {
-    text: "Feu clic a \"Executa el flux de treball\" per demanar a l'API de GitHub que executi el flux de treball anterior, utilitzant la configuració d'entrada especificada a continuació. El vostre codi es recarregarà a la seva darrera versió una vegada que s'hagi completat la execució del flux de treball.",
-  },
-  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
   githubActionStatusMsgWaiting: {
     text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...',
   },
-  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
-  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada: GitHub diu' },
+  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball - Estat de GitHub" },
+  githubActionsRunCompletedMsg: { text: 'Execució del flux de treball completada:' },
+  githubActionsRunFailedMsg: { text: "No s'ha pogut completar l'execució del flux de treball:" },
+  githubActionsGitHubStatusLink: { text: 'Estat de GitHub' },
   githubActionsRunButton: { text: 'Executa el flux de treball' },
+  githubActionsSupplyWorkpackageDefinition: { text: 'Proporciona la definició del paquet de treball' },
+  githubActionsRequiresWorkpackageDefinition: {
+    text: "Aquesta acció de GitHub requereix una definició de paquet de treball. Si us plau, proporcioneu-ne una (URL d'un objecte JSON de definició) a la configuració de mei-friend.",
+  },
   githubActionsRunButtonReload: { text: "Torna a carregar l'arxiu MEI" },
   githubActionsCancelButton: { text: 'Cancel·la' },
   githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
   githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
-  githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
+  githubActionsNoSummaryProvided: {
+    text: 'No s’ha proporcionat cap resum. Consulteu l’enllaç d’estat de GitHub anterior per a més detalls.',
+  },
+  githubActionsWaitingOpenLink: { text: 'Segueix l’estat del flux de treball a GitHub' },
+  githubActionsDisabledTooltip: {
+    text: 'Obriu una codificació d’aquest repositori per executar els fluxos de treball de GitHub Actions.',
+  },
+  githubActionsDisabledDirtyTooltip: {
+    text: 'Confirmeu els canvis locals per executar els fluxos de treball de GitHub Actions.',
+  },
+  githubActionsWorkpackageConfigInvalidResponse: {
+    text: "El fitxer de configuració JSON que heu especificat no s'ajusta a l'esquema esperat. Consulteu la documentació per obtenir més detalls.",
+  },
+  titleGithubActions: {
+    text: 'Usa GitHub Actions',
+    description: 'Treballar amb GitHub Actions quan estiguin disponibles en un repositori',
+  },
+  enableGithubActions: {
+    text: 'Mostra les GitHub Actions disponibles',
+    description: 'Llista les GitHub Actions disponibles en navegar pel repositori al menú de GitHub',
+  },
+  supplyWorkpackageGithubActionsConfiguration: {
+    text: 'Definició del paquet de treball',
+    description: 'Utilitza un fitxer de definició de paquet de treball de GitHub Actions',
+  },
 
   // fork modals // forquilles modals
   forkRepoGithubText: { text: 'Fer una forquilla del repositori de Github' },
@@ -1104,7 +1130,11 @@ export const lang = {
   commitFileNameText: { text: 'Nom del fitxer' },
   forkRepository: { text: 'Bifurcar el repositori' },
   forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
+  forkBranchMissingError: {
+    text: "Ho sentim, el teu fork existent no conté la branca sol·licitada i no s'hi ha pogut crear. Actualitza o elimina el teu fork i torna-ho a provar. Branca",
+  },
   loadingFile: { text: 'Carregant fitxer' },
+  loadFileError: { text: "Ho sentim, no s'ha pogut llegir el fitxer del repositori" },
   loadingFromGithub: { text: 'Carregant des de Github' },
   logOut: { text: 'Tancar sessió' },
   githubLogout: { text: 'Tancar sessió' },
