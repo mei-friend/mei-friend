@@ -8,6 +8,7 @@
 * Update splash screen privacy text (all languages) to reflect server-side credential handling
 * Force `Cache-Control: no-store` on all proxy responses and strip upstream caching headers: GitHub marks some API responses (e.g. the commit list) publicly cacheable, which — now that they flow same-origin through the proxy — could leave the Git Log stale for up to a minute after a commit and risk a shared cache serving one user's authenticated response to another
 * Fix spurious "The remote file has changed since your last commit" warnings when committing ([#185](https://github.com/mei-friend/mei-friend/issues/185)): the last-committed state is now correctly remembered across page reloads and the remote tracking state updated after each push. Also fix related start-up race conditions that could corrupt the in-browser repository clone, leave the commit spinner hanging indefinitely, or lose an edit made in the first moments after a page reload
+* Several other small GitHub fixes and improvements
 
 ### 1.4.1 patch 
 * Add selection for Verovio 6.2.1 instead of 6.2.0
