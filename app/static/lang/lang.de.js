@@ -1143,6 +1143,7 @@ export const lang = {
     text: 'Leider enthält Ihr bestehender Fork den angeforderten Branch nicht, und er konnte dort nicht angelegt werden. Bitte aktualisieren oder löschen Sie Ihren Fork und versuchen Sie es erneut. Branch',
   },
   loadingFile: { text: 'Lade Datei' },
+  loadFileError: { text: 'Die Datei konnte leider nicht aus dem Repository gelesen werden' },
   loadingFromGithub: { text: 'Lade von Github' },
   logOut: { text: 'Abmelden' },
   githubLogout: { text: 'Abmelden' },

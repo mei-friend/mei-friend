@@ -1135,6 +1135,7 @@ export const lang = {
     text: 'Przepraszamy, Twój istniejący fork nie zawiera żądanej gałęzi i nie udało się jej tam utworzyć. Zaktualizuj lub usuń swój fork i spróbuj ponownie. Gałąź',
   },
   loadingFile: { text: 'Wczytywanie pliku' },
+  loadFileError: { text: 'Przepraszamy, nie udało się odczytać pliku z repozytorium' },
   loadingFromGithub: { text: 'Wczytywanie z GitHub' },
   logOut: { text: 'Wyloguj się' },
   githubLogout: { text: 'Wyloguj się' },

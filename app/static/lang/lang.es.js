@@ -1133,6 +1133,7 @@ export const lang = {
     text: 'Lo sentimos, tu fork existente no contiene la rama solicitada y no se pudo crear allí. Por favor, actualiza o elimina tu fork y vuelve a intentarlo. Rama',
   },
   loadingFile: { text: 'Cargando archivo' },
+  loadFileError: { text: 'Lo siento, no se pudo leer el archivo del repositorio' },
   loadingFromGithub: { text: 'Cargando desde Github' },
   logOut: { text: 'Cerrar sesión' },
   githubLogout: { text: 'Cerrar sesión' },

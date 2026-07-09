@@ -992,6 +992,7 @@ export const lang = {
     text: 'Beklager, din eksisterende fork indeholder ikke den ønskede gren, og den kunne ikke oprettes der. Opdater eller slet venligst din fork og prøv igen. Gren',
   },
   loadingFile: { text: 'Indlæser fil' },
+  loadFileError: { text: 'Beklager, filen kunne ikke læses fra repositoriet' },
   loadingFromGithub: { text: 'Indlæser fra Github' },
   logOut: { text: 'Log ud' },
   githubLogout: { text: 'Log ud' },

@@ -957,6 +957,7 @@ export const lang = {
     text: '抱歉，您现有的 fork 不包含所请求的分支，且无法在其中创建该分支。请更新或删除您的 fork 后重试。分支',
   },
   loadingFile: { text: '正在加载文件' },
+  loadFileError: { text: '抱歉，无法从仓库读取文件' },
   loadingFromGithub: { text: '正在从 Github 加载' },
   logOut: { text: '登出' },
   githubLogout: { text: '登出' },

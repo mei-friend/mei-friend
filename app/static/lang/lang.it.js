@@ -1144,6 +1144,7 @@ export const lang = {
     text: 'Spiacenti, il tuo fork esistente non contiene il ramo richiesto e non è stato possibile crearlo lì. Aggiorna o elimina il tuo fork e riprova. Ramo',
   },
   loadingFile: { text: 'Caricamento file' },
+  loadFileError: { text: 'Spiacenti, non è stato possibile leggere il file dal repository' },
   loadingFromGithub: { text: 'Caricamento da Github' },
   logOut: { text: 'Esci' },
   githubLogout: { text: 'Esci' },

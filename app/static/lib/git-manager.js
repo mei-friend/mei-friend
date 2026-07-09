@@ -671,8 +671,8 @@ export default class GitManager {
     return await this.cloud.fork(callback, forkTo);
   }
 
-  async ensureBranchOnFork(upstreamRepo, branch = this.branch) {
-    return await this.cloud.ensureBranchOnFork(upstreamRepo, branch);
+  async ensureBranchSyncedOnFork(upstreamRepo, branch = this.branch) {
+    return await this.cloud.ensureBranchSyncedOnFork(upstreamRepo, branch);
   }
 
   async getAuthor() {
