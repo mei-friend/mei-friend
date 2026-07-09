@@ -122,6 +122,11 @@ export async function forkRepoClicked() {
     let githubRepo = `${inputName}/${inputRepo}`;
     gm.repo = githubRepo;
     Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) => l.classList.add('clockwise'));
+    // disable fork modal buttons while the fork is in flight
+    const forkModalButtons = ['forkAndOpenButton', 'forkAndOpenCancel', 'forkRepositoryButton', 'forkRepositoryCancel']
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    forkModalButtons.forEach((b) => (b.disabled = true));
     console.log('Forking repo: ', githubRepo, gm);
     await gm
       .fork(async () => {
@@ -141,9 +146,10 @@ export async function forkRepoClicked() {
           // once the clone is done; setting meiFileLocation to a repo name while
           // fileLocationType still says 'url' crashes facsimile redraws in between
           // a pre-existing fork may lack the requested branch (created upstream
-          // after forking); try to create it on the fork before cloning
+          // after forking) or trail behind it (e.g. missing a file added
+          // upstream later); create or sync the branch on the fork before cloning
           try {
-            await gm.ensureBranchOnFork(githubRepo, gm.branch);
+            await gm.ensureBranchSyncedOnFork(githubRepo, gm.branch);
           } catch (e) {
             console.warn("Couldn't create branch " + gm.branch + ' on fork ' + gm.repo + ': ', e);
             document.getElementById('GithubLogo').classList.remove('clockwise');
@@ -173,6 +179,7 @@ export async function forkRepoClicked() {
         Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) =>
           l.classList.remove('clockwise')
         );
+        forkModalButtons.forEach((b) => (b.disabled = false));
         document.getElementById('forkRepositoryInputRepoOverride').value = '';
         document.getElementById('forkRepositoryInputBranchOverride').value = '';
         document.getElementById('forkRepositoryInputFilepathOverride').value = '';
@@ -363,6 +370,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
       githubLoadingIndicator.classList.remove('clockwise');
+      v.showAlert(translator.lang.loadFileError.text + ': ' + gm.filepath);
     });
 } // loadFile()
 

@@ -4,12 +4,19 @@ import { forkRepoClicked } from './github-menu.js';
 
 const seperator = '|MEI-FRIEND|';
 
+function setForkButtonEnabled(enabled) {
+  // keep Cancel enabled so the user can always leave the modal
+  const forkButton = document.getElementById('forkRepositoryButton');
+  if (forkButton) forkButton.disabled = !enabled;
+}
+
 function onOrganizationInputChange(e) {
   if (e.target.value) {
     const userOrgRepos = document.getElementById('forkRepositoryInputRepo');
     userOrgRepos.innerHTML =
       '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
+    setForkButtonEnabled(false);
     let repos = fillInUserOrgRepos();
   }
 } // onOrganizationInputChange()
@@ -91,10 +98,12 @@ async function fillInUserOrgRepos(per_page = 100, page = 1) {
       } else {
         // finished!
         document.getElementById('forkRepoGithubLogo').classList.remove('clockwise');
+        setForkButtonEnabled(true);
       }
     } else {
       // give up!
       document.getElementById('forkRepoGithubLogo').classList.remove('clockwise');
+      setForkButtonEnabled(true);
       status.forEach((s) => (s.innerHTML = translator.lang.repoAccessError.text));
       if ('message' in repos) {
         status.forEach(
@@ -274,6 +283,7 @@ export async function forkRepository(gm) {
 
   if (organizationNameInput.value.length) {
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
+    setForkButtonEnabled(false);
     fillInUserOrgRepos(); // initialise with pre-supplied name
   }
 } // forkRepository()

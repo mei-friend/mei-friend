@@ -986,6 +986,7 @@ export const lang = {
     text: 'Izvinjavamo se, vaš postojeći fork ne sadrži traženu granu i nije je bilo moguće tamo kreirati. Molimo ažurirajte ili izbrišite svoj fork i pokušajte ponovo. Grana',
   },
   loadingFile: { text: 'Učitavanje fajla' },
+  loadFileError: { text: 'Izvinjavamo se, nije moguće pročitati fajl iz repozitorijuma' },
   loadingFromGithub: { text: 'Učitavanje sa GitHub-a' },
   logOut: { text: 'Odjavi se' },
   githubLogout: { text: 'Odjavi se' },

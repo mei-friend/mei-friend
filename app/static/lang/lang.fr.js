@@ -1143,6 +1143,7 @@ export const lang = {
     text: "Désolé, votre copie existante du répertoire ne contient pas la branche demandée, et celle-ci n'a pas pu y être créée. Veuillez mettre à jour ou supprimer votre copie et réessayer. Branche",
   },
   loadingFile: { text: 'Chargement du fichier' },
+  loadFileError: { text: 'Désolé, impossible de lire le fichier depuis le répertoire' },
   loadingFromGithub: { text: 'Chargement depuis Github' },
   logOut: { text: 'Déconnexion' },
   githubLogout: { text: 'Déconnexion de Github' },
