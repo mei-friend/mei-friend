@@ -1095,7 +1095,11 @@ export const lang = {
   commitFileNameText: { text: 'ファイル名' },
   forkRepository: { text: 'リポジトリをフォーク' },
   forkError: { text: '申し訳ありません、リポジトリをフォークできませんでした' },
+  forkBranchMissingError: {
+    text: '申し訳ありません、既存のフォークにはリクエストされたブランチが含まれておらず、そこに作成することもできませんでした。フォークを更新または削除して、もう一度お試しください。ブランチ',
+  },
   loadingFile: { text: 'ファイルを読み込み中' },
+  loadFileError: { text: '申し訳ありません、リポジトリからファイルを読み込めませんでした' },
   loadingFromGithub: { text: 'GitHubから読み込み中' },
   logOut: { text: 'ログアウト' },
   githubLogout: { text: 'ログアウト' },

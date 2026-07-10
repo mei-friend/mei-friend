@@ -1,7 +1,7 @@
 // mei-friend version and date
-export const version = '1.4.1';
-export const versionDate = '8 July 2026'; // use full or 3-character english months, will be translated
-export const splashDate = '8 July 2026'; // date of the splash screen content, same translation rules apply
+export const version = '1.5.0';
+export const versionDate = '9 July 2026'; // use full or 3-character english months, will be translated
+export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
 var spdWorker;
@@ -779,8 +779,10 @@ async function completeInitialLoad() {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (gm.repo && gm.branch && gm.filepath) {
+    if (gm.repo && gm.branch && gm.filepath && !urlFetchInProgress) {
       // preset github menu to where the user left off, if we can
+      // (skipped when a ?file= URL fetch is in flight: openUrlProcess() will
+      // clear gm's branch/filepath, so presetting would race against it)
       fillInBranchContents();
     }
   }
@@ -885,7 +887,22 @@ async function completeInitialLoad() {
     if (remoteFileChanged) {
       remoteFileChanged.innerHTML = '';
     }
-    gm.clone();
+    gm.clone()
+      .then(async () => {
+        // the clone checked out HEAD, but the restored editor content may carry
+        // uncommitted changes (loadDataInEditor blocks CM change events, so
+        // handleEditorChanges never writes the restored content to the worktree).
+        // Re-sync the worktree from the editor and derive changed/commit-UI state
+        // from real git status; if editor == HEAD this rightly clears a stale flag.
+        if (gm.filepath) {
+          const status = await gm.writeAndReturnStatus(cm.getValue());
+          setFileChangedState(await gm.fileChanged(gm.filepath, status));
+          setCommitUIEnabledStatus();
+        }
+      })
+      .catch((err) => {
+        console.warn("Couldn't clone repository on session restore: ", err);
+      });
   }
 } // completeInitialLoad()
 
@@ -2643,6 +2660,20 @@ export async function handleEditorChanges() {
   // fileChanged flag may have been set from storage
   let changeIndicator = true;
   let meiXml = cm.getValue();
+  if (storage.supported) {
+    // save editor content to storage BEFORE the git write below: writeAndReturnStatus()
+    // may block for seconds behind an in-flight clone (awaitClone), and a page reload
+    // during that wait must not lose this edit - storage.content is what a reload restores.
+    updateLocalStorage(meiXml);
+    if (!freshlyLoaded) {
+      // optimistically persist the changed flag alongside the content, so a reload
+      // during the git write also restores the "changed" state; the regular
+      // setFileChangedState() calls below correct it from actual git status.
+      // (Not calling setFileChangedState() here: it consults git status, which would
+      // block on the same in-flight clone.)
+      storage.fileChanged = 1;
+    }
+  }
   if (isLoggedIn && gm.filepath) {
     // if it's a git file, write to git
     console.log('Writing to git...');
@@ -2658,10 +2689,6 @@ export async function handleEditorChanges() {
     freshlyLoaded = false;
   } else {
     setFileChangedState(changeIndicator);
-  }
-  if (storage.supported) {
-    // on every set of changes, save editor content
-    updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readListItemsFromXML(true); // readAnnots(); from annotation.js

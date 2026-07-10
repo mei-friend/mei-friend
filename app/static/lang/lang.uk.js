@@ -1107,7 +1107,11 @@ export const lang = {
   commitFileNameText: { text: 'Назва файлу' },
   forkRepository: { text: 'Розгалужити сховище' },
   forkError: { text: 'На жаль, не вдалося розгалужити сховище' },
+  forkBranchMissingError: {
+    text: 'На жаль, ваш наявний форк не містить запитаної гілки, і її не вдалося там створити. Будь ласка, оновіть або видаліть свій форк і спробуйте ще раз. Гілка',
+  },
   loadingFile: { text: 'Завантаження файлу' },
+  loadFileError: { text: 'На жаль, не вдалося прочитати файл зі сховища' },
   loadingFromGithub: { text: 'Завантаження з GitHub' },
   logOut: { text: 'Вийти' },
   githubLogout: { text: 'Вийти' },

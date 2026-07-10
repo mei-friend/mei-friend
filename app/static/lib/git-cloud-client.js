@@ -444,6 +444,49 @@ export default class GitCloudClient {
     return result.replace('application/vnd.github.raw', uriSuffixToMimetype(fileContentsUrl));
   }
 
+  async ensureBranchSyncedOnFork(upstreamRepo, branch) {
+    // Pre-existing forks may lack branches created upstream after forking
+    // (e.g. after a default-branch rename), or have them but trail upstream
+    // (e.g. missing a file added there after forking). Since forks share the
+    // parent's object network, a missing branch can be created directly on
+    // the fork as a ref pointing at the upstream branch head, without
+    // cloning; an existing branch can be synced via merge-upstream.
+    if (this.providerType !== 'github') return;
+    const forkBranchUrl = `https://api.github.com/repos/${this.gm.repo}/branches/${branch}`;
+    const forkBranch = await this.githubFetch(forkBranchUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    });
+    if (forkBranch.status < 400) {
+      // branch already exists on fork: sync it with upstream. Tolerate
+      // failure (e.g. 409 on divergent histories) -- the user's own fork
+      // commits take precedence, so proceed with the fork as-is.
+      const mergeRes = await this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/merge-upstream`, {
+        method: 'POST',
+        headers: this.apiHeaders,
+        body: JSON.stringify({ branch: branch }),
+      });
+      if (mergeRes.status >= 400) {
+        console.warn("Couldn't sync fork branch " + branch + ' with upstream: ', mergeRes.status, mergeRes.statusText);
+      }
+      return;
+    }
+    const upstreamBranch = await this.githubFetch(`https://api.github.com/repos/${upstreamRepo}/branches/${branch}`, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+      return res.json();
+    });
+    await this.githubFetch(`https://api.github.com/repos/${this.gm.repo}/git/refs`, {
+      method: 'POST',
+      headers: this.apiHeaders,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: upstreamBranch.commit.sha }),
+    }).then((res) => {
+      if (res.status >= 400) throw res;
+    });
+  }
+
   async fork(callback, forkTo = this.userLogin) {
     let forksUrl;
     switch (this.providerType) {

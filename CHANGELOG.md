@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.5.0 develop
+
 ### 1.4.2 Improved security for GitHub login 
 * Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
 * Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
@@ -7,6 +9,8 @@
 * Set explicit session cookie flags (Secure, SameSite=Lax) and add a report-only Content-Security-Policy header as a first step towards an enforced CSP
 * Update splash screen privacy text (all languages) to reflect server-side credential handling
 * Force `Cache-Control: no-store` on all proxy responses and strip upstream caching headers: GitHub marks some API responses (e.g. the commit list) publicly cacheable, which — now that they flow same-origin through the proxy — could leave the Git Log stale for up to a minute after a commit and risk a shared cache serving one user's authenticated response to another
+* Fix spurious "The remote file has changed since your last commit" warnings when committing ([#185](https://github.com/mei-friend/mei-friend/issues/185)): the last-committed state is now correctly remembered across page reloads and the remote tracking state updated after each push. Also fix related start-up race conditions that could corrupt the in-browser repository clone, leave the commit spinner hanging indefinitely, or lose an edit made in the first moments after a page reload
+* Several other small GitHub fixes and improvements
 
 ### 1.4.1 patch 
 * Add selection for Verovio 6.2.1 instead of 6.2.0

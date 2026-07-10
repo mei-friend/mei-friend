@@ -122,6 +122,11 @@ export async function forkRepoClicked() {
     let githubRepo = `${inputName}/${inputRepo}`;
     gm.repo = githubRepo;
     Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) => l.classList.add('clockwise'));
+    // disable fork modal buttons while the fork is in flight
+    const forkModalButtons = ['forkAndOpenButton', 'forkAndOpenCancel', 'forkRepositoryButton', 'forkRepositoryCancel']
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    forkModalButtons.forEach((b) => (b.disabled = true));
     console.log('Forking repo: ', githubRepo, gm);
     await gm
       .fork(async () => {
@@ -137,17 +142,22 @@ export async function forkRepoClicked() {
           const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
           const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
           gm.filepath = _filepath;
-          setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+          // n.b. no setMeiFileInfo() here: loadFile() calls it with the same values
+          // once the clone is done; setting meiFileLocation to a repo name while
+          // fileLocationType still says 'url' crashes facsimile redraws in between
+          // a pre-existing fork may lack the requested branch (created upstream
+          // after forking) or trail behind it (e.g. missing a file added
+          // upstream later); create or sync the branch on the fork before cloning
+          try {
+            await gm.ensureBranchSyncedOnFork(githubRepo, gm.branch);
+          } catch (e) {
+            console.warn("Couldn't create branch " + gm.branch + ' on fork ' + gm.repo + ': ', e);
+            document.getElementById('GithubLogo').classList.remove('clockwise');
+            v.showAlert(translator.lang.forkBranchMissingError.text + ': ' + gm.branch);
+            return;
+          }
           // clone and load the file
-          await checkAndClone(`https://github.com/${gm.repo}.git`, gm.branch);
-          /*
-            .then(() => {
-              loadFile(_file);
-              updateFileStatusDisplay();
-            })
-            .catch((e) => {
-              showCloneErrorAlert(e);
-            });*/
+          await checkAndClone(_file, gm.cloud.getCloneURL(), gm.branch);
         }
       }, forkRepositoryToSelector.value)
       .catch((e) => {
@@ -169,6 +179,7 @@ export async function forkRepoClicked() {
         Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) =>
           l.classList.remove('clockwise')
         );
+        forkModalButtons.forEach((b) => (b.disabled = false));
         document.getElementById('forkRepositoryInputRepoOverride').value = '';
         document.getElementById('forkRepositoryInputBranchOverride').value = '';
         document.getElementById('forkRepositoryInputFilepathOverride').value = '';
@@ -336,12 +347,20 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
         gm.repo, // meiFileLocation
         gm.repo + ':' // meiFileLocationPrintable
       );
+      // set location type together with the location itself, before handleEncoding()
+      // triggers a render: a facsimile redraw arriving while meiFileLocation is a
+      // repo name but fileLocationType still says 'url' crashes createImageName()
+      setFileLocationType('github');
       handleEncoding(content, true, true, clearBeforeLoading); // retains current page and selection after commit
       setFileNameAfterLoad();
       updateFileStatusDisplay();
       setFileChangedState(await gm.fileChanged());
+      // The editor content is now read from the current clone HEAD, so it is no longer
+      // "restored stale content" - clear the latch. This is the general recovery path
+      // (any file (re)load from HEAD), not just handlePullCompleted()'s !fileChanged case,
+      // and lets a user trapped by a stale latch recover simply by reloading the file (#185).
+      gm.remoteChangedDuringRestore = false;
       updateGithubInLocalStorage();
-      setFileLocationType('github');
       setStandoffAnnotationEnabledStatus();
       fillInCommitLog('withRefresh');
       const fnStatus = document.getElementById('fileName');
@@ -351,6 +370,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
       githubLoadingIndicator.classList.remove('clockwise');
+      v.showAlert(translator.lang.loadFileError.text + ': ' + gm.filepath);
     });
 } // loadFile()
 
@@ -595,8 +615,19 @@ export async function fillInBranchContents(e) {
   githubLoadingIndicator.classList.add('clockwise');
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById('contentsHeader');
+  // remember gm state at request time: if it changes while listContents is in
+  // flight (e.g. openUrlProcess() clearing branch/filepath), our response is
+  // stale and rendering it would clobber the menu built for the new state
+  const requestedRepo = gm.repo;
+  const requestedBranch = gm.branch;
+  const requestedFilepath = gm.filepath;
   gm.listContents(gm.filepath)
     .then(async (branchContents) => {
+      if (gm.repo !== requestedRepo || gm.branch !== requestedBranch || gm.filepath !== requestedFilepath) {
+        console.log('fillInBranchContents(): gm changed while listing contents, abandoning stale response');
+        githubLoadingIndicator.classList.remove('clockwise');
+        return;
+      }
       console.log('fillInBranchContents() got contents: ', branchContents);
       let githubMenu = document.getElementById('GithubMenu');
       githubMenu.innerHTML = `
@@ -696,6 +727,7 @@ export async function fillInBranchContents(e) {
     })
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
+      githubLoadingIndicator.classList.remove('clockwise');
     });
 } // fillInBranchContents()
 
@@ -1249,7 +1281,14 @@ async function handleClickGithubAction(e, gm) {
                       runBtn.onclick = async () => {
                         ghLogo.classList.add('clockwise');
                         // do a pull to refresh the file
-                        await gm.pull();
+                        try {
+                          await gm.pull();
+                        } catch (e) {
+                          console.warn('Pull failed during workflow reload: ', e);
+                          ghLogo.classList.remove('clockwise');
+                          v.showAlert("Couldn't pull latest changes from GitHub: " + e);
+                          return;
+                        }
                         // redraw github menu to reflect changes in git log
                         fillInCommitLog('withRefresh');
                         console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
@@ -1498,7 +1537,20 @@ async function doCommit() {
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   // are there unmerged changes on the remote?
-  if (await gm.remoteChangesExist()) {
+  // Guard the check itself: if it throws (e.g. repo in an unusable state after a failed
+  // clone, or a network error), fail the commit visibly instead of leaving the spinner
+  // running forever on an uncaught rejection.
+  let remoteChanges;
+  try {
+    remoteChanges = await gm.remoteChangesExist();
+  } catch (e) {
+    githubLoadingIndicator.classList.remove('clockwise');
+    cm.setOption('readOnly', false);
+    console.error("Couldn't check remote for changes before commit: ", e);
+    v.showAlert("Couldn't commit - unable to check remote for changes: " + e);
+    return;
+  }
+  if (remoteChanges) {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push due to remote changes");
@@ -1550,6 +1602,11 @@ async function doCommit() {
       await gm.commit(message);
       await gm.push();
       gm.remoteChangedDuringRestore = false;
+      // Persist the new HEAD so the restored session's stored headSha tracks the remote.
+      // Without this, storage.github.headSha lags the just-pushed commit; on the next
+      // reload #doClone sees a mismatch and falsely re-arms remoteChangedDuringRestore,
+      // trapping the user in the "remote has changed" modal (issue #185).
+      updateGithubInLocalStorage();
       console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
       messageInput.value = '';
       console.log('Status after commit: ', await gm.status());

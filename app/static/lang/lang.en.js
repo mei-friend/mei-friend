@@ -1196,7 +1196,11 @@ export const lang = {
   },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, could not fork repository' },
+  forkBranchMissingError: {
+    text: 'Sorry, your existing fork does not contain the requested branch, and it could not be created there. Please update or delete your fork and try again. Branch',
+  },
   loadingFile: { text: 'Loading file' },
+  loadFileError: { text: 'Sorry, could not read file from repository' },
   loadingFromGithub: { text: 'Loading from Github' },
   logOut: { text: 'Log out' },
   githubLogout: { text: 'Log out' },
