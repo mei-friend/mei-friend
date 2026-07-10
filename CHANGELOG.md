@@ -1,8 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.5.0 develop
+* Show linked elements in the editor (as additional selection) and the notation panel (through rounded recangles) when selecting an element with @startid/@endid/@plist or att.linking attributes (@copyof/@corresp/@follows/@next/@precedes/@prev/@sameas/@synch). When cursor of editor is on a linking attribute, the linked element(s) are highlighted in the highlight color, while all other linked elements remain highlighted in the linked color. Arrow buttons are shown to navigate between the linking and the linked elements (also with up/down arrow keys). Press ESC to stop this functionality; to completely disable it, go to the   settings panel (enabled by default).
+* Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
 
-### 1.4.2 Improved security for GitHub login 
+
+### 1.4.2 Improved security for GitHub login (released on 9 July 2026)
 * Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
 * Harden GitHub authentication: revoke the OAuth token with GitHub on logout, require an authenticated session to use the CORS proxy (preventing open-relay abuse), and remove the wildcard CORS header
 * Keep the GitHub OAuth token server-side only: authenticated GitHub API and git requests are routed through the server proxy, which attaches credentials from the (now server-side, Flask-Session) session; the token is no longer embedded in the page, stored in localStorage (existing stored tokens are scrubbed on load), or otherwise exposed to the browser
@@ -17,8 +20,6 @@
 * Support for adding and removing IDs (through the manipulate menu) only on selection of encoding [#192](https://github.com/mei-friend/mei-friend/issues/192)
 * Speed up schema-based hinting behavior while typing in CodeMirror editor
 * Fix bugs involving the discovery service when working with stand-off annotations (RDF; Web Annotations and Music Annotation Ontology objecs). Fixes [#196](https://github.com/mei-friend/mei-friend/issues/196)
-* Show linked elements in the editor (as additional selection) and the notation panel (through rounded recangles) when selecting an element with @startid/@endid/@plist or att.linking attributes (@copyof/@corresp/@follows/@next/@precedes/@prev/@sameas/@synch). When cursor of editor is on a linking attribute, the linked element(s) are highlighted in the highlight color, while all other linked elements remain highlighted in the linked color. This function can be disabled in the settings panel, default: enabled.
-* Provide access to Verovio version selection at select menu at right footer
 * Fix commit button staying disabled when typing a commit message (regression from May 2026 on develop; checked `innerText` instead of `value` on the message input)
 
 ### 1.4.0 Custom GitHub Action Configurations
