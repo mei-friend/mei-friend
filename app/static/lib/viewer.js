@@ -61,6 +61,11 @@ export default class Viewer {
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
+    this.linkedElements = []; // IDs of elements referenced by the current selection (orange)
+    this.primaryLinkedElements = []; // IDs directly under cursor's linking attr (highlight color)
+    this._linkedEditorMarks = []; // active { id, marker } CodeMirror TextMarkers for selected/linked elements
+    this._linkedNavCurrentId = null; // id of the element currently targeted by jumpToLinkedMark()
+    this.linkingAttrs = [...att.attLinking]; // populated from schema on load
     this.lastNoteId = '';
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
@@ -615,6 +620,10 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
+    if (document.getElementById('showLinkedElements')?.checked) {
+      this.primaryLinkedElements = [];
+      this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+    }
     this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -669,11 +678,31 @@ export default class Viewer {
       let id = utils.getElementIdAtCursor(cm);
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
+      this.linkedElements = [];
+      this.primaryLinkedElements = [];
+      // immediately clear stale linked-element marks/nav buttons; re-populated
+      // below via updateHighlight() if the cursor landed on a linking element
+      this.updateLinkedEditorMarks(cm);
+      this.updateLinkedElementNav(cm);
       if (id) {
         const xmlEl = this.xmlDoc?.querySelector('[*|id="' + id + '"]');
         const isHeaderElement = !!(xmlEl && xmlEl.closest('meiHead'));
-        if (!isHeaderElement) { // avoid attempting page flip to header elements
+        if (!isHeaderElement) {
+          // avoid attempting page flip to header elements
           if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
+          if (document.getElementById('showLinkedElements')?.checked) {
+            const attrIds = this._getLinkedAttrAtCursor(cm);
+            if (attrIds !== null) {
+              // cursor is on a linking attribute: show that target in primary color,
+              // remaining linked elements from the element in orange
+              this.primaryLinkedElements = attrIds;
+              const all = this.resolveLinkedElements(this.selectedElements);
+              this.linkedElements = all.filter((id) => !attrIds.includes(id));
+            } else {
+              this.primaryLinkedElements = [];
+              this.linkedElements = this.resolveLinkedElements(this.selectedElements);
+            }
+          }
           let fl = document.getElementById('flipCheckbox');
           if (
             !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
@@ -769,7 +798,7 @@ export default class Viewer {
       // Skipping malformed input avoids a Verovio "Cannot load MEI data"
       // round-trip and the badge that goes with it during normal typing.
       if (!forceUpdate && !this.isWellFormedXml(mei)) {
-        const msg = (translator?.lang?.notationStaleXmlInvalid?.text) || 'Rendering paused — waiting for valid XML';
+        const msg = translator?.lang?.notationStaleXmlInvalid?.text || 'Rendering paused — waiting for valid XML';
         this.setNotationStale(msg);
         return;
       }
@@ -853,12 +882,7 @@ export default class Viewer {
     if (panel) panel.classList.add('notation-stale');
     const badge = document.getElementById('notation-error-badge');
     if (badge) {
-      this._populateNotationBadge(
-        badge,
-        reason,
-        'notationErrorBadgeLabel',
-        'notationErrorBadgeLabelPlural'
-      );
+      this._populateNotationBadge(badge, reason, 'notationErrorBadgeLabel', 'notationErrorBadgeLabelPlural');
     }
     // Error visible — warning (if any) drops back below it.
     const warningBadge = document.getElementById('notation-warning-badge');
@@ -896,12 +920,7 @@ export default class Viewer {
   setNotationWarning(reason) {
     const badge = document.getElementById('notation-warning-badge');
     if (!badge) return;
-    this._populateNotationBadge(
-      badge,
-      reason,
-      'notationWarningBadgeLabel',
-      'notationWarningBadgeLabelPlural'
-    );
+    this._populateNotationBadge(badge, reason, 'notationWarningBadgeLabel', 'notationWarningBadgeLabelPlural');
     // Float up under the Verovio logo when no error badge is shown.
     const errorBadge = document.getElementById('notation-error-badge');
     const errorVisible = errorBadge && errorBadge.style.display !== 'none';
@@ -918,10 +937,403 @@ export default class Viewer {
   } // clearNotationWarning()
 
   /**
+   * Returns the referenced IDs when the CodeMirror cursor is on or inside a
+   * linking attribute (name, '=', or value) from this.linkingAttrs; null otherwise.
+   * @param {CodeMirror} cm
+   * @returns {string[]|null}
+   */
+  _getLinkedAttrAtCursor(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    const ch = cursor.ch;
+    const attrNames = this.linkingAttrs.join('|');
+    const attrRe = new RegExp(`\\b(${attrNames})\\s*=\\s*["']([^"']*)["']`, 'g');
+    let match;
+    while ((match = attrRe.exec(line)) !== null) {
+      if (ch >= match.index && ch <= match.index + match[0].length) {
+        return match[2]
+          .trim()
+          .split(/\s+/)
+          .map((v) => utils.rmHash(v))
+          .filter(Boolean);
+      }
+    }
+    return null;
+  } // _getLinkedAttrAtCursor()
+
+  /**
+   * Given an array of primary element IDs, returns the IDs of elements they
+   * reference via any attribute in this.linkingAttrs (hash-prefixes stripped).
+   * The primary IDs themselves are excluded from the result.
+   * @param {string[]} ids
+   * @returns {string[]}
+   */
+  resolveLinkedElements(ids) {
+    if (!this.xmlDoc || !ids || ids.length === 0) return [];
+    const linked = new Set();
+    for (const id of ids) {
+      const el = this.xmlDoc.querySelector(`[*|id="${CSS.escape(id)}"]`);
+      if (!el) continue;
+      for (const attr of this.linkingAttrs) {
+        const val = el.getAttribute(attr);
+        // split handles both single-value attrs (startid/endid) and multi-value (plist)
+        if (val)
+          val
+            .trim()
+            .split(/\s+/)
+            .forEach((v) => linked.add(utils.rmHash(v)));
+      }
+    }
+    ids.forEach((id) => linked.delete(id)); // don't repeat primary IDs
+    return [...linked].filter(Boolean);
+  } // resolveLinkedElements()
+
+  /**
+   * Locates the opening tag of the element with the given xml:id in the
+   * editor text, returning its {from, to} range, or null if not found.
+   * @param {CodeMirror} cm
+   * @param {string} fullText result of cm.getValue(), passed in so callers
+   *   locating several ids only fetch it once
+   * @param {string} id
+   * @returns {{from: CodeMirror.Position, to: CodeMirror.Position}|null}
+   */
+  _findTagRange(cm, fullText, id) {
+    let idx = fullText.indexOf(`xml:id="${id}"`);
+    if (idx < 0) idx = fullText.indexOf(`xml:id='${id}'`);
+    if (idx < 0) return null;
+
+    const pos = cm.posFromIndex(idx);
+    const lineText = cm.getLine(pos.line);
+
+    // Walk back to find the opening < of the element tag on this line
+    const tagStart = lineText.lastIndexOf('<', pos.ch);
+    if (tagStart < 0) return null;
+
+    // Walk forward (up to 5 lines) to find the closing > of the opening tag
+    let endLine = pos.line;
+    let endCh = -1;
+    for (let l = pos.line; l <= Math.min(pos.line + 5, cm.lastLine()); l++) {
+      const lt = cm.getLine(l);
+      const searchFrom = l === pos.line ? pos.ch : 0;
+      const closeIdx = lt.indexOf('>', searchFrom);
+      if (closeIdx >= 0) {
+        endLine = l;
+        endCh = closeIdx + 1;
+        break;
+      }
+    }
+    if (endCh < 0) return null;
+
+    return { from: { line: pos.line, ch: tagStart }, to: { line: endLine, ch: endCh } };
+  } // _findTagRange()
+
+  /**
+   * Applies CodeMirror TextMarker highlights to the opening tags of the
+   * currently selected (source) element(s) (cm-linked-root-element) and all
+   * elements they link to (cm-primary-linked-element / cm-linked-element),
+   * clearing any previous marks first. Unlike the notation's .highlighted
+   * class — which only sits on whatever's currently under the cursor — these
+   * marks persist regardless of cursor position, so the selected/linking
+   * element stays visually distinct in the editor text even while Up/Down/
+   * arrow navigation (see jumpToLinkedMark()) moves the cursor elsewhere.
+   * @param {CodeMirror} cm
+   */
+  updateLinkedEditorMarks(cm) {
+    if (this._linkedEditorMarks) {
+      this._linkedEditorMarks.forEach(({ marker }) => marker.clear());
+    }
+    this._linkedEditorMarks = [];
+    this._linkedNavCurrentId = null;
+    if (this._linkedNavCurrentMark) {
+      this._linkedNavCurrentMark.clear();
+      this._linkedNavCurrentMark = null;
+    }
+    if (!cm || (this.linkedElements.length === 0 && this.primaryLinkedElements.length === 0)) return;
+
+    const fullText = cm.getValue();
+    const markIds = [
+      ...this.selectedElements.map((id) => ({ id, cls: 'cm-linked-root-element' })),
+      ...this.primaryLinkedElements.map((id) => ({ id, cls: 'cm-primary-linked-element' })),
+      ...this.linkedElements.map((id) => ({ id, cls: 'cm-linked-element' })),
+    ];
+    for (const { id, cls } of markIds) {
+      const range = this._findTagRange(cm, fullText, id);
+      if (!range) continue;
+      this._linkedEditorMarks.push({ id, marker: cm.markText(range.from, range.to, { className: cls }) });
+    }
+  } // updateLinkedEditorMarks()
+
+  /**
+   * Returns the currently selected element(s) and all linked-element marks as
+   * {id, from, to} items, sorted by document position, for cycling through
+   * with jumpToLinkedMark().
+   * @returns {Array<{id: string, from: CodeMirror.Position, to: CodeMirror.Position}>}
+   */
+  getNavigableItems() {
+    return (this._linkedEditorMarks || [])
+      .map(({ id, marker }) => {
+        const range = marker.find();
+        return range ? { id, ...range } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.from.line - b.from.line || a.from.ch - b.from.ch);
+  } // getNavigableItems()
+
+  /**
+   * Whether the given {from, to} range is entirely within the editor's
+   * current scroll viewport (used by jumpToLinkedMark() to only scroll when
+   * the jump target is actually offscreen).
+   * @param {CodeMirror} cm
+   * @param {{from: CodeMirror.Position, to: CodeMirror.Position}} range
+   * @returns {boolean}
+   */
+  _isRangeVisible(cm, range) {
+    const scrollInfo = cm.getScrollInfo();
+    const top = cm.charCoords(range.from, 'local').top;
+    const bottom = cm.charCoords(range.to, 'local').bottom;
+    return top >= scrollInfo.top && bottom <= scrollInfo.top + scrollInfo.clientHeight;
+  } // _isRangeVisible()
+
+  /**
+   * Moves the editor cursor and notation view to the next (direction=1) or
+   * previous (direction=-1) element in the linking chain — the originally
+   * selected element plus everything it links to — cycling in array order
+   * (by id, not by re-deriving positions from the cursor, which was fragile
+   * for the backward direction) and wrapping around at the ends. The
+   * newly-targeted element is marked with cm-linked-nav-current /
+   * nav-current-highlight-box (highlightColor) so it's clear which one is
+   * current. The originally selected element(s) are explicitly re-asserted
+   * as .highlighted on every jump, so they stay visibly selected throughout
+   * navigation instead of being dropped along the way.
+   *
+   * Also deliberately does NOT touch this.selectedElements/linkedElements/
+   * primaryLinkedElements: those still anchor the chain established by the
+   * original selection, so repeated jumps keep cycling that same chain
+   * instead of collapsing to whatever the newly-visited element links to on
+   * its own (which would strand navigation at the first plain note reached).
+   * @param {CodeMirror} cm
+   * @param {number} direction 1 to jump forward/down, -1 to jump backward/up
+   */
+  jumpToLinkedMark(cm, direction) {
+    const items = this.getNavigableItems();
+    if (!cm || items.length === 0) return;
+
+    let currentIndex = this._linkedNavCurrentId
+      ? items.findIndex((item) => item.id === this._linkedNavCurrentId)
+      : -1;
+    if (currentIndex < 0) {
+      // no active nav target yet: start adjacent to the originally selected element
+      currentIndex = items.findIndex((item) => this.selectedElements.includes(item.id));
+      if (currentIndex < 0) currentIndex = 0;
+    }
+    const target = items[(currentIndex + direction + items.length) % items.length];
+
+    // suppress the normal cursorActivity recompute triggered by moving the
+    // cursor below (mirrors handleClickOnNotation's use of the same flag).
+    // When this runs via the Up/Down keymap, CodeMirror's own keydown handler
+    // has already opened an operation (see codemirror.js's `on(inp, "keydown",
+    // operation(cm, onKeyDown))`), so cm.setCursor() here doesn't fire
+    // cursorActivity synchronously — it's queued for that OUTER operation's
+    // end, which lands right after this function returns. Re-enabling the
+    // flag synchronously at the end would be too early and let that queued,
+    // now-unsuppressed call wipe the chain state right after the jump; a
+    // setTimeout defers re-enabling until after it has already fired.
+    this.allowCursorActivity = false;
+    cm.setCursor(target.from);
+    // only scroll the editor when the target isn't already fully visible —
+    // unlike utils.setCursorToId(), don't re-center an on-screen jump target
+    if (!this._isRangeVisible(cm, target)) {
+      cm.scrollIntoView(null, Math.round(cm.getScrollInfo().clientHeight / 2));
+    }
+    this.scrollSvgTo(target.id);
+
+    // keep the originally selected element(s) visibly selected throughout
+    // navigation — jumping between linked elements must not deselect them
+    for (const rootId of this.selectedElements) {
+      document.querySelectorAll('#' + utils.escapeXmlId(rootId)).forEach((e) => {
+        e.classList.add('highlighted');
+        e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
+      });
+    }
+
+    this._linkedNavCurrentMark?.clear();
+    this._linkedNavCurrentMark = cm.markText(target.from, target.to, { className: 'cm-linked-nav-current' });
+    this._linkedNavCurrentId = target.id;
+    this.drawLinkedBoxes(); // reflect the new nav target in the notation's rounded boxes
+    this.updateLinkedElementNav(cm);
+    setTimeout(() => {
+      this.allowCursorActivity = true;
+    }, 0);
+  } // jumpToLinkedMark()
+
+  /**
+   * Shows/hides the up/down "jump to linked element" buttons depending on
+   * whether there's anything to cycle through (the selected element plus at
+   * least one linked element), and (de)activates the Up/Down keyboard
+   * shortcuts on cm while that's the case. Called whenever the linked-element
+   * highlight changes or the editor scrolls, so the shortcuts and buttons
+   * appear as soon as a linking element is selected/clicked, and disappear
+   * as soon as that selection is gone.
+   * @param {CodeMirror} cm
+   */
+  updateLinkedElementNav(cm) {
+    const up = document.getElementById('linkedNavUp');
+    const down = document.getElementById('linkedNavDown');
+    if (!up || !down) return;
+
+    const items = cm ? this.getNavigableItems() : [];
+    const show = items.length > 1; // more than just the selected element itself
+    up.classList.toggle('hidden', !show);
+    down.classList.toggle('hidden', !show);
+
+    if (!show) {
+      if (this._linkedNavKeyMap) {
+        cm?.removeKeyMap(this._linkedNavKeyMap);
+        this._linkedNavKeyMap = null;
+      }
+      if (this._linkedNavCurrentMark) {
+        this._linkedNavCurrentMark.clear();
+        this._linkedNavCurrentMark = null;
+      }
+      if (this._linkedNavCurrentId) {
+        this._linkedNavCurrentId = null;
+        this.drawLinkedBoxes(); // remove any stale "current" box from the notation
+      }
+      return;
+    }
+
+    // keep the buttons clear of CodeMirror's own scrollbars, which overlay the
+    // right/bottom edges of the editor only when the content actually scrolls
+    const wrapper = cm.getWrapperElement();
+    const vScrollbar = wrapper.querySelector('.CodeMirror-vscrollbar');
+    const hScrollbar = wrapper.querySelector('.CodeMirror-hscrollbar');
+    const vWidth = vScrollbar && vScrollbar.offsetWidth > 0 ? vScrollbar.offsetWidth : 0;
+    const hHeight = hScrollbar && hScrollbar.offsetHeight > 0 ? hScrollbar.offsetHeight : 0;
+    up.style.right = down.style.right = `${6 + vWidth}px`;
+    down.style.bottom = `${6 + hHeight}px`;
+
+    if (!this._linkedNavKeyMap) {
+      this._linkedNavKeyMap = {
+        Up: () => this.jumpToLinkedMark(cm, -1),
+        Down: () => this.jumpToLinkedMark(cm, 1),
+      };
+      cm.addKeyMap(this._linkedNavKeyMap);
+    }
+    // Esc deactivating this navigation is handled centrally in
+    // cmd.escapeKeyPressed() (main.js), via the global body keydown
+    // listener — CodeMirror's own key handling doesn't stop propagation for
+    // handled keys, so that listener fires too, regardless of what has
+    // focus (the editor or one of the arrow buttons).
+  } // updateLinkedElementNav()
+
+  /**
+   * Deactivates linked-element navigation for the current selection (called
+   * from cmd.escapeKeyPressed() in main.js on Esc): clears the chain
+   * (this.linkedElements / primaryLinkedElements), which removes the persistent editor marks,
+   * notation boxes, and the arrow buttons/Up/Down shortcuts. The originally
+   * selected element itself stays selected/highlighted as a normal
+   * selection. Navigation reactivates the usual way — clicking the element
+   * again, or moving the cursor back onto it — since neither of those is
+   * touched here.
+   * @param {CodeMirror} cm
+   */
+  deactivateLinkedNav(cm) {
+    this.linkedElements = [];
+    this.primaryLinkedElements = [];
+    this.updateLinkedEditorMarks(cm);
+    this.drawLinkedBoxes();
+    this.updateLinkedElementNav(cm);
+  } // deactivateLinkedNav()
+
+  /**
    * Highlights currently selected elements or the element at cursor in CodeMirror.
    * If cm is left out, all are cleared
    * @param {CodeMirror} cm
    */
+  /**
+   * Draws a rounded-rectangle overlay in the Verovio SVG around each linked element,
+   * using getBoundingClientRect() to convert screen coordinates to SVG space so the
+   * result is correct regardless of nested transforms or CSS zoom.
+   * The overlay group is appended last so it renders on top.
+   */
+  drawLinkedBoxes() {
+    const existing = document.getElementById('linked-highlight-overlay');
+    if (existing) existing.remove();
+
+    if (this.linkedElements.length === 0 && this.primaryLinkedElements.length === 0) return;
+
+    const svgRoot = document.querySelector('#verovio-panel svg');
+    if (!svgRoot) return;
+
+    // Append the overlay to .page-margin so it shares the exact coordinate
+    // system used by all notation elements and staff-line paths.
+    const pageSvg = svgRoot.querySelector('svg[viewBox]') || svgRoot;
+    const pageMargin = pageSvg.querySelector('.page-margin') || pageSvg;
+
+    // getScreenCTM() on .page-margin accounts for the viewBox scaling of the
+    // parent <svg> AND the translate() on .page-margin itself.  Inverting it
+    // converts getBoundingClientRect() screen coords into .page-margin's local
+    // coordinate system — consistent across Chrome, Firefox and Safari.
+    const ctm = pageMargin.getScreenCTM();
+    if (!ctm) return;
+    const invCTM = ctm.inverse();
+
+    // For non-rotated SVGs invCTM.a = SVG units per CSS pixel.
+    const pxToSVG = invCTM.a;
+
+    // All visual constants expressed as desired CSS pixels, converted to SVG units.
+    const pad = 4 * pxToSVG; // ~4 px padding
+    const rx = 5 * pxToSVG; // ~5 px corner radius
+
+    // Staff-line paths are in the same coordinate system — use stroke-width directly.
+    const staffLinePath = pageMargin.querySelector('.staff path');
+    const staffLineSW = staffLinePath ? parseFloat(staffLinePath.getAttribute('stroke-width')) : 0;
+    const strokeWidth = staffLineSW > 0 ? staffLineSW : pxToSVG;
+
+    const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    overlay.id = 'linked-highlight-overlay';
+
+    const boxIds = [
+      ...this.primaryLinkedElements.map((id) => ({ id, cls: 'primary-linked-highlight-box' })),
+      ...this.linkedElements.map((id) => ({ id, cls: 'linked-highlight-box' })),
+    ];
+    if (this._linkedNavCurrentId && !boxIds.some((b) => b.id === this._linkedNavCurrentId)) {
+      // the nav target may be the selected/source element, which otherwise
+      // has no rounded box of its own (just the plain .highlighted fill)
+      boxIds.push({ id: this._linkedNavCurrentId, cls: '' });
+    }
+    for (const { id, cls } of boxIds) {
+      const el = document.querySelector('#' + utils.escapeXmlId(id));
+      if (!el) continue;
+      const eb = el.getBoundingClientRect();
+      if (eb.width === 0 && eb.height === 0) continue; // not on current page
+
+      // Convert screen-space corners to .page-margin local coords via inverse CTM.
+      const pt1 = pageSvg.createSVGPoint();
+      pt1.x = eb.left;
+      pt1.y = eb.top;
+      const pt2 = pageSvg.createSVGPoint();
+      pt2.x = eb.right;
+      pt2.y = eb.bottom;
+      const p1 = pt1.matrixTransform(invCTM);
+      const p2 = pt2.matrixTransform(invCTM);
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', p1.x - pad);
+      rect.setAttribute('y', p1.y - pad);
+      rect.setAttribute('width', p2.x - p1.x + 2 * pad);
+      rect.setAttribute('height', p2.y - p1.y + 2 * pad);
+      rect.setAttribute('rx', rx);
+      rect.setAttribute('ry', rx);
+      rect.setAttribute('stroke-width', strokeWidth);
+      // layer the "current nav target" class on top so it stands out among the others
+      rect.setAttribute('class', (id === this._linkedNavCurrentId ? `${cls} nav-current-highlight-box` : cls).trim());
+      overlay.appendChild(rect);
+    }
+
+    if (overlay.childElementCount > 0) pageMargin.appendChild(overlay);
+  } // drawLinkedBoxes()
+
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('.highlighted');
@@ -960,6 +1372,16 @@ export default class Viewer {
         }
       }
     }
+
+    if (document.getElementById('showLinkedElements')?.checked) {
+      // mark linked elements in the CodeMirror editor (also resets nav state,
+      // so must run before drawLinkedBoxes() picks up the current nav target)
+      this.updateLinkedEditorMarks(cm);
+      // draw rounded boxes around linked elements in the notation
+      this.drawLinkedBoxes();
+    }
+    // show/hide jump-to-linked-element buttons and (de)activate Up/Down shortcuts
+    this.updateLinkedElementNav(cm);
   } // updateHighlight()
 
   setNotationColors(matchTheme = false, alwaysBW = false) {
@@ -1353,9 +1775,7 @@ export default class Viewer {
       }
     } else if (barSel) {
       barSel.disabled = false;
-      barSel.title =
-        translator?.lang?.midiExpansionSelectorTitle?.text ||
-        'Select expansion element for MIDI playback';
+      barSel.title = translator?.lang?.midiExpansionSelectorTitle?.text || 'Select expansion element for MIDI playback';
     }
   } // applySpeedModeUi()
 
@@ -2180,6 +2600,15 @@ export default class Viewer {
         break;
       case 'matchTheme':
         this.setNotationColors(value);
+        break;
+      case 'showLinkedElements':
+        if (!value) {
+          this.linkedElements = [];
+          this.primaryLinkedElements = [];
+          document.getElementById('linked-highlight-overlay')?.remove();
+          this.updateLinkedEditorMarks(cm);
+          this.updateLinkedElementNav(cm);
+        }
         break;
       case 'matchTags':
         cm.setOption(

@@ -1065,6 +1065,10 @@ export const lang = {
     text: 'Corrispondenza tag',
     description: "Evidenzia i tag corrispondenti intorno al cursore dell'editor",
   },
+  showLinkedElements: {
+    text: 'Mostra elementi collegati',
+    description: "Evidenzia gli elementi referenziati dall'elemento selezionato (es. startid/endid/plist) nell'editor e nella notazione",
+  },
   showTrailingSpace: {
     text: 'Evidenzia spazi finali',
     description: 'Evidenzia gli spazi inutili alla fine delle righe',

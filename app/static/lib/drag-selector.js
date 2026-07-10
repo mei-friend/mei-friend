@@ -34,6 +34,8 @@ export function addDragSelector(v, vp) {
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
       v.selectedElements = [];
+      v.linkedElements = [];
+      v.primaryLinkedElements = [];
       v.updateHighlight();
     }
     oldEls = [];
@@ -226,6 +228,10 @@ export function addDragSelector(v, vp) {
     }
     oldEls = [];
     console.debug('Drag-Selector selected elements: ', v.selectedElements);
+    if (document.getElementById('showLinkedElements')?.checked) {
+      v.linkedElements = v.resolveLinkedElements(v.selectedElements);
+    }
+    v.updateHighlight(cm);
   }); // mouse up event listener
 } // addDragSelector()
 

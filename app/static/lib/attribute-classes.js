@@ -2,6 +2,21 @@
  * Lists of elements contained by attribute classes, MEI 4.0.1
  */
 
+// attributes that reference other element IDs (att.startid, att.endid, att.plist, att.linking)
+export const attLinking = [
+  'startid',
+  'endid',
+  'plist',
+  'copyof',
+  'corresp',
+  'follows',
+  'next',
+  'precedes',
+  'prev',
+  'sameas',
+  'synch',
+];
+
 // elements with @curveDir
 export const attCurvature = ['bend', 'curve', 'lv', 'phrase', 'slur', 'tie'];
 

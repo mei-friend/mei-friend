@@ -1058,6 +1058,10 @@ export const lang = {
     text: 'Zaznacz pasujące tagi',
     description: 'Podświetl dopasowane tagi wokół kursora edytora',
   },
+  showLinkedElements: {
+    text: 'Pokaż powiązane elementy',
+    description: 'Podświetl elementy wskazywane przez wybrany element (np. startid/endid/plist) w edytorze i w notacji',
+  },
   showTrailingSpace: {
     text: 'Podświetlanie zbędnych spacji',
     description: 'Podświetl zbędne spacje na końcu linii',

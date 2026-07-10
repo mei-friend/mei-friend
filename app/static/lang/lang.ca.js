@@ -1059,6 +1059,10 @@ export const lang = {
     text: "Coincidència d'etiquetes",
     description: "Resalta les etiquetes coincidents al voltant del cursor de l'editor",
   },
+  showLinkedElements: {
+    text: 'Mostra elements enllaçats',
+    description: "Ressalta els elements referenciats per l'element seleccionat (p. ex. startid/endid/plist) a l'editor i la notació",
+  },
   showTrailingSpace: {
     text: 'Resalta els espais finals',
     description: 'Resalta els espais innecessaris al final de les línies',

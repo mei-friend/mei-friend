@@ -916,6 +916,10 @@ export const lang = {
     text: 'Match tags',
     description: 'Fremhæver matchende tags omkring editor markør',
   },
+  showLinkedElements: {
+    text: 'Vis tilknyttede elementer',
+    description: 'Fremhæv elementer, der refereres til af det valgte element (f.eks. startid/endid/plist) i editoren og notationen',
+  },
   showTrailingSpace: {
     text: 'Fremhæv unødvendige mellemrum',
     description: 'Fremhæver unødvendige mellemrum ved slutningen af linjer',

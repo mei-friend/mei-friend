@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.4.2';
-export const versionDate = '9 July 2026'; // use full or 3-character english months, will be translated
+export const version = '1.5.0';
+export const versionDate = '10 July 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -76,7 +76,7 @@ import {
   setChoiceOptions,
   hideAllOverflowContents,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { arrowDown, arrowUp, clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -123,10 +123,12 @@ import {
   defaultNotationOrientation,
   defaultNotationProportion,
   defaultVerovioOptions,
+  defaultVerovioVersion,
   guidelinesBase,
   platform,
   isSafari,
   supportedLanguages,
+  supportedVerovioVersions,
 } from './defaults.js';
 import Translator from './translator.js';
 import { luteconv } from './luteconv.js';
@@ -517,6 +519,10 @@ async function completeInitialLoad() {
   // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
+
+  // icons for the jump-to-linked-element buttons (shown/hidden by Viewer.updateLinkedElementNav)
+  document.getElementById('linkedNavUp').innerHTML = arrowUp;
+  document.getElementById('linkedNavDown').innerHTML = arrowDown;
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -1931,6 +1937,7 @@ export let cmd = {
   addBeamSpan: () => e.addBeamSpan(v, cm),
   correctAccid: () => checker.checkAccidGes(v, cm),
   checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
+  checkLinkedElements: () => setTimeout(() => checker.checkLinkedElements(v, cm), 10),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -1999,6 +2006,8 @@ export let cmd = {
     }
     // close all annotationMultiTools/MarkupDropDownContent
     v.hideAnnotationMarkupDropDownContent();
+    // deactivate linked-element Up/Down/arrow navigation, if active
+    v.deactivateLinkedNav(cm);
   },
   playPauseMidiPlayback: () => {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -2287,6 +2296,7 @@ function addEventListeners(v, cm) {
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
+  document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio
@@ -2369,6 +2379,15 @@ function addEventListeners(v, cm) {
     tagEncloserNode?.parentElement?.removeChild(tagEncloserNode);
     v.cursorActivity(cm);
   });
+
+  // keep jump-to-linked-element buttons in sync when the user scrolls manually
+  cm.on('scroll', () => v.updateLinkedElementNav(cm));
+
+  // jump to previous/next linked element mark (out-of-view fallback for Up/Down shortcuts)
+  document.getElementById('linkedNavUp').addEventListener('click', () => v.jumpToLinkedMark(cm, -1));
+  document.getElementById('linkedNavDown').addEventListener('click', () => v.jumpToLinkedMark(cm, 1));
+  // Esc deactivating this navigation is handled centrally in cmd.escapeKeyPressed()
+  // via the global body keydown listener below, so it works regardless of focus
 
   // editor reports changes
   cm.on('changes', (cm, changeObj) => {
@@ -2578,13 +2597,48 @@ export function drawRightFooter() {
   rf.innerHTML = versionHtml;
   // also update version string in splash screen
   document.getElementById('splashVersionNumber').innerHTML = versionHtml;
+
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     if (tkVersion.includes('dev')) {
       // current develop version, no release yet...
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }
-    rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
+    // hidden <select> offering the same version options as the settings panel;
+    // only its dropdown arrow (::after in CSS) is visible, next to the version link
+    let storage = window.localStorage;
+    let currentVerovioKey =
+      document.getElementById('selectToolkitVersion')?.value ||
+      (storage.hasOwnProperty('mf-selectToolkitVersion') ? storage['mf-selectToolkitVersion'] : defaultVerovioVersion);
+    const optionsHtml = Object.keys(supportedVerovioVersions)
+      .map((key) => {
+        let desc = supportedVerovioVersions[key].description;
+        if (supportedVerovioVersions[key].hasOwnProperty('releaseDate')) {
+          desc += ' (' + supportedVerovioVersions[key].releaseDate + ')';
+        }
+        return `<option value="${key}" title="${desc}"${key === currentVerovioKey ? ' selected' : ''}>${key}</option>`;
+      })
+      .join('');
+    rf.innerHTML +=
+      `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>` +
+      `<span class="verovioVersionSelectWrapper" title="${translator.lang.selectToolkitVersion.text}">` +
+      `<select id="rightFooterVerovioVersion">${optionsHtml}</select></span>`;
+
+    // switching the version here mirrors picking it in the mei-friend settings panel
+    document.getElementById('rightFooterVerovioVersion').addEventListener('change', (ev) => {
+      const newVersion = ev.target.value;
+      const settingsSelect = document.getElementById('selectToolkitVersion');
+      if (settingsSelect) {
+        settingsSelect.value = newVersion;
+        settingsSelect.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        vrvWorker.postMessage({
+          cmd: 'loadVerovio',
+          msg: newVersion,
+          url: supportedVerovioVersions[newVersion].url,
+        });
+      }
+    });
   }
 }
 

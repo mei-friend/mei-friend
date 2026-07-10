@@ -920,6 +920,10 @@ export const lang = {
     text: 'Tags matchen',
     description: 'Markeer gematchte tags rond editorcursor',
   },
+  showLinkedElements: {
+    text: 'Gekoppelde elementen tonen',
+    description: 'Elementen waarnaar het geselecteerde element verwijst (bijv. startid/endid/plist) markeren in de editor en de notatie',
+  },
   showTrailingSpace: {
     text: 'Markeer overtollige spaties',
     description: 'Markeer overtollige spaties aan het einde van regels',

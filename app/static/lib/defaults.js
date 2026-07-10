@@ -1199,6 +1199,12 @@ export const codeMirrorSettingsOptions = {
     type: 'bool',
     default: true,
   },
+  showLinkedElements: {
+    title: 'Show linked elements',
+    description: 'Highlight elements referenced by the selected element (i.e., through @startid/@endid/@plist) in the editor and notation',
+    type: 'bool',
+    default: true,
+  },
   showTrailingSpace: {
     title: 'Highlight trailing spaces',
     description: 'Highlights unnecessary trailing spaces at end of lines',
