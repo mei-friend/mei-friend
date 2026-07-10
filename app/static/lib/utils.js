@@ -373,8 +373,10 @@ export function getElementIdAtCursor(cm) {
     endRegEx = `</${tag}`;
   }
   for (let k = cursor.line; k >= 0; k--) {
-    if (cm.getLine(k).match(startRegEx)) {
+    let m;
+    if ((m = cm.getLine(k).match(startRegEx))) {
       from.line = k;
+      from.ch = m.index;
       break;
     }
   }
@@ -386,8 +388,12 @@ export function getElementIdAtCursor(cm) {
       break;
     }
   }
+  // if the tag found is on the cursor's own line but starts *after* the
+  // cursor (i.e. the cursor sits in leading whitespace before it, not at or
+  // inside the tag), it doesn't count as "on" that element
+  const cursorBeforeTag = from.line === cursor.line && cursor.ch < from.ch;
   // search for xml:id in row
-  let result = cm.getRange(from, to).match(xmlIdString);
+  let result = cursorBeforeTag ? null : cm.getRange(from, to).match(xmlIdString);
   // if one is found, return it
   if (result !== null) {
     return result[1];

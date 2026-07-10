@@ -1133,6 +1133,53 @@ input.urlResolves {
   height: 1.2em;
 }
 
+/* Jump-to-linked-element buttons, shown only while a linking element is
+   selected/clicked and has linked elements to cycle through (see
+   Viewer.updateLinkedElementNav). z-index/right/bottom are kept above
+   CodeMirror's own scrollbars (z-index: 6); right/bottom are further
+   adjusted in JS to clear a scrollbar when it's shown. */
+#linkedNavUp,
+#linkedNavDown {
+  position: absolute;
+  z-index: 7;
+  right: 6px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  max-height: 34px;
+  background-color: rgba(232, 133, 12, 0.15);
+  border-color: var(--linkedHighlightBorderColor);
+  opacity: 0.85;
+}
+
+#linkedNavUp:hover,
+#linkedNavDown:hover {
+  opacity: 1;
+  background-color: rgba(232, 133, 12, 0.15);
+  border-color: var(--linkedHighlightBorderColor);
+}
+
+/* higher specificity than .icon's `display: inline-flex`, so .hidden actually hides these */
+#linkedNavUp.hidden,
+#linkedNavDown.hidden {
+  display: none;
+}
+
+#linkedNavUp svg,
+#linkedNavDown svg {
+  width: 26px;
+  height: 26px;
+}
+
+#linkedNavUp {
+  top: 3px;
+}
+
+#linkedNavDown {
+  bottom: 6px;
+}
+
 .validation-report {
   font-size: 95%;
   display: block;
@@ -1794,6 +1841,37 @@ svg text {
   background-color: rgba(78, 139, 237, 0.15);
   border-top: 1px solid var(--highlightColor);
   border-bottom: 1px solid var(--highlightColor);
+}
+
+/* CodeMirror: opening-tag highlight for the originally selected/linking
+   element itself (e.g. a slur with @startid/@endid). Persists regardless of
+   cursor position, so it stays visually distinct while Up/Down/arrow
+   navigation moves the cursor to its linked elements and back. */
+.cm-linked-root-element {
+  background-color: rgba(232, 133, 12, 0.15);
+  border-top: 1px solid var(--linkedHighlightBorderColor);
+  border-bottom: 1px solid var(--linkedHighlightBorderColor);
+}
+
+/* Marks the element currently targeted by the linked-element Up/Down/arrow
+   navigation (Viewer.jumpToLinkedMark), layered on top of cm-linked-element /
+   cm-primary-linked-element so it stands out among the other linked marks. */
+.cm-linked-nav-current {
+  background-color: rgba(78, 139, 237, 0.35);
+  border-top: 2px solid var(--highlightColor);
+  border-bottom: 2px solid var(--highlightColor);
+}
+
+/* Notation-side counterpart of .cm-linked-nav-current: layered on top of
+   .linked-highlight-box / .primary-linked-highlight-box (or used alone, when
+   the nav target is the selected/source element) so the box currently
+   targeted by Up/Down/arrow navigation always renders in highlightColor. */
+#verovio-panel .nav-current-highlight-box {
+  fill: var(--highlightColor);
+  fill-opacity: 0.12;
+  stroke: var(--highlightColor);
+  stroke-opacity: 1;
+  pointer-events: none;
 }
 
 #verovio-panel .supplied {

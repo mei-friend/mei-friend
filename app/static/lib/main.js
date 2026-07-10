@@ -76,7 +76,7 @@ import {
   setChoiceOptions,
   hideAllOverflowContents,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { arrowDown, arrowUp, clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -519,6 +519,10 @@ async function completeInitialLoad() {
   // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
+
+  // icons for the jump-to-linked-element buttons (shown/hidden by Viewer.updateLinkedElementNav)
+  document.getElementById('linkedNavUp').innerHTML = arrowUp;
+  document.getElementById('linkedNavDown').innerHTML = arrowDown;
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -1985,6 +1989,8 @@ export let cmd = {
     }
     // close all annotationMultiTools/MarkupDropDownContent
     v.hideAnnotationMarkupDropDownContent();
+    // deactivate linked-element Up/Down/arrow navigation, if active
+    v.deactivateLinkedNav(cm);
   },
   playPauseMidiPlayback: () => {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -2356,6 +2362,15 @@ function addEventListeners(v, cm) {
     tagEncloserNode?.parentElement?.removeChild(tagEncloserNode);
     v.cursorActivity(cm);
   });
+
+  // keep jump-to-linked-element buttons in sync when the user scrolls manually
+  cm.on('scroll', () => v.updateLinkedElementNav(cm));
+
+  // jump to previous/next linked element mark (out-of-view fallback for Up/Down shortcuts)
+  document.getElementById('linkedNavUp').addEventListener('click', () => v.jumpToLinkedMark(cm, -1));
+  document.getElementById('linkedNavDown').addEventListener('click', () => v.jumpToLinkedMark(cm, 1));
+  // Esc deactivating this navigation is handled centrally in cmd.escapeKeyPressed()
+  // via the global body keydown listener below, so it works regardless of focus
 
   // editor reports changes
   cm.on('changes', (cm, changeObj) => {
