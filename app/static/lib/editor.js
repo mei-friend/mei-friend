@@ -1273,7 +1273,10 @@ export function addApplicationInfo(v, cm) {
     if (!encodingDesc) {
       encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
       encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
-      meiHead.appendChild(encodingDesc);
+
+      // meiHead sub-elements mandatory order: altId, fileDesc (required), encodingDesc, workList, revisionDesc
+      const fileDesc = Array.from(meiHead.children).find((c) => c.localName === 'fileDesc');
+      meiHead.insertBefore(encodingDesc, fileDesc?.nextElementSibling ?? null);
     }
 
     let appInfo = meiHead.querySelector('appInfo');
