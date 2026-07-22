@@ -1066,6 +1066,10 @@ export const lang = {
     text: 'Passende Tags hervorheben',
     description: 'Passende XML-Tags hervorheben',
   },
+  showLinkedElements: {
+    text: 'Verknüpfte Elemente anzeigen',
+    description: 'Elemente, auf die das ausgewählte Element verweist (z. B. startid/endid/plist), im Editor und in der Notation hervorheben',
+  },
   showTrailingSpace: {
     text: 'Nachstehende Leerzeichen',
     description: 'Überflüssige nachstehende Leerzeichen hervorheben',

@@ -878,6 +878,10 @@ export const lang = {
     text: '匹配标签',
     description: '高亮编辑器光标周围的匹配标签',
   },
+  showLinkedElements: {
+    text: '显示关联元素',
+    description: '在编辑器和乐谱中高亮显示所选元素引用的元素（如 startid/endid/plist）',
+  },
   showTrailingSpace: {
     text: '高亮尾随空格',
     description: '高亮行尾的不必要尾随空格',
