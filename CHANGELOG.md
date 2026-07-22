@@ -4,6 +4,7 @@
 * Show linked elements in the editor (as additional selection) and the notation panel (through rounded recangles) when selecting an element with @startid/@endid/@plist or att.linking attributes (@copyof/@corresp/@follows/@next/@precedes/@prev/@sameas/@synch). When cursor of editor is on a linking attribute, the linked element(s) are highlighted in the highlight color, while all other linked elements remain highlighted in the linked color. Arrow buttons are shown to navigate between the linking and the linked elements (also with up/down arrow keys). Press ESC to stop this functionality; to completely disable it, go to the   settings panel (enabled by default).
 * New linking elements checker added to manipulate menu bar item that checks whether linking elements (@startid/@endid/@plist and att.linking) point to existing elements in the encoding. It also warns for multiple blanks as separators in plists. 
 * Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
+* Insert `encodingDesc` (including `applicationInfo`) always after `fileDesc`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198).
 
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)
