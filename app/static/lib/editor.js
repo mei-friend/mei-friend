@@ -150,10 +150,10 @@ export function deleteElement(v, cm, modifyerKey = false) {
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
-            pointingElement.nodeName +
-            '>: "' +
-            pointingElement.getAttribute('xml:id') +
-            '"'
+          pointingElement.nodeName +
+          '>: "' +
+          pointingElement.getAttribute('xml:id') +
+          '"'
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
@@ -1257,6 +1257,33 @@ export function addVerticalGroup(v, cm) {
 } // addVerticalGroup()
 
 /**
+ * Creates a fileDesc element (with titleStmt/title and pubStmt children)
+ * and appends it to meiHead
+ * @param {Viewer} v
+ * @param {Element} meiHead
+ * @returns {Element} the newly created fileDesc element
+ */
+export function addFileDesc(v, meiHead) {
+  let fileDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'fileDesc');
+  fileDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('fileDesc', v.xmlIdStyle));
+
+  let titleStmt = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'titleStmt');
+  titleStmt.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('titleStmt', v.xmlIdStyle));
+  let title = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'title');
+  title.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('title', v.xmlIdStyle));
+  titleStmt.appendChild(title);
+
+  let pubStmt = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'pubStmt');
+  pubStmt.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('pubStmt', v.xmlIdStyle));
+
+  fileDesc.appendChild(titleStmt);
+  fileDesc.appendChild(pubStmt);
+  meiHead.appendChild(fileDesc);
+
+  return fileDesc;
+} // addFileDesc()
+
+/**
  * Adds an application element to appInfo or updates its date, if already there
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -1271,13 +1298,14 @@ export function addApplicationInfo(v, cm) {
     // application tree for mei-friend is created, if not present
     let encodingDesc = meiHead.querySelector('encodingDesc');
     if (!encodingDesc) {
-      let fileDesc = meiHead.querySelector('fileDesc');
-      if (!fileDesc) {
-        v.showAlert('Invalid MEI: meiHead is missing a fileDesc element.', 'warning');
-        return false;
-      }
       encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
       encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
+
+      // meiHead sub-elements mandatory order: altId, fileDesc (required), encodingDesc, workList, revisionDesc
+      let fileDesc = meiHead.querySelector('fileDesc');
+      if (!fileDesc) {
+        fileDesc = addFileDesc(v, meiHead);
+      }
       fileDesc.after(encodingDesc);
     }
 
@@ -2022,16 +2050,16 @@ export function removeInEditor(cm, xmlNode) {
   if (sc.findNext()) {
     console.debug(
       'removeInEditor() self closing element "' +
-        id +
-        '" from ln:' +
-        sc.from().line +
-        '/ch:' +
-        sc.from().ch +
-        ' to ln:' +
-        sc.to().line +
-        '/ch:' +
-        sc.to().ch +
-        '.'
+      id +
+      '" from ln:' +
+      sc.from().line +
+      '/ch:' +
+      sc.from().ch +
+      ' to ln:' +
+      sc.to().line +
+      '/ch:' +
+      sc.to().ch +
+      '.'
     );
   } else {
     let searchFullElement =
@@ -2046,16 +2074,16 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.debug(
         'removeInEditor() full element "' +
-          id +
-          '" from ln:' +
-          sc.from().line +
-          '/ch:' +
-          sc.from().ch +
-          ' to ln:' +
-          sc.to().line +
-          '/ch:' +
-          sc.to().ch +
-          '.'
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
       );
     }
   }
