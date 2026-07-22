@@ -1278,7 +1278,12 @@ export function addFileDesc(v, meiHead) {
 
   fileDesc.appendChild(titleStmt);
   fileDesc.appendChild(pubStmt);
-  meiHead.appendChild(fileDesc);
+
+  // meiHead sub-elements mandatory order: altId (optional), fileDesc (required), encodingDesc, workList, revisionDesc (all optional)
+  const nextSibling = Array.from(meiHead.children).find((c) =>
+    ['encodingDesc', 'workList', 'revisionDesc'].includes(c.localName)
+  );
+  meiHead.insertBefore(fileDesc, nextSibling ?? null);
 
   return fileDesc;
 } // addFileDesc()
