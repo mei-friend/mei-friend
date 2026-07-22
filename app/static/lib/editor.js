@@ -1271,9 +1271,14 @@ export function addApplicationInfo(v, cm) {
     // application tree for mei-friend is created, if not present
     let encodingDesc = meiHead.querySelector('encodingDesc');
     if (!encodingDesc) {
+      let fileDesc = meiHead.querySelector('fileDesc');
+      if (!fileDesc) {
+        v.showAlert('Invalid MEI: meiHead is missing a fileDesc element.', 'warning');
+        return false;
+      }
       encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
       encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
-      meiHead.appendChild(encodingDesc);
+      fileDesc.after(encodingDesc);
     }
 
     let appInfo = meiHead.querySelector('appInfo');
