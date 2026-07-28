@@ -5,6 +5,7 @@
 * New linking elements checker added to manipulate menu bar item that checks whether linking elements (@startid/@endid/@plist and att.linking) point to existing elements in the encoding. It also warns for multiple blanks as separators in plists. 
 * Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
 * Insert `encodingDesc` (including `applicationInfo`) and if absent `fileDesc` in correct element order of `meiHead`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198) thx @fernandoherreradelasheras. 
+* mei-friend insert and manipulate actions (including annotations and markup) stored as one undoable action in the CodeMirror editor history (fixes [#179](https://github.com/mei-friend/mei-friend/issues/179)).
 
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)
