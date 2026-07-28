@@ -3,7 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
-import { addApplicationInfo, replaceInEditor } from './editor.js';
+import { addApplicationInfo, replaceInEditor, withSingleUndoStep } from './editor.js';
 import { cm, cmd, handleEditorChanges, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
@@ -488,157 +488,159 @@ export function addMarkup(event) {
  * @param {string} mElName name of markup element to apply
  */
 function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
-  v.loadXml(cm.getValue());
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  if (v.selectedElements.length < 1) return;
-  v.allowCursorActivity = false;
-  cm.blockChanges = true;
+  withSingleUndoStep(cm, () => {
+    v.loadXml(cm.getValue());
+    v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+    v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
+    if (v.selectedElements.length < 1) return;
+    v.allowCursorActivity = false;
+    cm.blockChanges = true;
 
-  let uuids = [];
-  let elementGroups = [];
+    let uuids = [];
+    let elementGroups = [];
 
-  // this loop updated the list of selected elements to be wrapped by markup
-  // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
-  while (v.selectedElements.length > 0) {
-    let id = v.selectedElements[0];
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    if (!el) {
-      console.warn('No such element in xml document: ' + id);
-      // remove element from list of selected elements if it cannot be found
-      v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
-    } else {
-      // convert attrName artic|accid to note|chord element and surround that
-      if (
-        (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
-        (el.nodeName === 'note' && attrName === 'accid')
-      ) {
-        if (!el.hasAttribute(attrName)) {
-          let childElement;
-          el.childNodes.forEach((ch) => {
-            if (ch.nodeName === attrName) childElement = ch;
-          });
-          if (childElement) {
+    // this loop updated the list of selected elements to be wrapped by markup
+    // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
+    while (v.selectedElements.length > 0) {
+      let id = v.selectedElements[0];
+      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+      if (!el) {
+        console.warn('No such element in xml document: ' + id);
+        // remove element from list of selected elements if it cannot be found
+        v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
+      } else {
+        // convert attrName artic|accid to note|chord element and surround that
+        if (
+          (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
+          (el.nodeName === 'note' && attrName === 'accid')
+        ) {
+          if (!el.hasAttribute(attrName)) {
+            let childElement;
+            el.childNodes.forEach((ch) => {
+              if (ch.nodeName === attrName) childElement = ch;
+            });
+            if (childElement) {
+              // push childElement to list of groups to wrap
+              // and remove element from selectedElements to avoid double processing
+              elementGroups.push([childElement.getAttribute('xml:id')]);
+              v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
+            } else {
+              const msg =
+                'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
+              console.log(msg);
+              v.showAlert(msg, 'warning');
+              return;
+            }
+          } else {
+            // make new element out of attribute and handle it as element to be surrounded
+            let attrValue = el.getAttribute(attrName);
+            let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
+            let uuid = mintSuppliedId(id, attrName, v);
+            attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+            attrEl.setAttribute(attrName, attrValue);
+            el.removeAttribute(attrName);
+            el.appendChild(attrEl);
+            replaceInEditor(cm, el, true);
+            cm.execCommand('indentAuto');
+
             // push childElement to list of groups to wrap
             // and remove element from selectedElements to avoid double processing
-            elementGroups.push([childElement.getAttribute('xml:id')]);
+            elementGroups.push([attrEl.getAttribute('xml:id')]);
             v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
-          } else {
-            const msg =
-              'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
-            console.log(msg);
-            v.showAlert(msg, 'warning');
-            return;
           }
         } else {
-          // make new element out of attribute and handle it as element to be surrounded
-          let attrValue = el.getAttribute(attrName);
-          let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
-          let uuid = mintSuppliedId(id, attrName, v);
-          attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-          attrEl.setAttribute(attrName, attrValue);
-          el.removeAttribute(attrName);
-          el.appendChild(attrEl);
-          replaceInEditor(cm, el, true);
-          cm.execCommand('indentAuto');
+          if (['accid', 'artic'].includes(attrName)) {
+            const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
+            console.log(msg);
+            v.showAlert(msg, 'warning');
+          }
 
-          // push childElement to list of groups to wrap
-          // and remove element from selectedElements to avoid double processing
-          elementGroups.push([attrEl.getAttribute('xml:id')]);
-          v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
-        }
-      } else {
-        if (['accid', 'artic'].includes(attrName)) {
-          const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
-          console.log(msg);
-          v.showAlert(msg, 'warning');
+          // search for groups
+          elementGroups.push(dutils.getAdjacentSiblingElements(el, v.selectedElements, v.xmlDoc));
         }
 
-        // search for groups
-        elementGroups.push(dutils.getAdjacentSiblingElements(el, v.selectedElements, v.xmlDoc));
+        // the supplied element per selected element used to be created here
+        // this is moved to the next foreach loop
       }
+    } // while
 
-      // the supplied element per selected element used to be created here
-      // this is moved to the next foreach loop
-    }
-  } // while
+    // Arrays for the copied Elements and a sort-of dictionary for new 2 old IDs in case we have
+    // dependent IDs we need to change after the copy
+    let dicOld2NewIDs = {};
+    let copiedChilds = [];
 
-  // Arrays for the copied Elements and a sort-of dictionary for new 2 old IDs in case we have
-  // dependent IDs we need to change after the copy
-  let dicOld2NewIDs = {};
-  let copiedChilds = [];
+    // this loop iterates over the array of arrays of grouped ids
+    // and wraps the markup around a whole group
+    elementGroups.forEach((group) => {
+      let parent = v.xmlDoc.querySelector("[*|id='" + group[0] + "']").parentNode;
 
-  // this loop iterates over the array of arrays of grouped ids
-  // and wraps the markup around a whole group
-  elementGroups.forEach((group) => {
-    let parent = v.xmlDoc.querySelector("[*|id='" + group[0] + "']").parentNode;
+      // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
+      // added option to add xml:ids to the file before adding markup
+      if (parent && parent.getAttribute('xml:id') == null) {
+        const handleMissingParentId = new Promise((resolve, reject) => {
+          const msg = translator.lang.missingParentIdWarning.text;
+          console.log(msg);
 
-    // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
-    // added option to add xml:ids to the file before adding markup
-    if (parent && parent.getAttribute('xml:id') == null) {
-      const handleMissingParentId = new Promise((resolve, reject) => {
-        const msg = translator.lang.missingParentIdWarning.text;
-        console.log(msg);
-
-        v.showUserPrompt(msg, [
-          {
-            label: translator.lang.handleMissingParentIdProceed.text, //'Add xml:ids to document',
-            event: (abort) => {
-              resolve('promptOverlay', abort);
+          v.showUserPrompt(msg, [
+            {
+              label: translator.lang.handleMissingParentIdProceed.text, //'Add xml:ids to document',
+              event: (abort) => {
+                resolve('promptOverlay', abort);
+              },
             },
-          },
-          {
-            label: translator.lang.handleMissingParentIdAbort.text, //'Abort action',
-            event: (abort) => {
-              reject('promptOverlay', abort);
+            {
+              label: translator.lang.handleMissingParentIdAbort.text, //'Abort action',
+              event: (abort) => {
+                reject('promptOverlay', abort);
+              },
             },
-          },
-        ]);
-      });
-
-      handleMissingParentId
-        .then((resolveModal) => {
-          cmd.addIds();
-          v.hideUserPrompt(resolveModal);
-          console.log('Added ids and proceed.');
-          let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
-          uuids.push(markupUuid);
-        })
-        .catch((resolveModal) => {
-          v.hideUserPrompt(resolveModal);
-          console.log('Aborting action because of missing parent id.');
+          ]);
         });
-    } else {
-      let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
-      uuids.push(markupUuid);
 
-      // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
-    }
-  });
+        handleMissingParentId
+          .then((resolveModal) => {
+            cmd.addIds();
+            v.hideUserPrompt(resolveModal);
+            console.log('Added ids and proceed.');
+            let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
+            uuids.push(markupUuid);
+          })
+          .catch((resolveModal) => {
+            v.hideUserPrompt(resolveModal);
+            console.log('Aborting action because of missing parent id.');
+          });
+      } else {
+        let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
+        uuids.push(markupUuid);
 
-  // Go over the existing copied childs to modify dependent IDs to other modified elements
-  copiedChilds.forEach((item) => {
-    dutils.modifyDependenIDs(item, dicOld2NewIDs);
-  });
-
-  if (uuids.length > 0) {
-    v.selectedElements = [];
-    uuids.forEach((u) => v.selectedElements.push(u));
-    if (v.selectedElements.length > 1) {
-      // add corresp attribute to markup elements
-      addCorrespAttr(v.selectedElements);
-    }
-    v.selectedElements.forEach((id) => {
-      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
-      let parentEl = el.parentNode;
-      replaceInEditor(cm, parentEl, true);
-      replaceInEditor(cm, el, true); // to select new markup element
+        // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
+      }
     });
-  }
 
-  addApplicationInfo(v, cm);
-  v.allowCursorActivity = true; // update notation again
-  cm.blockChanges = false;
+    // Go over the existing copied childs to modify dependent IDs to other modified elements
+    copiedChilds.forEach((item) => {
+      dutils.modifyDependenIDs(item, dicOld2NewIDs);
+    });
+
+    if (uuids.length > 0) {
+      v.selectedElements = [];
+      uuids.forEach((u) => v.selectedElements.push(u));
+      if (v.selectedElements.length > 1) {
+        // add corresp attribute to markup elements
+        addCorrespAttr(v.selectedElements);
+      }
+      v.selectedElements.forEach((id) => {
+        let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+        let parentEl = el.parentNode;
+        replaceInEditor(cm, parentEl, true);
+        replaceInEditor(cm, el, true); // to select new markup element
+      });
+    }
+
+    addApplicationInfo(v, cm);
+    v.allowCursorActivity = true; // update notation again
+    cm.blockChanges = false;
+  });
 } // addMarkupToXML()
 
 /**
@@ -850,42 +852,44 @@ function mintSuppliedId(id, nodeName, v) {
  * @param {Array} selection
  */
 export function deleteMarkup(selection) {
-  //updateChoiceOptions(markupItem.content, true);
-  selection.forEach((id) => {
-    // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
-    // otherwise there are not all children of alternative encoding elements available
-    if (v.xmlDocOutdated === true) {
-      v.loadXml(cm.getValue(), true);
-    }
-    var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    // only run this when something to delete is found, otherwise we don't need to delete anything
-    // prevents crashes when we have trouble updating the itemList
-    if (toDelete != null) {
-      var parent = toDelete.parentElement;
-      var descendants = new DocumentFragment();
-
-      if (att.alternativeEncodingElements.includes(toDelete.localName)) {
-        let firstChild = toDelete.children[0];
-        for (let i = 0; i < firstChild.children.length; i++) {
-          let child = firstChild.children[i];
-          descendants.appendChild(child.cloneNode(true));
-        }
-      } else {
-        for (let i = 0; i < toDelete.children.length; i++) {
-          let child = toDelete.children[i];
-          descendants.appendChild(child.cloneNode(true));
-        }
+  withSingleUndoStep(cm, () => {
+    //updateChoiceOptions(markupItem.content, true);
+    selection.forEach((id) => {
+      // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
+      // otherwise there are not all children of alternative encoding elements available
+      if (v.xmlDocOutdated === true) {
+        v.loadXml(cm.getValue(), true);
       }
+      var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
+      // only run this when something to delete is found, otherwise we don't need to delete anything
+      // prevents crashes when we have trouble updating the itemList
+      if (toDelete != null) {
+        var parent = toDelete.parentElement;
+        var descendants = new DocumentFragment();
 
-      // replace toDelete element with its children...
-      replaceInEditor(cm, toDelete, true, Array.from(descendants.children));
-      // ... and remove toDelete afterwards
-      parent.replaceChild(descendants, toDelete);
-    } else {
-      console.warn('Failed to delete non-existing markup with xml:id ', id);
-    }
+        if (att.alternativeEncodingElements.includes(toDelete.localName)) {
+          let firstChild = toDelete.children[0];
+          for (let i = 0; i < firstChild.children.length; i++) {
+            let child = firstChild.children[i];
+            descendants.appendChild(child.cloneNode(true));
+          }
+        } else {
+          for (let i = 0; i < toDelete.children.length; i++) {
+            let child = toDelete.children[i];
+            descendants.appendChild(child.cloneNode(true));
+          }
+        }
+
+        // replace toDelete element with its children...
+        replaceInEditor(cm, toDelete, true, Array.from(descendants.children));
+        // ... and remove toDelete afterwards
+        parent.replaceChild(descendants, toDelete);
+      } else {
+        console.warn('Failed to delete non-existing markup with xml:id ', id);
+      }
+    });
+    updateChoiceOptions();
   });
-  updateChoiceOptions();
 } // deleteMarkup()
 
 /**

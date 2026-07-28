@@ -257,6 +257,14 @@ export function refreshAnnotationsInNotation(forceListRefresh = false) {
   annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
   rac.appendChild(annoSvg);
   if (document.getElementById('showAnnotations')?.checked) {
+    // Clear classes/tooltips left on notation elements by a previous call (e.g. for
+    // annotations that no longer exist after an undo/redo) before redrawing from the
+    // current listItems -- drawIdentify/drawHighlight/drawDescribe/drawLink only ever
+    // add these, they never clean up after themselves.
+    scoreSvg.querySelectorAll('.annotationIdentify, .annotationHighlight, .annotationDescribe, .annotationLink').forEach((el) => {
+      el.classList.remove('annotationIdentify', 'annotationHighlight', 'annotationDescribe', 'annotationLink');
+      el.querySelector(':scope > title.annotationTooltip')?.remove();
+    });
     // drawing handlers can draw into renderedAnnotationsSvg if they need to
     // markup does not need to be drawn explicitly because this is already handled by Verovio
     listItems.forEach((a) => {

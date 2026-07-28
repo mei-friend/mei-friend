@@ -8,7 +8,7 @@ import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
 import { cm, fileLocationType, gm, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
-import { addZone, replaceInEditor } from './editor.js';
+import { addZone, replaceInEditor, withSingleUndoStep } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
 
@@ -1021,79 +1021,81 @@ function ingestionInputHandler(ev) {
  * @returns
  */
 function handleFacsimileIngestion(reply) {
-  busy();
-  console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
-  let skelXml = new DOMParser().parseFromString(reply.mei, 'text/xml');
-  let facsimile = skelXml.querySelector('facsimile');
-  let zones = facsimile.querySelectorAll('zone');
-  let music = v.xmlDoc.querySelector('music');
-  if (!music) {
-    return;
-  }
-  v.allowCursorActivity = false;
+  withSingleUndoStep(cm, () => {
+    busy();
+    console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
+    let skelXml = new DOMParser().parseFromString(reply.mei, 'text/xml');
+    let facsimile = skelXml.querySelector('facsimile');
+    let zones = facsimile.querySelectorAll('zone');
+    let music = v.xmlDoc.querySelector('music');
+    if (!music) {
+      return;
+    }
+    v.allowCursorActivity = false;
 
-  // ingest facsimile into target MEI (in music before body)
-  let body = music.querySelector('body');
-  if (body) {
-    music.insertBefore(facsimile, body);
-    let id = body.getAttribute('xml:id');
-    let cr; // cursor
-    if (id) {
-      setCursorToId(cm, id);
-    } else {
-      // search for (first) body element in encoding
-      let sc = cm.getSearchCursor('<body');
-      if (sc.findNext()) {
-        cm.setCursor(sc.from());
+    // ingest facsimile into target MEI (in music before body)
+    let body = music.querySelector('body');
+    if (body) {
+      music.insertBefore(facsimile, body);
+      let id = body.getAttribute('xml:id');
+      let cr; // cursor
+      if (id) {
+        setCursorToId(cm, id);
       } else {
-        let msg = 'Ingesting facsimile failed, because no body element was found. ';
-        v.showAlert(msg);
+        // search for (first) body element in encoding
+        let sc = cm.getSearchCursor('<body');
+        if (sc.findNext()) {
+          cm.setCursor(sc.from());
+        } else {
+          let msg = 'Ingesting facsimile failed, because no body element was found. ';
+          v.showAlert(msg);
+        }
       }
+      cr = cm.getCursor();
+      cm.replaceRange(xmlToString(facsimile) + '\n', cr);
+      let cr2 = cm.getCursor();
+      for (let l = cr.line; l <= cr2.line; l++) {
+        cm.indentLine(l);
+      }
+      // loadFacsimile(v.xmlDoc);
+      console.log('Adding facsimile before body', facsimile);
     }
-    cr = cm.getCursor();
-    cm.replaceRange(xmlToString(facsimile) + '\n', cr);
-    let cr2 = cm.getCursor();
-    for (let l = cr.line; l <= cr2.line; l++) {
-      cm.indentLine(l);
-    }
-    // loadFacsimile(v.xmlDoc);
-    console.log('Adding facsimile before body', facsimile);
-  }
 
-  let warnings = '';
-  zones.forEach((z) => {
-    let zoneId = '';
-    if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
-    let type = '';
-    if (z.hasAttribute('type')) type = z.getAttribute('type');
-    let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
-    ms.forEach((m) => {
-      let n = m.getAttribute('n');
-      let pointerElement = music.querySelectorAll(type + '[n="' + n + '"]');
-      if (pointerElement.length < 1) {
-        warnings += type + '@n not found: n=' + n + '.<br>';
-      }
-      if (pointerElement.length > 1) {
-        warnings += type + '@n not unique: n=' + n + '.<br>';
-      }
-      if (pointerElement.length === 1) {
-        // console.info('Adding @facs=' + zoneId + ' to ', pointerElement)
-        pointerElement.item(0).setAttribute('facs', '#' + zoneId);
-        replaceInEditor(cm, pointerElement.item(0));
-      }
+    let warnings = '';
+    zones.forEach((z) => {
+      let zoneId = '';
+      if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
+      let type = '';
+      if (z.hasAttribute('type')) type = z.getAttribute('type');
+      let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
+      ms.forEach((m) => {
+        let n = m.getAttribute('n');
+        let pointerElement = music.querySelectorAll(type + '[n="' + n + '"]');
+        if (pointerElement.length < 1) {
+          warnings += type + '@n not found: n=' + n + '.<br>';
+        }
+        if (pointerElement.length > 1) {
+          warnings += type + '@n not unique: n=' + n + '.<br>';
+        }
+        if (pointerElement.length === 1) {
+          // console.info('Adding @facs=' + zoneId + ' to ', pointerElement)
+          pointerElement.item(0).setAttribute('facs', '#' + zoneId);
+          replaceInEditor(cm, pointerElement.item(0));
+        }
+      });
     });
-  });
-  if (warnings) {
-    warnings = '<h2>Facsimile ingested.</h2>These problems were encountered during facsimile ingestion:<br>' + warnings;
-    v.showAlert(warnings, 'warning');
-    // console.log(warnings);
-  }
+    if (warnings) {
+      warnings = '<h2>Facsimile ingested.</h2>These problems were encountered during facsimile ingestion:<br>' + warnings;
+      v.showAlert(warnings, 'warning');
+      // console.log(warnings);
+    }
 
-  // uncheck edit zones after ingest
-  document.getElementById('editFacsimileZones').checked = false;
-  v.updateData(cm, false, true);
-  v.allowCursorActivity = true;
-  busy(false);
+    // uncheck edit zones after ingest
+    document.getElementById('editFacsimileZones').checked = false;
+    v.updateData(cm, false, true);
+    v.allowCursorActivity = true;
+    busy(false);
+  });
 } // handleFacsimileIngestion()
 
 /**
