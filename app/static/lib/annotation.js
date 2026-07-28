@@ -128,6 +128,7 @@ export function drawDescribe(a) {
         e.classList.add('annotationDescribe');
         // create a title element within the described element to house the description (which will be available on hover)
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        title.classList.add('annotationTooltip');
         title.innerHTML = a.description;
         // slot it in as the first child of the selected element
         e.insertBefore(title, e.firstChild);
@@ -157,6 +158,7 @@ export function drawLink(a) {
         e.classList.add('annotationLink');
         // create a title element within the linked element to house the url (which will be available on hover)
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        title.classList.add('annotationTooltip');
         title.innerHTML = translator.lang.drawLinkUrl.text + ': ' + a.url;
         // slot it in as the first child of the selected element
         e.insertBefore(title, e.firstChild);
