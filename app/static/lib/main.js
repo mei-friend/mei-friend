@@ -1102,16 +1102,18 @@ async function vrvWorkerEventsHandler(ev) {
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
-      // add section selector
-      let ss = document.getElementById('sectionSelect');
-      while (ss.options.length > 0) ss.remove(0); // clear existing options
+      // add section selector (or hide it if only one section)
+      let sectionSelect = document.getElementById('sectionSelect');
+      while (sectionSelect.options.length > 0) sectionSelect.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
-        sections.forEach((opt) => ss.options.add(new Option(opt[0], opt[1])));
-        ss.style.display = 'block';
+        sections.forEach((opt) => sectionSelect.options.add(new Option(opt[0], opt[1])));
+        sectionSelect.style.display = 'block';
       } else {
-        ss.style.display = 'none';
+        sectionSelect.style.display = 'none';
       }
+      
+      // update page count and page number display
       let bs = document.getElementById('breaksSelect').value;
       if (ev.data.pageCount && !v.speedMode) {
         v.pageCount = ev.data.pageCount;
