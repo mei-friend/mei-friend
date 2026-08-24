@@ -1067,21 +1067,35 @@ export function setChoiceOptions(active, selector) {
   }
 } // setChoiceOptions()
 
-// checks xmlDoc for section, ending, lem, rdg elements for quick navigation
-export function generateSectionSelect(xmlDoc) {
+/**
+ * Selector for quick-navigation elements (mdiv, section, ending, lem, rdg).
+ * mdiv is only included if there are multiple mdivs in the document -- with
+ * just one, it has nothing meaningful to distinguish it from the document root.
+ * @param {Document} xmlDoc - The XML document to check
+ * @returns {string} - The CSS selector
+ */
+function getSectionSelectSelector(xmlDoc) {
   let selector = 'section,ending,lem,rdg';
-  let sections = [
-    // first option with empty string for Firefox (TODO: beautify)
-    ['', ''],
-  ];
+  let baseSection = xmlDoc.querySelector('music body');
+  if (baseSection && baseSection.querySelectorAll('mdiv').length > 1) {
+    selector = 'mdiv,' + selector;
+  }
+  return selector;
+} // getSectionSelectSelector()
+
+/**
+ * Checks xmlDoc for mdiv, section, ending, lem, rdg elements
+ * for quick navigation. mdiv is only added if there are multiple
+ * mdivs in the document.
+ * @param {Document} xmlDoc - The XML document to check
+ * @returns {Array} - An array of section options
+ */
+export function generateSectionSelect(xmlDoc) {
+  let selector = getSectionSelectSelector(xmlDoc);
+  let sections = [];
   let baseSection = xmlDoc.querySelector('music body');
   if (baseSection) {
-    // check if there are multiple mdivs, if so, add mdiv to selector
-    if (baseSection.querySelectorAll('mdiv').length > 1) {
-      selector = 'mdiv,' + selector;
-    }
-    let els = baseSection.querySelectorAll(selector);
-    els.forEach((el) => {
+    baseSection.querySelectorAll(selector).forEach((el) => {
       let str = '';
       let parent = el.parentElement.closest(selector);
       if (parent) {
@@ -1090,10 +1104,26 @@ export function generateSectionSelect(xmlDoc) {
       }
       sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
     });
-    if (sections.length === 2) sections.pop(); // remove if only the one section
   }
   return sections;
 } // generateSectionSelect()
+
+/**
+ * Keeps the #sectionSelect dropdown in sync with the current position, so it
+ * reflects the section/mdiv/ending/lem/rdg element containing `id` regardless
+ * of how that position was reached (encoding cursor, notation click, page/note
+ * navigation, etc.). No-op while the selector is hidden (nothing to sync) or
+ * when `id` cannot be resolved to an element.
+ * @param {Document} xmlDoc - The current XML document
+ * @param {string} id - xml:id of the element to locate
+ */
+export function updateSectionSelectValue(xmlDoc, id) {
+  let sectionSelect = document.getElementById('sectionSelect');
+  if (!sectionSelect || sectionSelect.style.display === 'none' || !id || !xmlDoc) return;
+  let el = xmlDoc.querySelector('[*|id="' + id + '"]');
+  let section = el?.closest(getSectionSelectSelector(xmlDoc));
+  if (section) sectionSelect.value = section.getAttribute('xml:id');
+} // updateSectionSelectValue()
 
 export function addModifyerKeys(root) {
   let modifierKeys = {

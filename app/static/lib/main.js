@@ -1104,11 +1104,13 @@ async function vrvWorkerEventsHandler(ev) {
 
       // add section selector (or hide it if only one section)
       let sectionSelect = document.getElementById('sectionSelect');
+      let previousSectionSelectValue = sectionSelect.value; // preserve selection across the rebuild below
       while (sectionSelect.options.length > 0) sectionSelect.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
         sections.forEach((opt) => sectionSelect.options.add(new Option(opt[0], opt[1])));
         sectionSelect.style.display = 'block';
+        sectionSelect.value = previousSectionSelectValue;
       } else {
         sectionSelect.style.display = 'none';
       }
@@ -2223,11 +2225,14 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileCloseButton').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
-  let ss = document.getElementById('sectionSelect');
-  ss.addEventListener('change', () => {
+  document.getElementById('sectionSelect')?.addEventListener('change', () => {
     v.allowCursorActivity = false;
-    setCursorToId(cm, ss.value);
-    v.updatePage(cm, '', ss.value);
+    // clear any previously selected element so the resulting updateHighlight()
+    // call picks up the section just chosen (from the cursor) instead of
+    // re-resolving stale selectedElements and overriding this selection
+    v.selectedElements = [];
+    setCursorToId(cm, sectionSelect.value);
+    v.updatePage(cm, '', sectionSelect.value);
     v.allowCursorActivity = true;
   });
   document.getElementById('firstPageButton').addEventListener('click', cmd.firstPage);

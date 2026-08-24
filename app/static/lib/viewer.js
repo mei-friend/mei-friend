@@ -10,6 +10,7 @@ import {
   setControlMenuState,
   setCheckbox,
   adjustCtrlMenuOverflow,
+  updateSectionSelectValue,
 } from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
@@ -1348,6 +1349,11 @@ export default class Viewer {
       console.log('updateHighlight() take id from cursor: ' + ids[0]);
     }
     // console.info('updateHighlight() ids: ', ids);
+
+    // keep the section-navigation dropdown in sync with the current position,
+    // regardless of how it was reached (encoding cursor, notation click, page/note
+    // navigation, etc.) -- updateHighlight() runs after all of them.
+    updateSectionSelectValue(this.xmlDoc, ids[0]);
 
     // highlight those elements
     for (let id of ids) {
