@@ -1069,13 +1069,17 @@ export function setChoiceOptions(active, selector) {
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {
-  let selector = 'mdiv,section,ending,lem,rdg';
+  let selector = 'section,ending,lem,rdg';
   let sections = [
-    //first option with empty string for Firefox (TODO: beautify)
+    // first option with empty string for Firefox (TODO: beautify)
     ['', ''],
   ];
   let baseSection = xmlDoc.querySelector('music body');
   if (baseSection) {
+    // check if there are multiple mdivs, if so, add mdiv to selector
+    if (baseSection.querySelectorAll('mdiv').length > 1) {
+      selector = 'mdiv,' + selector;
+    }
     let els = baseSection.querySelectorAll(selector);
     els.forEach((el) => {
       let str = '';
