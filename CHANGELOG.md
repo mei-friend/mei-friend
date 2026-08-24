@@ -7,7 +7,7 @@
 * Insert `encodingDesc` (including `applicationInfo`) and if absent `fileDesc` in correct element order of `meiHead`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198) thx @fernandoherreradelasheras. 
 * mei-friend insert and manipulate actions (including annotations and markup) stored as one undoable action in the CodeMirror editor history (fixes [#179](https://github.com/mei-friend/mei-friend/issues/179)).
 * Support for `mdiv`s in section select menu (mdiv still not supported in SpeedMode), current position in score is reflected in selected option of section select menu.
-
+* Add Verovio version 6.3.0 to toolkit list
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)
 * Your GitHub access token (the key which allows access to your repositories) was previously kept in your browser, and is now kept securely on the mei-friend server instead; logging out now fully invalidates it. The previous approach could in principle have been exploited (e.g. by malicious browser extensions), but we have no indication that this ever happened. On your next login, GitHub will ask you to re-authorize mei-friend once — this automatically invalidates all previously issued access keys.
