@@ -1102,16 +1102,20 @@ async function vrvWorkerEventsHandler(ev) {
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
-      // add section selector
-      let ss = document.getElementById('sectionSelect');
-      while (ss.options.length > 0) ss.remove(0); // clear existing options
+      // add section selector (or hide it if only one section)
+      let sectionSelect = document.getElementById('sectionSelect');
+      let previousSectionSelectValue = sectionSelect.value; // preserve selection across the rebuild below
+      while (sectionSelect.options.length > 0) sectionSelect.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
-        sections.forEach((opt) => ss.options.add(new Option(opt[0], opt[1])));
-        ss.style.display = 'block';
+        sections.forEach((opt) => sectionSelect.options.add(new Option(opt[0], opt[1])));
+        sectionSelect.style.display = 'block';
+        sectionSelect.value = previousSectionSelectValue;
       } else {
-        ss.style.display = 'none';
+        sectionSelect.style.display = 'none';
       }
+      
+      // update page count and page number display
       let bs = document.getElementById('breaksSelect').value;
       if (ev.data.pageCount && !v.speedMode) {
         v.pageCount = ev.data.pageCount;
@@ -2221,11 +2225,14 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileCloseButton').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
-  let ss = document.getElementById('sectionSelect');
-  ss.addEventListener('change', () => {
+  document.getElementById('sectionSelect')?.addEventListener('change', () => {
     v.allowCursorActivity = false;
-    setCursorToId(cm, ss.value);
-    v.updatePage(cm, '', ss.value);
+    // clear any previously selected element so the resulting updateHighlight()
+    // call picks up the section just chosen (from the cursor) instead of
+    // re-resolving stale selectedElements and overriding this selection
+    v.selectedElements = [];
+    setCursorToId(cm, sectionSelect.value);
+    v.updatePage(cm, '', sectionSelect.value);
     v.allowCursorActivity = true;
   });
   document.getElementById('firstPageButton').addEventListener('click', cmd.firstPage);
