@@ -841,8 +841,7 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
   // move-to and move-back prevents oscillation that arose from disagreement between the
   // two paths (e.g. cached width sums that ignored inter-element margins).
   const FIT_GAP = 1; // px — required gap between child's right edge and ctrlMenu's right
-  const overflows = (child, ctrlMenuRight) =>
-    child.getBoundingClientRect().right > ctrlMenuRight - FIT_GAP;
+  const overflows = (child, ctrlMenuRight) => child.getBoundingClientRect().right > ctrlMenuRight - FIT_GAP;
 
   // Move any overflowing children (and all later siblings, to preserve order) into the
   // overflow menu.  Returns true if any items were moved, so the caller can run a second
@@ -1070,12 +1069,12 @@ export function setChoiceOptions(active, selector) {
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {
-  let selector = 'section,ending,lem,rdg';
+  let selector = 'mdiv,section,ending,lem,rdg';
   let sections = [
     //first option with empty string for Firefox (TODO: beautify)
     ['', ''],
   ];
-  let baseSection = xmlDoc.querySelector('music score');
+  let baseSection = xmlDoc.querySelector('music body');
   if (baseSection) {
     let els = baseSection.querySelectorAll(selector);
     els.forEach((el) => {
