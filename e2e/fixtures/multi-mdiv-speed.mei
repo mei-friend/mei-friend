@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Multi-mdiv speed-mode fixture</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv xml:id="mdiv1">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="section1">
+            <measure xml:id="m1a" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-m1a-1" dur="4" oct="4" pname="c"/>
+                  <note xml:id="note-m1a-2" dur="4" oct="4" pname="d"/>
+                  <note xml:id="note-m1a-3" dur="4" oct="4" pname="e"/>
+                  <note xml:id="note-m1a-4" dur="4" oct="4" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterM1a"/>
+            <measure xml:id="m1b" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-m1b-1" dur="4" oct="4" pname="g"/>
+                  <note xml:id="note-m1b-2" dur="4" oct="4" pname="a"/>
+                  <note xml:id="note-m1b-3" dur="4" oct="4" pname="b"/>
+                  <note xml:id="note-m1b-4" dur="4" oct="5" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+      <!-- mdiv2 starts with NO leading break, so its first measure (m2a)
+           shares a rendered page with mdiv1's last measure (m1b): a
+           genuine mixed-mdiv page. -->
+      <mdiv xml:id="mdiv2">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" keysig="2s"/>
+              <staffDef n="2" lines="5" clef.shape="F" clef.line="4" meter.count="3" meter.unit="4" keysig="2s"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="section2">
+            <measure xml:id="m2a" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-m2a-s1-1" dur="4" oct="5" pname="d"/>
+                  <note xml:id="note-m2a-s1-2" dur="4" oct="5" pname="e"/>
+                  <note xml:id="note-m2a-s1-3" dur="4" oct="5" pname="f"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-m2a-s2-1" dur="4" oct="3" pname="d"/>
+                  <note xml:id="note-m2a-s2-2" dur="4" oct="3" pname="e"/>
+                  <note xml:id="note-m2a-s2-3" dur="4" oct="3" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterM2a"/>
+            <measure xml:id="m2b" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-m2b-s1-1" dur="4" oct="5" pname="g"/>
+                  <note xml:id="note-m2b-s1-2" dur="4" oct="5" pname="a"/>
+                  <note xml:id="note-m2b-s1-3" dur="4" oct="5" pname="b"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-m2b-s2-1" dur="4" oct="3" pname="g"/>
+                  <note xml:id="note-m2b-s2-2" dur="4" oct="3" pname="a"/>
+                  <note xml:id="note-m2b-s2-3" dur="4" oct="3" pname="b"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+      <!-- mdiv3 has an explicit leading break, so it lands cleanly on its
+           own page, with no content mixed in from mdiv2. -->
+      <mdiv xml:id="mdiv3">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="4f"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="section3">
+            <pb xml:id="pbBeforeMdiv3"/>
+            <measure xml:id="m3a" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-m3a-1" dur="4" oct="4" pname="d"/>
+                  <note xml:id="note-m3a-2" dur="4" oct="4" pname="e"/>
+                  <note xml:id="note-m3a-3" dur="4" oct="4" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

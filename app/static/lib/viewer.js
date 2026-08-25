@@ -293,7 +293,8 @@ export default class Viewer {
 
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
-      let music = speedMeiDoc.querySelector('music score');
+      // 'music body' (not 'music score') so breaks in any mdiv are counted, not just the first
+      let music = speedMeiDoc.querySelector('music body');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';

@@ -32,6 +32,14 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.
  * and following dummy pages added with one meashre on each for anchoring
  * cross-page spanners. For page 1, no preceding dummy page is added, only a
  * following one.
+ *
+ * Walks every `<mdiv><score>` in the document, in document order (not just
+ * the first), threading a shared page/measure counter across mdiv
+ * boundaries, so a page belonging to any mdiv can be located and rendered.
+ * If a page's content straddles two (or more) mdivs, every contributing
+ * mdiv is rendered onto that one page, each keeping its own `<scoreDef>` --
+ * matching how normal/full mode's Verovio-driven layout can likewise mix
+ * mdivs onto a single page when no explicit break falls at the boundary.
  */
 export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, includeDummyMeasures = true) {
   const meiHeader = xmlDoc.querySelector('meiHead');
@@ -40,9 +48,11 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     return;
   }
   // console.info('getPageFromDom(' + pageNo + ') meiHead: ', meiHeader);
-  let xmlScore = xmlDoc.querySelector('mdiv > score');
-  if (!xmlScore) {
-    console.info('getPageFromDom(): no xmlScore element');
+  // all scores in document order, spanning every <mdiv> (not just the first)
+  const musicBody = xmlDoc.querySelector('music body');
+  const xmlScores = musicBody ? Array.from(musicBody.querySelectorAll('score')) : [];
+  if (xmlScores.length === 0) {
+    console.info('getPageFromDom(): no score element');
     return;
   }
 
@@ -64,61 +74,99 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   spdNode.setAttribute('meiversion', meiVersion);
 
   spdNode.appendChild(meiHeader.cloneNode(true));
-  spdNode.appendChild(minimalMEIMusicTree(xmlDoc));
-  const scoreDef = /** @type {Element | undefined} */ (xmlScore.querySelector('music scoreDef')?.cloneNode(true));
-  if (!scoreDef) {
-    console.info('getPageFromDom(): no scoreDef element');
+  const musicEl = minimalMEIMusicBody(xmlDoc);
+  spdNode.appendChild(musicEl);
+  const bodyEl = /** @type {Element} */ (musicEl.querySelector('body'));
+
+  // page/measure counters, threaded across all scores below so counting
+  // continues correctly across an mdiv boundary instead of restarting at
+  // page 1 for every mdiv
+  let state = { p: 1, mNo: 1, done: false, matched: false, countNow: false };
+  /** @type {{xmlScore: Element, scoreDef: Element, spdScore: Element, baseSection: Element} | null} */
+  let firstDest = null; // first mdiv/score contributing pageNo's content
+  /** @type {{xmlScore: Element, scoreDef: Element, spdScore: Element, baseSection: Element} | null} */
+  let lastDest = null; // last mdiv/score contributing pageNo's content (===firstDest unless the page spans an mdiv boundary)
+
+  for (let s = 0; s < xmlScores.length && state.p <= pageNo && !state.done; s++) {
+    const xmlScore = xmlScores[s];
+    const scoreDefSrc = xmlScore.querySelector('music scoreDef');
+    if (!scoreDefSrc) continue;
+    const scoreDef = /** @type {Element} */ (scoreDefSrc.cloneNode(true));
+
+    let baseSection = xmlDoc.createElementNS(meiNameSpace, 'section');
+    baseSection.setAttributeNS(xmlNameSpace, 'xml:id', firstDest ? 'baseSection-' + s : 'baseSection');
+    let mdiv = xmlDoc.createElementNS(meiNameSpace, 'mdiv');
+    let spdScore = xmlDoc.createElementNS(meiNameSpace, 'score');
+    mdiv.appendChild(spdScore);
+
+    spdScore.appendChild(scoreDef); // is updated within readSection()
+    spdScore.appendChild(baseSection);
+
+    state.matched = false; // reset: does THIS mdiv actually contain pageNo?
+    let digger = readSection(pageNo, spdScore, breaks, countingMode, state);
+    xmlScore.childNodes.forEach((item) => {
+      if (item.nodeName === 'section') {
+        // diggs into section hierachy
+        let returnSection = digger(/** @type {Element}*/ (item));
+        baseSection.appendChild(returnSection);
+      }
+    });
+
+    if (!state.matched) continue; // pageNo isn't in this mdiv; try the next one
+
+    if (!firstDest && pageNo > 1 && includeDummyMeasures) {
+      // this is the first mdiv contributing to pageNo: add the "before"
+      // context anchor, sourced from this mdiv's own scoreDef/staff count
+      let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
+      measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
+      baseSection.insertBefore(measure, baseSection.firstChild);
+      let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
+      startingPb.setAttributeNS(xmlNameSpace, 'xml:id', 'startingPb');
+      baseSection.insertBefore(startingPb, measure.nextSibling);
+    }
+
+    bodyEl.appendChild(mdiv);
+    const thisDest = { xmlScore, scoreDef, spdScore, baseSection };
+    if (!firstDest) firstDest = thisDest;
+    lastDest = thisDest;
+    // no `break` here: pageNo may continue into a further mdiv (rendered as
+    // one page containing content from more than one mdiv, matching how
+    // normal/full mode's Verovio-driven layout can mix mdivs onto one page).
+    // A later mdiv that doesn't match (the common case) is a harmless no-op
+    // and the loop then stops on its own via the `for` condition below.
+  }
+
+  if (!firstDest) {
+    console.info('getPageFromDom(): page ' + pageNo + ' not found in any mdiv');
     return;
   }
-  // console.info('scoreDef: ', scoreDef);
-  let baseSection = xmlDoc.createElementNS(meiNameSpace, 'section');
-  baseSection.setAttributeNS(xmlNameSpace, 'xml:id', 'baseSection');
-  // console.info('section: ', baseSection);
 
-  if (pageNo > 1 && includeDummyMeasures) {
-    let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
-    measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
-    baseSection.appendChild(measure);
-    let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
-    startingPb.setAttributeNS(xmlNameSpace, 'xml:id', 'startingPb');
-    baseSection.appendChild(startingPb);
-  }
-  let spdScore = /** @type {Element} */ (spdNode.querySelector('mdiv > score'));
-  // console.info('spdScore: ', spdScore);
-
-  spdScore.appendChild(scoreDef); // is updated within readSection()
-  spdScore.appendChild(baseSection);
-
-  let digger = readSection(pageNo, spdScore, breaks, countingMode);
-  let sections = xmlScore.childNodes;
-  sections.forEach((item) => {
-    if (item.nodeName === 'section') {
-      // diggs into section hierachy
-      let returnSection = digger(/** @type {Element}*/ (item));
-      baseSection.appendChild(returnSection);
-    }
-  });
-
-  // add third measure (even if last page)
+  // add third measure (even if last page), sourced from the LAST contributing
+  // mdiv's own scoreDef/staff count
+  const { scoreDef: lastScoreDef, baseSection: lastBaseSection } = /** @type {NonNullable<typeof lastDest>} */ (
+    lastDest
+  );
   if (includeDummyMeasures) {
-    let m = dummyMeasure(xmlDoc, countStaves(scoreDef));
+    let m = dummyMeasure(xmlDoc, countStaves(lastScoreDef));
     m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
-    baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
-    baseSection.appendChild(m);
+    lastBaseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
+    lastBaseSection.appendChild(m);
   }
 
-  // matchTimespanningElements(xmlScore, spdScore, pageNo);
+  // matchTimespanningElements(xmlScore, spdNode, pageNo);
 
   if (includeDummyMeasures && Object.keys(pageSpanners.start).length > 0) {
-    addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, breaks);
+    addPageSpanningElements(xmlDoc, spdNode, pageSpanners, pageNo, breaks);
   }
 
-  // insert sb elements for each element except last
+  // insert sb elements for each element except last -- searched across the
+  // whole destination document, since breaks[pageNo]'s ids may belong to
+  // either mdiv when the page spans an mdiv boundary
   if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0 && !Array.isArray(breaks)) {
     breaks[pageNo].forEach((id, i) => {
       if (i < breaks[pageNo].length - 1) {
         // last element is a <pb>
-        let m = spdScore.querySelector('[*|id="' + id + '"]');
+        let m = spdNode.querySelector('[*|id="' + id + '"]');
         // console.info("spd(p:" + pageNo + " i:" + i + "): id=" + id + ", m:", m);
         if (m) {
           let sb = xmlDoc.createElementNS(meiNameSpace, 'sb');
@@ -146,19 +194,31 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * closure takes as argument.
  * @param {Breaks} breaks
  * @param {string} countingMode
+ * @param {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean}} state
+ * Page/measure counters shared across every `readSection()` call made for
+ * one `getPageFromDom()` invocation (one call per candidate `<mdiv>`), so
+ * counting continues correctly across an mdiv boundary instead of
+ * restarting at page 1 for every mdiv. `state.done` signals the quick
+ * "first page" heuristic has collected enough measures and no further
+ * mdiv needs to be visited. `state.matched` is set whenever real content
+ * for `pageNo` is actually appended -- the caller resets it to `false`
+ * before each call to detect whether THIS mdiv is the one that contains
+ * `pageNo` (a `<score>` with no matching content simply has no `<section>`
+ * children reduced to `pageNo`, so `matched` stays `false`). `state.countNow`
+ * (once the first measure of the whole document is seen) must stay shared
+ * too, so a later mdiv's own leading break is recognised as a real break
+ * rather than re-triggering the "ignore breaks before the first measure"
+ * rule for every mdiv.
  * @returns {function(Element): Element}  Recursive closure that takes an
  * original `<section>` as argument and creates a new `<section>` with the
  * content of the original `<section>` reduced to the page with page number
  * `pageNo`.
  */
-function readSection(pageNo, spdScore, breaks, countingMode) {
-  let p = 1; // page count
-  let mNo = 1; // measure count (for a fast first page, with breaks = '')
+function readSection(pageNo, spdScore, breaks, countingMode, state) {
   let mxMeasures = 50; // for a quick first page
   let breaksSelector = '';
   // For 'encodedBreaks', `breaks` will always be an Array of 'sb' and 'pb'
   if (countingMode === 'encodedBreaks') breaksSelector = /** @type {string[]} */ (breaks).join(', ');
-  let countNow = false; // to ignore encoded page breaks before first measure
   let staffDefs = spdScore.querySelectorAll('staffDef');
 
   // recursive closure to dig through hierarchically stacked sections and append
@@ -174,13 +234,15 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
     let children = section.childNodes;
     let lgt = children.length;
     for (let i = 0; i < lgt; i++) {
-      if (countingMode === 'firstPage' && mNo >= mxMeasures)
+      if (countingMode === 'firstPage' && state.mNo >= mxMeasures) {
         // exit with first page
+        state.done = true;
         return newSection;
-      if (p > pageNo) break; // only until requested pageNo is processed
+      }
+      if (state.p > pageNo) break; // only until requested pageNo is processed
       if (children[i].nodeType !== Node.ELEMENT_NODE) continue;
       let currentNode = /** @type {Element} */ (children[i]);
-      // console.info('digDeeper(' + pageNo + '): p: ' + p +
+      // console.info('digDeeper(' + pageNo + '): p: ' + state.p +
       //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
       // copy expansion elements to new section
@@ -197,20 +259,23 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         continue;
       }
       if (currentNodeName === 'measure') {
-        countNow = true; // increment m when counting measures for a quick first page
+        // shared across mdivs: once the first measure of the whole document
+        // has been seen, a later mdiv's own leading break is a real break,
+        // not a "before the first measure" break to be ignored
+        state.countNow = true; // increment m when counting measures for a quick first page
       }
 
       if (countingMode === 'firstPage') {
-        if (currentNodeName === 'measure') mNo++;
-        else currentNode.querySelectorAll('measure').forEach(() => mNo++);
+        if (currentNodeName === 'measure') state.mNo++;
+        else currentNode.querySelectorAll('measure').forEach(() => state.mNo++);
         // } else if (countingMode === 'measure') {
-        //   if (currentNodeName === 'measure') p++;
-        //   else currentNode.querySelectorAll('measure').forEach(() => p++);
+        //   if (currentNodeName === 'measure') state.p++;
+        //   else currentNode.querySelectorAll('measure').forEach(() => state.p++);
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
         // For 'encodedBreaks', `breaks` is an Array
         if (
-          countNow &&
+          state.countNow &&
           currentNodeName !== 'ending' &&
           /** @type {string[]} */ (
             // @ts-ignore
@@ -218,7 +283,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
               (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
         ) {
-          if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
+          if (dutils.countAsBreak(sb ? sb : currentNode)) state.p++;
           continue;
         }
         // ignore system/page breaks in other countingModes
@@ -226,7 +291,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 
       // update scoreDef @key.sig attribute or keySig@sig and
       // for @meter@count/@unit attr or meterSig@count/unit.
-      if (currentNodeName === 'scoreDef' && p < pageNo) {
+      if (currentNodeName === 'scoreDef' && state.p < pageNo) {
         const scoreDef = /** @type {Element} */ (currentNode);
         const keySig = scoreDef.getAttribute('key.sig') || scoreDef.querySelector('keySig')?.getAttribute('sig');
         if (keySig) {
@@ -240,7 +305,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       }
 
       // remember tempo@midi.bpm, mm, mm.unit, mm.dots and save it in global scoreDef
-      if (p < pageNo) {
+      if (state.p < pageNo) {
         currentNode.querySelectorAll('tempo').forEach((t) => {
           copyTempoInfo(t, spdScore);
         });
@@ -248,7 +313,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
       let staffDefList = currentNode.querySelectorAll(breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
-      if (staffDefList && staffDefList.length > 0 && p < pageNo) {
+      if (staffDefList && staffDefList.length > 0 && state.p < pageNo) {
         // console.info('staffDef: ', staffDefList);
         for (let st of staffDefList) {
           if (countingMode === 'encodedBreaks' && /** @type {string[]} */ (breaks).includes(st.nodeName)) break;
@@ -297,7 +362,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
       let clefList = currentNode.querySelectorAll(breaksSelector ? breaksSelector + ', clef' : 'clef');
-      if (clefList && clefList.length > 0 && p < pageNo) {
+      if (clefList && clefList.length > 0 && state.p < pageNo) {
         // console.info('clefList: ', clefList);
         for (let clef of clefList) {
           // check clefs of measure, ignore @sameas
@@ -325,10 +390,11 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         // copy elements containing breaks
         let endingNode = /** @type {Element} */ (currentNode.cloneNode(true));
         let breakNode = endingNode.querySelector(breaksSelector);
-        if (p === pageNo && breakNode) {
+        if (state.p === pageNo && breakNode) {
           breakNode.parentNode?.replaceChild(document.createElementNS(meiNameSpace, 'pb'), breakNode);
           newSection.appendChild(endingNode);
-        } else if (p === pageNo - 1 && breakNode) {
+          state.matched = true;
+        } else if (state.p === pageNo - 1 && breakNode) {
           // remove elements until first break
           // remove starting pb (in case of a pb inside endingNode)
           // or replace existing sb inside endingNode with startingPb
@@ -342,28 +408,32 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           newSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
-        p++;
+        state.p++;
         continue;
       }
 
       // append children
-      if (p === pageNo) {
+      if (state.p === pageNo) {
         let nodeCopy = /** @type {Element} */ (currentNode.cloneNode(true));
         if (countingMode === 'computedBreaks') {
           // remove breaks from DOM
           nodeCopy.querySelectorAll('pb, sb').forEach((b) => nodeCopy.removeChild(b));
         }
         newSection.appendChild(nodeCopy);
+        state.matched = true;
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
       // increment in countingMode computedBreaks
       if (countingMode === 'computedBreaks') {
-        if (currentNodeName === 'measure' && currentNode.getAttribute('xml:id') === breaks[p][breaks[p].length - 1])
-          p++;
+        if (
+          currentNodeName === 'measure' &&
+          currentNode.getAttribute('xml:id') === breaks[state.p][breaks[state.p].length - 1]
+        )
+          state.p++;
         else {
           currentNode.querySelectorAll('measure').forEach((m) => {
-            if (m.getAttribute('xml:id') === breaks[p][breaks[p].length - 1]) p++;
+            if (m.getAttribute('xml:id') === breaks[state.p][breaks[state.p].length - 1]) state.p++;
           });
         }
       }
@@ -862,20 +932,20 @@ function copyTempoInfo(sourceNode, targetNode) {
 } // copyTempoInfo()
 
 /**
- * Add time-spanning elements spanning across pages to `spdScore`
- * @param {Element} xmlScore
- * @param {Element} spdScore
+ * Add time-spanning elements spanning across pages to `spdNode`
+ * @param {Document} xmlDoc
+ * @param {Element} spdNode
  * @param {PageSpanners} pageSpanners
  * @param {number} pageNo
  * @param {*} breaks
  */
-function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, breaks) {
+function addPageSpanningElements(xmlDoc, spdNode, pageSpanners, pageNo, breaks) {
   // 1) go through endingElements and add to starting measure (p. 1)
-  const startingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
+  const startingMeasure = /** @type {Element} */ (spdNode.querySelector('[*|id="startingMeasure"]'));
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
     for (let endingElementId of endingElementIds) {
-      let endingElement = xmlScore.querySelector('[*|id="' + endingElementId + '"]');
+      let endingElement = xmlDoc.querySelector('[*|id="' + endingElementId + '"]');
       if (endingElement) {
         let tstamp2 = computeTimeStamp2Attribute(endingElement, 'ending');
         let clonedElement = endingElement.cloneNode(true);
@@ -890,12 +960,12 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
   } // 1) if
 
   // 2) go through startingElements and append to ending measure (p. 3)
-  const endingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
+  const endingMeasure = /** @type {Element} */ (spdNode.querySelector('[*|id="endingMeasure"]'));
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
     for (let startingElementId of startingElementIds) {
-      // find element in spdScore, not in xmlScore, because it gets modified without clone
-      let startingElement = spdScore.querySelector('[*|id="' + startingElementId + '"]');
+      // find element in spdNode, not in xmlDoc, because it gets modified without clone
+      let startingElement = spdNode.querySelector('[*|id="' + startingElementId + '"]');
       if (startingElement) {
         let tstamp2 = computeTimeStamp2Attribute(startingElement, 'starting');
         if (tstamp2) startingElement.setAttribute('tstamp2', tstamp2);
@@ -916,7 +986,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
         let page = getPageNumberForIdInPageSpannersEndObject(elId);
         if (page > 0) {
           console.log('AAAAAcross-page PageSpanner ' + elId + ' from ' + p + ' to ' + page);
-          let el = xmlScore.querySelector('[*|id="' + elId + '"]');
+          let el = xmlDoc.querySelector('[*|id="' + elId + '"]');
           if (el) {
             let tstamp2 = computeTimeStamp2Attribute(el, 'ending');
             let clonedElement = el.cloneNode(true);
@@ -946,10 +1016,10 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
    */
   function addPointingNote(el, searchAttr = 'startid', refMeas) {
     let startid = utils.rmHash(el.getAttribute(searchAttr));
-    let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
+    let startNote = xmlDoc.querySelector('[*|id="' + startid + '"]');
     if (!startNote) return false;
     const staffNo = startNote.closest('staff')?.getAttribute('n') || '-1';
-    if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
+    if (!spdNode.querySelector('[*|id="' + startid + '"]')) {
       let staff = refMeas.querySelector('staff[n="' + staffNo + '"]');
       staff?.querySelector('layer')?.appendChild(startNote.cloneNode(true));
     }
@@ -973,9 +1043,9 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
       // find number of measures until next page/system break
       let nodeList;
       if (Array.isArray(breaks)) {
-        nodeList = xmlScore.querySelectorAll('measure,[*|id="' + elId + '"],' + breaks);
+        nodeList = xmlDoc.querySelectorAll('measure,[*|id="' + elId + '"],' + breaks);
       } else {
-        nodeList = xmlScore.querySelectorAll('measure,[*|id="' + elId + '"]');
+        nodeList = xmlDoc.querySelectorAll('measure,[*|id="' + elId + '"]');
       }
       let dm = 0;
       let count = false;
@@ -1121,6 +1191,17 @@ function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
 export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   let sel = '';
   let page = 1;
+
+  // If `id` refers to a container (mdiv, section, ending, ...) rather than a
+  // leaf, resolve it to its first descendant <measure> before locating a
+  // page. Otherwise the container's own opening tag -- which in document
+  // order precedes anything nested inside it, including a leading page/system
+  // break right at the start of its content -- would resolve to the page
+  // *before* the container's actual content starts.
+  const targetEl = xmlDoc.querySelector('[*|id="' + id + '"]');
+  const firstMeasureId = targetEl?.querySelector('measure')?.getAttribute('xml:id');
+  if (firstMeasureId) id = firstMeasureId;
+
   switch (breaksOption) {
     case 'none':
       return page;
@@ -1143,7 +1224,8 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
       return page;
   }
   if (sel === '') return page;
-  const music = xmlDoc.querySelector('music score') || xmlDoc.documentElement;
+  // 'music body' (not 'music score') so ids in any mdiv can be found, not just the first
+  const music = xmlDoc.querySelector('music body') || xmlDoc.documentElement;
   if (!music) return page;
   let els = Array.from(music.querySelectorAll(sel));
   for (let i = els.length - 1; i >= 0; i--) {
@@ -1177,19 +1259,17 @@ function minimalMEIFile(xmlNode) {
 
 /**
  * @param {Document} xmlNode
- * @returns {Element} A new `<music>` Element with `<body>`, `<mdiv>`, and
- * `<score>` in it
+ * @returns {Element} A new `<music>` Element with an empty `<body>`.
+ * `<mdiv>`/`<score>` children are added on demand, one per contributing
+ * mdiv, by `getPageFromDom()` -- a page may need to source content from any
+ * mdiv in the original document, not just the first.
  */
-function minimalMEIMusicTree(xmlNode) {
+function minimalMEIMusicBody(xmlNode) {
   let music = xmlNode.createElementNS(meiNameSpace, 'music');
   let body = xmlNode.createElementNS(meiNameSpace, 'body');
-  let mdiv = xmlNode.createElementNS(meiNameSpace, 'mdiv');
-  let score = xmlNode.createElementNS(meiNameSpace, 'score');
-  mdiv.appendChild(score);
-  body.appendChild(mdiv);
   music.appendChild(body);
   return music;
-} // minimalMEIMusicTree()
+} // minimalMEIMusicBody()
 
 /**
  * Currently unused. Let's keep it for later.
