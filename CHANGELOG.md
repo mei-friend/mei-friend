@@ -6,7 +6,8 @@
 * Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
 * Insert `encodingDesc` (including `applicationInfo`) and if absent `fileDesc` in correct element order of `meiHead`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198) thx @fernandoherreradelasheras. 
 * mei-friend insert and manipulate actions (including annotations and markup) stored as one undoable action in the CodeMirror editor history (fixes [#179](https://github.com/mei-friend/mei-friend/issues/179)).
-* Support for `mdiv`s in section select menu (mdiv still not supported in SpeedMode), current position in score is reflected in selected option of section select menu.
+* Support for `mdiv`s in section select menu, current position in score is reflected in selected option of section select menu.
+* SpeedMode support for multiple mdivs
 * Add Verovio version 6.3.0 to toolkit list
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)
