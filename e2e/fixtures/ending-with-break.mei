@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Endings containing breaks (speed-mode fixture)</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <!-- A single mdiv, but with the layout that speed mode handles in its own
+           code path: an <ending> (volta bracket) whose content is split by a
+           break, so one page ends and the next begins *inside* the ending.
+           ending1 has content after it in the section, ending2 is the very last
+           element of the section - both cases have to page correctly. -->
+      <mdiv xml:id="mdivEndings">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionEndings">
+            <measure xml:id="mE1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mE1" dur="1" oct="4" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterME1"/>
+            <ending xml:id="ending1" n="1">
+              <measure xml:id="mE2" n="2">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mE2" dur="1" oct="4" pname="d"/>
+                  </layer>
+                </staff>
+              </measure>
+              <sb xml:id="sbInEnding1"/>
+              <measure xml:id="mE3" n="3">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mE3" dur="1" oct="4" pname="e"/>
+                  </layer>
+                </staff>
+              </measure>
+            </ending>
+            <measure xml:id="mE4" n="4">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mE4" dur="1" oct="4" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+            <sb xml:id="sbAfterME4"/>
+            <measure xml:id="mE5" n="5">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mE5" dur="1" oct="4" pname="g"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterME5"/>
+            <ending xml:id="ending2" n="2">
+              <measure xml:id="mE6" n="6">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mE6" dur="1" oct="4" pname="a"/>
+                  </layer>
+                </staff>
+              </measure>
+              <sb xml:id="sbInEnding2"/>
+              <measure xml:id="mE7" n="7">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mE7" dur="1" oct="4" pname="b"/>
+                  </layer>
+                </staff>
+              </measure>
+            </ending>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

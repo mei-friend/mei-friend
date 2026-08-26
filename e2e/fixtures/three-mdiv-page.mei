@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Three mdivs sharing one page (speed-mode fixture)</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <!-- Neither mdivB nor mdivC starts with a break, so page 2 is made up of
+           mA2 + mB1 + mC1: content from THREE different mdivs, each with its own
+           scoreDef and a different number of staves (1 / 3 / 2). -->
+      <mdiv xml:id="mdivA">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionA">
+            <measure xml:id="mA1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mA1" dur="1" oct="4" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMA1"/>
+            <measure xml:id="mA2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mA2" dur="1" oct="4" pname="d"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+      <mdiv xml:id="mdivB">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="1s"/>
+              <staffDef n="2" lines="5" clef.shape="C" clef.line="3" meter.count="4" meter.unit="4" keysig="1s"/>
+              <staffDef n="3" lines="5" clef.shape="F" clef.line="4" meter.count="4" meter.unit="4" keysig="1s"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionB">
+            <measure xml:id="mB1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mB1-s1" dur="1" oct="5" pname="e"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mB1-s2" dur="1" oct="4" pname="e"/>
+                </layer>
+              </staff>
+              <staff n="3">
+                <layer n="1">
+                  <note xml:id="note-mB1-s3" dur="1" oct="3" pname="e"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+      <mdiv xml:id="mdivC">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="6" meter.unit="8" keysig="2f"/>
+              <staffDef n="2" lines="5" clef.shape="F" clef.line="4" meter.count="6" meter.unit="8" keysig="2f"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionC">
+            <measure xml:id="mC1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mC1-s1" dur="2" oct="5" pname="f"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mC1-s2" dur="2" oct="3" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMC1"/>
+            <measure xml:id="mC2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mC2-s1" dur="2" oct="5" pname="g"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mC2-s2" dur="2" oct="3" pname="g"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

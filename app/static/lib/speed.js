@@ -21,8 +21,6 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.
 /** @typedef {'computedBreaks' | 'encodedBreaks' | 'firstPage'} CountingMode */
 /** @typedef {'sb' | 'pb'} Break */
 /** @typedef {'none' | 'auto' | 'line' | 'encoded' | 'smart'} BreaksOption */
-/** @typedef {string | null | undefined} meiVersion */
-let meiVersion = defaultMeiVersion;
 
 /**
  * @param {Document} xmlDoc
@@ -71,8 +69,9 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   // construct new MEI node for Verovio engraving
   let spdNode = minimalMEIFile(xmlDoc);
 
-  // check for mei version or use default
-  meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion') ?? meiVersion;
+  // check for mei version or use default (never inherit it from a previously
+  // processed document, so a file without @meiversion is treated as default)
+  const meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion') || defaultMeiVersion;
   spdNode.setAttribute('meiversion', meiVersion);
 
   spdNode.appendChild(meiHeader.cloneNode(true));
@@ -84,19 +83,24 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   // continues correctly across an mdiv boundary instead of restarting at
   // page 1 for every mdiv
   let state = { p: 1, mNo: 1, done: false, matched: false, countNow: false };
-  /** @type {{xmlScore: Element, scoreDef: Element, spdScore: Element, baseSection: Element} | null} */
-  let firstDest = null; // first mdiv/score contributing pageNo's content
-  /** @type {{xmlScore: Element, scoreDef: Element, spdScore: Element, baseSection: Element} | null} */
-  let lastDest = null; // last mdiv/score contributing pageNo's content (===firstDest unless the page spans an mdiv boundary)
+  let anyDest = false; // has any mdiv contributed pageNo's content yet?
+  /** @type {Element | null} */
+  let lastScoreDef = null; // `<scoreDef>` of the last mdiv contributing to pageNo
+  /** @type {Element | null} */
+  let lastBaseSection = null; // `<section>` of the last mdiv contributing to pageNo
 
   for (let s = 0; s < xmlScores.length && state.p <= pageNo && !state.done; s++) {
     const xmlScore = xmlScores[s];
     const scoreDefSrc = xmlScore.querySelector('music scoreDef');
-    if (!scoreDefSrc) continue;
-    const scoreDef = /** @type {Element} */ (scoreDefSrc.cloneNode(true));
+    // A `<score>` without `<scoreDef>` is invalid MEI, but skipping it would
+    // drop its measures from the page count and shift every later page, so
+    // fall back to an empty `<scoreDef>` and keep counting.
+    const scoreDef = /** @type {Element} */ (
+      scoreDefSrc ? scoreDefSrc.cloneNode(true) : xmlDoc.createElementNS(meiNameSpace, 'scoreDef')
+    );
 
     let baseSection = xmlDoc.createElementNS(meiNameSpace, 'section');
-    baseSection.setAttributeNS(xmlNameSpace, 'xml:id', firstDest ? 'baseSection-' + s : 'baseSection');
+    baseSection.setAttributeNS(xmlNameSpace, 'xml:id', anyDest ? 'baseSection-' + s : 'baseSection');
     let mdiv = xmlDoc.createElementNS(meiNameSpace, 'mdiv');
     let spdScore = xmlDoc.createElementNS(meiNameSpace, 'score');
     mdiv.appendChild(spdScore);
@@ -104,8 +108,22 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     spdScore.appendChild(scoreDef); // is updated within readSection()
     spdScore.appendChild(baseSection);
 
+    if (!anyDest && pageNo > 1 && includeDummyMeasures) {
+      // Add the "before" context anchor, sourced from this mdiv's own
+      // scoreDef/staff count. It has to be in place BEFORE readSection() digs,
+      // because the ending-with-break branch in there relocates `#startingPb`
+      // into the `<ending>`. If this mdiv turns out not to contain pageNo, the
+      // anchor is discarded together with the mdiv.
+      let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
+      measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
+      baseSection.appendChild(measure);
+      let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
+      startingPb.setAttributeNS(xmlNameSpace, 'xml:id', 'startingPb');
+      baseSection.appendChild(startingPb);
+    }
+
     state.matched = false; // reset: does THIS mdiv actually contain pageNo?
-    let digger = readSection(pageNo, spdScore, breaks, countingMode, state);
+    let digger = readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion);
     xmlScore.childNodes.forEach((item) => {
       if (item.nodeName === 'section') {
         // diggs into section hierachy
@@ -116,21 +134,10 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
 
     if (!state.matched) continue; // pageNo isn't in this mdiv; try the next one
 
-    if (!firstDest && pageNo > 1 && includeDummyMeasures) {
-      // this is the first mdiv contributing to pageNo: add the "before"
-      // context anchor, sourced from this mdiv's own scoreDef/staff count
-      let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
-      measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
-      baseSection.insertBefore(measure, baseSection.firstChild);
-      let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
-      startingPb.setAttributeNS(xmlNameSpace, 'xml:id', 'startingPb');
-      baseSection.insertBefore(startingPb, measure.nextSibling);
-    }
-
     bodyEl.appendChild(mdiv);
-    const thisDest = { xmlScore, scoreDef, spdScore, baseSection };
-    if (!firstDest) firstDest = thisDest;
-    lastDest = thisDest;
+    anyDest = true;
+    lastScoreDef = scoreDef;
+    lastBaseSection = baseSection;
     // no `break` here: pageNo may continue into a further mdiv (rendered as
     // one page containing content from more than one mdiv, matching how
     // normal/full mode's Verovio-driven layout can mix mdivs onto one page).
@@ -138,16 +145,13 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     // and the loop then stops on its own via the `for` condition below.
   }
 
-  if (!firstDest) {
+  if (!anyDest || !lastScoreDef || !lastBaseSection) {
     console.info('getPageFromDom(): page ' + pageNo + ' not found in any mdiv');
     return;
   }
 
   // add third measure (even if last page), sourced from the LAST contributing
   // mdiv's own scoreDef/staff count
-  const { scoreDef: lastScoreDef, baseSection: lastBaseSection } = /** @type {NonNullable<typeof lastDest>} */ (
-    lastDest
-  );
   if (includeDummyMeasures) {
     let m = dummyMeasure(xmlDoc, countStaves(lastScoreDef));
     m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
@@ -211,12 +215,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * too, so a later mdiv's own leading break is recognised as a real break
  * rather than re-triggering the "ignore breaks before the first measure"
  * rule for every mdiv.
+ * @param {string} meiVersion  MEI version of the source document, deciding
+ * whether key signatures are written as `@keysig` (MEI >= 5) or `@key.sig`.
  * @returns {function(Element): Element}  Recursive closure that takes an
  * original `<section>` as argument and creates a new `<section>` with the
  * content of the original `<section>` reduced to the page with page number
  * `pageNo`.
  */
-function readSection(pageNo, spdScore, breaks, countingMode, state) {
+function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion = defaultMeiVersion) {
   let mxMeasures = 50; // for a quick first page
   let breaksSelector = '';
   // For 'encodedBreaks', `breaks` will always be an Array of 'sb' and 'pb'
@@ -300,7 +306,7 @@ function readSection(pageNo, spdScore, breaks, countingMode, state) {
           scoreDef.getAttribute('keysig') ||
           scoreDef.querySelector('keySig')?.getAttribute('sig');
         if (keySig) {
-          addKeySigElement(staffDefs, keySig);
+          addKeySigElement(staffDefs, keySig, meiVersion);
         }
         const { count, unit } = getMeter(scoreDef);
         if (count && unit) {
@@ -328,15 +334,7 @@ function readSection(pageNo, spdScore, breaks, countingMode, state) {
             // console.info('staffDef update: keysig: ' + keysigValue);
             for (let staffDef of staffDefs) {
               if (st.getAttribute('n') === staffDef.getAttribute('n')) {
-                let el = document.createElementNS(meiNameSpace, 'keySig');
-                el.setAttribute('sig', keysigValue);
-                //console.info('Updating scoreDef('+st.getAttribute('n')+'): ',el);
-                let k = staffDef.querySelector('keySig');
-                if (k) {
-                  k.setAttribute('sig', keysigValue);
-                } else {
-                  staffDef.appendChild(el);
-                }
+                setKeySig(staffDef, keysigValue, meiVersion);
               }
             }
           } else {
@@ -410,8 +408,9 @@ function readSection(pageNo, spdScore, breaks, countingMode, state) {
           } else {
             startingPd?.remove();
           }
-          // ...and add endingNode
+          // ...and add endingNode (its part after the break belongs to pageNo)
           newSection.appendChild(endingNode);
+          state.matched = true;
         }
         // console.info('Ending with break inside: ', endingNode);
         state.p++;
@@ -1149,19 +1148,33 @@ function addPageSpanningElements(xmlDoc, spdNode, pageSpanners, pageNo, breaks) 
 } // addPageSpanningElements()
 
 /**
- * Helper function to `readSection()`; adds `<keySig>` element to `spdScore`.
+ * Helper function to `readSection()`; sets the key signature of every
+ * `<staffDef>` in `staffDefs`.
  * @param {NodeListOf<Element>} staffDefs
- * @param {string} keysigValue  The value for the `keySig/@sig` attribute.
+ * @param {string} keysigValue  A data.KEYFIFTHS value, such as '3f' or '0'.
+ * @param {string} meiVersion  MEI version of the source document.
  */
-function addKeySigElement(staffDefs, keysigValue) {
+function addKeySigElement(staffDefs, keysigValue, meiVersion = defaultMeiVersion) {
   for (let staffDef of staffDefs) {
-    let k = staffDef.querySelector('keySig');
-    if (k) {
-      k.remove();
-    }
-    staffDef.setAttribute(parseFloat(meiVersion) >= 5.0 ? 'keysig' : 'key.sig', keysigValue);
+    setKeySig(staffDef, keysigValue, meiVersion);
   }
 } // addKeySigElement()
+
+/**
+ * Writes `keysigValue` to a single `<staffDef>`, using the attribute spelling
+ * of the document's MEI version (`@keysig` since MEI 5.0, `@key.sig` before)
+ * and clearing every other way the key signature could be stated on it, so no
+ * two conflicting statements survive on the same `<staffDef>`.
+ * @param {Element} staffDef
+ * @param {string} keysigValue  A data.KEYFIFTHS value, such as '3f' or '0'.
+ * @param {string} meiVersion  MEI version of the source document.
+ */
+function setKeySig(staffDef, keysigValue, meiVersion = defaultMeiVersion) {
+  staffDef.querySelector('keySig')?.remove();
+  staffDef.removeAttribute('key.sig');
+  staffDef.removeAttribute('keysig');
+  staffDef.setAttribute(parseFloat(meiVersion) >= 5.0 ? 'keysig' : 'key.sig', keysigValue);
+} // setKeySig()
 
 /**
  * Helper function to `readSection()`; adds `@meter.sig` to `spdScore`.

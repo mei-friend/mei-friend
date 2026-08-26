@@ -53,19 +53,21 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     console.log('Speed worker: Invalid MEI file. ');
     return undefined;
   }
-  let score;
-  score = getElementByTagName(music.children, 'score', score);
-  if (!score) {
+  // every <mdiv><score> in document order, not just one of them: pages are
+  // counted continuously across mdiv boundaries (same as speed.getPageFromDom())
+  let scores = [];
+  getElementsByTagName(music.children, 'score', scores);
+  if (scores.length === 0) {
     console.log('Speed worker: Missing score element in MEI file.');
     return undefined;
-  } else {
-    // console.log('Speed worker: xmlDoc music > score: ', score);
   }
 
   // collect all time-spanning elements with @startid and @endid
   let tsTable = {}; // object with id as keys and an array of [startid, endid]
   let idList = []; // list of time-pointer ids to be checked
-  tsTable = findTimeSpanningElements(score.children, tsTable, idList);
+  for (const score of scores) {
+    tsTable = findTimeSpanningElements(score.children, tsTable, idList);
+  }
 
   // determine page number for list of ids
   noteTable = {};
@@ -75,7 +77,11 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let tmp = {}; // list of unpaged tstamp2 elements (with xml:id as keys and endMeasure as value)
   let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page
 
-  noteTable = getPageNumberForElements(score.children, noteTable, idList);
+  // `count`, `p` and `measureCount` are shared across the scores below, so
+  // counting continues across an mdiv boundary instead of restarting at page 1
+  for (const score of scores) {
+    noteTable = getPageNumberForElements(score.children, noteTable, idList);
+  }
 
   // packing pageSpanners with different page references
   let p1 = 0;
@@ -229,15 +235,43 @@ function getElementByTagName(nodeArray, elName, el) {
   }
   for (let e of nodeArray) {
     if (e.hasOwnProperty('tagName') && e.tagName === elName) {
-      el = e;
-      break;
+      return e;
     }
     if (e.hasOwnProperty('children')) {
-      el = getElementByTagName(e.children, elName, el);
+      // return as soon as a match is found, so a later sibling's subtree
+      // cannot overwrite it with a match further down the document
+      const found = getElementByTagName(e.children, elName, el);
+      if (found) return found;
     }
   }
   return el;
 } // getElementByTagName()
+
+/**
+ * Collects all elements with tag name elName into els, in document order.
+ * (getElementByTagName() above returns only the first element, which is not
+ * enough for documents with more than one <mdiv>.)
+ * @param {array} nodeArray
+ * @param {string} elName
+ * @param {array} els  Output array, appended to in place
+ * @returns {array} els
+ */
+function getElementsByTagName(nodeArray, elName, els) {
+  if (!Array.isArray(nodeArray)) {
+    console.error('Speed worker: getElementsByTagName(): not an array: ', nodeArray);
+    return els;
+  }
+  for (let e of nodeArray) {
+    if (e.hasOwnProperty('tagName') && e.tagName === elName) {
+      els.push(e);
+      continue; // no nested <score> inside a <score>
+    }
+    if (e.hasOwnProperty('children')) {
+      getElementsByTagName(e.children, elName, els);
+    }
+  }
+  return els;
+} // getElementsByTagName()
 
 // same as in ./utils.js, but importScripts do not seem to do the job...
 function rmHash(hashedString) {

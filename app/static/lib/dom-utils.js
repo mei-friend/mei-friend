@@ -393,7 +393,10 @@ export function generateExpansionList(xmlDoc, baseSelector = 'music score', noEx
 export function getKeySigForNote(xmlDoc, noteElement) {
   if (!xmlDoc || !noteElement || !noteElement.hasAttribute('xml:id')) return '';
   let keySigString = '0';
-  const sigList = xmlDoc.querySelectorAll('[key\\.sig],[sig],[*|id="' + noteElement.getAttribute('xml:id') + '"]');
+  // '[keysig]' is MEI >= 5.0, '[key.sig]' up to MEI 4.0.1, '[sig]' the <keySig> element
+  const sigList = xmlDoc.querySelectorAll(
+    '[key\\.sig],[keysig],[sig],[*|id="' + noteElement.getAttribute('xml:id') + '"]'
+  );
   for (const s of sigList) {
     if (s === noteElement) break;
     keySigString = s.getAttribute('key.sig') || s.getAttribute('keysig') || s.getAttribute('sig') || '0';
