@@ -21,6 +21,8 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.
 /** @typedef {'computedBreaks' | 'encodedBreaks' | 'firstPage'} CountingMode */
 /** @typedef {'sb' | 'pb'} Break */
 /** @typedef {'none' | 'auto' | 'line' | 'encoded' | 'smart'} BreaksOption */
+/** @typedef {string | null | undefined} meiVersion */
+let meiVersion = defaultMeiVersion;
 
 /**
  * @param {Document} xmlDoc
@@ -59,7 +61,8 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   // determine one of three counting modes
   /** @type CountingMode */
   let countingMode = 'firstPage'; // quick first page for xx measures
-  if (Array.isArray(breaks)) countingMode = 'encodedBreaks'; // encoded sb and pb as provided
+  if (Array.isArray(breaks))
+    countingMode = 'encodedBreaks'; // encoded sb and pb as provided
   else if (typeof breaks === 'object' && Object.keys(breaks).length > 0) countingMode = 'computedBreaks'; // breaks object
   // else if (breaks === 'measure') // breaks for each encoded measure
   //   countingMode = 'measure';
@@ -69,8 +72,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   let spdNode = minimalMEIFile(xmlDoc);
 
   // check for mei version or use default
-  let meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion');
-  if (!meiVersion) meiVersion = defaultMeiVersion;
+  meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion') ?? meiVersion;
   spdNode.setAttribute('meiversion', meiVersion);
 
   spdNode.appendChild(meiHeader.cloneNode(true));
@@ -293,7 +295,10 @@ function readSection(pageNo, spdScore, breaks, countingMode, state) {
       // for @meter@count/@unit attr or meterSig@count/unit.
       if (currentNodeName === 'scoreDef' && state.p < pageNo) {
         const scoreDef = /** @type {Element} */ (currentNode);
-        const keySig = scoreDef.getAttribute('key.sig') || scoreDef.querySelector('keySig')?.getAttribute('sig');
+        const keySig =
+          scoreDef.getAttribute('key.sig') ||
+          scoreDef.getAttribute('keysig') ||
+          scoreDef.querySelector('keySig')?.getAttribute('sig');
         if (keySig) {
           addKeySigElement(staffDefs, keySig);
         }
@@ -317,7 +322,8 @@ function readSection(pageNo, spdScore, breaks, countingMode, state) {
         // console.info('staffDef: ', staffDefList);
         for (let st of staffDefList) {
           if (countingMode === 'encodedBreaks' && /** @type {string[]} */ (breaks).includes(st.nodeName)) break;
-          const keysigValue = st.getAttribute('key.sig') || st.querySelector('keySig')?.getAttribute('sig');
+          const keysigValue =
+            st.getAttribute('key.sig') || st.getAttribute('keysig') || st.querySelector('keySig')?.getAttribute('sig');
           if (keysigValue) {
             // console.info('staffDef update: keysig: ' + keysigValue);
             for (let staffDef of staffDefs) {
@@ -1153,7 +1159,7 @@ function addKeySigElement(staffDefs, keysigValue) {
     if (k) {
       k.remove();
     }
-    staffDef.setAttribute('key.sig', keysigValue);
+    staffDef.setAttribute(parseFloat(meiVersion) >= 5.0 ? 'keysig' : 'key.sig', keysigValue);
   }
 } // addKeySigElement()
 

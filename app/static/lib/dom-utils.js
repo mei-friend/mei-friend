@@ -396,7 +396,7 @@ export function getKeySigForNote(xmlDoc, noteElement) {
   const sigList = xmlDoc.querySelectorAll('[key\\.sig],[sig],[*|id="' + noteElement.getAttribute('xml:id') + '"]');
   for (const s of sigList) {
     if (s === noteElement) break;
-    keySigString = s.getAttribute('key.sig') || s.getAttribute('sig') || '0';
+    keySigString = s.getAttribute('key.sig') || s.getAttribute('keysig') || s.getAttribute('sig') || '0';
   }
   return keySigString;
 } // getKeySigForNote()
