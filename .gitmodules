@@ -1,3 +1,4 @@
 [submodule "app/static/codemirror5"]
 	path = app/static/CodeMirror
 	url = https://github.com/codemirror/codemirror5
+	ignore = dirty
