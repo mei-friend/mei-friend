@@ -1,7 +1,11 @@
 // mei-friend version and date
-export const version = '1.5.0';
-export const versionDate = '24 Aug 2026'; // use full or 3-character english months, will be translated
+export const version = '1.6.0';
+export const versionDate = '24 Sep 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
+// Date of the Let's Encode paragraph, which only campaign volunteers ever see.
+// Bump this instead of splashDate when only that paragraph changes: volunteers
+// are shown the splash again, regular users who dismissed it are not disturbed.
+export const letsEncodeSplashDate = '24 Sep 2026';
 
 var vrvWorker;
 var spdWorker;
@@ -13,6 +17,10 @@ let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
 let letsEncode = { active: false, error: null }; // Let's Encode hand-off, detected in onLanguageLoaded()
+// Which content date governs this load: the LATER of the two in Let's Encode
+// mode, so an LE-only change reaches volunteers while a change to the shared
+// text still reaches everybody. Set in onLanguageLoaded(), once the mode is known.
+let effectiveSplashDate = splashDate;
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -507,16 +515,19 @@ function onLanguageLoaded() {
     // done here, not after the splash: the logo is a live link behind the
     // overlay, and following it would cost the volunteer their work
     retargetLogoLink();
+    if (new Date(letsEncodeSplashDate) > new Date(splashDate)) {
+      effectiveSplashDate = letsEncodeSplashDate;
+    }
   }
 
   // show splash screen if required, i.e.: if never previously acknowledged; or,
-  // if acknowledged before latest splash screen content update (splashDate), or,
+  // if acknowledged before the latest content update (effectiveSplashDate), or,
   // if splash screen is set to show on every load
   if (storage.supported) {
     storage.read();
     let splashTextUpdatedSinceLastAck;
     try {
-      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(splashDate).getTime();
+      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(effectiveSplashDate).getTime();
     } catch {
       splashTextUpdatedSinceLastAck = false;
     }
@@ -1656,7 +1667,9 @@ function createSplashScreen() {
 function handleSplashConfirmed(splashInitialLoad, storage) {
   document.getElementById('splashOverlay').style.display = 'none';
   if (storage && storage.supported) {
-    storage.splashAcknowledged = splashDate;
+    // record the date that was actually tested against, so acknowledging the
+    // Let's Encode splash also settles the shared text the volunteer just read
+    storage.splashAcknowledged = effectiveSplashDate;
   }
   if (splashInitialLoad) completeInitialLoad();
 }
@@ -1665,7 +1678,7 @@ function showSplashScreen(showUpdateIndicator = false) {
   const updateIndicator = document.getElementById('splashUpdateIndicator');
   const splashLastUpdated = document.getElementById('splashLastUpdated');
   updateIndicator.innerHTML = translator.lang.splashUpdateIndicator.html;
-  const translatedSplashDate = translator.translateDate(splashDate);
+  const translatedSplashDate = translator.translateDate(effectiveSplashDate);
   splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
   showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   if (isLetsEncodeMode()) {
