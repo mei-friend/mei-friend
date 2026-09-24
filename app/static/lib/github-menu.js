@@ -1,5 +1,5 @@
 import { forkRepository, forkRepositoryCancel } from './fork-repository.js';
-import { completeLetsEncodeTask, isLetsEncodeMode } from './lets-encode.js';
+import { isLetsEncodeMode, renderLetsEncodeMenu, setLetsEncodeUser } from './lets-encode.js';
 import {
   cm,
   fileChanged,
@@ -618,6 +618,13 @@ async function proposeFileName(fname) {
 } // proposeFileName()
 
 export async function fillInBranchContents(e) {
+  if (isLetsEncodeMode()) {
+    // The volunteer is bound to one file on one branch. Browsing repositories,
+    // branches or files here would leave "Complete task" armed over a different
+    // encoding, so the task menu takes this menu's place entirely.
+    renderLetsEncodeMenu(gm, doCommit);
+    return;
+  }
   // clone repo and read contents of branch
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add('clockwise');
@@ -853,6 +860,11 @@ async function handleWorkflowsListReceived(resp) {
 }
 
 async function fillInCommitLog(refresh = false) {
+  if (isLetsEncodeMode()) {
+    // renderCommitLog() appends into #GithubMenu, which in Let's Encode mode
+    // holds the task menu; the volunteer has no use for the branch's history.
+    return;
+  }
   if (refresh) {
     const githubLoadingIndicator = document.getElementById('GithubLogo');
     githubLoadingIndicator.classList.add('clockwise');
@@ -1414,12 +1426,19 @@ export function logoutFromGithub() {
 
 export function refreshGithubMenu() {
   console.log('refreshGithubMenu()', gm);
+  let githubMenu = document.getElementById('GithubMenu');
+  if (isLetsEncodeMode()) {
+    // The menu manages one task, so it says so; the account moves to the status
+    // line, next to the campaign and task it is committing to.
+    document.getElementById('GithubName').innerText = translator.lang.letsEncodeMenuLabel.text;
+    gm.getAuthor().then((author) => setLetsEncodeUser(author.name || author.username));
+    renderLetsEncodeMenu(gm, doCommit);
+    return;
+  }
   // display Github name
   gm.getAuthor().then((author) => {
     document.getElementById('GithubName').innerText = author.name;
   });
-  // populate Github menu
-  let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
   githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!gm.filepath) {
@@ -1515,11 +1534,6 @@ async function handleCommitButtonClicked(e) {
     if (commitNewFile) {
       await prepareNewFileForCommit();
     }
-    if (isLetsEncodeMode()) {
-      // "Complete task": commit, then hand the outcome back to the campaign
-      await completeLetsEncodeTask(doCommit);
-      return;
-    }
     await doCommit();
     if (commitNewFile) {
       setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
@@ -1573,10 +1587,12 @@ async function prepareNewFileForCommit() {
  * callers that report the outcome elsewhere — Let's Encode mode — rely on this.
  * Interactive callers may ignore it: failures are reported in the UI regardless.
  */
-async function doCommit() {
+async function doCommit(suppliedMessage = null) {
   const commitButton = document.getElementById('githubCommitButton');
   const messageInput = document.getElementById('commitMessageInput');
-  const message = messageInput.value;
+  // Let's Encode mode supplies the message and renders no commit UI at all, so
+  // the input may not exist; interactive callers still take it from the field.
+  const message = suppliedMessage !== null ? suppliedMessage : messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   // are there unmerged changes on the remote?
   // Guard the check itself: if it throws (e.g. repo in an unusable state after a failed
@@ -1658,7 +1674,7 @@ async function doCommit() {
       // trapping the user in the "remote has changed" modal (issue #185).
       updateGithubInLocalStorage();
       console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
-      messageInput.value = '';
+      if (messageInput) messageInput.value = '';
       console.log('Status after commit: ', await gm.status());
       setCommitUIEnabledStatus();
       updateFileStatusDisplay();

@@ -1899,6 +1899,8 @@ export default class Viewer {
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
       let o = meiFriendSettingsOptions[opt];
+      // Let's Encode settings are meaningless outside a campaign hand-off
+      if (o.letsEncodeOnly && !isLetsEncodeMode()) return;
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {

@@ -601,6 +601,25 @@ export const defaultNotationUpdateDelay = 400; // ms, debounce window for editor
  * language pack files in ../lang/lang.XX.js Don't edit texts here.
  */
 export const meiFriendSettingsOptions = {
+  // Shown only in Let's Encode mode (see letsEncodeOnly, honoured by
+  // addMeiFriendOptionsToSettingsPanel), and first, because for a volunteer
+  // handed one task it is the only section that concerns them.
+  titleLetsEncode: {
+    title: "Let's Encode!",
+    description: '',
+    type: 'header',
+    default: true,
+    letsEncodeOnly: true,
+  },
+  letsEncodeAutosaveMinutes: {
+    title: 'Autosave interval (minutes)',
+    description: 'filled in by language packs',
+    type: 'int',
+    min: 0,
+    step: 1,
+    default: 3,
+    letsEncodeOnly: true,
+  },
   titleGeneral: {
     title: 'General',
     description: '',

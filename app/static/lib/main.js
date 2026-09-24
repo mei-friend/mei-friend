@@ -107,7 +107,14 @@ import {
   onRemoteUpdate,
 } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
-import { initLetsEncodeMode, isLetsEncodeMode, openLetsEncodeFile, retargetLogoLink } from './lets-encode.js';
+import {
+  initLetsEncodeMode,
+  isLetsEncodeMode,
+  noteLetsEncodeInitiatedLogin,
+  openLetsEncodeFile,
+  renderLetsEncodeStatus,
+  retargetLogoLink,
+} from './lets-encode.js';
 import {
   addZoneDrawer,
   clearFacsimile,
@@ -195,7 +202,12 @@ export async function setFileChangedState(fileChangedState) {
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');
   const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
   const commitUI = document.querySelector('#commitUI');
-  if (fileChanged) {
+  if (isLetsEncodeMode()) {
+    // the flag is still tracked, but the indicator is meaningless here: the
+    // volunteer has one file and commits it by completing the task
+    fileStatusElement.classList.remove('changed');
+    fileChangedIndicatorElement.innerText = '';
+  } else if (fileChanged) {
     fileStatusElement.classList.add('changed');
     fileChangedIndicatorElement.innerText = '*';
   } else {
@@ -290,6 +302,11 @@ export function setFileLocationType(t) {
 }
 
 export function updateFileStatusDisplay() {
+  if (isLetsEncodeMode()) {
+    // the status line carries the campaign, task and account instead
+    renderLetsEncodeStatus();
+    return;
+  }
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   // hack: if we're loading the default mei-friend encoding, override the printable location
   if (meiFileLocation === defaultMeiFileURL) {
@@ -840,7 +857,10 @@ async function completeInitialLoad() {
       openLetsEncodeFile(gm);
     } else {
       // initLetsEncodeMode() has already remembered the task, so it survives the
-      // login redirect and is picked up again when we come back here.
+      // login redirect and is picked up again when we come back here. Note that
+      // the login is ours, not the volunteer's doing: abandoning the task later
+      // signs them out again only in that case.
+      noteLetsEncodeInitiatedLogin();
       document.getElementById('githubLoginLink').click();
     }
   }

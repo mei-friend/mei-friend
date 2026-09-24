@@ -280,6 +280,61 @@ a:active {
   text-decoration: underline;
 }
 
+/* The task menu holds two actions, not a repository listing, so it drops the
+   GitHub menu's 90% min-height and sits at its own size. */
+#GithubMenu.letsEncodeTaskMenu {
+  min-height: auto;
+}
+
+/* The account the volunteer is committing as, after the campaign and task in
+   the status line. Set apart so the three read as separate facts. */
+#letsEncodeStatusUser {
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+#letsEncodeStatusUser:not(:empty)::before {
+  content: '·';
+  margin-right: 0.6em;
+  opacity: 0.6;
+}
+
+/* The GitHub mark sits inline with the account name it belongs to: a little
+   larger than the surrounding text and lifted off the baseline, since the glyph
+   is optically centred in its box rather than sitting on it. */
+#letsEncodeStatusUser #GithubLogo {
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
+  margin: 0 0.3em 0 0.25em;
+}
+
+/* Time left on the claim, when the campaign's lock table records one. */
+#letsEncodeStatusExpiry {
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+#letsEncodeStatusExpiry:not(:empty)::before {
+  content: '·';
+  margin-right: 0.6em;
+  opacity: 0.6;
+}
+
+#letsEncodeStatusExpiry.letsEncodeExpired {
+  color: var(--fileStatusWarnColor, #b3261e);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* "Last save: …" under the Save entry: a note, not an action. */
+#letsEncodeLastSave {
+  display: block;
+  padding: 0 1rem 0.35rem 1rem;
+  font-size: 0.82em;
+  opacity: 0.7;
+}
+
 /* Shown on the splash screen only when the volunteer arrived from a campaign,
    explaining why they are looking at mei-friend at all. */
 #splashLetsEncode {
@@ -355,13 +410,99 @@ a:active {
   animation: leWave 1.6s ease-in-out infinite;
 }
 
-#letsEncodeFigure.le-failed {
+/* Concluding the agreement: the campaign's own handshake */
+#letsEncodeFigure.le-completing {
+  --s: 4.4rem;
+  --r: -2deg;
+  --ox: 50%;
+  --oy: 90%;
+}
+
+#letsEncodeFigure.le-completing #letsEncodeHandPic {
+  animation: leShake 1.8s ease-in-out infinite;
+}
+
+@keyframes leShake {
+  0%,
+  36%,
+  100% {
+    transform: rotate(var(--r, 0deg));
+  }
+  8% {
+    transform: rotate(calc(var(--r, 0deg) - 3deg));
+  }
+  18% {
+    transform: rotate(calc(var(--r, 0deg) + 2deg));
+  }
+  28% {
+    transform: rotate(calc(var(--r, 0deg) - 1deg));
+  }
+}
+
+/* the wave serves both goodbyes: task finished, and task handed back */
+#letsEncodeFigure.le-farewell {
+  --s: 4.6rem;
+  --r: -8deg;
+  --ox: 50%;
+  --oy: 95%;
+}
+
+#letsEncodeFigure.le-farewell #letsEncodeHandPic {
+  animation: leWave 1.6s ease-in-out infinite;
+}
+
+/* Question modals put the hand beside
+   the text rather than above it */
+#letsEncodeUI.le-inline {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'hand text'
+    'buttons buttons';
+  align-items: center;
+  /* wide enough that the hands' rotation does not reach the text */
+  column-gap: 1.5rem;
+  text-align: left;
+}
+
+#letsEncodeUI.le-inline #letsEncodeFigure {
+  grid-area: hand;
+  height: auto;
+  align-self: stretch;
+  align-items: center;
+  --s: 100%;
+}
+
+#letsEncodeUI.le-inline #letsEncodeHandPic {
+  max-height: 4.5rem;
+  min-height: 2.5rem;
+}
+
+#letsEncodeUI.le-inline #letsEncodeOverlayMessage {
+  grid-area: text;
+  margin: 0;
+}
+
+#letsEncodeUI.le-inline #letsEncodeOverlayButtons {
+  grid-area: buttons;
+}
+
+/* the wag serves both "that did not work" and "hold on, are you sure?" */
+#letsEncodeFigure.le-failed,
+#letsEncodeFigure.le-confirm {
   --r: 14deg;
   --ox: 70%;
   --oy: 100%;
 }
 
-#letsEncodeFigure.le-failed #letsEncodeHandPic {
+/* the wag rests at 14deg and swings 9 more, so it overflows further than the rest */
+#letsEncodeUI.le-inline #letsEncodeFigure.le-confirm,
+#letsEncodeUI.le-inline #letsEncodeFigure.le-failed {
+  margin-right: 0.9rem;
+}
+
+#letsEncodeFigure.le-failed #letsEncodeHandPic,
+#letsEncodeFigure.le-confirm #letsEncodeHandPic {
   animation: leWag 1.6s ease-in-out infinite;
 }
 
