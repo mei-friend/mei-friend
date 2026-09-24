@@ -1,13 +1,52 @@
+// Keys that belong to the person rather than to the work in front of them.
+// These stay in localStorage even when the rest of the session is scoped to the
+// tab, so a Let's Encode volunteer is not asked to acknowledge the splash
+// screen again on their next ordinary visit. Settings need no entry here: the
+// 'mf-' options are written straight to window.localStorage by viewer.js and
+// never pass through this class.
+const globalKeys = ['splashAcknowledged', 'mf-showSplashScreen'];
+
 export default class Storage {
   constructor() {
     this.override = false;
     try {
       this.storage = window.localStorage;
+      this.globalStorage = window.localStorage;
       this.supported = true;
     } catch (err) {
       this.supported = false;
       console.warn('Unable to access local storage: ', err);
     }
+  }
+
+  /**
+   * useTabScopedStorage
+   * @description Move everything except the global keys into sessionStorage, so
+   * this session neither reads nor overwrites the work the person has open in
+   * ordinary mei-friend use. sessionStorage survives reloads and same-tab
+   * navigation — including the GitHub OAuth round trip, so an in-progress task
+   * is not lost — and is discarded when the tab closes. Used by Let's Encode
+   * mode; a first step towards issue #79, which wants this per session.
+   * Call before read(), or the previous scope's values are already loaded.
+   */
+  useTabScopedStorage() {
+    try {
+      this.storage = window.sessionStorage;
+      // a scope switch invalidates whatever the previous one loaded
+      this.read();
+    } catch (err) {
+      console.warn('Unable to access session storage, staying on local storage: ', err);
+    }
+  }
+
+  /**
+   * storeFor
+   * @description Which backing store owns this key.
+   * @param {string} item key name
+   * @returns {globalThis.Storage}
+   */
+  storeFor(item) {
+    return globalKeys.includes(item) ? this.globalStorage : this.storage;
   }
 
   safelySetStorageItem(item, content) {
@@ -17,7 +56,7 @@ export default class Storage {
           if (content && typeof content === 'object') {
             content = JSON.stringify(content);
           }
-          this.storage.setItem(item, content);
+          this.storeFor(item).setItem(item, content);
         } catch (err) {
           this.override = true;
           console.warn(
@@ -58,9 +97,10 @@ export default class Storage {
       this._speed = this.storage.getItem('speed');
       this._breaks = this.storage.getItem('breaks');
       this._forkAndOpen = this.storage.getItem('forkAndOpen');
+      this._letsEncode = JSON.parse(this.storage.getItem('letsEncode'));
       this._githubLogoutRequested = this.storage.getItem('githubLogoutRequested');
       this._restoreSolidSession = this.storage.getItem('restoreSolidSession');
-      this._splashAcknowledged = this.storage.getItem('splashAcknowledged');
+      this._splashAcknowledged = this.storeFor('splashAcknowledged').getItem('splashAcknowledged');
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -83,14 +123,14 @@ export default class Storage {
 
   removeItem(item) {
     if (this.supported) {
-      this.storage.removeItem(item);
+      this.storeFor(item).removeItem(item);
       this['_' + item] = null;
     }
   }
 
   hasItem(item) {
     if (this.supported) {
-      return this.storage.getItem(item) !== null;
+      return this.storeFor(item).getItem(item) !== null;
     }
   }
 
@@ -319,6 +359,17 @@ export default class Storage {
     this._forkAndOpen = forkAndOpen;
   }
 
+  // Let's Encode task context ({ campaign, task, file }), remembered across the
+  // GitHub OAuth round-trip so the hand-off survives the login redirect.
+  get letsEncode() {
+    return this._letsEncode;
+  }
+
+  set letsEncode(letsEncode) {
+    this.safelySetStorageItem('letsEncode', letsEncode);
+    this._letsEncode = letsEncode;
+  }
+
   get restoreSolidSession() {
     return this._restoreSolidSession;
   }
@@ -352,7 +403,7 @@ export default class Storage {
   }
 
   get showSplashScreen() {
-    return this.storage['mf-showSplashScreen'];
+    return this.storeFor('mf-showSplashScreen')['mf-showSplashScreen'];
   }
 
   set showSplashScreen(showSplashScreen) {

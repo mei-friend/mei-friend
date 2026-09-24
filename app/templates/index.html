@@ -185,7 +185,7 @@
   <body>
     <div class="header" id="meiFriendHeader">
       <div class="title">
-        <a href="https://mei-friend.mdw.ac.at/"
+        <a href="https://mei-friend.mdw.ac.at/" id="meiFriendLogoLink"
           ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
         /></a>
       </div>
@@ -715,6 +715,7 @@
           <hr class="dropdownLine" />
           <div id="splashBodyContainer">
             <div id="splashUpdateIndicator"></div>
+            <div id="splashLetsEncode"></div>
             <div id="splashBody"></div>
           </div>
           <div id="splashFooter">
@@ -790,6 +791,18 @@
             <script xmlns="" />
           </svg>
           <p id="solidOverlayCancel">Restoring Solid session - press <span>esc</span> or click here to cancel</p>
+        </div>
+      </div>
+      <div id="letsEncodeOverlay">
+        <div id="letsEncodeUI">
+          <div id="letsEncodeFigure">
+            <img id="letsEncodeHandPic" src="" alt="" aria-hidden="true" />
+          </div>
+          <p id="letsEncodeOverlayMessage"></p>
+          <div id="letsEncodeOverlayButtons">
+            <input type="button" id="letsEncodeRetryButton" value="Try again" />
+            <input type="button" id="letsEncodeAbandonButton" value="Return to Let's Encode" />
+          </div>
         </div>
       </div>
       <div id="githubActionsOverlay">

@@ -1177,6 +1177,27 @@ export const lang = {
   githubFilepath: { text: 'Path' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit as new file' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html: "<p>You have arrived from <strong>Let's Encode!</strong> to work on an encoding task. mei-friend is one of the editors Let's Encode uses for this; once you have finished, the <strong>Complete task</strong> button in the GitHub menu (top-left, showing your username) will save your work on this task and take you back to the campaign.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Complete task' },
+  letsEncodeLoading: { text: 'Fetching your task from Let’s Encode…' },
+  letsEncodeLogoLinkTitle: { text: 'Open your Let’s Encode campaign in a new tab (your task stays open here)' },
+  letsEncodeCommitting: { text: 'Completing your task…' },
+  letsEncodeCompleted: { text: "Task completed — sending you back to Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Your work could not be committed.' },
+  letsEncodeRetryButton: { value: 'Try again' },
+  letsEncodeAbandonButton: { value: "Return to Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text: "This Let's Encode link is incomplete: it names no campaign, so there is nowhere to report back to. Please return to Let's Encode and open the task again.",
+  },
+  letsEncodeMissingParameterError: { text: "The Let's Encode hand-off was missing a required parameter:" },
+  letsEncodeFileError: { text: 'The handed-over file could not be opened on GitHub.' },
+  letsEncodeCloneError: { text: 'The task repository could not be cloned.' },
+  letsEncodeRemoteChangedError: {
+    text: 'The file changed on GitHub while you were working, so your encoding could not be committed to the task branch.',
+  },
   commitLog: { text: 'Commit log' },
   githubDate: { text: 'Date' },
   githubAuthor: { text: 'Author' },

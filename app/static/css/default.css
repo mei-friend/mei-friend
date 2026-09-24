@@ -255,6 +255,7 @@ a:active {
 .openUrlOverlay,
 #githubActionsOverlay,
 #solidOverlay,
+#letsEncodeOverlay,
 #splashOverlay {
   flex-direction: row;
   justify-content: center;
@@ -277,6 +278,174 @@ a:active {
 
 #solidLoadingIndicator:hover {
   text-decoration: underline;
+}
+
+/* Shown on the splash screen only when the volunteer arrived from a campaign,
+   explaining why they are looking at mei-friend at all. */
+#splashLetsEncode {
+  display: none;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--notationColor, #424282);
+  background-color: rgba(215, 227, 244, 0.35);
+}
+
+#splashLetsEncode p {
+  margin: 0;
+}
+
+/* Let's Encode task interstitial: shown while a task is being completed, and
+   carrying the retry / give-up choice when the commit will not go through. */
+#letsEncodeOverlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#letsEncodeUI {
+  border-radius: 32px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  width: 22rem;
+  max-width: 80vw;
+  height: fit-content;
+  z-index: 190;
+  text-align: center;
+}
+
+/* A Let's Encode hand, one gesture per state, borrowing the landing page's
+   header-hand mechanic (instigation/static/styles.css): the image runs the
+   gesture about its own pivot (--ox/--oy, the wrist), and the gesture shapes
+   are the house keyframes (hpicTwiddle, hpicWave, hpicWag) with a rest built
+   into the cycle where a state persists. Per-state values are set on the
+   figure by its state class. The box is a fixed height so the panel does not
+   jump between states; the hands differ in aspect ratio. */
+#letsEncodeFigure {
+  height: 6rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  --s: 5.5rem;
+}
+
+#letsEncodeHandPic {
+  display: block;
+  width: auto;
+  height: var(--s);
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+  transform: rotate(var(--r, 0deg)); /* the resting tilt, kept under reduced motion */
+}
+
+#letsEncodeFigure.le-busy {
+  --s: 4.2rem;
+  --ox: 88%;
+  --oy: 88%;
+}
+
+#letsEncodeFigure.le-busy #letsEncodeHandPic {
+  animation: leTwiddle 3.84s ease-in-out infinite;
+}
+
+#letsEncodeFigure.le-done {
+  --ox: 82%;
+  --oy: 95%;
+}
+
+#letsEncodeFigure.le-done #letsEncodeHandPic {
+  animation: leWave 1.6s ease-in-out infinite;
+}
+
+#letsEncodeFigure.le-failed {
+  --r: 14deg;
+  --ox: 70%;
+  --oy: 100%;
+}
+
+#letsEncodeFigure.le-failed #letsEncodeHandPic {
+  animation: leWag 1.6s ease-in-out infinite;
+}
+
+/* "DUM DUM . . DUM DUM DUM . ." — two bars of full dips with a rest after
+   each bar; the dip shape is hpicTwiddle */
+@keyframes leTwiddle {
+  0%,
+  12%,
+  31%,
+  50%,
+  60%,
+  71%,
+  88%,
+  100% {
+    transform: rotate(0);
+  }
+  6%,
+  55%,
+  65% {
+    transform: rotate(-10deg);
+  }
+  21%,
+  79% {
+    transform: rotate(-10deg);
+  }
+  27%,
+  85% {
+    transform: rotate(4deg);
+  }
+}
+
+/* hpicWave (1 s) then rest */
+@keyframes leWave {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0);
+  }
+  11% {
+    transform: rotate(-10deg);
+  }
+  26% {
+    transform: rotate(8deg);
+  }
+  41% {
+    transform: rotate(-6deg);
+  }
+  54% {
+    transform: rotate(4deg);
+  }
+}
+
+/* "uh uh uh": left, right, left, back to rest, then a pause. --r is the
+   resting tilt, so the hand can sit turned without a wrapper element. */
+@keyframes leWag {
+  0%,
+  60%,
+  100% {
+    transform: rotate(var(--r, 0deg));
+  }
+  12%,
+  48% {
+    transform: rotate(calc(var(--r, 0deg) - 9deg));
+  }
+  30% {
+    transform: rotate(calc(var(--r, 0deg) + 9deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #letsEncodeHandPic {
+    animation: none !important;
+  }
+}
+
+#letsEncodeOverlayMessage {
+  margin: 1rem 0 0 0;
+}
+
+#letsEncodeOverlayButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 #solidOverlayCancel span {

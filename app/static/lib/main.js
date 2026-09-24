@@ -12,6 +12,7 @@ var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
+let letsEncode = { active: false, error: null }; // Let's Encode hand-off, detected in onLanguageLoaded()
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -106,6 +107,7 @@ import {
   onRemoteUpdate,
 } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
+import { initLetsEncodeMode, isLetsEncodeMode, openLetsEncodeFile, retargetLogoLink } from './lets-encode.js';
 import {
   addZoneDrawer,
   clearFacsimile,
@@ -475,6 +477,21 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
+  // Let's Encode campaign hand-off (?le_campaignname and ?le_taskid, alongside
+  // the usual ?file). Detected here, before the splash decision and before
+  // storage is read, for two reasons: the splash has to know whether to wear
+  // the joint branding, and entering the mode scopes storage to this tab, which
+  // must happen before anything is read or written. An incomplete hand-off also
+  // fails back to the campaign at once, rather than after the volunteer has
+  // dismissed a splash screen they did not need to see.
+  const leSearchParams = new URLSearchParams(window.location.search);
+  letsEncode = initLetsEncodeMode(leSearchParams, leSearchParams.get('file'));
+  if (letsEncode.active) {
+    // done here, not after the splash: the logo is a live link behind the
+    // overlay, and following it would cost the volunteer their work
+    retargetLogoLink();
+  }
+
   // show splash screen if required, i.e.: if never previously acknowledged; or,
   // if acknowledged before latest splash screen content update (splashDate), or,
   // if splash screen is set to show on every load
@@ -667,8 +684,22 @@ async function completeInitialLoad() {
 
   let urlFileName = searchParams.get('file');
 
-  if (storage.supported && urlFileName) {
+  // Let's Encode campaign hand-off: open the file through the GitHub
+  // integration so the volunteer can commit to the task branch, then report
+  // back to the campaign. Detected up in onLanguageLoaded(), before the splash
+  // screen; used here to keep the ordinary ?file fetch below from running,
+  // which would otherwise clear the GitHub binding we need.
+  const letsEncodeMode = letsEncode.active;
+  if (letsEncode.error === 'noCampaign') {
+    // nowhere to report this back to, so it stays on screen until dismissed
+    v.showAlert(translator.lang.letsEncodeNoCampaignError.text, 'error', 0);
+  }
+
+  if (storage.supported && urlFileName && !letsEncodeMode) {
     // write url filename to storage so we can act upon it later, e.g. on return from solid login
+    // (not in Let's Encode mode: the handed-off file is opened through the GitHub
+    // integration, never fetched as a URL, and recording it as a 'url' location
+    // would send us fetching a raw link we cannot read on a private repository)
     let url = new URL(urlFileName);
     storage.safelySetStorageItem('fileLocation', url.href);
     storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
@@ -697,12 +728,13 @@ async function completeInitialLoad() {
   // ... if we have a fileLocationType 'url' with a fileLocation specified in storage, but NO meiXml
   // ... (=> because storage was disabled, e.g., due to encoding size)...
   // then, fetch and load the URL.
-  if (urlFileName && !(forkParam === 'true')) {
+  if (urlFileName && !(forkParam === 'true') && !letsEncodeMode) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
     urlFetchInProgress = true;
   } else if (
     storage.supported &&
+    !letsEncodeMode &&
     storage.fileLocationType &&
     storage.fileLocation &&
     storage.fileLocationType === 'url' &&
@@ -736,8 +768,12 @@ async function completeInitialLoad() {
     }
     setFileChangedState(storage.fileChanged);
     updateFileStatusDisplay();
-    if (!urlFileName && !urlFetchInProgress) {
+    if (!urlFileName && !urlFetchInProgress && !letsEncodeMode) {
       // no URI param specified - try to restore from storage
+      // (in Let's Encode mode nothing is opened here: the task arrives through
+      // the GitHub integration behind a loading overlay, and putting the default
+      // encoding in the editor first invites the volunteer to edit a document
+      // that is about to be replaced)
       if (storage.content && storage.fileName) {
         // restore file name and content from storage
         // unless a URI param was specified
@@ -773,7 +809,7 @@ async function completeInitialLoad() {
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
-    openFile(undefined, false, false); // default MEI
+    if (!letsEncodeMode) openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
     // regardless of storage availability:
@@ -795,6 +831,17 @@ async function completeInitialLoad() {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
         document.getElementById('githubLoginLink').click();
       }
+    }
+  }
+
+  if (letsEncodeMode) {
+    if (isLoggedIn && gm) {
+      console.log("Opening Let's Encode task file...");
+      openLetsEncodeFile(gm);
+    } else {
+      // initLetsEncodeMode() has already remembered the task, so it survives the
+      // login redirect and is picked up again when we come back here.
+      document.getElementById('githubLoginLink').click();
     }
   }
 
@@ -1062,7 +1109,12 @@ async function vrvWorkerEventsHandler(ev) {
       setChoiceOptions('', 'choiceOrigRegSelect');
       setChoiceOptions('', 'choiceSicCorrSelect');
       setChoiceOptions('', 'substSelect');
-      if (!storage.supported || !meiFileName) {
+      if (isLetsEncodeMode()) {
+        // Let's Encode mode: the task arrives through the GitHub integration,
+        // behind the loading overlay. Opening the default encoding here would
+        // put a document in the editor that is about to be replaced — and
+        // editing it while the clone is in flight breaks the load.
+      } else if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
       } else {
@@ -1596,6 +1648,19 @@ function showSplashScreen(showUpdateIndicator = false) {
   const translatedSplashDate = translator.translateDate(splashDate);
   splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
   showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
+  if (isLetsEncodeMode()) {
+    // Arriving from a campaign rather than off the street: wear the joint logo
+    // and say where they are and why, so the splash is not a non-sequitur.
+    // (This changes only what the splash says, never whether it appears.)
+    const splashLogo = document.getElementById('splashLogo');
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const logoDir = splashLogo.src.substring(0, splashLogo.src.lastIndexOf('/') + 1);
+    splashLogo.src = logoDir + 'mei-friend-lets-encode' + (dark ? '-dark' : '') + '.svg';
+    splashLogo.alt = "mei-friend and Let's Encode!";
+    const letsEncodeNote = document.getElementById('splashLetsEncode');
+    letsEncodeNote.innerHTML = translator.lang.splashLetsEncode.html;
+    letsEncodeNote.style.display = 'block';
+  }
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
