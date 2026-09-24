@@ -328,7 +328,7 @@ a:active {
 }
 
 /* "Last save: …" under the Save entry: a note, not an action. */
-#letsEncodeLastSave {
+#letsEncodeLastSaveIndicator {
   display: block;
   padding: 0 1rem 0.35rem 1rem;
   font-size: 0.82em;

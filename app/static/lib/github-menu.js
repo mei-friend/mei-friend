@@ -1462,7 +1462,7 @@ export function refreshGithubMenu() {
  */
 function commitButtonLabel(asNewFile = false) {
   if (isLetsEncodeMode()) {
-    return translator.lang.letsEncodeCompleteTaskButton.value;
+    return translator.lang.letsEncodeCompleteTaskButton.text;
   }
   return asNewFile
     ? translator.lang.githubCommitButton.classes.commitAsNewFile.value

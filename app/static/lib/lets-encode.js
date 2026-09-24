@@ -418,7 +418,7 @@ function letsEncodeRelativeTime(timestamp) {
  * moment on hover.
  */
 export function renderLastSaveIndicator() {
-  const el = document.getElementById('letsEncodeLastSave');
+  const el = document.getElementById('letsEncodeLastSaveIndicator');
   if (!el) return;
   const savedAt = letsEncodeTask && letsEncodeTask.lastSaved;
   if (!savedAt) {
@@ -491,41 +491,65 @@ export function renderLetsEncodeMenu(gm, commit) {
   menu.classList.add('letsEncodeTaskMenu');
   menu.textContent = '';
 
+  // The three items are named by their pack keys, so translateGui() relabels
+  // them on a language change like any other menu entry.
   const save = document.createElement('a');
-  save.id = 'letsEncodeSaveTask';
+  save.id = 'letsEncodeSaveButton';
   save.classList.add('closeOnClick');
   save.href = '#';
-  save.textContent = translator.lang.letsEncodeSaveButton.value;
+  save.textContent = translator.lang.letsEncodeSaveButton.text;
   save.addEventListener('click', () => saveLetsEncodeTask(commit));
   menu.appendChild(save);
 
   const lastSave = document.createElement('span');
-  lastSave.id = 'letsEncodeLastSave';
+  // not 'letsEncodeLastSave': that is a pack key, and translateGui() would
+  // overwrite the element with the bare label, dropping the time
+  lastSave.id = 'letsEncodeLastSaveIndicator';
   menu.appendChild(lastSave);
 
   menu.appendChild(document.createElement('hr')).classList.add('dropdownLine');
 
   const complete = document.createElement('a');
-  complete.id = 'letsEncodeCompleteTask';
+  complete.id = 'letsEncodeCompleteTaskButton';
   complete.classList.add('closeOnClick');
   complete.href = '#';
-  complete.textContent = translator.lang.letsEncodeCompleteTaskButton.value;
+  complete.textContent = translator.lang.letsEncodeCompleteTaskButton.text;
   complete.addEventListener('click', () => completeLetsEncodeTask(commit, gm));
   menu.appendChild(complete);
 
   menu.appendChild(document.createElement('hr')).classList.add('dropdownLine');
 
   const abandon = document.createElement('a');
-  abandon.id = 'letsEncodeAbandonTask';
+  abandon.id = 'letsEncodeAbandonTaskButton';
   abandon.classList.add('closeOnClick');
   abandon.href = '#';
-  abandon.textContent = translator.lang.letsEncodeAbandonTaskButton.value;
+  abandon.textContent = translator.lang.letsEncodeAbandonTaskButton.text;
   abandon.addEventListener('click', () => confirmAbandonLetsEncodeTask());
   menu.appendChild(abandon);
 
   renderLastSaveIndicator();
   startLetsEncodeTimers(gm, commit);
 } // renderLetsEncodeMenu()
+
+/**
+ * relabelLetsEncodeUi
+ * @description Redraw, in the new language, what the translator's id-based
+ * pass cannot reach: text composed with live values (the last save, the
+ * account, the countdown, the logo tooltip), and the menu button, whose id
+ * belongs to the GitHub menu. The menu items themselves carry their pack keys
+ * as ids and are relabelled by translateGui().
+ */
+function relabelLetsEncodeUi() {
+  if (!letsEncodeTask) return;
+  const menuButton = document.getElementById('GithubName');
+  if (menuButton) menuButton.innerText = translator.lang.letsEncodeMenuLabel.text;
+  renderLastSaveIndicator();
+  renderLetsEncodeStatus();
+  renderLetsEncodeExpiry();
+  retargetLogoLink();
+} // relabelLetsEncodeUi()
+
+document.addEventListener('mf-language-changed', relabelLetsEncodeUi);
 
 // The GitHub account the volunteer is committing as, once we have asked for it.
 let letsEncodeUser = '';
@@ -892,7 +916,7 @@ export async function completeLetsEncodeTask(commit, gm) {
       {
         label: nothingDone
           ? translator.lang.letsEncodeCompleteAnyway.value
-          : translator.lang.letsEncodeCompleteTaskButton.value,
+          : translator.lang.letsEncodeCompleteTaskButton.text,
         action: () => runLetsEncodeCommit(commit),
       },
     ],
