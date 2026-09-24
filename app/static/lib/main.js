@@ -116,6 +116,7 @@ import {
 } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
+  addLetsEncodeParams,
   initLetsEncodeMode,
   isLetsEncodeMode,
   noteLetsEncodeInitiatedLogin,
@@ -950,6 +951,8 @@ async function completeInitialLoad() {
     shortUrl.searchParams.append('code', solidCodeParam);
     shortUrl.searchParams.append('state', solidStateParam);
   }
+  // keep a Let's Encode task in the URL, so a reload stays in the task
+  addLetsEncodeParams(shortUrl);
   window.history.pushState({}, '', shortUrl.href);
   if (storage.supported && storage.restoreSolidSession) {
     restoreSolidTimeout = setTimeout(function () {
@@ -1682,15 +1685,11 @@ function showSplashScreen(showUpdateIndicator = false) {
   splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
   showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   if (isLetsEncodeMode()) {
-    // Arriving from a campaign rather than off the street: wear the joint logo
-    // and say where they are and why, so the splash is not a non-sequitur.
+    // Arriving from a campaign rather than off the street: say where they are
+    // and why, so the splash is not a non-sequitur. The splash keeps the plain
+    // mei-friend logo on purpose — the navbar already wears the joint one, and
+    // this is where the volunteer learns the name of the tool they are in.
     // (This changes only what the splash says, never whether it appears.)
-    const splashLogo = document.getElementById('splashLogo');
-
-    // background colour stays same regardless of light/dark mode, so always use the light variant
-    const logoDir = splashLogo.src.substring(0, splashLogo.src.lastIndexOf('/') + 1);
-    splashLogo.src = logoDir + 'mei-friend-lets-encode.svg';
-    splashLogo.alt = "mei-friend and Let's Encode!";
     const letsEncodeNote = document.getElementById('splashLetsEncode');
     letsEncodeNote.innerHTML = translator.lang.splashLetsEncode.html;
     letsEncodeNote.style.display = 'block';

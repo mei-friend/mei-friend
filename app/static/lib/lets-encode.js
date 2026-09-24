@@ -180,14 +180,27 @@ export function initLetsEncodeMode(searchParams, urlFileName) {
 function restoreLetsEncodeUrl() {
   try {
     const url = new URL(window.location.href);
-    url.searchParams.set('file', letsEncodeTask.file);
-    url.searchParams.set('le_campaignname', letsEncodeTask.campaign);
-    url.searchParams.set('le_taskid', letsEncodeTask.task);
+    addLetsEncodeParams(url);
     window.history.replaceState(null, '', url.toString());
   } catch (e) {
     console.warn("Let's Encode: could not restore the task parameters to the URL ", e);
   }
 } // restoreLetsEncodeUrl()
+
+/**
+ * addLetsEncodeParams
+ * @description Write the hand-off parameters into a URL, so that anything
+ * tidying the address bar can keep them: completeInitialLoad() strips every
+ * parameter once it has read them, and without these a reload would land the
+ * volunteer in ordinary mei-friend. Does nothing outside Let's Encode mode.
+ * @param {URL} url modified in place
+ */
+export function addLetsEncodeParams(url) {
+  if (!letsEncodeTask) return;
+  url.searchParams.set('file', letsEncodeTask.file);
+  url.searchParams.set('le_campaignname', letsEncodeTask.campaign);
+  url.searchParams.set('le_taskid', letsEncodeTask.task);
+} // addLetsEncodeParams()
 
 /**
  * readRememberedTask
@@ -210,13 +223,14 @@ function readRememberedTask() {
 
 /**
  * letsEncodeCampaignUrl
- * @description The task's page on the campaign, carrying no outcome. Used for
- * links that are a visit rather than a hand-back.
+ * @description The campaign's page, carrying no outcome; with the task, the
+ * base of the hand-back URL.
+ * @param {boolean} [withTask] whether to name the task (the hand-back needs it)
  * @returns {URL}
  */
-function letsEncodeCampaignUrl() {
+function letsEncodeCampaignUrl(withTask = true) {
   const url = new URL(letsEncodeBaseUrl() + '/' + encodeURIComponent(letsEncodeTask.campaign));
-  url.searchParams.set('task', letsEncodeTask.task);
+  if (withTask) url.searchParams.set('task', letsEncodeTask.task);
   return url;
 } // letsEncodeCampaignUrl()
 
@@ -791,12 +805,13 @@ export async function abandonLetsEncodeTask() {
  * discarding uncommitted edits — and from any other deployment leaves for
  * production mei-friend entirely. Point it at the campaign instead, opened in a
  * new tab, so a volunteer who wants to look something up keeps their work and
- * their task. It carries no mf_status: a visit must not read as a finished task.
+ * their task. It carries neither mf_status nor the task: a visit must not read
+ * as a finished task, and it goes to the campaign, not to this task's page.
  */
 export function retargetLogoLink() {
   const link = document.getElementById('meiFriendLogoLink');
   if (!link || !letsEncodeTask) return;
-  link.href = letsEncodeCampaignUrl().toString();
+  link.href = letsEncodeCampaignUrl(false).toString();
   link.target = '_blank';
   link.rel = 'noopener';
   link.title = translator.lang.letsEncodeLogoLinkTitle.text;
