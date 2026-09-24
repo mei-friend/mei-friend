@@ -1179,7 +1179,7 @@ export const lang = {
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit as new file' } }, value: 'Commit' },
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
-    html: "<p>You have arrived from <strong>Let's Encode!</strong> to work on an encoding task. This editor, mei-friend, is one of the tools Let's Encode uses for this; once you have finished, the <strong>Complete task</strong> button in the GitHub menu (top-left, showing your username) will save your work on this task and take you back to the campaign.</p>",
+    html: "<p>You have arrived from <strong>Let's Encode!</strong> to work on an encoding task. mei-friend is one of the editors Let's Encode offers for this work. Use <strong>Save</strong> in the <strong>Task Management</strong> menu (top left) to keep your progress as you go, and <strong>Complete task</strong> when you are finished, to hand your work back to the campaign.</p>",
   },
   letsEncodeCompleteTaskButton: { value: 'Complete task' },
   letsEncodeMenuLabel: { text: 'Task Management' },

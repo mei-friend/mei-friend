@@ -1673,9 +1673,12 @@ function showSplashScreen(showUpdateIndicator = false) {
     // and say where they are and why, so the splash is not a non-sequitur.
     // (This changes only what the splash says, never whether it appears.)
     const splashLogo = document.getElementById('splashLogo');
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Always the light variant: the splash panel is cornflower blue whatever the
+    // system colour scheme (--overlayBackgroundColor is never themed, and the
+    // splash appears before setMenuColors() runs anyway), so the dark logo's
+    // cream lettering, drawn for a dark page, washes out on it.
     const logoDir = splashLogo.src.substring(0, splashLogo.src.lastIndexOf('/') + 1);
-    splashLogo.src = logoDir + 'mei-friend-lets-encode' + (dark ? '-dark' : '') + '.svg';
+    splashLogo.src = logoDir + 'mei-friend-lets-encode.svg';
     splashLogo.alt = "mei-friend and Let's Encode!";
     const letsEncodeNote = document.getElementById('splashLetsEncode');
     letsEncodeNote.innerHTML = translator.lang.splashLetsEncode.html;
