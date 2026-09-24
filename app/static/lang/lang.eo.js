@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend estas redaktanto por <a href="https://music-encoding.org">muzikaj kodadoj</a>, gastigita ĉe
+      mei-friend estas redaktanto por <a href="https://music-encoding.org" target="_blank">muzikaj kodadoj</a>, gastigita ĉe
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno</a>. 
       Bonvolu konsulti nian <a href="https://mei-friend.github.io" target="_blank">ampleksan dokumentadon</a> por 
       pliaj informoj.
@@ -74,8 +74,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Aŭstra Scienco-Fondo (FWF)</a> sub la projektoj
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      kaj <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> kaj <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Mi komprenas!' },
@@ -247,11 +247,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Gastigita de <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'ĉe <a href="https://mdw.ac.at">mdw</a>, kun ' +
+      'Gastigita de <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'ĉe <a href="https://mdw.ac.at" target="_blank">mdw</a>, kun ' +
       heart +
       ' el Vieno. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Imprinto</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Imprinto</a>.',
   },
   loadingVerovio: { text: 'Ŝarĝante Verovio' },
   verovioLoaded: { text: 'ŝargita' },
@@ -1105,6 +1105,70 @@ export const lang = {
   githubFilepath: { text: 'Vojo' },
   githubCommit: { text: 'Kontribuo' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Kontribui kiel nova dosiero' } }, value: 'Kontribui' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Vi venas de <strong>Let's Encode!</strong> por labori pri kodada tasko. mei-friend estas unu el la redaktiloj, kiujn Let's Encode proponas por ĉi tiu laboro. Uzu <strong>Konservi</strong> en la menuo <strong>Taskadministrado</strong> (supre maldekstre) por konservi vian progreson dum la laboro, kaj <strong>Fini la taskon</strong>, kiam vi finis, por kontribui vian laboron al la kampanjo.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Fini la taskon' },
+  letsEncodeMenuLabel: { text: 'Taskadministrado' },
+  letsEncodeLoggedInAs: { text: 'Ensalutinta kiel' },
+  letsEncodeSaveButton: { value: 'Konservi' },
+  letsEncodeSaving: { text: 'Konservado de via laboro…' },
+  letsEncodeSaveFailed: { text: 'Via laboro ne povis esti konservita.' },
+  letsEncodeDismiss: { value: 'Fermi' },
+  letsEncodeLastSave: { text: 'Laste konservita:' },
+  letsEncodeLastAutosave: { text: 'Aŭtomate konservita:' },
+  letsEncodeSavedAt: { text: 'Konservita je' },
+  letsEncodeExpiresAt: { text: 'Eksvalidiĝas je' },
+  letsEncodeTimeRemaining: { text: 'restas por fini la taskon' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 't' },
+  letsEncodeAgo: { text: 'antaŭ {n}' },
+  letsEncodeJustNow: { text: 'ĵus' },
+  letsEncodeTimeExpired: { text: 'La tempo por fini ĉi tiun taskon elĉerpiĝis' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Intervalo de aŭtomata konservado (minutoj)',
+    description:
+      'Kiom ofte, en minutoj, via laboro estas aŭtomate konservata dum vi redaktas. Konservado okazas nur se vi faris ŝanĝojn; 0 malŝaltas aŭtomatan konservadon.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Agordoj por la Let's Encode-tasko, pri kiu vi laboras" },
+  letsEncodeAbandonTaskButton: { value: 'Rezigni la taskon' },
+  letsEncodeKeepWorking: { value: 'Daŭrigi la laboron' },
+  letsEncodeCompleteAnyway: { value: 'Tamen fini la taskon' },
+  letsEncodeAbandonConfirm: { value: 'Rezigni la taskon' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Vi ne ŝanĝis ĉi tiun kodon. Ankaŭ tio gravas: fini la taskon registras, ke ĝi bezonis neniujn ŝanĝojn. Aŭ vi povas daŭrigi la laboron.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Ĉu fini ĉi tiun taskon? Via laboro estos konservita kaj transdonita al Let's Encode, kaj la tasko estos fermita.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Ĉu rezigni ĉi tiun taskon? Via laboro pri ĝi perdiĝos, inkluzive de tio, kion vi jam konservis, kaj Let's Encode estos informita, ke vi ne finis la taskon.",
+  },
+  letsEncodeLoading: { text: "Ŝargado de via tasko el Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Malfermi vian Let's Encode-kampanjon en nova langeto (via tasko restas malfermita ĉi tie)",
+  },
+  letsEncodeCommitting: { text: 'Finado de via tasko…' },
+  letsEncodeCompleted: { text: "Tasko finita — ni resendas vin al Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Via tasko ne povis esti finita.' },
+  letsEncodeRetryButton: { value: 'Reprovi' },
+  letsEncodeAbandonButton: { value: "Reiri al Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Ĉi tiu Let's Encode-ligilo estas nekompleta: ĝi nomas neniun kampanjon, do ne eblas raporti la rezulton. Bonvolu reiri al Let's Encode kaj malfermi la taskon denove.",
+  },
+  letsEncodeMissingParameterError: { text: "Al la transdono de Let's Encode mankis deviga parametro:" },
+  letsEncodeFileError: { text: 'La transdonita dosiero ne povis esti malfermita ĉe GitHub.' },
+  letsEncodeCloneError: { text: 'Via tasko ne povis esti ŝargita el GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'La dosiero estis ŝanĝita ĉe GitHub dum vi laboris, do via laboro ne povis esti konservita.',
+  },
   commitLog: { text: 'Kontribuaj protokoloj' },
   githubDate: { text: 'Dato' },
   githubAuthor: { text: 'Aŭtoro' },

@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend es un editor de <a href="https://music-encoding.org">codificaciones musicales</a>, alojado en la
+        mei-friend es un editor de <a href="https://music-encoding.org" target="_blank">codificaciones musicales</a>, alojado en la
         <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universidad de Música y Artes Escénicas de Viena</a>. 
         Consulta nuestra <a href="https://mei-friend.github.io" target="_blank">documentación extensa</a> para obtener
         más información.
@@ -76,8 +76,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Fondo de Ciencia de Austria (FWF)</a> en los proyectos
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        e <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> y <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>
     `,
   },
@@ -248,11 +248,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Alojado por <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      '@ <a href="https://mdw.ac.at">mdw</a>, con ' +
+      'Alojado por <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      '@ <a href="https://mdw.ac.at" target="_blank">mdw</a>, con ' +
       heart +
       ' desde Viena. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Cargando Verovio' },
   verovioLoaded: { text: 'cargado' },
@@ -1125,6 +1125,75 @@ export const lang = {
   githubFilepath: { text: 'Ruta' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar como nuevo archivo' } }, value: 'Confirmar' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Llegas desde <strong>Let's Encode!</strong> para trabajar en una tarea de codificación. mei-friend es uno de los editores que Let's Encode ofrece para este trabajo. Usa <strong>Guardar</strong> en el menú <strong>Gestión de la tarea</strong> (arriba a la izquierda) para guardar tu progreso sobre la marcha y <strong>Completar tarea</strong> cuando hayas terminado, para aportar tu trabajo a la campaña.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Completar tarea' },
+  letsEncodeMenuLabel: { text: 'Gestión de la tarea' },
+  letsEncodeLoggedInAs: { text: 'Sesión iniciada como' },
+  letsEncodeSaveButton: { value: 'Guardar' },
+  letsEncodeSaving: { text: 'Guardando tu trabajo…' },
+  letsEncodeSaveFailed: { text: 'No se ha podido guardar tu trabajo.' },
+  letsEncodeDismiss: { value: 'Cerrar' },
+  letsEncodeLastSave: { text: 'Último guardado:' },
+  letsEncodeLastAutosave: { text: 'Guardado automático:' },
+  letsEncodeSavedAt: { text: 'Guardado el' },
+  letsEncodeExpiresAt: { text: 'Vence el' },
+  letsEncodeTimeRemaining: { text: 'para completar la tarea' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'hace {n}' },
+  letsEncodeJustNow: { text: 'ahora mismo' },
+  letsEncodeTimeExpired: { text: 'Se ha agotado el tiempo para completar esta tarea' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Intervalo de guardado automático (minutos)',
+    description:
+      'Cada cuántos minutos se guarda automáticamente tu trabajo mientras editas. Solo se guarda si has hecho cambios; 0 desactiva el guardado automático.',
+  },
+  titleLetsEncode: {
+    title: 'Let’s Encode!',
+    description: "Configuración de la tarea de Let's Encode en la que estás trabajando",
+  },
+  letsEncodeAbandonTaskButton: { value: 'Abandonar tarea' },
+  letsEncodeKeepWorking: { value: 'Seguir trabajando' },
+  letsEncodeCompleteAnyway: { value: 'Completar la tarea de todos modos' },
+  letsEncodeAbandonConfirm: { value: 'Abandonar tarea' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'No has modificado esta codificación. Eso también cuenta: al completar la tarea queda constancia de que no necesitaba cambios. También puedes seguir trabajando en ella.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "¿Quieres completar esta tarea? Tu trabajo se guardará y se entregará a Let's Encode, y la tarea quedará cerrada.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "¿Abandonar esta tarea? Tu trabajo en ella se perderá, incluido lo que ya hayas guardado, y se comunicará a Let's Encode que no has completado la tarea.",
+  },
+  letsEncodeLoading: { text: "Cargando tu tarea desde Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Abrir tu campaña de Let's Encode en una pestaña nueva (tu tarea sigue abierta aquí)",
+  },
+  letsEncodeCommitting: { text: 'Completando tu tarea…' },
+  letsEncodeCompleted: { text: "Tarea completada: volviendo a Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'No se ha podido completar tu tarea.' },
+  letsEncodeRetryButton: { value: 'Reintentar' },
+  letsEncodeAbandonButton: { value: "Volver a Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Este enlace de Let's Encode está incompleto: no indica ninguna campaña, así que no hay adónde enviar el resultado. Vuelve a Let's Encode y abre la tarea de nuevo.",
+  },
+  letsEncodeMissingParameterError: {
+    text: "A la transferencia desde Let's Encode le faltaba un parámetro obligatorio:",
+  },
+  letsEncodeFileError: { text: 'No se ha podido abrir en GitHub el archivo recibido.' },
+  letsEncodeCloneError: { text: 'No se ha podido cargar tu tarea desde GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'El archivo se modificó en GitHub mientras trabajabas, así que no se ha podido guardar tu trabajo.',
+  },
   commitLog: { text: 'Registro de confirmaciones' },
   githubDate: { text: 'Fecha' },
   githubAuthor: { text: 'Autor' },

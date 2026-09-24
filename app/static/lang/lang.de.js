@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org" target="_blank">Musik-Kodierungen</a>, gehostet an der
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
       Bitte besuchen Sie für weitere Informationen unsere
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
@@ -79,8 +79,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      und <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> und <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Verstanden!' },
@@ -250,11 +250,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Gehosted von <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      '@ <a href="https://mdw.ac.at">mdw</a>, mit ' +
+      'Gehosted von <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      '@ <a href="https://mdw.ac.at" target="_blank">mdw</a>, mit ' +
       heart +
       ' aus Wien. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Lade Verovio' },
   verovioLoaded: { text: 'geladen' },
@@ -1135,6 +1135,63 @@ export const lang = {
   githubFilepath: { text: 'Pfad' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als neue Datei' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html: "<p>Sie kommen von <strong>Let's Encode!</strong>, um an einer Kodierungsaufgabe zu arbeiten. mei-friend ist einer der Editoren, die Let's Encode für diese Arbeit anbietet. Sichern Sie Ihren Fortschritt zwischendurch mit <strong>Speichern</strong> im Menü <strong>Aufgabenverwaltung</strong> (oben links), und wählen Sie <strong>Aufgabe abschließen</strong>, wenn Sie fertig sind, um Ihr Ergebnis der Kampagne bereitzustellen.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Aufgabe abschließen' },
+  letsEncodeMenuLabel: { text: 'Aufgabenverwaltung' },
+  letsEncodeLoggedInAs: { text: 'Angemeldet als' },
+  letsEncodeSaveButton: { value: 'Speichern' },
+  letsEncodeSaving: { text: 'Ihre Arbeit wird gespeichert…' },
+  letsEncodeSaveFailed: { text: 'Ihre Arbeit konnte nicht gespeichert werden.' },
+  letsEncodeDismiss: { value: 'Schließen' },
+  letsEncodeLastSave: { text: 'Zuletzt gespeichert:' },
+  letsEncodeLastAutosave: { text: 'Automatisch gespeichert:' },
+  letsEncodeSavedAt: { text: 'Gespeichert am' },
+  letsEncodeExpiresAt: { text: 'Läuft ab am' },
+  letsEncodeTimeRemaining: { text: 'verbleiben, um die Aufgabe abzuschließen' },
+  letsEncodeHoursShort: { text: 'Std.' },
+  letsEncodeMinutesShort: { text: 'Min.' },
+  letsEncodeDaysShort: { text: 'Tg.' },
+  letsEncodeAgo: { text: 'vor {n}' },
+  letsEncodeJustNow: { text: 'gerade eben' },
+  letsEncodeTimeExpired: { text: 'Die Zeit für diese Aufgabe ist abgelaufen' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Intervall für automatisches Speichern (Minuten)',
+    description:
+      'Wie oft Ihre Arbeit während der Bearbeitung automatisch gespeichert wird, in Minuten. Gespeichert wird nur, wenn Sie etwas geändert haben; 0 schaltet das automatische Speichern aus.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: 'Einstellungen für die Let’s-Encode-Aufgabe, an der Sie arbeiten' },
+  letsEncodeAbandonTaskButton: { value: 'Aufgabe abbrechen' },
+  letsEncodeKeepWorking: { value: 'Weiterarbeiten' },
+  letsEncodeCompleteAnyway: { value: 'Aufgabe trotzdem abschließen' },
+  letsEncodeAbandonConfirm: { value: 'Aufgabe abbrechen' },
+  letsEncodeNoChangesPrompt: {
+    text: 'Sie haben an dieser Kodierung nichts geändert. Auch das zählt: Wenn Sie die Aufgabe abschließen, wird festgehalten, dass keine Änderungen nötig waren. Sie können aber auch weiterarbeiten.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: 'Möchten Sie diese Aufgabe abschließen? Ihre Arbeit wird gespeichert und an Let’s Encode übermittelt; die Aufgabe ist damit beendet.',
+  },
+  letsEncodeAbandonPrompt: {
+    text: 'Diese Aufgabe abbrechen? Ihre Arbeit daran geht verloren, auch was Sie bereits gespeichert haben, und Let’s Encode wird mitgeteilt, dass Sie die Aufgabe nicht abgeschlossen haben.',
+  },
+  letsEncodeLoading: { text: 'Ihre Aufgabe wird von Let’s Encode geladen…' },
+  letsEncodeLogoLinkTitle: { text: 'Ihre Let’s-Encode-Kampagne in einem neuen Tab öffnen (Ihre Aufgabe bleibt hier geöffnet)' },
+  letsEncodeCommitting: { text: 'Ihre Aufgabe wird abgeschlossen…' },
+  letsEncodeCompleted: { text: "Aufgabe abgeschlossen – Sie werden zu Let's Encode zurückgeleitet…" },
+  letsEncodeCommitFailed: { text: 'Ihre Aufgabe konnte nicht abgeschlossen werden.' },
+  letsEncodeRetryButton: { value: 'Erneut versuchen' },
+  letsEncodeAbandonButton: { value: "Zurück zu Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text: "Dieser Let's-Encode-Link ist unvollständig: Er nennt keine Kampagne, daher kann kein Ergebnis zurückgemeldet werden. Bitte kehren Sie zu Let's Encode zurück und öffnen Sie die Aufgabe erneut.",
+  },
+  letsEncodeMissingParameterError: { text: "Bei der Übergabe von Let's Encode fehlte ein erforderlicher Parameter:" },
+  letsEncodeFileError: { text: 'Die übergebene Datei konnte auf GitHub nicht geöffnet werden.' },
+  letsEncodeCloneError: { text: 'Ihre Aufgabe konnte nicht von GitHub geladen werden.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Die Datei wurde auf GitHub geändert, während Sie gearbeitet haben; Ihre Arbeit konnte daher nicht gespeichert werden.',
+  },
   commitLog: { text: 'Commit-Log' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Author' },

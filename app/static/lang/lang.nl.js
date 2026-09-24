@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend is een editor voor <a href="https://music-encoding.org">muziekcoderingen</a>, gehost bij de
+        mei-friend is een editor voor <a href="https://music-encoding.org" target="_blank">muziekcoderingen</a>, gehost bij de
         <a href="https://mdw.ac.at" target="_blank">mdw – Universiteit voor Muziek en Podiumkunsten Wenen</a>.
         Raadpleeg onze <a href="https://mei-friend.github.io" target="_blank">uitgebreide documentatie</a> voor
         meer informatie.
@@ -71,8 +71,8 @@ export const lang = {
         De ontwikkeling van de mei-friend webapplicatie wordt gefinancierd door het
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> onder projecten
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
-          >P 34664-G (Signature Sound Vienna)</a>
-        en <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+          >P 34664-G (Signature Sound Vienna)</a>,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> en <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Begrepen!' },
@@ -248,11 +248,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Gehost door <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'bij <a href="https://mdw.ac.at">mdw</a>, met ' +
+      'Gehost door <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'bij <a href="https://mdw.ac.at" target="_blank">mdw</a>, met ' +
       heart +
       ' uit Wenen. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Verovio laden' },
   verovioLoaded: { text: 'geladen' },
@@ -989,6 +989,70 @@ export const lang = {
   githubFilepath: { text: 'Pad' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als nieuw bestand' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>U komt van <strong>Let's Encode!</strong> om aan een coderingstaak te werken. mei-friend is een van de editors die Let's Encode hiervoor aanbiedt. Gebruik <strong>Opslaan</strong> in het menu <strong>Taakbeheer</strong> (linksboven) om uw voortgang tussendoor te bewaren, en <strong>Taak voltooien</strong> wanneer u klaar bent, om uw werk bij te dragen aan de campagne.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Taak voltooien' },
+  letsEncodeMenuLabel: { text: 'Taakbeheer' },
+  letsEncodeLoggedInAs: { text: 'Ingelogd als' },
+  letsEncodeSaveButton: { value: 'Opslaan' },
+  letsEncodeSaving: { text: 'Uw werk wordt opgeslagen…' },
+  letsEncodeSaveFailed: { text: 'Uw werk kon niet worden opgeslagen.' },
+  letsEncodeDismiss: { value: 'Sluiten' },
+  letsEncodeLastSave: { text: 'Laatst opgeslagen:' },
+  letsEncodeLastAutosave: { text: 'Automatisch opgeslagen:' },
+  letsEncodeSavedAt: { text: 'Opgeslagen op' },
+  letsEncodeExpiresAt: { text: 'Verloopt op' },
+  letsEncodeTimeRemaining: { text: 'resterend om de taak te voltooien' },
+  letsEncodeHoursShort: { text: 'u' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: '{n} geleden' },
+  letsEncodeJustNow: { text: 'zojuist' },
+  letsEncodeTimeExpired: { text: 'De tijd om deze taak te voltooien is verstreken' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval voor automatisch opslaan (minuten)',
+    description:
+      'Hoe vaak uw werk tijdens het bewerken automatisch wordt opgeslagen, in minuten. Er wordt alleen opgeslagen als u iets hebt gewijzigd; 0 schakelt automatisch opslaan uit.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Instellingen voor de Let's Encode-taak waaraan u werkt" },
+  letsEncodeAbandonTaskButton: { value: 'Taak afbreken' },
+  letsEncodeKeepWorking: { value: 'Verder werken' },
+  letsEncodeCompleteAnyway: { value: 'Taak toch voltooien' },
+  letsEncodeAbandonConfirm: { value: 'Taak afbreken' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'U hebt deze codering niet gewijzigd. Ook dat telt: door de taak te voltooien wordt vastgelegd dat er geen wijzigingen nodig waren. U kunt ook verder werken.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Wilt u deze taak voltooien? Uw werk wordt opgeslagen en doorgegeven aan Let's Encode, en de taak wordt afgesloten.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Deze taak afbreken? Uw werk eraan gaat verloren, ook wat u al hebt opgeslagen, en Let's Encode krijgt te horen dat u de taak niet hebt voltooid.",
+  },
+  letsEncodeLoading: { text: "Uw taak wordt opgehaald bij Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Uw Let's Encode-campagne openen in een nieuw tabblad (uw taak blijft hier geopend)",
+  },
+  letsEncodeCommitting: { text: 'Uw taak wordt voltooid…' },
+  letsEncodeCompleted: { text: "Taak voltooid — u wordt teruggestuurd naar Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Uw taak kon niet worden voltooid.' },
+  letsEncodeRetryButton: { value: 'Opnieuw proberen' },
+  letsEncodeAbandonButton: { value: "Terug naar Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Deze Let's Encode-link is onvolledig: er wordt geen campagne genoemd, dus het resultaat kan nergens worden gemeld. Ga terug naar Let's Encode en open de taak opnieuw.",
+  },
+  letsEncodeMissingParameterError: { text: "Bij de overdracht vanuit Let's Encode ontbrak een verplichte parameter:" },
+  letsEncodeFileError: { text: 'Het overgedragen bestand kon niet worden geopend op GitHub.' },
+  letsEncodeCloneError: { text: 'Uw taak kon niet worden geladen vanaf GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Het bestand is op GitHub gewijzigd terwijl u werkte, waardoor uw werk niet kon worden opgeslagen.',
+  },
   commitLog: { text: 'Commitlogboek' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Auteur' },

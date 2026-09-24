@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend je uređivač za <a href="https://music-encoding.org">muzičke kodove</a>, hostiran na
+      mei-friend je uređivač za <a href="https://music-encoding.org" target="_blank">muzičke kodove</a>, hostiran na
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Univerzitetu muzike i izvođačkih umetnosti u Beču</a>. 
       Molimo vas da pogledate našu <a href="https://mei-friend.github.io" target="_blank">obimnu dokumentaciju</a> za 
       dodatne informacije.
@@ -70,8 +70,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> u okviru projekata
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Razumem!' },
@@ -247,11 +247,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impresum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impresum</a>.',
   },
   loadingVerovio: { text: 'Učitavanje Verovija' },
   verovioLoaded: { text: 'učitan' },
@@ -980,6 +980,70 @@ export const lang = {
   githubFilepath: { text: 'Putanja' },
   githubCommit: { text: 'Komit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Komituj kao novi fajl' } }, value: 'Komituj' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Došli ste s <strong>Let's Encode!</strong> kako biste radili na zadatku kodiranja. mei-friend jedan je od uređivača koje Let's Encode nudi za ovaj rad. Upotrijebite <strong>Spremi</strong> u izborniku <strong>Upravljanje zadatkom</strong> (gore lijevo) kako biste usput spremali svoj napredak, a <strong>Završi zadatak</strong> kada završite, kako biste dali svoj doprinos kampanji.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Završi zadatak' },
+  letsEncodeMenuLabel: { text: 'Upravljanje zadatkom' },
+  letsEncodeLoggedInAs: { text: 'Prijavljeni ste kao' },
+  letsEncodeSaveButton: { value: 'Spremi' },
+  letsEncodeSaving: { text: 'Vaš se rad sprema…' },
+  letsEncodeSaveFailed: { text: 'Vaš rad nije bilo moguće spremiti.' },
+  letsEncodeDismiss: { value: 'Zatvori' },
+  letsEncodeLastSave: { text: 'Posljednje spremanje:' },
+  letsEncodeLastAutosave: { text: 'Automatski spremljeno:' },
+  letsEncodeSavedAt: { text: 'Spremljeno' },
+  letsEncodeExpiresAt: { text: 'Istječe' },
+  letsEncodeTimeRemaining: { text: 'preostalo za završetak zadatka' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'prije {n}' },
+  letsEncodeJustNow: { text: 'upravo sada' },
+  letsEncodeTimeExpired: { text: 'Vrijeme za završetak ovog zadatka je isteklo' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval automatskog spremanja (minute)',
+    description:
+      'Koliko se često vaš rad automatski sprema dok uređujete, u minutama. Sprema se samo ako ste nešto izmijenili; 0 isključuje automatsko spremanje.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Postavke zadatka Let's Encode na kojem radite" },
+  letsEncodeAbandonTaskButton: { value: 'Odustani od zadatka' },
+  letsEncodeKeepWorking: { value: 'Nastavi s radom' },
+  letsEncodeCompleteAnyway: { value: 'Ipak završi zadatak' },
+  letsEncodeAbandonConfirm: { value: 'Odustani od zadatka' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Niste mijenjali ovo kodiranje. I to se računa: završetkom zadatka bilježi se da izmjene nisu bile potrebne. Možete i nastaviti s radom.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Želite li završiti ovaj zadatak? Vaš će rad biti spremljen i proslijeđen platformi Let's Encode, a zadatak će biti zatvoren.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Odustati od ovog zadatka? Vaš će rad na njemu biti izgubljen, uključujući ono što ste već spremili, a platforma Let's Encode bit će obaviještena da niste završili zadatak.",
+  },
+  letsEncodeLoading: { text: "Učitavanje vašeg zadatka s platforme Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Otvorite svoju kampanju Let's Encode u novoj kartici (vaš zadatak ostaje ovdje otvoren)",
+  },
+  letsEncodeCommitting: { text: 'Završavanje vašeg zadatka…' },
+  letsEncodeCompleted: { text: "Zadatak je završen — vraćamo vas na Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Vaš zadatak nije bilo moguće završiti.' },
+  letsEncodeRetryButton: { value: 'Pokušaj ponovno' },
+  letsEncodeAbandonButton: { value: "Povratak na Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Ova poveznica Let's Encode nije potpuna: ne navodi nijednu kampanju, pa nema kamo prijaviti rezultat. Vratite se na Let's Encode i ponovno otvorite zadatak.",
+  },
+  letsEncodeMissingParameterError: { text: "Pri predaji s platforme Let's Encode nedostajao je obvezan parametar:" },
+  letsEncodeFileError: { text: 'Predanu datoteku nije bilo moguće otvoriti na GitHubu.' },
+  letsEncodeCloneError: { text: 'Vaš zadatak nije bilo moguće učitati s GitHuba.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Datoteka je izmijenjena na GitHubu dok ste radili, pa vaš rad nije bilo moguće spremiti.',
+  },
   commitLog: { text: 'Zapis komita' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Autor' },

@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend és un editor per a les <a href="https://music-encoding.org">codificacions musicals</a>, allotjat a
+        mei-friend és un editor per a les <a href="https://music-encoding.org" target="_blank">codificacions musicals</a>, allotjat a
         <a href="https://mdw.ac.at" target="_blank">la Universitat de Música i Arts Escèniques de Viena</a>. 
         Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
         més informació.
@@ -76,8 +76,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> en els projectes
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>
     `,
   },
@@ -254,11 +254,11 @@ export const lang = {
   // Footer texts // Textos del peu de pàgina
   leftFooter: {
     html:
-      'Allotjat per <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'a <a href="https://mdw.ac.at">mdw</a>, amb ' +
+      'Allotjat per <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'a <a href="https://mdw.ac.at" target="_blank">mdw</a>, amb ' +
       heart +
       ' des de Viena. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Avís legal</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Avís legal</a>.',
   },
   loadingVerovio: { text: "S'està carregant Verovio" },
   verovioLoaded: { text: 'carregat' },
@@ -1126,6 +1126,73 @@ export const lang = {
   githubFilepath: { text: 'Camí' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar com a nou fitxer' } }, value: 'Confirmar' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Arribes des de <strong>Let's Encode!</strong> per treballar en una tasca de codificació. mei-friend és un dels editors que Let's Encode ofereix per a aquesta feina. Fes servir <strong>Desa</strong> al menú <strong>Gestió de la tasca</strong> (a dalt a l'esquerra) per anar desant el teu progrés, i <strong>Completa la tasca</strong> quan hagis acabat, per aportar la teva feina a la campanya.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Completa la tasca' },
+  letsEncodeMenuLabel: { text: 'Gestió de la tasca' },
+  letsEncodeLoggedInAs: { text: 'Sessió iniciada com a' },
+  letsEncodeSaveButton: { value: 'Desa' },
+  letsEncodeSaving: { text: "S'està desant la teva feina…" },
+  letsEncodeSaveFailed: { text: "No s'ha pogut desar la teva feina." },
+  letsEncodeDismiss: { value: 'Tanca' },
+  letsEncodeLastSave: { text: 'Últim desament:' },
+  letsEncodeLastAutosave: { text: 'Desat automàticament:' },
+  letsEncodeSavedAt: { text: 'Desat el' },
+  letsEncodeExpiresAt: { text: 'Venç el' },
+  letsEncodeTimeRemaining: { text: 'per completar la tasca' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'fa {n}' },
+  letsEncodeJustNow: { text: 'ara mateix' },
+  letsEncodeTimeExpired: { text: "S'ha esgotat el temps per completar aquesta tasca" },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval de desament automàtic (minuts)',
+    description:
+      'Cada quants minuts es desa automàticament la teva feina mentre edites. Només es desa si has fet canvis; 0 desactiva el desament automàtic.',
+  },
+  titleLetsEncode: {
+    title: 'Let’s Encode!',
+    description: "Configuració de la tasca de Let's Encode en què estàs treballant",
+  },
+  letsEncodeAbandonTaskButton: { value: 'Abandona la tasca' },
+  letsEncodeKeepWorking: { value: 'Continua treballant' },
+  letsEncodeCompleteAnyway: { value: 'Completa la tasca igualment' },
+  letsEncodeAbandonConfirm: { value: 'Abandona la tasca' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'No has modificat aquesta codificació. Això també compta: en completar la tasca queda constància que no calia cap canvi. També pots continuar treballant-hi.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Vols completar aquesta tasca? La teva feina es desarà i es lliurarà a Let's Encode, i la tasca quedarà tancada.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Vols abandonar aquesta tasca? La feina que hi has fet es perdrà, fins i tot el que ja hagis desat, i es comunicarà a Let's Encode que no has completat la tasca.",
+  },
+  letsEncodeLoading: { text: "S'està carregant la teva tasca des de Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Obre la teva campanya de Let's Encode en una pestanya nova (la teva tasca continua oberta aquí)",
+  },
+  letsEncodeCommitting: { text: "S'està completant la teva tasca…" },
+  letsEncodeCompleted: { text: "Tasca completada: tornant a Let's Encode…" },
+  letsEncodeCommitFailed: { text: "No s'ha pogut completar la teva tasca." },
+  letsEncodeRetryButton: { value: 'Torna-ho a provar' },
+  letsEncodeAbandonButton: { value: "Torna a Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Aquest enllaç de Let's Encode és incomplet: no indica cap campanya, de manera que no hi ha on enviar el resultat. Torna a Let's Encode i obre la tasca de nou.",
+  },
+  letsEncodeMissingParameterError: { text: "Al traspàs des de Let's Encode hi faltava un paràmetre obligatori:" },
+  letsEncodeFileError: { text: "No s'ha pogut obrir a GitHub el fitxer rebut." },
+  letsEncodeCloneError: { text: "No s'ha pogut carregar la teva tasca des de GitHub." },
+  letsEncodeRemoteChangedError: {
+    text: "El fitxer s'ha modificat a GitHub mentre treballaves, de manera que no s'ha pogut desar la teva feina.",
+  },
   commitLog: { text: 'Registre de confirmacions' },
   githubDate: { text: 'Data' },
   githubAuthor: { text: 'Autor' },

@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
    <p>
-      mei-friendは、<a href="https://music-encoding.org">Music Encoding Initiative</a>で記述された楽譜ファイルの編集を目的に開発された楽譜データエディタです。現在、<a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストしています。
+      mei-friendは、<a href="https://music-encoding.org" target="_blank">Music Encoding Initiative</a>で記述された楽譜ファイルの編集を目的に開発された楽譜データエディタです。現在、<a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストしています。
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
@@ -65,8 +65,7 @@ export const lang = {
       </p>
       <p>
         mei-friend Webアプリケーションの開発は、<a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>
-        のプロジェクト<a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（Signature Sound Vienna）</a>
-        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>によって資金提供されています。
+        のプロジェクト<a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（Signature Sound Vienna）</a>、<a href="https://e-laute.info" target="_blank">I 6019（E-LAUTE）</a>、および<a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625（Let's Encode!）</a>によって資金提供されています。
         </p>
     `,
   },
@@ -243,11 +242,11 @@ export const lang = {
   leftFooter: {
     // No translation needed for HTML links, 'heart', and place names
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Imprint</a>.',
   },
   loadingVerovio: { text: 'Verovioを読み込む' },
   verovioLoaded: { text: '読み込み完了' },
@@ -1087,6 +1086,55 @@ export const lang = {
   githubFilepath: { text: 'ファイルパス' },
   githubCommit: { text: 'コミット' },
   githubCommitButton: { classes: { commitAsNewFile: { value: '新しいファイルとしてコミット' } }, value: 'コミット' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p><strong>Let's Encode!</strong>からエンコード作業のためにお越しいただきました。mei-friendは、Let's Encodeがこの作業のために提供しているエディタの一つです。作業中は<strong>タスク管理</strong>メニュー（左上）の<strong>保存</strong>で進捗を随時保存し、終わったら<strong>タスクを完了</strong>を選んで、成果をキャンペーンに提供してください。</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'タスクを完了' },
+  letsEncodeMenuLabel: { text: 'タスク管理' },
+  letsEncodeLoggedInAs: { text: 'ログイン中:' },
+  letsEncodeSaveButton: { value: '保存' },
+  letsEncodeSaving: { text: '作業内容を保存しています…' },
+  letsEncodeSaveFailed: { text: '作業内容を保存できませんでした。' },
+  letsEncodeDismiss: { value: '閉じる' },
+  letsEncodeLastSave: { text: '最終保存:' },
+  letsEncodeLastAutosave: { text: '自動保存:' },
+  letsEncodeSavedAt: { text: '保存日時:' },
+  letsEncodeExpiresAt: { text: '期限:' },
+  letsEncodeTimeRemaining: { text: '以内にタスクを完了してください' },
+  letsEncodeHoursShort: { text: '時間' },
+  letsEncodeMinutesShort: { text: '分' },
+  letsEncodeDaysShort: { text: '日' },
+  letsEncodeAgo: { text: '{n}前' },
+  letsEncodeJustNow: { text: 'たった今' },
+  letsEncodeTimeExpired: { text: 'このタスクの期限が過ぎました' },
+  letsEncodeAutosaveMinutes: {
+    title: '自動保存の間隔（分）',
+    description: '編集中に作業内容を自動保存する間隔（分）です。変更がある場合にのみ保存されます。0にすると自動保存はオフになります。',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "作業中のLet's Encodeタスクの設定" },
+  letsEncodeAbandonTaskButton: { value: 'タスクを中止' },
+  letsEncodeKeepWorking: { value: '作業を続ける' },
+  letsEncodeCompleteAnyway: { value: 'このままタスクを完了' },
+  letsEncodeAbandonConfirm: { value: 'タスクを中止' },
+  letsEncodeNoChangesPrompt: { text: 'このエンコードは変更されていません。それも貢献になります。タスクを完了すると、変更が不要だったことが記録されます。作業を続けることもできます。' },
+  letsEncodeConfirmCompletePrompt: { text: "このタスクを完了しますか？作業内容は保存されてLet's Encodeに渡され、タスクは終了します。" },
+  letsEncodeAbandonPrompt: { text: "このタスクを中止しますか？すでに保存した内容も含め、このタスクでの作業は失われます。また、タスクが完了しなかったことがLet's Encodeに通知されます。" },
+  letsEncodeLoading: { text: "Let's Encodeからタスクを読み込んでいます…" },
+  letsEncodeLogoLinkTitle: { text: "Let's Encodeのキャンペーンを新しいタブで開く（タスクはここで開いたままです）" },
+  letsEncodeCommitting: { text: 'タスクを完了しています…' },
+  letsEncodeCompleted: { text: "タスクが完了しました。Let's Encodeに戻ります…" },
+  letsEncodeCommitFailed: { text: 'タスクを完了できませんでした。' },
+  letsEncodeRetryButton: { value: '再試行' },
+  letsEncodeAbandonButton: { value: "Let's Encodeに戻る" },
+  letsEncodeNoCampaignError: {
+    text: "このLet's Encodeのリンクは不完全です。キャンペーンが指定されていないため、結果を報告する先がありません。Let's Encodeに戻り、もう一度タスクを開いてください。",
+  },
+  letsEncodeMissingParameterError: { text: "Let's Encodeからの引き渡しに必要なパラメータがありません:" },
+  letsEncodeFileError: { text: '引き渡されたファイルをGitHubで開けませんでした。' },
+  letsEncodeCloneError: { text: 'GitHubからタスクを読み込めませんでした。' },
+  letsEncodeRemoteChangedError: { text: '作業中にGitHub上でファイルが変更されたため、作業内容を保存できませんでした。' },
   commitLog: { text: 'コミットログ' },
   githubDate: { text: '日付' },
   githubAuthor: { text: '著者' },

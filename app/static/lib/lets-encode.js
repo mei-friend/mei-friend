@@ -342,25 +342,74 @@ function noteLetsEncodeSaved(automatic = false) {
 } // noteLetsEncodeSaved()
 
 /**
+ * letsEncodeDuration
+ * @description A span of time in the largest units that apply, e.g. "2 d 5 h",
+ * "5 h 20 min", "20 min", at most in days. The units come from the language
+ * pack rather than Intl, which lacks data for some of mei-friend's languages
+ * (Esperanto has none in Chromium, and Bosnian yields "-5 min"); they are
+ * abbreviations, so they need no plural forms. The non-breaking space keeps
+ * each number on the same line as its unit.
+ * @param {number} totalMinutes whole minutes, not negative
+ * @param {number} maxUnits how many units to show, largest first
+ * @returns {string}
+ */
+function letsEncodeDuration(totalMinutes, maxUnits) {
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  const units = [
+    [days, translator.lang.letsEncodeDaysShort.text],
+    [hours, translator.lang.letsEncodeHoursShort.text],
+    [minutes, translator.lang.letsEncodeMinutesShort.text],
+  ];
+  // start at the largest unit that is not zero, and leave out a zero after it
+  // ("2 d", not "2 d 0 h"); under a minute this still says "0 min"
+  let first = units.findIndex(([n]) => n > 0);
+  if (first < 0) first = units.length - 1;
+  return units
+    .slice(first, first + maxUnits)
+    .filter(([n], i) => i === 0 || n > 0)
+    .map(([n, unit]) => n + '\u00a0' + unit)
+    .join(' ');
+} // letsEncodeDuration()
+
+/**
+ * letsEncodeTimestamp
+ * @description The exact moment, as "2026-09-24 15:07" in the volunteer's local
+ * time, for every language alike: unambiguous, and independent of locale data
+ * the browser may lack (Esperanto) or the browser's own language. Assembled by
+ * hand because toISOString() would give UTC.
+ * @param {number} timestamp epoch milliseconds
+ * @returns {string}
+ */
+function letsEncodeTimestamp(timestamp) {
+  const d = new Date(timestamp);
+  const pad = (n) => String(n).padStart(2, '0');
+  return (
+    d.getFullYear() +
+    '-' +
+    pad(d.getMonth() + 1) +
+    '-' +
+    pad(d.getDate()) +
+    ' ' +
+    pad(d.getHours()) +
+    ':' +
+    pad(d.getMinutes())
+  );
+} // letsEncodeTimestamp()
+
+/**
  * letsEncodeRelativeTime
- * @description "5 minutes ago" in the reader's language, falling back to
- * minutes if the browser has no Intl.RelativeTimeFormat.
+ * @description "5 min ago" in mei-friend's own language, not the browser's:
+ * someone running the English interface on a German browser should not be
+ * told "vor 5 Minuten".
  * @param {number} timestamp epoch milliseconds
  * @returns {string}
  */
 function letsEncodeRelativeTime(timestamp) {
-  const minutes = Math.round((Date.now() - timestamp) / 60000);
-  try {
-    // mei-friend's own language, not the browser's: someone running the English
-    // interface on a German browser should not be told "in dieser Minute"
-    const rtf = new Intl.RelativeTimeFormat(translator.langCode || undefined, { numeric: 'auto' });
-    if (minutes < 60) return rtf.format(-minutes, 'minute');
-    const hours = Math.round(minutes / 60);
-    if (hours < 24) return rtf.format(-hours, 'hour');
-    return rtf.format(-Math.round(hours / 24), 'day');
-  } catch (e) {
-    return minutes + ' min';
-  }
+  const minutes = Math.floor((Date.now() - timestamp) / 60000);
+  if (minutes < 1) return translator.lang.letsEncodeJustNow.text;
+  return translator.lang.letsEncodeAgo.text.replace('{n}', letsEncodeDuration(minutes, 1));
 } // letsEncodeRelativeTime()
 
 /**
@@ -385,7 +434,7 @@ export function renderLastSaveIndicator() {
     ? translator.lang.letsEncodeLastAutosave.text
     : translator.lang.letsEncodeLastSave.text;
   el.innerText = label + ' ' + letsEncodeRelativeTime(savedAt);
-  el.title = translator.lang.letsEncodeSavedAt.text + ' ' + new Date(savedAt).toLocaleString();
+  el.title = translator.lang.letsEncodeSavedAt.text + ' ' + letsEncodeTimestamp(savedAt);
 } // renderLastSaveIndicator()
 
 /**
@@ -659,14 +708,11 @@ export function renderLetsEncodeExpiry() {
     el.innerText = translator.lang.letsEncodeTimeExpired.text;
     el.classList.add('letsEncodeExpired');
   } else {
-    const totalMinutes = Math.floor(remaining / 60000);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    const clock = (hours ? hours + ' hrs ' : '') + minutes + ' mins';
+    const clock = letsEncodeDuration(Math.floor(remaining / 60000), 2);
     el.innerText = clock + ' ' + translator.lang.letsEncodeTimeRemaining.text;
     el.classList.remove('letsEncodeExpired');
   }
-  el.title = translator.lang.letsEncodeExpiresAt.text + ' ' + new Date(letsEncodeExpiresAt).toLocaleString();
+  el.title = translator.lang.letsEncodeExpiresAt.text + ' ' + letsEncodeTimestamp(letsEncodeExpiresAt);
 } // renderLetsEncodeExpiry()
 
 /**

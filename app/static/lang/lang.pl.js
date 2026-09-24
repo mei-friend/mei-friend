@@ -22,7 +22,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend to edytor dla <a href="https://music-encoding.org">kodowań muzycznych</a>, hostowany na
+        mei-friend to edytor dla <a href="https://music-encoding.org" target="_blank">kodowań muzycznych</a>, hostowany na
         <a href="https://mdw.ac.at" target="_blank">Uniwersytecie Muzycznym i Sztuk Widowiskowych w Wiedniu</a>. 
         Prosimy o zapoznanie się z naszą <a href="https://mei-friend.github.io" target="_blank">rozszerzoną dokumentacją</a> 
         dla dalszych informacji.
@@ -77,8 +77,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Austriacki Fundusz Nauki (FWF)</a> w ramach projektów
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>
     `,
   },
@@ -252,11 +252,11 @@ export const lang = {
   // Footer texts // Teksty stopki
   leftFooter: {
     html:
-      'Hostowany przez <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'na <a href="https://mdw.ac.at">mdw</a>, z ' +
+      'Hostowany przez <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'na <a href="https://mdw.ac.at" target="_blank">mdw</a>, z ' +
       heart +
       ' z Wiednia. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Oświadczenie</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Oświadczenie</a>.',
   },
   loadingVerovio: { text: 'Wczytywanie Verovio' },
   verovioLoaded: { text: 'wczytany' },
@@ -1127,6 +1127,70 @@ export const lang = {
   githubFilepath: { text: 'Ścieżka' },
   githubCommit: { text: 'Zatwierdź' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Zatwierdź jako nowy plik' } }, value: 'Zatwierdź' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Przychodzisz z <strong>Let's Encode!</strong>, aby pracować nad zadaniem kodowania. mei-friend jest jednym z edytorów, które Let's Encode oferuje do tej pracy. Używaj przycisku <strong>Zapisz</strong> w menu <strong>Zarządzanie zadaniem</strong> (w lewym górnym rogu), aby na bieżąco zapisywać postępy, a gdy skończysz, wybierz <strong>Zakończ zadanie</strong>, aby wnieść swoją pracę do kampanii.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Zakończ zadanie' },
+  letsEncodeMenuLabel: { text: 'Zarządzanie zadaniem' },
+  letsEncodeLoggedInAs: { text: 'Zalogowano jako' },
+  letsEncodeSaveButton: { value: 'Zapisz' },
+  letsEncodeSaving: { text: 'Zapisywanie Twojej pracy…' },
+  letsEncodeSaveFailed: { text: 'Nie udało się zapisać Twojej pracy.' },
+  letsEncodeDismiss: { value: 'Zamknij' },
+  letsEncodeLastSave: { text: 'Ostatni zapis:' },
+  letsEncodeLastAutosave: { text: 'Zapis automatyczny:' },
+  letsEncodeSavedAt: { text: 'Zapisano' },
+  letsEncodeExpiresAt: { text: 'Wygasa' },
+  letsEncodeTimeRemaining: { text: 'na ukończenie zadania' },
+  letsEncodeHoursShort: { text: 'godz.' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd.' },
+  letsEncodeAgo: { text: '{n} temu' },
+  letsEncodeJustNow: { text: 'przed chwilą' },
+  letsEncodeTimeExpired: { text: 'Czas na ukończenie tego zadania minął' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Częstotliwość automatycznego zapisu (minuty)',
+    description:
+      'Jak często, w minutach, Twoja praca jest zapisywana automatycznie podczas edycji. Zapis następuje tylko wtedy, gdy wprowadzisz zmiany; 0 wyłącza automatyczny zapis.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Ustawienia zadania Let's Encode, nad którym pracujesz" },
+  letsEncodeAbandonTaskButton: { value: 'Porzuć zadanie' },
+  letsEncodeKeepWorking: { value: 'Pracuj dalej' },
+  letsEncodeCompleteAnyway: { value: 'Mimo to zakończ zadanie' },
+  letsEncodeAbandonConfirm: { value: 'Porzuć zadanie' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'W tym kodowaniu nie wprowadzono żadnych zmian. To też się liczy: zakończenie zadania odnotowuje, że nie wymagało ono zmian. Możesz też pracować dalej.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Zakończyć to zadanie? Twoja praca zostanie zapisana i przekazana do Let's Encode, a zadanie zostanie zamknięte.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Porzucić to zadanie? Twoja praca nad nim przepadnie, łącznie z tym, co już zapisano, a Let's Encode otrzyma informację, że zadanie nie zostało ukończone.",
+  },
+  letsEncodeLoading: { text: "Pobieranie zadania z Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Otwórz swoją kampanię Let's Encode w nowej karcie (zadanie pozostanie tu otwarte)",
+  },
+  letsEncodeCommitting: { text: 'Kończenie zadania…' },
+  letsEncodeCompleted: { text: "Zadanie ukończone — powrót do Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Nie udało się zakończyć zadania.' },
+  letsEncodeRetryButton: { value: 'Spróbuj ponownie' },
+  letsEncodeAbandonButton: { value: "Wróć do Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Ten link Let's Encode jest niekompletny: nie wskazuje żadnej kampanii, więc nie ma dokąd zgłosić wyniku. Wróć do Let's Encode i otwórz zadanie ponownie.",
+  },
+  letsEncodeMissingParameterError: { text: "W przekazaniu z Let's Encode brakowało wymaganego parametru:" },
+  letsEncodeFileError: { text: 'Nie udało się otworzyć przekazanego pliku w GitHubie.' },
+  letsEncodeCloneError: { text: 'Nie udało się wczytać zadania z GitHuba.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Plik został zmieniony w GitHubie podczas Twojej pracy, więc nie udało się jej zapisać.',
+  },
   commitLog: { text: 'Dziennik zatwierdzeń' },
   githubDate: { text: 'Data' },
   githubAuthor: { text: 'Autor' },

@@ -1,7 +1,7 @@
 // mei-friend version and date
 export const version = '1.6.0';
 export const versionDate = '24 Sep 2026'; // use full or 3-character english months, will be translated
-export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
+export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
 // Date of the Let's Encode paragraph, which only campaign volunteers ever see.
 // Bump this instead of splashDate when only that paragraph changes: volunteers
 // are shown the splash again, regular users who dismissed it are not disturbed.

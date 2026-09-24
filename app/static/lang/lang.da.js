@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend er en editor for <a href="https://music-encoding.org">musik kodninger</a>, hostet på
+        mei-friend er en editor for <a href="https://music-encoding.org" target="_blank">musik kodninger</a>, hostet på
         <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>.
         Se venligst vores <a href="https://mei-friend.github.io" target="_blank">omfattende dokumentation</a> for
         yderligere information.
@@ -73,8 +73,8 @@ export const lang = {
       <p>
         Udviklingen af mei-friend webapplikationen er finansieret af
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projekterne
-        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>
-        og <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> og <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Forstået!' },
@@ -252,11 +252,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hostet af <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'på <a href="https://mdw.ac.at">mdw</a>, med ' +
+      'Hostet af <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'på <a href="https://mdw.ac.at" target="_blank">mdw</a>, med ' +
       heart +
       ' fra Wien. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Indlæser Verovio' },
   verovioLoaded: { text: 'indlæst' },
@@ -984,6 +984,67 @@ export const lang = {
   githubFilepath: { text: 'Sti' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit som ny fil' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Du kommer fra <strong>Let's Encode!</strong> for at arbejde på en kodningsopgave. mei-friend er en af de editorer, som Let's Encode tilbyder til dette arbejde. Brug <strong>Gem</strong> i menuen <strong>Opgavestyring</strong> (øverst til venstre) til at gemme dine fremskridt undervejs, og <strong>Afslut opgave</strong>, når du er færdig, for at bidrage med dit arbejde til kampagnen.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Afslut opgave' },
+  letsEncodeMenuLabel: { text: 'Opgavestyring' },
+  letsEncodeLoggedInAs: { text: 'Logget ind som' },
+  letsEncodeSaveButton: { value: 'Gem' },
+  letsEncodeSaving: { text: 'Gemmer dit arbejde…' },
+  letsEncodeSaveFailed: { text: 'Dit arbejde kunne ikke gemmes.' },
+  letsEncodeDismiss: { value: 'Luk' },
+  letsEncodeLastSave: { text: 'Sidst gemt:' },
+  letsEncodeLastAutosave: { text: 'Automatisk gemt:' },
+  letsEncodeSavedAt: { text: 'Gemt' },
+  letsEncodeExpiresAt: { text: 'Udløber' },
+  letsEncodeTimeRemaining: { text: 'tilbage til at afslutte opgaven' },
+  letsEncodeHoursShort: { text: 't' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'for {n} siden' },
+  letsEncodeJustNow: { text: 'lige nu' },
+  letsEncodeTimeExpired: { text: 'Tiden til at afslutte opgaven er udløbet' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval for automatisk gemning (minutter)',
+    description:
+      'Hvor ofte dit arbejde gemmes automatisk, mens du redigerer, i minutter. Der gemmes kun, når du har lavet ændringer; 0 slår automatisk gemning fra.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Indstillinger for den Let's Encode-opgave, du arbejder på" },
+  letsEncodeAbandonTaskButton: { value: 'Opgiv opgave' },
+  letsEncodeKeepWorking: { value: 'Arbejd videre' },
+  letsEncodeCompleteAnyway: { value: 'Afslut opgaven alligevel' },
+  letsEncodeAbandonConfirm: { value: 'Opgiv opgave' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Du har ikke ændret denne kodning. Det tæller også: når du afslutter opgaven, registreres det, at den ikke krævede ændringer. Du kan også arbejde videre.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: "Vil du afslutte denne opgave? Dit arbejde gemmes og overdrages til Let's Encode, og opgaven lukkes.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Opgive denne opgave? Dit arbejde med den går tabt, også det, du allerede har gemt, og Let's Encode får besked om, at du ikke afsluttede opgaven.",
+  },
+  letsEncodeLoading: { text: "Henter din opgave fra Let's Encode…" },
+  letsEncodeLogoLinkTitle: { text: "Åbn din Let's Encode-kampagne i en ny fane (din opgave forbliver åben her)" },
+  letsEncodeCommitting: { text: 'Afslutter din opgave…' },
+  letsEncodeCompleted: { text: "Opgaven er afsluttet — du sendes tilbage til Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Din opgave kunne ikke afsluttes.' },
+  letsEncodeRetryButton: { value: 'Prøv igen' },
+  letsEncodeAbandonButton: { value: "Tilbage til Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Dette Let's Encode-link er ufuldstændigt: det nævner ingen kampagne, så resultatet kan ikke meldes tilbage nogen steder. Gå tilbage til Let's Encode, og åbn opgaven igen.",
+  },
+  letsEncodeMissingParameterError: { text: "Overdragelsen fra Let's Encode manglede en påkrævet parameter:" },
+  letsEncodeFileError: { text: 'Den overdragne fil kunne ikke åbnes på GitHub.' },
+  letsEncodeCloneError: { text: 'Din opgave kunne ikke indlæses fra GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Filen blev ændret på GitHub, mens du arbejdede, så dit arbejde kunne ikke gemmes.',
+  },
   commitLog: { text: 'Commit log' },
   githubDate: { text: 'Dato' },
   githubAuthor: { text: 'Forfatter' },

@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend è un editor per le <a href="https://music-encoding.org">codifiche musicali</a>, ospitato presso
+        mei-friend è un editor per le <a href="https://music-encoding.org" target="_blank">codifiche musicali</a>, ospitato presso
         l'<a href="https://mdw.ac.at" target="_blank">Università di Musica e Arti dello Spettacolo di Vienna</a>. Si prega
         di consultare la nostra <a href="https://mei-friend.github.io" target="_blank">documentazione completa</a> per ulteriori
         informazioni.
@@ -77,8 +77,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Fondo austriaco per la scienza (FWF)</a> nei progetti
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        e <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> e <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
       </p>
     `,
   },
@@ -252,11 +252,11 @@ export const lang = {
   // Footer texts/ Testi di piè di pagina
   leftFooter: {
     html:
-      'Ospitato da <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'a <a href="https://mdw.ac.at">mdw</a>, con ' +
+      'Ospitato da <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'a <a href="https://mdw.ac.at" target="_blank">mdw</a>, con ' +
       heart +
       ' da Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Imprint</a>.',
   },
   loadingVerovio: { text: 'Caricamento Verovio' },
   verovioLoaded: { text: 'Caricato' },
@@ -1136,6 +1136,73 @@ export const lang = {
   githubFilepath: { text: 'Percorso' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit come nuovo file' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Arrivi da <strong>Let's Encode!</strong> per lavorare a un'attività di codifica. mei-friend è uno degli editor che Let's Encode offre per questo lavoro. Usa <strong>Salva</strong> nel menu <strong>Gestione attività</strong> (in alto a sinistra) per salvare i tuoi progressi man mano, e <strong>Completa l'attività</strong> quando hai finito, per dare il tuo contributo alla campagna.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: "Completa l'attività" },
+  letsEncodeMenuLabel: { text: 'Gestione attività' },
+  letsEncodeLoggedInAs: { text: 'Accesso effettuato come' },
+  letsEncodeSaveButton: { value: 'Salva' },
+  letsEncodeSaving: { text: 'Salvataggio del tuo lavoro…' },
+  letsEncodeSaveFailed: { text: 'Non è stato possibile salvare il tuo lavoro.' },
+  letsEncodeDismiss: { value: 'Chiudi' },
+  letsEncodeLastSave: { text: 'Ultimo salvataggio:' },
+  letsEncodeLastAutosave: { text: 'Salvataggio automatico:' },
+  letsEncodeSavedAt: { text: 'Salvato il' },
+  letsEncodeExpiresAt: { text: 'Scade il' },
+  letsEncodeTimeRemaining: { text: "per completare l'attività" },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'g' },
+  letsEncodeAgo: { text: '{n} fa' },
+  letsEncodeJustNow: { text: 'proprio ora' },
+  letsEncodeTimeExpired: { text: 'Il tempo per completare questa attività è scaduto' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Intervallo di salvataggio automatico (minuti)',
+    description:
+      'Ogni quanti minuti il tuo lavoro viene salvato automaticamente mentre modifichi. Il salvataggio avviene solo se hai apportato modifiche; 0 disattiva il salvataggio automatico.',
+  },
+  titleLetsEncode: {
+    title: 'Let’s Encode!',
+    description: "Impostazioni dell'attività Let's Encode su cui stai lavorando",
+  },
+  letsEncodeAbandonTaskButton: { value: "Abbandona l'attività" },
+  letsEncodeKeepWorking: { value: 'Continua a lavorare' },
+  letsEncodeCompleteAnyway: { value: "Completa comunque l'attività" },
+  letsEncodeAbandonConfirm: { value: "Abbandona l'attività" },
+  letsEncodeNoChangesPrompt: {
+    text:
+      "Non hai modificato questa codifica. Conta anche questo: completando l'attività si registra che non servivano modifiche. Puoi anche continuare a lavorarci.",
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Vuoi completare questa attività? Il tuo lavoro verrà salvato e consegnato a Let's Encode, e l'attività verrà chiusa.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Abbandonare questa attività? Il tuo lavoro andrà perso, compreso ciò che hai già salvato, e Let's Encode verrà informato che non hai completato l'attività.",
+  },
+  letsEncodeLoading: { text: "Caricamento della tua attività da Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Apri la tua campagna Let's Encode in una nuova scheda (la tua attività resta aperta qui)",
+  },
+  letsEncodeCommitting: { text: 'Completamento della tua attività…' },
+  letsEncodeCompleted: { text: "Attività completata: ritorno a Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Non è stato possibile completare la tua attività.' },
+  letsEncodeRetryButton: { value: 'Riprova' },
+  letsEncodeAbandonButton: { value: "Torna a Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Questo link di Let's Encode è incompleto: non indica alcuna campagna, quindi non c'è modo di comunicare il risultato. Torna a Let's Encode e apri di nuovo l'attività.",
+  },
+  letsEncodeMissingParameterError: { text: "Nel passaggio da Let's Encode mancava un parametro obbligatorio:" },
+  letsEncodeFileError: { text: 'Non è stato possibile aprire su GitHub il file ricevuto.' },
+  letsEncodeCloneError: { text: 'Non è stato possibile caricare la tua attività da GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Il file è stato modificato su GitHub mentre lavoravi, quindi non è stato possibile salvare il tuo lavoro.',
+  },
   commitLog: { text: 'Registro commit' },
   githubDate: { text: 'Data' },
   githubAuthor: { text: 'Autore' },

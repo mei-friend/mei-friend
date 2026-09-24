@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend је уређивач за <a href="https://music-encoding.org">музичке кодове</a>, хостован на
+      mei-friend је уређивач за <a href="https://music-encoding.org" target="_blank">музичке кодове</a>, хостован на
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Универзитету музике и извођачких уметности у Бечу</a>. 
       Молимо вас да консултујете нашу <a href="https://mei-friend.github.io" target="_blank">обимну документацију</a> за 
       додатне информације.
@@ -70,8 +70,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Аустријски фонд за науку (FWF)</a> у оквиру пројеката
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
             >P 34664-G (Signature Sound Vienna)</a
-        >
-        и <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> и <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
         </p>`,
   },
   splashGotItButtonText: { text: 'Разумем!' },
@@ -246,11 +246,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Импресум</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Импресум</a>.',
   },
   loadingVerovio: { text: 'Учитавање Verovio' },
   verovioLoaded: { text: 'учитан' },
@@ -976,6 +976,70 @@ export const lang = {
   githubFilepath: { text: 'Путања' },
   githubCommit: { text: 'Комит' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Комитуј као нови фајл' } }, value: 'Комитуј' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Дошли сте са <strong>Let's Encode!</strong> да бисте радили на задатку кодирања. mei-friend је један од едитора које Let's Encode нуди за овај рад. Користите <strong>Сачувај</strong> у менију <strong>Управљање задатком</strong> (горе лево) да успут чувате свој напредак, а <strong>Заврши задатак</strong> када завршите, да бисте дали свој допринос кампањи.</p>",
+  },
+  letsEncodeCompleteTaskButton: { value: 'Заврши задатак' },
+  letsEncodeMenuLabel: { text: 'Управљање задатком' },
+  letsEncodeLoggedInAs: { text: 'Пријављени сте као' },
+  letsEncodeSaveButton: { value: 'Сачувај' },
+  letsEncodeSaving: { text: 'Ваш рад се чува…' },
+  letsEncodeSaveFailed: { text: 'Ваш рад није могао да буде сачуван.' },
+  letsEncodeDismiss: { value: 'Затвори' },
+  letsEncodeLastSave: { text: 'Последње чување:' },
+  letsEncodeLastAutosave: { text: 'Аутоматски сачувано:' },
+  letsEncodeSavedAt: { text: 'Сачувано' },
+  letsEncodeExpiresAt: { text: 'Истиче' },
+  letsEncodeTimeRemaining: { text: 'преостало за завршетак задатка' },
+  letsEncodeHoursShort: { text: 'ч' },
+  letsEncodeMinutesShort: { text: 'мин' },
+  letsEncodeDaysShort: { text: 'д' },
+  letsEncodeAgo: { text: 'пре {n}' },
+  letsEncodeJustNow: { text: 'управо сада' },
+  letsEncodeTimeExpired: { text: 'Време за завршетак овог задатка је истекло' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Интервал аутоматског чувања (минути)',
+    description:
+      'Колико често се ваш рад аутоматски чува док уређујете, у минутима. Чува се само ако сте направили измене; 0 искључује аутоматско чување.',
+  },
+  titleLetsEncode: { title: 'Let’s Encode!', description: "Поставке Let's Encode задатка на ком радите" },
+  letsEncodeAbandonTaskButton: { value: 'Одустани од задатка' },
+  letsEncodeKeepWorking: { value: 'Настави са радом' },
+  letsEncodeCompleteAnyway: { value: 'Ипак заврши задатак' },
+  letsEncodeAbandonConfirm: { value: 'Одустани од задатка' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Нисте мењали ово кодирање. И то се рачуна: завршавањем задатка бележи се да измене нису биле потребне. Можете и да наставите са радом.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Желите ли да завршите овај задатак? Ваш рад ће бити сачуван и прослеђен платформи Let's Encode, а задатак ће бити затворен.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Одустати од овог задатка? Ваш рад на њему биће изгубљен, укључујући и оно што сте већ сачували, а платформа Let's Encode биће обавештена да нисте завршили задатак.",
+  },
+  letsEncodeLoading: { text: "Учитавање вашег задатка са платформе Let's Encode…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Отворите своју Let's Encode кампању у новој картици (ваш задатак остаје отворен овде)",
+  },
+  letsEncodeCommitting: { text: 'Завршавање вашег задатка…' },
+  letsEncodeCompleted: { text: "Задатак је завршен — враћамо вас на Let's Encode…" },
+  letsEncodeCommitFailed: { text: 'Ваш задатак није могао да буде завршен.' },
+  letsEncodeRetryButton: { value: 'Покушај поново' },
+  letsEncodeAbandonButton: { value: "Повратак на Let's Encode" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Овај Let's Encode линк је непотпун: не наводи ниједну кампању, па нема где да се пријави резултат. Молимо вратите се на Let's Encode и поново отворите задатак.",
+  },
+  letsEncodeMissingParameterError: { text: "При предаји са платформе Let's Encode недостајао је обавезан параметар:" },
+  letsEncodeFileError: { text: 'Предати фајл није могао да буде отворен на GitHub-у.' },
+  letsEncodeCloneError: { text: 'Ваш задатак није могао да буде учитан са GitHub-а.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Фајл је измењен на GitHub-у док сте радили, па ваш рад није могао да буде сачуван.',
+  },
   commitLog: { text: 'Запис комита' },
   githubDate: { text: 'Датум' },
   githubAuthor: { text: 'Аутор' },
