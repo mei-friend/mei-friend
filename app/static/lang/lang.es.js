@@ -1186,9 +1186,6 @@ export const lang = {
     text:
       "Este enlace de Let's Encode está incompleto: no indica ninguna campaña, así que no hay adónde enviar el resultado. Vuelve a Let's Encode y abre la tarea de nuevo.",
   },
-  letsEncodeMissingParameterError: {
-    text: "A la transferencia desde Let's Encode le faltaba un parámetro obligatorio:",
-  },
   letsEncodeFileError: { text: 'No se ha podido abrir en GitHub el archivo recibido.' },
   letsEncodeCloneError: { text: 'No se ha podido cargar tu tarea desde GitHub.' },
   letsEncodeRemoteChangedError: {

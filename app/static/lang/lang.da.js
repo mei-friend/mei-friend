@@ -1039,7 +1039,6 @@ export const lang = {
     text:
       "Dette Let's Encode-link er ufuldstændigt: det nævner ingen kampagne, så resultatet kan ikke meldes tilbage nogen steder. Gå tilbage til Let's Encode, og åbn opgaven igen.",
   },
-  letsEncodeMissingParameterError: { text: "Overdragelsen fra Let's Encode manglede en påkrævet parameter:" },
   letsEncodeFileError: { text: 'Den overdragne fil kunne ikke åbnes på GitHub.' },
   letsEncodeCloneError: { text: 'Din opgave kunne ikke indlæses fra GitHub.' },
   letsEncodeRemoteChangedError: {

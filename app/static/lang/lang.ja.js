@@ -1131,7 +1131,6 @@ export const lang = {
   letsEncodeNoCampaignError: {
     text: "このLet's Encodeのリンクは不完全です。キャンペーンが指定されていないため、結果を報告する先がありません。Let's Encodeに戻り、もう一度タスクを開いてください。",
   },
-  letsEncodeMissingParameterError: { text: "Let's Encodeからの引き渡しに必要なパラメータがありません:" },
   letsEncodeFileError: { text: '引き渡されたファイルをGitHubで開けませんでした。' },
   letsEncodeCloneError: { text: 'GitHubからタスクを読み込めませんでした。' },
   letsEncodeRemoteChangedError: { text: '作業中にGitHub上でファイルが変更されたため、作業内容を保存できませんでした。' },

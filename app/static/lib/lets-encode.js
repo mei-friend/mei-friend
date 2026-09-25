@@ -10,14 +10,15 @@
  * is only to log them in to the right repository, branch, and file, let them
  * work as usual, and report back.
  *
- * The hand-off carries ?le_campaignname, ?le_taskid, and the usual ?file (a raw
- * githubusercontent URL). The return trip is a navigation to
+ * The hand-off carries ?le_taskid and the usual ?file (a raw githubusercontent
+ * URL); the campaign is the name of the repository that URL points into. The
+ * return trip is a navigation to
  * <base>/<campaign>?task=<task>&mf_status=complete|failed[&mf_msg=...].
  */
 
 import { cm, storage, translator, version } from './main.js';
 import { checkAndClone } from './github-menu.js';
-import { parseRawGithubUrl } from './fork-repository.js';
+import { matchRawGithubUrl, parseRawGithubUrl } from './fork-repository.js';
 
 // n.b. the git manager is passed in rather than imported, matching
 // forkAndOpen(gm, url) next door: main.js assigns `gm` only once the user is
@@ -121,10 +122,9 @@ export function clearLetsEncodeTask() {
  * the failure itself, there being no campaign to return it to
  */
 export function initLetsEncodeMode(searchParams, urlFileName) {
-  const campaign = searchParams.get('le_campaignname');
   const task = searchParams.get('le_taskid');
 
-  if (!campaign && !task) {
+  if (!task) {
     // No hand-off in this URL. The ONLY reason to resurrect one from storage is
     // that we sent the volunteer to GitHub ourselves and the login redirect
     // dropped the query string; `pendingLogin` marks exactly that, and is spent
@@ -145,19 +145,14 @@ export function initLetsEncodeMode(searchParams, urlFileName) {
     return { active: false, error: null };
   }
 
-  // Either parameter puts us in Let's Encode mode; all three are then required.
+  // ?le_taskid puts us in Let's Encode mode. The campaign is not passed: it is
+  // always the name of the repository ?file points into.
+  const campaign = campaignFromFileUrl(urlFileName);
   if (!campaign) {
     // Without the campaign name there is no address to report back to, so the
     // failure has to be shown here rather than returned.
-    console.warn("Let's Encode mode requested without le_campaignname; cannot report back");
+    console.warn("Let's Encode mode requested without a raw GitHub ?file; cannot report back");
     return { active: false, error: 'noCampaign' };
-  }
-  if (!task || !urlFileName) {
-    const missing = !task ? 'le_taskid' : 'file';
-    console.warn("Let's Encode hand-off incomplete, missing: " + missing);
-    letsEncodeTask = { campaign: campaign, task: task || '', file: urlFileName || '' };
-    returnToLetsEncode('failed', translator.lang.letsEncodeMissingParameterError.text + ' ' + missing);
-    return { active: false, error: null };
   }
 
   // Scope the session to this tab BEFORE anything is written, so the task never
@@ -198,9 +193,20 @@ function restoreLetsEncodeUrl() {
 export function addLetsEncodeParams(url) {
   if (!letsEncodeTask) return;
   url.searchParams.set('file', letsEncodeTask.file);
-  url.searchParams.set('le_campaignname', letsEncodeTask.campaign);
   url.searchParams.set('le_taskid', letsEncodeTask.task);
 } // addLetsEncodeParams()
+
+/**
+ * campaignFromFileUrl
+ * @description The campaign a handed-over file belongs to: Let's Encode keeps
+ * each campaign in a repository of the same name.
+ * @param {string|null} fileUrl the ?file parameter, a raw GitHub URL
+ * @returns {string|null} the repository name, or null if there is none to read
+ */
+function campaignFromFileUrl(fileUrl) {
+  const components = fileUrl ? matchRawGithubUrl(fileUrl) : null;
+  return components ? components[2] : null;
+} // campaignFromFileUrl()
 
 /**
  * readRememberedTask

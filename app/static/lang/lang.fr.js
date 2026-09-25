@@ -1196,7 +1196,6 @@ export const lang = {
     text:
       "Ce lien Let's Encode est incomplet : il ne nomme aucune campagne, il n'y a donc nulle part où transmettre le résultat. Veuillez retourner sur Let's Encode et rouvrir la tâche.",
   },
-  letsEncodeMissingParameterError: { text: "Il manquait un paramètre requis lors du transfert depuis Let's Encode :" },
   letsEncodeFileError: { text: "Le fichier transmis n'a pas pu être ouvert sur GitHub." },
   letsEncodeCloneError: { text: "Votre tâche n'a pas pu être chargée depuis GitHub." },
   letsEncodeRemoteChangedError: {

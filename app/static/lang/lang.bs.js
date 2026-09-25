@@ -1036,7 +1036,6 @@ export const lang = {
     text:
       "Ovaj Let's Encode link je nepotpun: ne navodi nijednu kampanju, pa nema gdje prijaviti rezultat. Molimo vratite se na Let's Encode i ponovo otvorite zadatak.",
   },
-  letsEncodeMissingParameterError: { text: "Pri predaji s platforme Let's Encode nedostajao je obavezan parametar:" },
   letsEncodeFileError: { text: 'Predati fajl nije bilo moguće otvoriti na GitHubu.' },
   letsEncodeCloneError: { text: 'Vaš zadatak nije bilo moguće učitati s GitHuba.' },
   letsEncodeRemoteChangedError: {

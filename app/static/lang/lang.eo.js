@@ -1163,7 +1163,6 @@ export const lang = {
     text:
       "Ĉi tiu Let's Encode-ligilo estas nekompleta: ĝi nomas neniun kampanjon, do ne eblas raporti la rezulton. Bonvolu reiri al Let's Encode kaj malfermi la taskon denove.",
   },
-  letsEncodeMissingParameterError: { text: "Al la transdono de Let's Encode mankis deviga parametro:" },
   letsEncodeFileError: { text: 'La transdonita dosiero ne povis esti malfermita ĉe GitHub.' },
   letsEncodeCloneError: { text: 'Via tasko ne povis esti ŝargita el GitHub.' },
   letsEncodeRemoteChangedError: {

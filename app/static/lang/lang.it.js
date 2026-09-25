@@ -1197,7 +1197,6 @@ export const lang = {
     text:
       "Questo link di Let's Encode è incompleto: non indica alcuna campagna, quindi non c'è modo di comunicare il risultato. Torna a Let's Encode e apri di nuovo l'attività.",
   },
-  letsEncodeMissingParameterError: { text: "Nel passaggio da Let's Encode mancava un parametro obbligatorio:" },
   letsEncodeFileError: { text: 'Non è stato possibile aprire su GitHub il file ricevuto.' },
   letsEncodeCloneError: { text: 'Non è stato possibile caricare la tua attività da GitHub.' },
   letsEncodeRemoteChangedError: {

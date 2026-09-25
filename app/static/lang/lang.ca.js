@@ -1187,7 +1187,6 @@ export const lang = {
     text:
       "Aquest enllaç de Let's Encode és incomplet: no indica cap campanya, de manera que no hi ha on enviar el resultat. Torna a Let's Encode i obre la tasca de nou.",
   },
-  letsEncodeMissingParameterError: { text: "Al traspàs des de Let's Encode hi faltava un paràmetre obligatori:" },
   letsEncodeFileError: { text: "No s'ha pogut obrir a GitHub el fitxer rebut." },
   letsEncodeCloneError: { text: "No s'ha pogut carregar la teva tasca des de GitHub." },
   letsEncodeRemoteChangedError: {

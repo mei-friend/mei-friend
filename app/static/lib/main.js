@@ -503,8 +503,8 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
-  // Let's Encode campaign hand-off (?le_campaignname and ?le_taskid, alongside
-  // the usual ?file). Detected here, before the splash decision and before
+  // Let's Encode campaign hand-off (?le_taskid alongside the usual ?file, whose
+  // repository names the campaign). Detected here, before the splash decision and before
   // storage is read, for two reasons: the splash has to know whether to wear
   // the joint branding, and entering the mode scopes storage to this tab, which
   // must happen before anything is read or written. An incomplete hand-off also

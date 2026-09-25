@@ -1047,7 +1047,6 @@ export const lang = {
     text:
       "Deze Let's Encode-link is onvolledig: er wordt geen campagne genoemd, dus het resultaat kan nergens worden gemeld. Ga terug naar Let's Encode en open de taak opnieuw.",
   },
-  letsEncodeMissingParameterError: { text: "Bij de overdracht vanuit Let's Encode ontbrak een verplichte parameter:" },
   letsEncodeFileError: { text: 'Het overgedragen bestand kon niet worden geopend op GitHub.' },
   letsEncodeCloneError: { text: 'Uw taak kon niet worden geladen vanaf GitHub.' },
   letsEncodeRemoteChangedError: {
