@@ -10,15 +10,15 @@
  * is only to log them in to the right repository, branch, and file, let them
  * work as usual, and report back.
  *
- * The hand-off carries ?le_taskid and the usual ?file (a raw githubusercontent
- * URL); the campaign is the name of the repository that URL points into. The
- * return trip is a navigation to
+ * The hand-off carries ?le_campaignname, ?le_taskid, and the usual ?file (a raw
+ * githubusercontent URL), and optionally ?le_base, the sending installation's
+ * address (see resolveLetsEncodeBaseUrl). The return trip is a navigation to
  * <base>/<campaign>?task=<task>&mf_status=complete|failed[&mf_msg=...].
  */
 
 import { cm, storage, translator, version } from './main.js';
 import { checkAndClone } from './github-menu.js';
-import { matchRawGithubUrl, parseRawGithubUrl } from './fork-repository.js';
+import { parseRawGithubUrl } from './fork-repository.js';
 
 // n.b. the git manager is passed in rather than imported, matching
 // forkAndOpen(gm, url) next door: main.js assigns `gm` only once the user is
@@ -44,17 +44,65 @@ const successDwellMs = 2500;
 let letsEncodeTask = null;
 
 /**
- * letsEncodeBaseUrl
- * @description Where volunteers are returned to. Deployments that talk to a
- * staging campaign server override it in env.js (per-installation, untracked),
- * the same file that already carries the environment name.
- * @returns {string}
+ * resolveLetsEncodeBaseUrl
+ * @description Where this hand-off came from, and so where the volunteer is
+ * returned to. Any Let's Encode installation may send volunteers here — a
+ * testing server, or someone else's campaign platform — so the base is not
+ * fixed. In order of preference:
+ *   1. ?le_base, stated by the sender; the only source that can carry a path,
+ *      for an installation not at the root of its host;
+ *   2. the referrer's ORIGIN. Only the origin is ever usable: browsers send
+ *      just that cross-origin by default, and the full referrer would be the
+ *      task page, not the base. Ignored when empty (no-referrer policies,
+ *      stripped by privacy tools) or when it is mei-friend itself;
+ *   3. window.letsEncodeBaseUrl from env.js (per-installation, untracked);
+ *   4. the mdw campaign server.
+ * Called once, at the hand-off: the base is then kept with the task and
+ * written back into the URL, since after the GitHub login or a reload the
+ * referrer no longer names the campaign.
+ * @param {URLSearchParams} searchParams
+ * @returns {string} an absolute URL without a trailing slash
  */
-function letsEncodeBaseUrl() {
+function resolveLetsEncodeBaseUrl(searchParams) {
+  const stated = searchParams.get('le_base');
+  if (stated) {
+    try {
+      const url = new URL(stated);
+      if (url.protocol === 'https:' || url.protocol === 'http:') {
+        return (url.origin + url.pathname).replace(/\/+$/, '');
+      }
+    } catch (e) {
+      // fall through to the next source
+    }
+    console.warn("Let's Encode: ignoring unusable le_base: " + stated);
+  }
+  try {
+    const referrer = document.referrer ? new URL(document.referrer) : null;
+    if (
+      referrer &&
+      (referrer.protocol === 'https:' || referrer.protocol === 'http:') &&
+      referrer.origin !== window.location.origin
+    ) {
+      return referrer.origin;
+    }
+  } catch (e) {
+    // fall through to the next source
+  }
   if (typeof window.letsEncodeBaseUrl === 'string' && window.letsEncodeBaseUrl) {
     return window.letsEncodeBaseUrl.replace(/\/+$/, '');
   }
   return defaultLetsEncodeBaseUrl;
+} // resolveLetsEncodeBaseUrl()
+
+/**
+ * letsEncodeBaseUrl
+ * @description Where volunteers are returned to: the base resolved at the
+ * hand-off. A task remembered from before `base` was recorded falls back to
+ * the default.
+ * @returns {string}
+ */
+function letsEncodeBaseUrl() {
+  return (letsEncodeTask && letsEncodeTask.base) || defaultLetsEncodeBaseUrl;
 } // letsEncodeBaseUrl()
 
 /**
@@ -122,9 +170,10 @@ export function clearLetsEncodeTask() {
  * the failure itself, there being no campaign to return it to
  */
 export function initLetsEncodeMode(searchParams, urlFileName) {
+  const campaign = searchParams.get('le_campaignname');
   const task = searchParams.get('le_taskid');
 
-  if (!task) {
+  if (!campaign && !task) {
     // No hand-off in this URL. The ONLY reason to resurrect one from storage is
     // that we sent the volunteer to GitHub ourselves and the login redirect
     // dropped the query string; `pendingLogin` marks exactly that, and is spent
@@ -145,14 +194,21 @@ export function initLetsEncodeMode(searchParams, urlFileName) {
     return { active: false, error: null };
   }
 
-  // ?le_taskid puts us in Let's Encode mode. The campaign is not passed: it is
-  // always the name of the repository ?file points into.
-  const campaign = campaignFromFileUrl(urlFileName);
+  const base = resolveLetsEncodeBaseUrl(searchParams);
+
+  // Either parameter puts us in Let's Encode mode; all three are then required.
   if (!campaign) {
     // Without the campaign name there is no address to report back to, so the
     // failure has to be shown here rather than returned.
-    console.warn("Let's Encode mode requested without a raw GitHub ?file; cannot report back");
+    console.warn("Let's Encode mode requested without le_campaignname; cannot report back");
     return { active: false, error: 'noCampaign' };
+  }
+  if (!task || !urlFileName) {
+    const missing = !task ? 'le_taskid' : 'file';
+    console.warn("Let's Encode hand-off incomplete, missing: " + missing);
+    letsEncodeTask = { campaign: campaign, task: task || '', file: urlFileName || '', base: base };
+    returnToLetsEncode('failed', translator.lang.letsEncodeMissingParameterError.text + ' ' + missing);
+    return { active: false, error: null };
   }
 
   // Scope the session to this tab BEFORE anything is written, so the task never
@@ -160,7 +216,7 @@ export function initLetsEncodeMode(searchParams, urlFileName) {
   // open in ordinary mei-friend use.
   storage.useTabScopedStorage();
   // startedAt gives autosave a baseline before the first save of the session
-  setLetsEncodeTask({ campaign: campaign, task: task, file: urlFileName, startedAt: Date.now() });
+  setLetsEncodeTask({ campaign: campaign, task: task, file: urlFileName, base: base, startedAt: Date.now() });
   console.log("Let's Encode mode:", letsEncodeTask);
   return { active: true, error: null };
 } // initLetsEncodeMode()
@@ -193,20 +249,11 @@ function restoreLetsEncodeUrl() {
 export function addLetsEncodeParams(url) {
   if (!letsEncodeTask) return;
   url.searchParams.set('file', letsEncodeTask.file);
+  url.searchParams.set('le_campaignname', letsEncodeTask.campaign);
   url.searchParams.set('le_taskid', letsEncodeTask.task);
+  // always stated, even when it came from the referrer, which a reload loses
+  if (letsEncodeTask.base) url.searchParams.set('le_base', letsEncodeTask.base);
 } // addLetsEncodeParams()
-
-/**
- * campaignFromFileUrl
- * @description The campaign a handed-over file belongs to: Let's Encode keeps
- * each campaign in a repository of the same name.
- * @param {string|null} fileUrl the ?file parameter, a raw GitHub URL
- * @returns {string|null} the repository name, or null if there is none to read
- */
-function campaignFromFileUrl(fileUrl) {
-  const components = fileUrl ? matchRawGithubUrl(fileUrl) : null;
-  return components ? components[2] : null;
-} // campaignFromFileUrl()
 
 /**
  * readRememberedTask

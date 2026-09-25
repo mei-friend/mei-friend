@@ -1186,6 +1186,7 @@ export const lang = {
   letsEncodeNoCampaignError: {
     text: "Dieser Let's-Encode-Link ist unvollständig: Er nennt keine Kampagne, daher kann kein Ergebnis zurückgemeldet werden. Bitte kehren Sie zu Let's Encode zurück und öffnen Sie die Aufgabe erneut.",
   },
+  letsEncodeMissingParameterError: { text: "Bei der Übergabe von Let's Encode fehlte ein erforderlicher Parameter:" },
   letsEncodeFileError: { text: 'Die übergebene Datei konnte auf GitHub nicht geöffnet werden.' },
   letsEncodeCloneError: { text: 'Ihre Aufgabe konnte nicht von GitHub geladen werden.' },
   letsEncodeRemoteChangedError: {

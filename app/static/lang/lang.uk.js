@@ -1156,6 +1156,7 @@ export const lang = {
     text:
       "Це посилання Let's Encode неповне: у ньому не вказано кампанію, тож немає куди повідомити результат. Поверніться до Let's Encode і відкрийте завдання знову.",
   },
+  letsEncodeMissingParameterError: { text: "Під час передачі з Let's Encode бракувало обов’язкового параметра:" },
   letsEncodeFileError: { text: 'Не вдалося відкрити на GitHub переданий файл.' },
   letsEncodeCloneError: { text: 'Не вдалося завантажити ваше завдання з GitHub.' },
   letsEncodeRemoteChangedError: {

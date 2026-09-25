@@ -1228,6 +1228,7 @@ export const lang = {
   letsEncodeNoCampaignError: {
     text: "This Let's Encode link is incomplete: it names no campaign, so there is nowhere to report back to. Please return to Let's Encode and open the task again.",
   },
+  letsEncodeMissingParameterError: { text: "The Let's Encode hand-off was missing a required parameter:" },
   letsEncodeFileError: { text: 'The handed-over file could not be opened on GitHub.' },
   letsEncodeCloneError: { text: 'Your task could not be loaded from GitHub.' },
   letsEncodeRemoteChangedError: {

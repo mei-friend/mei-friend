@@ -1185,6 +1185,7 @@ export const lang = {
     text:
       "Ten link Let's Encode jest niekompletny: nie wskazuje żadnej kampanii, więc nie ma dokąd zgłosić wyniku. Wróć do Let's Encode i otwórz zadanie ponownie.",
   },
+  letsEncodeMissingParameterError: { text: "W przekazaniu z Let's Encode brakowało wymaganego parametru:" },
   letsEncodeFileError: { text: 'Nie udało się otworzyć przekazanego pliku w GitHubie.' },
   letsEncodeCloneError: { text: 'Nie udało się wczytać zadania z GitHuba.' },
   letsEncodeRemoteChangedError: {

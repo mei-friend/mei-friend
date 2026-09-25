@@ -988,6 +988,7 @@ export const lang = {
   letsEncodeRetryButton: { value: '重试' },
   letsEncodeAbandonButton: { value: "返回 Let's Encode" },
   letsEncodeNoCampaignError: { text: "此 Let's Encode 链接不完整：未指定任何活动，因此无法报告结果。请返回 Let's Encode 并重新打开任务。" },
+  letsEncodeMissingParameterError: { text: "从 Let's Encode 转交时缺少必需的参数：" },
   letsEncodeFileError: { text: '无法在 GitHub 上打开转交的文件。' },
   letsEncodeCloneError: { text: '无法从 GitHub 加载您的任务。' },
   letsEncodeRemoteChangedError: { text: '您工作期间该文件在 GitHub 上被修改，因此无法保存您的工作。' },
