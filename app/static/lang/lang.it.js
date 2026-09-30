@@ -78,7 +78,7 @@ export const lang = {
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
         >,
-        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> e <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> e <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>
     `,
   },
@@ -1139,7 +1139,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Arrivi da <strong>Let's Encode!</strong> per lavorare a un'attività di codifica. mei-friend è uno degli editor che Let's Encode offre per questo lavoro. Usa <strong>Salva</strong> nel menu <strong>Gestione attività</strong> (in alto a sinistra) per salvare i tuoi progressi man mano, e <strong>Completa l'attività</strong> quando hai finito, per dare il tuo contributo alla campagna.</p>",
+      "<p>Arrivi da <strong>Let's\u00a0Encode!</strong> per lavorare a un'attività di codifica. mei-friend è uno degli editor che «Let's\u00a0Encode!» offre per questo lavoro. Usa <strong>Salva</strong> nel menu <strong>Gestione attività</strong> (in alto a sinistra) per salvare i tuoi progressi man mano, e <strong>Completa l'attività</strong> quando hai finito, per dare il tuo contributo alla campagna.</p>",
   },
   letsEncodeCompleteTaskButton: { text: "Completa l'attività" },
   letsEncodeMenuLabel: { text: 'Gestione attività' },
@@ -1165,8 +1165,8 @@ export const lang = {
       'Ogni quanti minuti il tuo lavoro viene salvato automaticamente mentre modifichi. Il salvataggio avviene solo se hai apportato modifiche; 0 disattiva il salvataggio automatico.',
   },
   titleLetsEncode: {
-    title: 'Let’s Encode!',
-    description: "Impostazioni dell'attività Let's Encode su cui stai lavorando",
+    title: 'Let\'s\u00a0Encode!',
+    description: "Impostazioni dell'attività «Let's\u00a0Encode!» su cui stai lavorando",
   },
   letsEncodeAbandonTaskButton: { text: "Abbandona l'attività" },
   letsEncodeKeepWorking: { value: 'Continua a lavorare' },
@@ -1178,26 +1178,27 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "Vuoi completare questa attività? Il tuo lavoro verrà salvato e consegnato a Let's Encode, e l'attività verrà chiusa.",
+      "Vuoi completare questa attività? Il tuo lavoro verrà salvato e consegnato a «Let's\u00a0Encode!», e l'attività verrà chiusa.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Abbandonare questa attività? Il tuo lavoro andrà perso, compreso ciò che hai già salvato, e Let's Encode verrà informato che non hai completato l'attività.",
+      "Abbandonare questa attività? Il tuo lavoro andrà perso, compreso ciò che hai già salvato, e «Let's\u00a0Encode!» verrà informato che non hai completato l'attività.",
   },
-  letsEncodeLoading: { text: "Caricamento della tua attività da Let's Encode…" },
+  letsEncodeLoading: { text: "Caricamento della tua attività da «Let's\u00a0Encode!»…" },
   letsEncodeLogoLinkTitle: {
-    text: "Apri la tua campagna Let's Encode in una nuova scheda (la tua attività resta aperta qui)",
+    text: "Apri la tua campagna «Let's\u00a0Encode!» in una nuova scheda (la tua attività resta aperta qui)",
   },
+  letsEncodeDragOverlayText: { text: "Non è possibile aprire altri file durante un'attività «Let's\u00a0Encode!»." },
   letsEncodeCommitting: { text: 'Completamento della tua attività…' },
-  letsEncodeCompleted: { text: "Attività completata: ritorno a Let's Encode…" },
+  letsEncodeCompleted: { text: "Attività completata: ritorno a «Let's\u00a0Encode!»…" },
   letsEncodeCommitFailed: { text: 'Non è stato possibile completare la tua attività.' },
   letsEncodeRetryButton: { value: 'Riprova' },
-  letsEncodeAbandonButton: { value: "Torna a Let's Encode" },
+  letsEncodeAbandonButton: { value: "Torna a «Let's\u00a0Encode!»" },
   letsEncodeNoCampaignError: {
     text:
-      "Questo link di Let's Encode è incompleto: non indica alcuna campagna, quindi non c'è modo di comunicare il risultato. Torna a Let's Encode e apri di nuovo l'attività.",
+      "Questo link di «Let's\u00a0Encode!» è incompleto: non indica alcuna campagna, quindi non c'è modo di comunicare il risultato. Torna a «Let's\u00a0Encode!» e apri di nuovo l'attività.",
   },
-  letsEncodeMissingParameterError: { text: "Nel passaggio da Let's Encode mancava un parametro obbligatorio:" },
+  letsEncodeMissingParameterError: { text: "Nel passaggio da «Let's\u00a0Encode!» mancava un parametro obbligatorio:" },
   letsEncodeFileError: { text: 'Non è stato possibile aprire su GitHub il file ricevuto.' },
   letsEncodeCloneError: { text: 'Non è stato possibile caricare la tua attività da GitHub.' },
   letsEncodeRemoteChangedError: {

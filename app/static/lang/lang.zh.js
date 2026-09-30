@@ -67,7 +67,7 @@ export const lang = {
       <p>
         mei-friend Web 应用程序的开发由
         <a href="https://fwf.ac.at" target="_blank">奥地利科学基金会（FWF）</a> 项目
-        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（维也纳签名声音）</a>、<a href="https://e-laute.info" target="_blank">I 6019（E-LAUTE）</a> 和 <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625（Let's Encode!）</a> 资助。
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（维也纳签名声音）</a>、<a href="https://e-laute.info" target="_blank">I 6019（E-LAUTE）</a> 和 <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625（Let's\u00a0Encode!）</a> 资助。
       </p>`,
   },
   splashGotItButtonText: { text: '知道了！' },
@@ -951,7 +951,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>您从 <strong>Let's Encode!</strong> 来到这里，参与一项编码任务。mei-friend 是 Let's Encode 为此项工作提供的编辑器之一。工作过程中，请使用 <strong>任务管理</strong> 菜单（左上角）中的 <strong>保存</strong> 随时保存进度；完成后点击 <strong>完成任务</strong>，将您的成果贡献给本次活动。</p>",
+      "<p>您从 <strong>Let's\u00a0Encode!</strong> 来到这里，参与一项编码任务。mei-friend 是 “Let's\u00a0Encode!” 为此项工作提供的编辑器之一。工作过程中，请使用 <strong>任务管理</strong> 菜单（左上角）中的 <strong>保存</strong> 随时保存进度；完成后点击 <strong>完成任务</strong>，将您的成果贡献给本次活动。</p>",
   },
   letsEncodeCompleteTaskButton: { text: '完成任务' },
   letsEncodeMenuLabel: { text: '任务管理' },
@@ -972,23 +972,24 @@ export const lang = {
   letsEncodeJustNow: { text: '刚刚' },
   letsEncodeTimeExpired: { text: '完成此任务的时间已到' },
   letsEncodeAutosaveMinutes: { title: '自动保存间隔（分钟）', description: '编辑时自动保存您工作的频率（分钟）。仅在您做出更改时才会保存；设为 0 可关闭自动保存。' },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "您正在进行的 Let's Encode 任务的设置" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "您正在进行的 “Let's\u00a0Encode!” 任务的设置" },
   letsEncodeAbandonTaskButton: { text: '放弃任务' },
   letsEncodeKeepWorking: { value: '继续工作' },
   letsEncodeCompleteAnyway: { value: '仍然完成任务' },
   letsEncodeAbandonConfirm: { value: '放弃任务' },
   letsEncodeNoChangesPrompt: { text: '您尚未修改此编码。这同样有意义：完成任务会记录下它无需修改。您也可以继续工作。' },
-  letsEncodeConfirmCompletePrompt: { text: "确定要完成此任务吗？您的工作将被保存并提交给 Let's Encode，任务随即结束。" },
-  letsEncodeAbandonPrompt: { text: "确定要放弃此任务吗？您在此任务上的工作将会丢失，包括已保存的内容，并且 Let's Encode 将被告知您未完成该任务。" },
-  letsEncodeLoading: { text: "正在从 Let's Encode 获取您的任务…" },
-  letsEncodeLogoLinkTitle: { text: "在新标签页中打开您的 Let's Encode 活动（您的任务仍在此处保持打开）" },
+  letsEncodeConfirmCompletePrompt: { text: "确定要完成此任务吗？您的工作将被保存并提交给 “Let's\u00a0Encode!”，任务随即结束。" },
+  letsEncodeAbandonPrompt: { text: "确定要放弃此任务吗？您在此任务上的工作将会丢失，包括已保存的内容，并且 “Let's\u00a0Encode!” 将被告知您未完成该任务。" },
+  letsEncodeLoading: { text: "正在从 “Let's\u00a0Encode!” 获取您的任务…" },
+  letsEncodeLogoLinkTitle: { text: "在新标签页中打开您的 “Let's\u00a0Encode!” 活动（您的任务仍在此处保持打开）" },
+  letsEncodeDragOverlayText: { text: "在“Let's\u00a0Encode!”任务期间无法打开其他文件。" },
   letsEncodeCommitting: { text: '正在完成您的任务…' },
-  letsEncodeCompleted: { text: "任务已完成——正在返回 Let's Encode…" },
+  letsEncodeCompleted: { text: "任务已完成——正在返回 “Let's\u00a0Encode!”…" },
   letsEncodeCommitFailed: { text: '无法完成您的任务。' },
   letsEncodeRetryButton: { value: '重试' },
-  letsEncodeAbandonButton: { value: "返回 Let's Encode" },
-  letsEncodeNoCampaignError: { text: "此 Let's Encode 链接不完整：未指定任何活动，因此无法报告结果。请返回 Let's Encode 并重新打开任务。" },
-  letsEncodeMissingParameterError: { text: "从 Let's Encode 转交时缺少必需的参数：" },
+  letsEncodeAbandonButton: { value: "返回 “Let's\u00a0Encode!”" },
+  letsEncodeNoCampaignError: { text: "此 “Let's\u00a0Encode!” 链接不完整：未指定任何活动，因此无法报告结果。请返回 “Let's\u00a0Encode!” 并重新打开任务。" },
+  letsEncodeMissingParameterError: { text: "从 “Let's\u00a0Encode!” 转交时缺少必需的参数：" },
   letsEncodeFileError: { text: '无法在 GitHub 上打开转交的文件。' },
   letsEncodeCloneError: { text: '无法从 GitHub 加载您的任务。' },
   letsEncodeRemoteChangedError: { text: '您工作期间该文件在 GitHub 上被修改，因此无法保存您的工作。' },

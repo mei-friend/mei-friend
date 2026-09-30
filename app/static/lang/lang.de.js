@@ -80,7 +80,7 @@ export const lang = {
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
       >,
-      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> und <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> und <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Verstanden!' },
@@ -1137,7 +1137,7 @@ export const lang = {
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als neue Datei' } }, value: 'Commit' },
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
-    html: "<p>Sie kommen von <strong>Let's Encode!</strong>, um an einer Kodierungsaufgabe zu arbeiten. mei-friend ist einer der Editoren, die Let's Encode für diese Arbeit anbietet. Sichern Sie Ihren Fortschritt zwischendurch mit <strong>Speichern</strong> im Menü <strong>Aufgabenverwaltung</strong> (oben links), und wählen Sie <strong>Aufgabe abschließen</strong>, wenn Sie fertig sind, um Ihr Ergebnis der Kampagne bereitzustellen.</p>",
+    html: "<p>Sie kommen von <strong>Let's\u00a0Encode!</strong>, um an einer Kodierungsaufgabe zu arbeiten. mei-friend ist einer der Editoren, die „Let's\u00a0Encode!“ für diese Arbeit anbietet. Sichern Sie Ihren Fortschritt zwischendurch mit <strong>Speichern</strong> im Menü <strong>Aufgabenverwaltung</strong> (oben links), und wählen Sie <strong>Aufgabe abschließen</strong>, wenn Sie fertig sind, um Ihr Ergebnis der Kampagne bereitzustellen.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Aufgabe abschließen' },
   letsEncodeMenuLabel: { text: 'Aufgabenverwaltung' },
@@ -1162,7 +1162,7 @@ export const lang = {
     description:
       'Wie oft Ihre Arbeit während der Bearbeitung automatisch gespeichert wird, in Minuten. Gespeichert wird nur, wenn Sie etwas geändert haben; 0 schaltet das automatische Speichern aus.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: 'Einstellungen für die Let’s-Encode-Aufgabe, an der Sie arbeiten' },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: 'Einstellungen für die „Let\'s\u00a0Encode!“-Aufgabe, an der Sie arbeiten' },
   letsEncodeAbandonTaskButton: { text: 'Aufgabe abbrechen' },
   letsEncodeKeepWorking: { value: 'Weiterarbeiten' },
   letsEncodeCompleteAnyway: { value: 'Aufgabe trotzdem abschließen' },
@@ -1171,22 +1171,23 @@ export const lang = {
     text: 'Sie haben an dieser Kodierung nichts geändert. Auch das zählt: Wenn Sie die Aufgabe abschließen, wird festgehalten, dass keine Änderungen nötig waren. Sie können aber auch weiterarbeiten.',
   },
   letsEncodeConfirmCompletePrompt: {
-    text: 'Möchten Sie diese Aufgabe abschließen? Ihre Arbeit wird gespeichert und an Let’s Encode übermittelt; die Aufgabe ist damit beendet.',
+    text: 'Möchten Sie diese Aufgabe abschließen? Ihre Arbeit wird gespeichert und an „Let\'s\u00a0Encode!“ übermittelt; die Aufgabe ist damit beendet.',
   },
   letsEncodeAbandonPrompt: {
-    text: 'Diese Aufgabe abbrechen? Ihre Arbeit daran geht verloren, auch was Sie bereits gespeichert haben, und Let’s Encode wird mitgeteilt, dass Sie die Aufgabe nicht abgeschlossen haben.',
+    text: 'Diese Aufgabe abbrechen? Ihre Arbeit daran geht verloren, auch was Sie bereits gespeichert haben, und „Let\'s\u00a0Encode!“ wird mitgeteilt, dass Sie die Aufgabe nicht abgeschlossen haben.',
   },
-  letsEncodeLoading: { text: 'Ihre Aufgabe wird von Let’s Encode geladen…' },
-  letsEncodeLogoLinkTitle: { text: 'Ihre Let’s-Encode-Kampagne in einem neuen Tab öffnen (Ihre Aufgabe bleibt hier geöffnet)' },
+  letsEncodeLoading: { text: 'Ihre Aufgabe wird von „Let\'s\u00a0Encode!“ geladen…' },
+  letsEncodeLogoLinkTitle: { text: 'Ihre „Let\'s\u00a0Encode!“-Kampagne in einem neuen Tab öffnen (Ihre Aufgabe bleibt hier geöffnet)' },
+  letsEncodeDragOverlayText: { text: "Andere Dateien können während einer „Let's\u00a0Encode!“-Aufgabe nicht geöffnet werden." },
   letsEncodeCommitting: { text: 'Ihre Aufgabe wird abgeschlossen…' },
-  letsEncodeCompleted: { text: "Aufgabe abgeschlossen – Sie werden zu Let's Encode zurückgeleitet…" },
+  letsEncodeCompleted: { text: "Aufgabe abgeschlossen – Sie werden zu „Let's\u00a0Encode!“ zurückgeleitet…" },
   letsEncodeCommitFailed: { text: 'Ihre Aufgabe konnte nicht abgeschlossen werden.' },
   letsEncodeRetryButton: { value: 'Erneut versuchen' },
-  letsEncodeAbandonButton: { value: "Zurück zu Let's Encode" },
+  letsEncodeAbandonButton: { value: "Zurück zu „Let's\u00a0Encode!“" },
   letsEncodeNoCampaignError: {
-    text: "Dieser Let's-Encode-Link ist unvollständig: Er nennt keine Kampagne, daher kann kein Ergebnis zurückgemeldet werden. Bitte kehren Sie zu Let's Encode zurück und öffnen Sie die Aufgabe erneut.",
+    text: "Dieser „Let's\u00a0Encode!“-Link ist unvollständig: Er nennt keine Kampagne, daher kann kein Ergebnis zurückgemeldet werden. Bitte kehren Sie zu „Let's\u00a0Encode!“ zurück und öffnen Sie die Aufgabe erneut.",
   },
-  letsEncodeMissingParameterError: { text: "Bei der Übergabe von Let's Encode fehlte ein erforderlicher Parameter:" },
+  letsEncodeMissingParameterError: { text: "Bei der Übergabe von „Let's\u00a0Encode!“ fehlte ein erforderlicher Parameter:" },
   letsEncodeFileError: { text: 'Die übergebene Datei konnte auf GitHub nicht geöffnet werden.' },
   letsEncodeCloneError: { text: 'Ihre Aufgabe konnte nicht von GitHub geladen werden.' },
   letsEncodeRemoteChangedError: {

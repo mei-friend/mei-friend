@@ -77,7 +77,7 @@ export const lang = {
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
         >,
-        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> y <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> y <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>
     `,
   },
@@ -1128,7 +1128,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Llegas desde <strong>Let's Encode!</strong> para trabajar en una tarea de codificación. mei-friend es uno de los editores que Let's Encode ofrece para este trabajo. Usa <strong>Guardar</strong> en el menú <strong>Gestión de la tarea</strong> (arriba a la izquierda) para guardar tu progreso sobre la marcha y <strong>Completar tarea</strong> cuando hayas terminado, para aportar tu trabajo a la campaña.</p>",
+      "<p>Llegas desde <strong>Let's\u00a0Encode!</strong> para trabajar en una tarea de codificación. mei-friend es uno de los editores que «Let's\u00a0Encode!» ofrece para este trabajo. Usa <strong>Guardar</strong> en el menú <strong>Gestión de la tarea</strong> (arriba a la izquierda) para guardar tu progreso sobre la marcha y <strong>Completar tarea</strong> cuando hayas terminado, para aportar tu trabajo a la campaña.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Completar tarea' },
   letsEncodeMenuLabel: { text: 'Gestión de la tarea' },
@@ -1154,8 +1154,8 @@ export const lang = {
       'Cada cuántos minutos se guarda automáticamente tu trabajo mientras editas. Solo se guarda si has hecho cambios; 0 desactiva el guardado automático.',
   },
   titleLetsEncode: {
-    title: 'Let’s Encode!',
-    description: "Configuración de la tarea de Let's Encode en la que estás trabajando",
+    title: 'Let\'s\u00a0Encode!',
+    description: "Configuración de la tarea de «Let's\u00a0Encode!» en la que estás trabajando",
   },
   letsEncodeAbandonTaskButton: { text: 'Abandonar tarea' },
   letsEncodeKeepWorking: { value: 'Seguir trabajando' },
@@ -1167,27 +1167,28 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "¿Quieres completar esta tarea? Tu trabajo se guardará y se entregará a Let's Encode, y la tarea quedará cerrada.",
+      "¿Quieres completar esta tarea? Tu trabajo se guardará y se entregará a «Let's\u00a0Encode!», y la tarea quedará cerrada.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "¿Abandonar esta tarea? Tu trabajo en ella se perderá, incluido lo que ya hayas guardado, y se comunicará a Let's Encode que no has completado la tarea.",
+      "¿Abandonar esta tarea? Tu trabajo en ella se perderá, incluido lo que ya hayas guardado, y se comunicará a «Let's\u00a0Encode!» que no has completado la tarea.",
   },
-  letsEncodeLoading: { text: "Cargando tu tarea desde Let's Encode…" },
+  letsEncodeLoading: { text: "Cargando tu tarea desde «Let's\u00a0Encode!»…" },
   letsEncodeLogoLinkTitle: {
-    text: "Abrir tu campaña de Let's Encode en una pestaña nueva (tu tarea sigue abierta aquí)",
+    text: "Abrir tu campaña de «Let's\u00a0Encode!» en una pestaña nueva (tu tarea sigue abierta aquí)",
   },
+  letsEncodeDragOverlayText: { text: "No se pueden abrir otros archivos durante una tarea de «Let's\u00a0Encode!»." },
   letsEncodeCommitting: { text: 'Completando tu tarea…' },
-  letsEncodeCompleted: { text: "Tarea completada: volviendo a Let's Encode…" },
+  letsEncodeCompleted: { text: "Tarea completada: volviendo a «Let's\u00a0Encode!»…" },
   letsEncodeCommitFailed: { text: 'No se ha podido completar tu tarea.' },
   letsEncodeRetryButton: { value: 'Reintentar' },
-  letsEncodeAbandonButton: { value: "Volver a Let's Encode" },
+  letsEncodeAbandonButton: { value: "Volver a «Let's\u00a0Encode!»" },
   letsEncodeNoCampaignError: {
     text:
-      "Este enlace de Let's Encode está incompleto: no indica ninguna campaña, así que no hay adónde enviar el resultado. Vuelve a Let's Encode y abre la tarea de nuevo.",
+      "Este enlace de «Let's\u00a0Encode!» está incompleto: no indica ninguna campaña, así que no hay adónde enviar el resultado. Vuelve a «Let's\u00a0Encode!» y abre la tarea de nuevo.",
   },
   letsEncodeMissingParameterError: {
-    text: "A la transferencia desde Let's Encode le faltaba un parámetro obligatorio:",
+    text: "A la transferencia desde «Let's\u00a0Encode!» le faltaba un parámetro obligatorio:",
   },
   letsEncodeFileError: { text: 'No se ha podido abrir en GitHub el archivo recibido.' },
   letsEncodeCloneError: { text: 'No se ha podido cargar tu tarea desde GitHub.' },

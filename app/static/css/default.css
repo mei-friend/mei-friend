@@ -242,6 +242,18 @@ a:active {
   z-index: 200;
 }
 
+/* Let's Encode: a drop that will be refused, in the alert dialogue's warning
+   orange rather than the blue that invites a drop; dark text, as white would
+   not read on the lighter background */
+.dragOverlay.refused {
+  border-color: #ff9800;
+  background-color: #ffe0b2;
+}
+
+.dragOverlay.refused .dragOverlayText {
+  color: #6d3a00;
+}
+
 .dragOverlayText {
   position: absolute;
   top: 50%;

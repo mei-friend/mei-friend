@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { setupPage } from './setup';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { setupPage, dropFile } from './setup';
 
 // ─── Hand-off parameters ──────────────────────────────────────────────────────
 
@@ -211,5 +213,28 @@ test.describe('2 File menu shortcuts', () => {
     await pressShortcut(page, 'Mod+s');
     await expect.poll(async () => (await commits()).length).toBe(2);
     expect(seen).toEqual([]); // never a download
+  });
+});
+
+test.describe('3 Drag and drop', () => {
+  // input.spec.ts 3.1 shows the same drop opening the file outside Let's Encode
+  test("3.1 In Let's Encode, a dropped file is refused, and the overlay says why", async ({ page }) => {
+    await setupLetsEncodePage(page);
+    const editor = () => page.evaluate(() => (document.querySelector('.CodeMirror') as any).CodeMirror.getValue());
+    const before = await editor();
+    const mei = readFileSync(join(__dirname, 'fixtures', 'expansion-repeat.mei'), 'utf-8');
+
+    const seen = await dropFile(page, 'expansion-repeat.mei', mei);
+    expect(seen.overlayShown).toBe(true);
+    expect(seen.overlayText).toMatch(/Let's\sEncode!/); // a no-break space, so the name never wraps apart
+    expect(seen.dropEffect).toBe('none'); // the no-drop cursor
+    expect(seen.dragoverPrevented).toBe(true); // or the browser would open the file in this tab
+    expect(seen.dropPrevented).toBe(true);
+    expect(seen.overlayShownAfterDrop).toBe(false);
+
+    // openFile() would have loaded it, and stripped the task from the URL
+    await page.waitForTimeout(1500);
+    expect(await editor()).toBe(before);
+    expect(new URL(page.url()).searchParams.get('le_taskid')).toBe(TASK);
   });
 });

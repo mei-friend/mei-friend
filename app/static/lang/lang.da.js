@@ -74,7 +74,7 @@ export const lang = {
         Udviklingen af mei-friend webapplikationen er finansieret af
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projekterne
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>,
-        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> og <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> og <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Forstået!' },
@@ -987,7 +987,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Du kommer fra <strong>Let's Encode!</strong> for at arbejde på en kodningsopgave. mei-friend er en af de editorer, som Let's Encode tilbyder til dette arbejde. Brug <strong>Gem</strong> i menuen <strong>Opgavestyring</strong> (øverst til venstre) til at gemme dine fremskridt undervejs, og <strong>Afslut opgave</strong>, når du er færdig, for at bidrage med dit arbejde til kampagnen.</p>",
+      "<p>Du kommer fra <strong>Let's\u00a0Encode!</strong> for at arbejde på en kodningsopgave. mei-friend er en af de editorer, som »Let's\u00a0Encode!« tilbyder til dette arbejde. Brug <strong>Gem</strong> i menuen <strong>Opgavestyring</strong> (øverst til venstre) til at gemme dine fremskridt undervejs, og <strong>Afslut opgave</strong>, når du er færdig, for at bidrage med dit arbejde til kampagnen.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Afslut opgave' },
   letsEncodeMenuLabel: { text: 'Opgavestyring' },
@@ -1012,7 +1012,7 @@ export const lang = {
     description:
       'Hvor ofte dit arbejde gemmes automatisk, mens du redigerer, i minutter. Der gemmes kun, når du har lavet ændringer; 0 slår automatisk gemning fra.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "Indstillinger for den Let's Encode-opgave, du arbejder på" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Indstillinger for den »Let's\u00a0Encode!«-opgave, du arbejder på" },
   letsEncodeAbandonTaskButton: { text: 'Opgiv opgave' },
   letsEncodeKeepWorking: { value: 'Arbejd videre' },
   letsEncodeCompleteAnyway: { value: 'Afslut opgaven alligevel' },
@@ -1022,24 +1022,25 @@ export const lang = {
       'Du har ikke ændret denne kodning. Det tæller også: når du afslutter opgaven, registreres det, at den ikke krævede ændringer. Du kan også arbejde videre.',
   },
   letsEncodeConfirmCompletePrompt: {
-    text: "Vil du afslutte denne opgave? Dit arbejde gemmes og overdrages til Let's Encode, og opgaven lukkes.",
+    text: "Vil du afslutte denne opgave? Dit arbejde gemmes og overdrages til »Let's\u00a0Encode!«, og opgaven lukkes.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Opgive denne opgave? Dit arbejde med den går tabt, også det, du allerede har gemt, og Let's Encode får besked om, at du ikke afsluttede opgaven.",
+      "Opgive denne opgave? Dit arbejde med den går tabt, også det, du allerede har gemt, og »Let's\u00a0Encode!« får besked om, at du ikke afsluttede opgaven.",
   },
-  letsEncodeLoading: { text: "Henter din opgave fra Let's Encode…" },
-  letsEncodeLogoLinkTitle: { text: "Åbn din Let's Encode-kampagne i en ny fane (din opgave forbliver åben her)" },
+  letsEncodeLoading: { text: "Henter din opgave fra »Let's\u00a0Encode!«…" },
+  letsEncodeLogoLinkTitle: { text: "Åbn din »Let's\u00a0Encode!«-kampagne i en ny fane (din opgave forbliver åben her)" },
+  letsEncodeDragOverlayText: { text: "Andre filer kan ikke åbnes under en »Let's\u00a0Encode!«-opgave." },
   letsEncodeCommitting: { text: 'Afslutter din opgave…' },
-  letsEncodeCompleted: { text: "Opgaven er afsluttet — du sendes tilbage til Let's Encode…" },
+  letsEncodeCompleted: { text: "Opgaven er afsluttet — du sendes tilbage til »Let's\u00a0Encode!«…" },
   letsEncodeCommitFailed: { text: 'Din opgave kunne ikke afsluttes.' },
   letsEncodeRetryButton: { value: 'Prøv igen' },
-  letsEncodeAbandonButton: { value: "Tilbage til Let's Encode" },
+  letsEncodeAbandonButton: { value: "Tilbage til »Let's\u00a0Encode!«" },
   letsEncodeNoCampaignError: {
     text:
-      "Dette Let's Encode-link er ufuldstændigt: det nævner ingen kampagne, så resultatet kan ikke meldes tilbage nogen steder. Gå tilbage til Let's Encode, og åbn opgaven igen.",
+      "Dette »Let's\u00a0Encode!«-link er ufuldstændigt: det nævner ingen kampagne, så resultatet kan ikke meldes tilbage nogen steder. Gå tilbage til »Let's\u00a0Encode!«, og åbn opgaven igen.",
   },
-  letsEncodeMissingParameterError: { text: "Overdragelsen fra Let's Encode manglede en påkrævet parameter:" },
+  letsEncodeMissingParameterError: { text: "Overdragelsen fra »Let's\u00a0Encode!« manglede en påkrævet parameter:" },
   letsEncodeFileError: { text: 'Den overdragne fil kunne ikke åbnes på GitHub.' },
   letsEncodeCloneError: { text: 'Din opgave kunne ikke indlæses fra GitHub.' },
   letsEncodeRemoteChangedError: {

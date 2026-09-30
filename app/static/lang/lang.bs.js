@@ -71,7 +71,7 @@ export const lang = {
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
       >,
-      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Razumem!' },
@@ -981,7 +981,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Došli ste sa <strong>Let's Encode!</strong> kako biste radili na zadatku kodiranja. mei-friend je jedan od editora koje Let's Encode nudi za ovaj rad. Koristite <strong>Sačuvaj</strong> u meniju <strong>Upravljanje zadatkom</strong> (gore lijevo) da usput čuvate svoj napredak, a <strong>Završi zadatak</strong> kada završite, kako biste dali svoj doprinos kampanji.</p>",
+      "<p>Došli ste sa <strong>Let's\u00a0Encode!</strong> kako biste radili na zadatku kodiranja. mei-friend je jedan od editora koje „Let's\u00a0Encode!“ nudi za ovaj rad. Koristite <strong>Sačuvaj</strong> u meniju <strong>Upravljanje zadatkom</strong> (gore lijevo) da usput čuvate svoj napredak, a <strong>Završi zadatak</strong> kada završite, kako biste dali svoj doprinos kampanji.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Završi zadatak' },
   letsEncodeMenuLabel: { text: 'Upravljanje zadatkom' },
@@ -1006,7 +1006,7 @@ export const lang = {
     description:
       'Koliko često se vaš rad automatski čuva dok uređujete, u minutama. Čuva se samo ako ste napravili izmjene; 0 isključuje automatsko čuvanje.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "Postavke Let's Encode zadatka na kojem radite" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Postavke „Let's\u00a0Encode!“ zadatka na kojem radite" },
   letsEncodeAbandonTaskButton: { text: 'Odustani od zadatka' },
   letsEncodeKeepWorking: { value: 'Nastavi s radom' },
   letsEncodeCompleteAnyway: { value: 'Ipak završi zadatak' },
@@ -1017,26 +1017,27 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "Želite li završiti ovaj zadatak? Vaš rad će biti sačuvan i proslijeđen platformi Let's Encode, a zadatak će biti zatvoren.",
+      "Želite li završiti ovaj zadatak? Vaš rad će biti sačuvan i proslijeđen platformi „Let's\u00a0Encode!“, a zadatak će biti zatvoren.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Odustati od ovog zadatka? Vaš rad na njemu bit će izgubljen, uključujući i ono što ste već sačuvali, a platforma Let's Encode bit će obaviještena da niste završili zadatak.",
+      "Odustati od ovog zadatka? Vaš rad na njemu bit će izgubljen, uključujući i ono što ste već sačuvali, a platforma „Let's\u00a0Encode!“ bit će obaviještena da niste završili zadatak.",
   },
-  letsEncodeLoading: { text: "Učitavanje vašeg zadatka s platforme Let's Encode…" },
+  letsEncodeLoading: { text: "Učitavanje vašeg zadatka s platforme „Let's\u00a0Encode!“…" },
   letsEncodeLogoLinkTitle: {
-    text: "Otvorite svoju Let's Encode kampanju u novoj kartici (vaš zadatak ostaje otvoren ovdje)",
+    text: "Otvorite svoju „Let's\u00a0Encode!“ kampanju u novoj kartici (vaš zadatak ostaje otvoren ovdje)",
   },
+  letsEncodeDragOverlayText: { text: "Druge datoteke se ne mogu otvoriti tokom zadatka „Let's\u00a0Encode!“." },
   letsEncodeCommitting: { text: 'Završavanje vašeg zadatka…' },
-  letsEncodeCompleted: { text: "Zadatak je završen — vraćamo vas na Let's Encode…" },
+  letsEncodeCompleted: { text: "Zadatak je završen — vraćamo vas na „Let's\u00a0Encode!“…" },
   letsEncodeCommitFailed: { text: 'Vaš zadatak nije mogao biti završen.' },
   letsEncodeRetryButton: { value: 'Pokušaj ponovo' },
-  letsEncodeAbandonButton: { value: "Povratak na Let's Encode" },
+  letsEncodeAbandonButton: { value: "Povratak na „Let's\u00a0Encode!“" },
   letsEncodeNoCampaignError: {
     text:
-      "Ovaj Let's Encode link je nepotpun: ne navodi nijednu kampanju, pa nema gdje prijaviti rezultat. Molimo vratite se na Let's Encode i ponovo otvorite zadatak.",
+      "Ovaj „Let's\u00a0Encode!“ link je nepotpun: ne navodi nijednu kampanju, pa nema gdje prijaviti rezultat. Molimo vratite se na „Let's\u00a0Encode!“ i ponovo otvorite zadatak.",
   },
-  letsEncodeMissingParameterError: { text: "Pri predaji s platforme Let's Encode nedostajao je obavezan parametar:" },
+  letsEncodeMissingParameterError: { text: "Pri predaji s platforme „Let's\u00a0Encode!“ nedostajao je obavezan parametar:" },
   letsEncodeFileError: { text: 'Predati fajl nije bilo moguće otvoriti na GitHubu.' },
   letsEncodeCloneError: { text: 'Vaš zadatak nije bilo moguće učitati s GitHuba.' },
   letsEncodeRemoteChangedError: {

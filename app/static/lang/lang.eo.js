@@ -75,7 +75,7 @@ export const lang = {
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
       >,
-      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> kaj <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> kaj <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Mi komprenas!' },
@@ -1108,7 +1108,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Vi venas de <strong>Let's Encode!</strong> por labori pri kodada tasko. mei-friend estas unu el la redaktiloj, kiujn Let's Encode proponas por ĉi tiu laboro. Uzu <strong>Konservi</strong> en la menuo <strong>Taskadministrado</strong> (supre maldekstre) por konservi vian progreson dum la laboro, kaj <strong>Fini la taskon</strong>, kiam vi finis, por kontribui vian laboron al la kampanjo.</p>",
+      "<p>Vi venas de <strong>Let's\u00a0Encode!</strong> por labori pri kodada tasko. mei-friend estas unu el la redaktiloj, kiujn “Let's\u00a0Encode!” proponas por ĉi tiu laboro. Uzu <strong>Konservi</strong> en la menuo <strong>Taskadministrado</strong> (supre maldekstre) por konservi vian progreson dum la laboro, kaj <strong>Fini la taskon</strong>, kiam vi finis, por kontribui vian laboron al la kampanjo.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Fini la taskon' },
   letsEncodeMenuLabel: { text: 'Taskadministrado' },
@@ -1133,7 +1133,7 @@ export const lang = {
     description:
       'Kiom ofte, en minutoj, via laboro estas aŭtomate konservata dum vi redaktas. Konservado okazas nur se vi faris ŝanĝojn; 0 malŝaltas aŭtomatan konservadon.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "Agordoj por la Let's Encode-tasko, pri kiu vi laboras" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Agordoj por la “Let's\u00a0Encode!”-tasko, pri kiu vi laboras" },
   letsEncodeAbandonTaskButton: { text: 'Rezigni la taskon' },
   letsEncodeKeepWorking: { value: 'Daŭrigi la laboron' },
   letsEncodeCompleteAnyway: { value: 'Tamen fini la taskon' },
@@ -1144,26 +1144,27 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "Ĉu fini ĉi tiun taskon? Via laboro estos konservita kaj transdonita al Let's Encode, kaj la tasko estos fermita.",
+      "Ĉu fini ĉi tiun taskon? Via laboro estos konservita kaj transdonita al “Let's\u00a0Encode!”, kaj la tasko estos fermita.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Ĉu rezigni ĉi tiun taskon? Via laboro pri ĝi perdiĝos, inkluzive de tio, kion vi jam konservis, kaj Let's Encode estos informita, ke vi ne finis la taskon.",
+      "Ĉu rezigni ĉi tiun taskon? Via laboro pri ĝi perdiĝos, inkluzive de tio, kion vi jam konservis, kaj “Let's\u00a0Encode!” estos informita, ke vi ne finis la taskon.",
   },
-  letsEncodeLoading: { text: "Ŝargado de via tasko el Let's Encode…" },
+  letsEncodeLoading: { text: "Ŝargado de via tasko el “Let's\u00a0Encode!”…" },
   letsEncodeLogoLinkTitle: {
-    text: "Malfermi vian Let's Encode-kampanjon en nova langeto (via tasko restas malfermita ĉi tie)",
+    text: "Malfermi vian “Let's\u00a0Encode!”-kampanjon en nova langeto (via tasko restas malfermita ĉi tie)",
   },
+  letsEncodeDragOverlayText: { text: "Aliaj dosieroj ne povas esti malfermitaj dum tasko de “Let's\u00a0Encode!”." },
   letsEncodeCommitting: { text: 'Finado de via tasko…' },
-  letsEncodeCompleted: { text: "Tasko finita — ni resendas vin al Let's Encode…" },
+  letsEncodeCompleted: { text: "Tasko finita — ni resendas vin al “Let's\u00a0Encode!”…" },
   letsEncodeCommitFailed: { text: 'Via tasko ne povis esti finita.' },
   letsEncodeRetryButton: { value: 'Reprovi' },
-  letsEncodeAbandonButton: { value: "Reiri al Let's Encode" },
+  letsEncodeAbandonButton: { value: "Reiri al “Let's\u00a0Encode!”" },
   letsEncodeNoCampaignError: {
     text:
-      "Ĉi tiu Let's Encode-ligilo estas nekompleta: ĝi nomas neniun kampanjon, do ne eblas raporti la rezulton. Bonvolu reiri al Let's Encode kaj malfermi la taskon denove.",
+      "Ĉi tiu “Let's\u00a0Encode!”-ligilo estas nekompleta: ĝi nomas neniun kampanjon, do ne eblas raporti la rezulton. Bonvolu reiri al “Let's\u00a0Encode!” kaj malfermi la taskon denove.",
   },
-  letsEncodeMissingParameterError: { text: "Al la transdono de Let's Encode mankis deviga parametro:" },
+  letsEncodeMissingParameterError: { text: "Al la transdono de “Let's\u00a0Encode!” mankis deviga parametro:" },
   letsEncodeFileError: { text: 'La transdonita dosiero ne povis esti malfermita ĉe GitHub.' },
   letsEncodeCloneError: { text: 'Via tasko ne povis esti ŝargita el GitHub.' },
   letsEncodeRemoteChangedError: {

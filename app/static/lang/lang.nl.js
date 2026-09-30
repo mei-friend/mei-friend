@@ -72,7 +72,7 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> onder projecten
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a>,
-        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> en <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> en <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Begrepen!' },
@@ -992,7 +992,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>U komt van <strong>Let's Encode!</strong> om aan een coderingstaak te werken. mei-friend is een van de editors die Let's Encode hiervoor aanbiedt. Gebruik <strong>Opslaan</strong> in het menu <strong>Taakbeheer</strong> (linksboven) om uw voortgang tussendoor te bewaren, en <strong>Taak voltooien</strong> wanneer u klaar bent, om uw werk bij te dragen aan de campagne.</p>",
+      "<p>U komt van <strong>Let's\u00a0Encode!</strong> om aan een coderingstaak te werken. mei-friend is een van de editors die ‘Let's\u00a0Encode!’ hiervoor aanbiedt. Gebruik <strong>Opslaan</strong> in het menu <strong>Taakbeheer</strong> (linksboven) om uw voortgang tussendoor te bewaren, en <strong>Taak voltooien</strong> wanneer u klaar bent, om uw werk bij te dragen aan de campagne.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Taak voltooien' },
   letsEncodeMenuLabel: { text: 'Taakbeheer' },
@@ -1017,7 +1017,7 @@ export const lang = {
     description:
       'Hoe vaak uw werk tijdens het bewerken automatisch wordt opgeslagen, in minuten. Er wordt alleen opgeslagen als u iets hebt gewijzigd; 0 schakelt automatisch opslaan uit.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "Instellingen voor de Let's Encode-taak waaraan u werkt" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Instellingen voor de ‘Let's\u00a0Encode!’-taak waaraan u werkt" },
   letsEncodeAbandonTaskButton: { text: 'Taak afbreken' },
   letsEncodeKeepWorking: { value: 'Verder werken' },
   letsEncodeCompleteAnyway: { value: 'Taak toch voltooien' },
@@ -1028,26 +1028,27 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "Wilt u deze taak voltooien? Uw werk wordt opgeslagen en doorgegeven aan Let's Encode, en de taak wordt afgesloten.",
+      "Wilt u deze taak voltooien? Uw werk wordt opgeslagen en doorgegeven aan ‘Let's\u00a0Encode!’, en de taak wordt afgesloten.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Deze taak afbreken? Uw werk eraan gaat verloren, ook wat u al hebt opgeslagen, en Let's Encode krijgt te horen dat u de taak niet hebt voltooid.",
+      "Deze taak afbreken? Uw werk eraan gaat verloren, ook wat u al hebt opgeslagen, en ‘Let's\u00a0Encode!’ krijgt te horen dat u de taak niet hebt voltooid.",
   },
-  letsEncodeLoading: { text: "Uw taak wordt opgehaald bij Let's Encode…" },
+  letsEncodeLoading: { text: "Uw taak wordt opgehaald bij ‘Let's\u00a0Encode!’…" },
   letsEncodeLogoLinkTitle: {
-    text: "Uw Let's Encode-campagne openen in een nieuw tabblad (uw taak blijft hier geopend)",
+    text: "Uw ‘Let's\u00a0Encode!’-campagne openen in een nieuw tabblad (uw taak blijft hier geopend)",
   },
+  letsEncodeDragOverlayText: { text: "Andere bestanden kunnen niet worden geopend tijdens een ‘Let's\u00a0Encode!’-taak." },
   letsEncodeCommitting: { text: 'Uw taak wordt voltooid…' },
-  letsEncodeCompleted: { text: "Taak voltooid — u wordt teruggestuurd naar Let's Encode…" },
+  letsEncodeCompleted: { text: "Taak voltooid — u wordt teruggestuurd naar ‘Let's\u00a0Encode!’…" },
   letsEncodeCommitFailed: { text: 'Uw taak kon niet worden voltooid.' },
   letsEncodeRetryButton: { value: 'Opnieuw proberen' },
-  letsEncodeAbandonButton: { value: "Terug naar Let's Encode" },
+  letsEncodeAbandonButton: { value: "Terug naar ‘Let's\u00a0Encode!’" },
   letsEncodeNoCampaignError: {
     text:
-      "Deze Let's Encode-link is onvolledig: er wordt geen campagne genoemd, dus het resultaat kan nergens worden gemeld. Ga terug naar Let's Encode en open de taak opnieuw.",
+      "Deze ‘Let's\u00a0Encode!’-link is onvolledig: er wordt geen campagne genoemd, dus het resultaat kan nergens worden gemeld. Ga terug naar ‘Let's\u00a0Encode!’ en open de taak opnieuw.",
   },
-  letsEncodeMissingParameterError: { text: "Bij de overdracht vanuit Let's Encode ontbrak een verplichte parameter:" },
+  letsEncodeMissingParameterError: { text: "Bij de overdracht vanuit ‘Let's\u00a0Encode!’ ontbrak een verplichte parameter:" },
   letsEncodeFileError: { text: 'Het overgedragen bestand kon niet worden geopend op GitHub.' },
   letsEncodeCloneError: { text: 'Uw taak kon niet worden geladen vanaf GitHub.' },
   letsEncodeRemoteChangedError: {

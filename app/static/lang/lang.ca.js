@@ -77,7 +77,7 @@ export const lang = {
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
         >,
-        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>
     `,
   },
@@ -1129,7 +1129,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Arribes des de <strong>Let's Encode!</strong> per treballar en una tasca de codificació. mei-friend és un dels editors que Let's Encode ofereix per a aquesta feina. Fes servir <strong>Desa</strong> al menú <strong>Gestió de la tasca</strong> (a dalt a l'esquerra) per anar desant el teu progrés, i <strong>Completa la tasca</strong> quan hagis acabat, per aportar la teva feina a la campanya.</p>",
+      "<p>Arribes des de <strong>Let's\u00a0Encode!</strong> per treballar en una tasca de codificació. mei-friend és un dels editors que «Let's\u00a0Encode!» ofereix per a aquesta feina. Fes servir <strong>Desa</strong> al menú <strong>Gestió de la tasca</strong> (a dalt a l'esquerra) per anar desant el teu progrés, i <strong>Completa la tasca</strong> quan hagis acabat, per aportar la teva feina a la campanya.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Completa la tasca' },
   letsEncodeMenuLabel: { text: 'Gestió de la tasca' },
@@ -1155,8 +1155,8 @@ export const lang = {
       'Cada quants minuts es desa automàticament la teva feina mentre edites. Només es desa si has fet canvis; 0 desactiva el desament automàtic.',
   },
   titleLetsEncode: {
-    title: 'Let’s Encode!',
-    description: "Configuració de la tasca de Let's Encode en què estàs treballant",
+    title: 'Let\'s\u00a0Encode!',
+    description: "Configuració de la tasca de «Let's\u00a0Encode!» en què estàs treballant",
   },
   letsEncodeAbandonTaskButton: { text: 'Abandona la tasca' },
   letsEncodeKeepWorking: { value: 'Continua treballant' },
@@ -1168,26 +1168,27 @@ export const lang = {
   },
   letsEncodeConfirmCompletePrompt: {
     text:
-      "Vols completar aquesta tasca? La teva feina es desarà i es lliurarà a Let's Encode, i la tasca quedarà tancada.",
+      "Vols completar aquesta tasca? La teva feina es desarà i es lliurarà a «Let's\u00a0Encode!», i la tasca quedarà tancada.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Vols abandonar aquesta tasca? La feina que hi has fet es perdrà, fins i tot el que ja hagis desat, i es comunicarà a Let's Encode que no has completat la tasca.",
+      "Vols abandonar aquesta tasca? La feina que hi has fet es perdrà, fins i tot el que ja hagis desat, i es comunicarà a «Let's\u00a0Encode!» que no has completat la tasca.",
   },
-  letsEncodeLoading: { text: "S'està carregant la teva tasca des de Let's Encode…" },
+  letsEncodeLoading: { text: "S'està carregant la teva tasca des de «Let's\u00a0Encode!»…" },
   letsEncodeLogoLinkTitle: {
-    text: "Obre la teva campanya de Let's Encode en una pestanya nova (la teva tasca continua oberta aquí)",
+    text: "Obre la teva campanya de «Let's\u00a0Encode!» en una pestanya nova (la teva tasca continua oberta aquí)",
   },
+  letsEncodeDragOverlayText: { text: "No es poden obrir altres fitxers durant una tasca de «Let's\u00a0Encode!»." },
   letsEncodeCommitting: { text: "S'està completant la teva tasca…" },
-  letsEncodeCompleted: { text: "Tasca completada: tornant a Let's Encode…" },
+  letsEncodeCompleted: { text: "Tasca completada: tornant a «Let's\u00a0Encode!»…" },
   letsEncodeCommitFailed: { text: "No s'ha pogut completar la teva tasca." },
   letsEncodeRetryButton: { value: 'Torna-ho a provar' },
-  letsEncodeAbandonButton: { value: "Torna a Let's Encode" },
+  letsEncodeAbandonButton: { value: "Torna a «Let's\u00a0Encode!»" },
   letsEncodeNoCampaignError: {
     text:
-      "Aquest enllaç de Let's Encode és incomplet: no indica cap campanya, de manera que no hi ha on enviar el resultat. Torna a Let's Encode i obre la tasca de nou.",
+      "Aquest enllaç de «Let's\u00a0Encode!» és incomplet: no indica cap campanya, de manera que no hi ha on enviar el resultat. Torna a «Let's\u00a0Encode!» i obre la tasca de nou.",
   },
-  letsEncodeMissingParameterError: { text: "Al traspàs des de Let's Encode hi faltava un paràmetre obligatori:" },
+  letsEncodeMissingParameterError: { text: "Al traspàs des de «Let's\u00a0Encode!» hi faltava un paràmetre obligatori:" },
   letsEncodeFileError: { text: "No s'ha pogut obrir a GitHub el fitxer rebut." },
   letsEncodeCloneError: { text: "No s'ha pogut carregar la teva tasca des de GitHub." },
   letsEncodeRemoteChangedError: {

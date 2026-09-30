@@ -71,7 +71,7 @@ export const lang = {
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
       >,
-      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> і <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's Encode!)</a>.
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> і <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Зрозуміло!' },
@@ -1102,7 +1102,7 @@ export const lang = {
   // Let's Encode! campaign mode (see lib/lets-encode.js)
   splashLetsEncode: {
     html:
-      "<p>Ви перейшли з <strong>Let's Encode!</strong>, щоб працювати над завданням з кодування. mei-friend — один із редакторів, які Let's Encode пропонує для цієї роботи. Використовуйте <strong>Зберегти</strong> в меню <strong>Керування завданням</strong> (угорі ліворуч), щоб зберігати свій прогрес під час роботи, і <strong>Завершити завдання</strong>, коли закінчите, щоб зробити свій внесок у кампанію.</p>",
+      "<p>Ви перейшли з <strong>Let's\u00a0Encode!</strong>, щоб працювати над завданням з кодування. mei-friend — один із редакторів, які «Let's\u00a0Encode!» пропонує для цієї роботи. Використовуйте <strong>Зберегти</strong> в меню <strong>Керування завданням</strong> (угорі ліворуч), щоб зберігати свій прогрес під час роботи, і <strong>Завершити завдання</strong>, коли закінчите, щоб зробити свій внесок у кампанію.</p>",
   },
   letsEncodeCompleteTaskButton: { text: 'Завершити завдання' },
   letsEncodeMenuLabel: { text: 'Керування завданням' },
@@ -1127,7 +1127,7 @@ export const lang = {
     description:
       'Як часто, у хвилинах, ваша робота автоматично зберігається під час редагування. Збереження відбувається лише тоді, коли ви внесли зміни; 0 вимикає автозбереження.',
   },
-  titleLetsEncode: { title: 'Let’s Encode!', description: "Налаштування завдання Let's Encode, над яким ви працюєте" },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Налаштування завдання «Let's\u00a0Encode!», над яким ви працюєте" },
   letsEncodeAbandonTaskButton: { text: 'Відмовитися від завдання' },
   letsEncodeKeepWorking: { value: 'Продовжити роботу' },
   letsEncodeCompleteAnyway: { value: 'Усе одно завершити завдання' },
@@ -1137,26 +1137,27 @@ export const lang = {
       'Ви не змінили це кодування. Це теж має значення: завершивши завдання, ви зафіксуєте, що змін не було потрібно. Або ж можете продовжити роботу.',
   },
   letsEncodeConfirmCompletePrompt: {
-    text: "Завершити це завдання? Вашу роботу буде збережено й передано до Let's Encode, а завдання буде закрито.",
+    text: "Завершити це завдання? Вашу роботу буде збережено й передано до «Let's\u00a0Encode!», а завдання буде закрито.",
   },
   letsEncodeAbandonPrompt: {
     text:
-      "Відмовитися від цього завдання? Вашу роботу над ним буде втрачено, зокрема й те, що ви вже зберегли, а Let's Encode отримає повідомлення, що ви не завершили завдання.",
+      "Відмовитися від цього завдання? Вашу роботу над ним буде втрачено, зокрема й те, що ви вже зберегли, а «Let's\u00a0Encode!» отримає повідомлення, що ви не завершили завдання.",
   },
-  letsEncodeLoading: { text: "Завантаження вашого завдання з Let's Encode…" },
+  letsEncodeLoading: { text: "Завантаження вашого завдання з «Let's\u00a0Encode!»…" },
   letsEncodeLogoLinkTitle: {
-    text: "Відкрити вашу кампанію Let's Encode у новій вкладці (завдання залишиться відкритим тут)",
+    text: "Відкрити вашу кампанію «Let's\u00a0Encode!» у новій вкладці (завдання залишиться відкритим тут)",
   },
+  letsEncodeDragOverlayText: { text: "Під час завдання «Let's\u00a0Encode!» інші файли відкрити не можна." },
   letsEncodeCommitting: { text: 'Завершення вашого завдання…' },
-  letsEncodeCompleted: { text: "Завдання завершено — повертаємо вас до Let's Encode…" },
+  letsEncodeCompleted: { text: "Завдання завершено — повертаємо вас до «Let's\u00a0Encode!»…" },
   letsEncodeCommitFailed: { text: 'Не вдалося завершити ваше завдання.' },
   letsEncodeRetryButton: { value: 'Спробувати ще раз' },
-  letsEncodeAbandonButton: { value: "Повернутися до Let's Encode" },
+  letsEncodeAbandonButton: { value: "Повернутися до «Let's\u00a0Encode!»" },
   letsEncodeNoCampaignError: {
     text:
-      "Це посилання Let's Encode неповне: у ньому не вказано кампанію, тож немає куди повідомити результат. Поверніться до Let's Encode і відкрийте завдання знову.",
+      "Це посилання «Let's\u00a0Encode!» неповне: у ньому не вказано кампанію, тож немає куди повідомити результат. Поверніться до «Let's\u00a0Encode!» і відкрийте завдання знову.",
   },
-  letsEncodeMissingParameterError: { text: "Під час передачі з Let's Encode бракувало обов’язкового параметра:" },
+  letsEncodeMissingParameterError: { text: "Під час передачі з «Let's\u00a0Encode!» бракувало обов’язкового параметра:" },
   letsEncodeFileError: { text: 'Не вдалося відкрити на GitHub переданий файл.' },
   letsEncodeCloneError: { text: 'Не вдалося завантажити ваше завдання з GitHub.' },
   letsEncodeRemoteChangedError: {
