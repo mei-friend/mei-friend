@@ -242,6 +242,16 @@ a:active {
   z-index: 200;
 }
 
+/* Let's Encode: refuse file drops to avoid leaving task; warn in alert-orange */
+.dragOverlay.refused {
+  border-color: #ff9800;
+  background-color: #ffe0b2;
+}
+
+.dragOverlay.refused .dragOverlayText {
+  color: #6d3a00;
+}
+
 .dragOverlayText {
   position: absolute;
   top: 50%;
@@ -255,6 +265,7 @@ a:active {
 .openUrlOverlay,
 #githubActionsOverlay,
 #solidOverlay,
+#letsEncodeOverlay,
 #splashOverlay {
   flex-direction: row;
   justify-content: center;
@@ -277,6 +288,318 @@ a:active {
 
 #solidLoadingIndicator:hover {
   text-decoration: underline;
+}
+
+/* The task menu holds two actions, not a repository listing, so it drops the
+   GitHub menu's 90% min-height and sits at its own size. */
+#GithubMenu.letsEncodeTaskMenu {
+  min-height: auto;
+}
+
+/* The account the volunteer is committing as, after the campaign and task in
+   the status line. Set apart so the three read as separate facts. */
+#letsEncodeStatusUser {
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+#letsEncodeStatusUser:not(:empty)::before {
+  content: '·';
+  margin-right: 0.6em;
+  opacity: 0.6;
+}
+
+/* The GitHub mark sits inline with the account name it belongs to: a little
+   larger than the surrounding text and lifted off the baseline, since the glyph
+   is optically centred in its box rather than sitting on it. */
+#letsEncodeStatusUser #GithubLogo {
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
+  margin: 0 0.3em 0 0.25em;
+}
+
+/* Time left on the claim, when the campaign's lock table records one. */
+#letsEncodeStatusExpiry {
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+#letsEncodeStatusExpiry:not(:empty)::before {
+  content: '·';
+  margin-right: 0.6em;
+  opacity: 0.6;
+}
+
+#letsEncodeStatusExpiry.letsEncodeExpired {
+  color: var(--fileStatusWarnColor, #b3261e);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* "Last save: …" under the Save entry: a note, not an action. */
+#letsEncodeLastSaveIndicator {
+  display: block;
+  padding: 0 1rem 0.35rem 1rem;
+  font-size: 0.82em;
+  opacity: 0.7;
+}
+
+/* Shown on the splash screen only when the volunteer arrived from a campaign,
+   explaining why they are looking at mei-friend at all. */
+/* Set off from the rest of the splash by the campaign's own callout wash — the
+   pale blue-to-green gradient the landing page uses for "Start or join a
+   campaign" — rather than by a rule down its edge. */
+#splashLetsEncode {
+  display: none;
+  margin: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: linear-gradient(120deg, rgba(109, 195, 255, 0.16), rgba(118, 222, 118, 0.16));
+}
+
+#splashLetsEncode p {
+  margin: 0;
+}
+
+/* Let's Encode task interstitial: shown while a task is being completed, and
+   carrying the retry / give-up choice when the commit will not go through. */
+#letsEncodeOverlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#letsEncodeUI {
+  border-radius: 32px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  width: 22rem;
+  max-width: 80vw;
+  height: fit-content;
+  z-index: 190;
+  text-align: center;
+}
+
+/* A Let's Encode hand, one gesture per state, borrowing the landing page's
+   header-hand mechanic (instigation/static/styles.css): the image runs the
+   gesture about its own pivot (--ox/--oy, the wrist), and the gesture shapes
+   are the house keyframes (hpicTwiddle, hpicWave, hpicWag) with a rest built
+   into the cycle where a state persists. Per-state values are set on the
+   figure by its state class. The box is a fixed height so the panel does not
+   jump between states; the hands differ in aspect ratio. */
+#letsEncodeFigure {
+  height: 6rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  --s: 5.5rem;
+}
+
+#letsEncodeHandPic {
+  display: block;
+  width: auto;
+  height: var(--s);
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+  transform: rotate(var(--r, 0deg)); /* the resting tilt, kept under reduced motion */
+}
+
+#letsEncodeFigure.le-busy {
+  --s: 4.2rem;
+  --ox: 88%;
+  --oy: 88%;
+}
+
+#letsEncodeFigure.le-busy #letsEncodeHandPic {
+  animation: leTwiddle 3.84s ease-in-out infinite;
+}
+
+#letsEncodeFigure.le-done {
+  --ox: 82%;
+  --oy: 95%;
+}
+
+#letsEncodeFigure.le-done #letsEncodeHandPic {
+  animation: leWave 1.6s ease-in-out infinite;
+}
+
+/* Concluding the agreement: the campaign's own handshake */
+#letsEncodeFigure.le-completing {
+  --s: 4.4rem;
+  --r: -2deg;
+  --ox: 50%;
+  --oy: 90%;
+}
+
+#letsEncodeFigure.le-completing #letsEncodeHandPic {
+  animation: leShake 1.8s ease-in-out infinite;
+}
+
+@keyframes leShake {
+  0%,
+  36%,
+  100% {
+    transform: rotate(var(--r, 0deg));
+  }
+  8% {
+    transform: rotate(calc(var(--r, 0deg) - 3deg));
+  }
+  18% {
+    transform: rotate(calc(var(--r, 0deg) + 2deg));
+  }
+  28% {
+    transform: rotate(calc(var(--r, 0deg) - 1deg));
+  }
+}
+
+/* the wave serves both goodbyes: task finished, and task handed back */
+#letsEncodeFigure.le-farewell {
+  --s: 4.6rem;
+  --r: -8deg;
+  --ox: 50%;
+  --oy: 95%;
+}
+
+#letsEncodeFigure.le-farewell #letsEncodeHandPic {
+  animation: leWave 1.6s ease-in-out infinite;
+}
+
+/* Question modals put the hand beside
+   the text rather than above it */
+#letsEncodeUI.le-inline {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'hand text'
+    'buttons buttons';
+  align-items: center;
+  /* wide enough that the hands' rotation does not reach the text */
+  column-gap: 1.5rem;
+  text-align: left;
+}
+
+#letsEncodeUI.le-inline #letsEncodeFigure {
+  grid-area: hand;
+  height: auto;
+  align-self: stretch;
+  align-items: center;
+  --s: 100%;
+}
+
+#letsEncodeUI.le-inline #letsEncodeHandPic {
+  max-height: 4.5rem;
+  min-height: 2.5rem;
+}
+
+#letsEncodeUI.le-inline #letsEncodeOverlayMessage {
+  grid-area: text;
+  margin: 0;
+}
+
+#letsEncodeUI.le-inline #letsEncodeOverlayButtons {
+  grid-area: buttons;
+}
+
+/* the wag serves both "that did not work" and "hold on, are you sure?" */
+#letsEncodeFigure.le-failed,
+#letsEncodeFigure.le-confirm {
+  --r: 14deg;
+  --ox: 70%;
+  --oy: 100%;
+}
+
+/* the wag rests at 14deg and swings 9 more, so it overflows further than the rest */
+#letsEncodeUI.le-inline #letsEncodeFigure.le-confirm,
+#letsEncodeUI.le-inline #letsEncodeFigure.le-failed {
+  margin-right: 0.9rem;
+}
+
+#letsEncodeFigure.le-failed #letsEncodeHandPic,
+#letsEncodeFigure.le-confirm #letsEncodeHandPic {
+  animation: leWag 1.6s ease-in-out infinite;
+}
+
+/* "DUM DUM . . DUM DUM DUM . ." — two bars of full dips with a rest after
+   each bar; the dip shape is hpicTwiddle */
+@keyframes leTwiddle {
+  0%,
+  12%,
+  31%,
+  50%,
+  60%,
+  71%,
+  88%,
+  100% {
+    transform: rotate(0);
+  }
+  6%,
+  55%,
+  65% {
+    transform: rotate(-10deg);
+  }
+  21%,
+  79% {
+    transform: rotate(-10deg);
+  }
+  27%,
+  85% {
+    transform: rotate(4deg);
+  }
+}
+
+/* hpicWave (1 s) then rest */
+@keyframes leWave {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0);
+  }
+  11% {
+    transform: rotate(-10deg);
+  }
+  26% {
+    transform: rotate(8deg);
+  }
+  41% {
+    transform: rotate(-6deg);
+  }
+  54% {
+    transform: rotate(4deg);
+  }
+}
+
+/* "uh uh uh": left, right, left, back to rest, then a pause. --r is the
+   resting tilt, so the hand can sit turned without a wrapper element. */
+@keyframes leWag {
+  0%,
+  60%,
+  100% {
+    transform: rotate(var(--r, 0deg));
+  }
+  12%,
+  48% {
+    transform: rotate(calc(var(--r, 0deg) - 9deg));
+  }
+  30% {
+    transform: rotate(calc(var(--r, 0deg) + 9deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #letsEncodeHandPic {
+    animation: none !important;
+  }
+}
+
+#letsEncodeOverlayMessage {
+  margin: 1rem 0 0 0;
+}
+
+#letsEncodeOverlayButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 #solidOverlayCancel span {

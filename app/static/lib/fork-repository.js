@@ -158,10 +158,62 @@ function onSelectRepository(e) {
   }
 } // onSelectRepository()
 
+/**
+ * matchRawGithubUrl
+ * @description Cheap structural check: does this look like a fully qualified raw
+ * GitHub URL? Returns the regex match ([, userOrg, repo, residue]) or null.
+ * @param {string} url
+ * @returns {Array|null}
+ */
+export function matchRawGithubUrl(url) {
+  return url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/(.*)$/);
+} // matchRawGithubUrl()
+
+/**
+ * parseRawGithubUrl
+ * @description Split a raw GitHub URL into the components needed to bind the
+ * GitHub integration to it. Branch names and file paths may both contain
+ * slashes, so the split point cannot be read off the URL: retrieve the
+ * repository's branches and find the one that prefixes the remainder.
+ * @param {object} gm GitManager, used to list the repository's branches
+ * @param {string} url fully qualified raw GitHub URL
+ * @returns {Promise<{userOrg: string, repo: string, branch: string, filepath: string}>}
+ * @throws {Error} if the URL is not a raw GitHub URL, or no branch matches it
+ */
+export async function parseRawGithubUrl(gm, url) {
+  const components = matchRawGithubUrl(url);
+  if (!components || components.length !== 4) {
+    throw new Error('ForkRepository: URL does not match expectations: ' + url);
+  }
+  const userOrg = components[1];
+  const repo = components[2];
+  let residue = components[3];
+  const branches = await gm.getBranches(100, 1, userOrg + '/' + repo);
+  console.log('branches', branches, 'residue', residue);
+  residue = residue.replace('refs/remotes/origin/', ''); // remove remote branch prefix if present
+  residue = residue.replace('refs/heads/', ''); // remove branch prefix if present
+  residue = residue.replace('refs/tags/', ''); // remove tag prefix if present
+  // Require the separating slash, and prefer the longest match: without the
+  // slash a branch "main" would claim "maintenance/score.mei", and with nested
+  // branch names ("feat" alongside "feat/x") the shorter one could win.
+  const branch = branches
+    .filter((b) => residue.startsWith(b.name + '/'))
+    .sort((a, b) => b.name.length - a.name.length)[0];
+  if (!branch) {
+    throw new Error('ForkRepository: URL does not match expectations');
+  }
+  return {
+    userOrg: userOrg,
+    repo: repo,
+    branch: branch.name,
+    filepath: residue.slice(branch.name.length + 1), // the remaining residue is the file path
+  };
+} // parseRawGithubUrl()
+
 export async function forkAndOpen(gm, url) {
   // ensure URL matches our expectations
   // (fully qualified raw github url)
-  const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/(.*)$/);
+  const components = matchRawGithubUrl(url);
   console.log('components: ', components);
   if (components && components.length === 4) {
     console.log('forkAndOpen', components);
@@ -172,23 +224,10 @@ export async function forkAndOpen(gm, url) {
     fc.style.display = 'block';
     let userOrg = components[1];
     let repo = components[2];
-    let residue = components[3];
-    // n.b., because both branch names and file paths can contain slashes,
-    // it is hard to distinguish between them in the URL; but we need to know both!
-    // therefore, retrieve the list of branches and match them against the residue (finding a branch that is the starting substring of the residue)
-    let branches = await gm.getBranches(100, 1, userOrg + '/' + repo);
-    console.log('branches', branches, 'residue', residue);
     try {
-      residue = residue.replace('refs/remotes/origin/', ''); // remove remote branch prefix if present
-      residue = residue.replace('refs/heads/', ''); // remove branch prefix if present
-      residue = residue.replace('refs/tags/', ''); // remove tag prefix if present
-      let branch = branches.find((b) => residue.startsWith(b.name));
-      if (!branch) {
-        throw new Error('ForkRepository: URL does not match expectations');
-      }
-      // the remaining residue is the file path
-      components[4] = branch.name;
-      components[5] = residue.slice(branch.name.length + 1);
+      const parsed = await parseRawGithubUrl(gm, url);
+      components[4] = parsed.branch;
+      components[5] = parsed.filepath;
 
       document.querySelector('#forkRepoRequested').innerText = `${userOrg}/${repo}`;
 

@@ -1,4 +1,5 @@
 import * as att from './attribute-classes.js';
+import { isLetsEncodeMode } from './lets-encode.js';
 import * as dutils from './dom-utils.js';
 import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as pageRagenSelector from './page-range-selector.js';
@@ -1529,6 +1530,13 @@ export default class Viewer {
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30)
       );
     }
+    if (isLetsEncodeMode()) {
+      // In Let's Encode mode Eulise keeps her perch but wears the joint logo.
+      // Only a light and a dark variant exist, so this deliberately bypasses the
+      // environment prefix, the asleep state, and the Safari PNG fallback.
+      const owlDir = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
+      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + '.svg';
+    }
     owl.setAttribute('src', owlSrc);
     splashOwl.setAttribute('src', splashOwlSrc);
   } // setMenuColors()
@@ -1891,6 +1899,8 @@ export default class Viewer {
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
       let o = meiFriendSettingsOptions[opt];
+      // Let's Encode settings are meaningless outside a campaign hand-off
+      if (o.letsEncodeOnly && !isLetsEncodeMode()) return;
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {

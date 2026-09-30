@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend is an editor for <a href="https://music-encoding.org">music encodings</a>, hosted at the
+        mei-friend is an editor for <a href="https://music-encoding.org" target="_blank">music encodings</a>, hosted at the
         <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a>.
         Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for
         further information.
@@ -91,8 +91,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projects
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        and <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a>, and <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Got it!' },
@@ -266,11 +266,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Imprint</a>.',
   },
   loadingVerovio: { text: 'Loading Verovio' },
   verovioLoaded: { text: 'loaded' },
@@ -1177,6 +1177,64 @@ export const lang = {
   githubFilepath: { text: 'Path' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit as new file' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html: "<p>You have arrived from <strong>Let's\u00a0Encode!</strong> to work on an encoding task. mei-friend is one of the editors ‘Let's\u00a0Encode!’ offers for this work. Use <strong>Save</strong> in the <strong>Task Management</strong> menu (top left) to keep your progress as you go, and <strong>Complete task</strong> when you are finished, to contribute your work to the campaign.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Complete task' },
+  letsEncodeMenuLabel: { text: 'Task Management' },
+  letsEncodeLoggedInAs: { text: 'Logged in as' },
+  letsEncodeSaveButton: { text: 'Save' },
+  letsEncodeSaving: { text: 'Saving your work…' },
+  letsEncodeSaveFailed: { text: 'Your work could not be saved.' },
+  letsEncodeDismiss: { value: 'Dismiss' },
+  letsEncodeLastSave: { text: 'Last save:' },
+  letsEncodeLastAutosave: { text: 'Autosaved:' },
+  letsEncodeSavedAt: { text: 'Saved at' },
+  letsEncodeExpiresAt: { text: 'Expires at' },
+  letsEncodeTimeRemaining: { text: 'remaining to complete task' },
+  letsEncodeHoursShort: { text: 'h' }, // abbreviated, so it needs no plural: "1 h 20 min remaining"
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: '{n} ago' }, // {n} is a span such as "5 min" or "2 h"
+  letsEncodeJustNow: { text: 'just now' },
+  letsEncodeTimeExpired: { text: 'Time to complete this task has run out' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Autosave interval (minutes)',
+    description:
+      'How often your work is saved automatically while you edit, in minutes. It is only saved when you have made changes; set to 0 to turn autosave off.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: 'Settings for the ‘Let\'s\u00a0Encode!’ task you are working on' },
+  letsEncodeAbandonTaskButton: { text: 'Abandon task' },
+  letsEncodeKeepWorking: { value: 'Keep working' },
+  letsEncodeCompleteAnyway: { value: 'Complete task anyway' },
+  letsEncodeAbandonConfirm: { value: 'Abandon task' },
+  letsEncodeNoChangesPrompt: {
+    text: 'You haven’t changed this encoding. That counts too: completing the task records that it needed no changes. Or you can keep working on it.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: 'Ready to complete this task? Your work will be saved and passed on to ‘Let\'s\u00a0Encode!’, and the task will be closed.',
+  },
+  letsEncodeAbandonPrompt: {
+    text: 'Abandon this task? Your work on it will be lost, including anything you have already saved, and ‘Let\'s\u00a0Encode!’ will be told that you did not complete the task.',
+  },
+  letsEncodeLoading: { text: 'Fetching your task from ‘Let\'s\u00a0Encode!’…' },
+  letsEncodeLogoLinkTitle: { text: 'Open your ‘Let\'s\u00a0Encode!’ campaign in a new tab (your task stays open here)' },
+  letsEncodeDragOverlayText: { text: "Other files can't be opened during a ‘Let's\u00a0Encode!’ task." },
+  letsEncodeCommitting: { text: 'Completing your task…' },
+  letsEncodeCompleted: { text: "Task completed — sending you back to ‘Let's\u00a0Encode!’…" },
+  letsEncodeCommitFailed: { text: 'Your task could not be completed.' },
+  letsEncodeRetryButton: { value: 'Try again' },
+  letsEncodeAbandonButton: { value: "Return to ‘Let's\u00a0Encode!’" },
+  letsEncodeNoCampaignError: {
+    text: "This ‘Let's\u00a0Encode!’ link is incomplete: it names no campaign, so there is nowhere to report back to. Please return to ‘Let's\u00a0Encode!’ and open the task again.",
+  },
+  letsEncodeMissingParameterError: { text: "The ‘Let's\u00a0Encode!’ hand-off was missing a required parameter:" },
+  letsEncodeFileError: { text: 'The handed-over file could not be opened on GitHub.' },
+  letsEncodeCloneError: { text: 'Your task could not be loaded from GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'The file was changed on GitHub while you were working, so your work could not be saved.',
+  },
   commitLog: { text: 'Commit log' },
   githubDate: { text: 'Date' },
   githubAuthor: { text: 'Author' },

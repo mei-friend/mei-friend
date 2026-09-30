@@ -569,8 +569,8 @@ export default class GitManager {
     return await pfs.readdir(this.directory + path);
   }
 
-  async readLog() {
-    return this.cloud.getCommits(this.repo, this.branch);
+  async readLog(path = '', since = '') {
+    return this.cloud.getCommits(this.repo, this.branch, path, since);
   }
 
   async directlyReadFileContents(rawUri) {

@@ -1,4 +1,5 @@
 import { forkRepository, forkRepositoryCancel } from './fork-repository.js';
+import { isLetsEncodeMode, renderLetsEncodeMenu, setLetsEncodeUser } from './lets-encode.js';
 import {
   cm,
   fileChanged,
@@ -336,7 +337,12 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
   console.log('loadFile(), before readFile(), gm.filepath: ', gm.filepath, 'directory: ', gm.directory);
-  gm.readFile()
+  // resolves true once the file is in the editor, false if it could not be
+  // read; callers that need to know when loading has finished (Let's Encode
+  // mode, which holds an overlay up meanwhile) await it. Deliberately resolves
+  // rather than rejects, so existing callers that ignore it cannot produce an
+  // unhandled rejection.
+  return gm.readFile()
     .then(async (content) => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
@@ -366,11 +372,13 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
       const fnStatus = document.getElementById('fileName');
       if (fnStatus) fnStatus.removeAttribute('contenteditable');
       v.allowCursorActivity = true;
+      return true;
     })
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
       githubLoadingIndicator.classList.remove('clockwise');
       v.showAlert(translator.lang.loadFileError.text + ': ' + gm.filepath);
+      return false;
     });
 } // loadFile()
 
@@ -610,6 +618,13 @@ async function proposeFileName(fname) {
 } // proposeFileName()
 
 export async function fillInBranchContents(e) {
+  if (isLetsEncodeMode()) {
+    // The volunteer is bound to one file on one branch. Browsing repositories,
+    // branches or files here would leave "Complete task" armed over a different
+    // encoding, so the task menu takes this menu's place entirely.
+    renderLetsEncodeMenu(gm, doCommit);
+    return;
+  }
   // clone repo and read contents of branch
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add('clockwise');
@@ -668,7 +683,11 @@ export async function fillInBranchContents(e) {
         commitUI.setAttribute('id', 'commitUI');
 
         const commitFileName = document.createElement('span');
-        commitFileName.setAttribute('contenteditable', '');
+        if (!isLetsEncodeMode()) {
+          // In Let's Encode mode the campaign collects the encoding from the
+          // path it handed us, so the file name must not drift: leave it fixed.
+          commitFileName.setAttribute('contenteditable', '');
+        }
         commitFileName.setAttribute('id', 'commitFileName');
         commitFileName.setAttribute('spellcheck', 'false');
 
@@ -841,6 +860,11 @@ async function handleWorkflowsListReceived(resp) {
 }
 
 async function fillInCommitLog(refresh = false) {
+  if (isLetsEncodeMode()) {
+    // renderCommitLog() appends into #GithubMenu, which in Let's Encode mode
+    // holds the task menu; the volunteer has no use for the branch's history.
+    return;
+  }
   if (refresh) {
     const githubLoadingIndicator = document.getElementById('GithubLogo');
     githubLoadingIndicator.classList.add('clockwise');
@@ -1402,12 +1426,19 @@ export function logoutFromGithub() {
 
 export function refreshGithubMenu() {
   console.log('refreshGithubMenu()', gm);
+  let githubMenu = document.getElementById('GithubMenu');
+  if (isLetsEncodeMode()) {
+    // The menu manages one task, so it says so; the account moves to the status
+    // line, next to the campaign and task it is committing to.
+    document.getElementById('GithubName').innerText = translator.lang.letsEncodeMenuLabel.text;
+    gm.getAuthor().then((author) => setLetsEncodeUser(author.name || author.username));
+    renderLetsEncodeMenu(gm, doCommit);
+    return;
+  }
   // display Github name
   gm.getAuthor().then((author) => {
     document.getElementById('GithubName').innerText = author.name;
   });
-  // populate Github menu
-  let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
   githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!gm.filepath) {
@@ -1421,6 +1452,23 @@ export function refreshGithubMenu() {
   }
 } // refreshGithubMenu()
 
+/**
+ * commitButtonLabel
+ * @description The commit button's caption. In Let's Encode mode a commit
+ * completes the task and returns the volunteer to the campaign, so the button
+ * says that instead.
+ * @param {boolean} [asNewFile] whether the file is being committed under a new name
+ * @returns {string}
+ */
+function commitButtonLabel(asNewFile = false) {
+  if (isLetsEncodeMode()) {
+    return translator.lang.letsEncodeCompleteTaskButton.text;
+  }
+  return asNewFile
+    ? translator.lang.githubCommitButton.classes.commitAsNewFile.value
+    : translator.lang.githubCommitButton.value;
+} // commitButtonLabel()
+
 export async function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById('githubCommitButton');
   const commitMessageInput = document.getElementById('commitMessageInput');
@@ -1429,7 +1477,7 @@ export async function setCommitUIEnabledStatus() {
     if (commitFileName.innerText === stripMeiFileName()) {
       // no name change => button reads "Commit"
       commitButton.classList.remove('commitAsNewFile');
-      commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
+      commitButton.setAttribute('value', commitButtonLabel());
       if (await gm.fileChanged()) {
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
@@ -1442,7 +1490,7 @@ export async function setCommitUIEnabledStatus() {
       }
     } else {
       // file name has changed => button reads "Commit as new file"
-      commitButton.setAttribute('value', translator.lang.githubCommitButton.classes.commitAsNewFile.value);
+      commitButton.setAttribute('value', commitButtonLabel(true));
       commitButton.classList.add('commitAsNewFile');
       // enable commit UI regardless of fileChanged state
       commitButton.removeAttribute('disabled');
@@ -1459,7 +1507,7 @@ function setFileNameAfterLoad(ev) {
     if (isMEI) {
       // trim preceding slash
       commitFileName.innerText = stripMeiFileName();
-      commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
+      commitButton.setAttribute('value', commitButtonLabel());
     } else {
       commitFileName.innerText = '...';
       commitButton.setAttribute('value', '...');
@@ -1531,10 +1579,20 @@ async function prepareNewFileForCommit() {
     });
 } // prepareNewFileForCommit()
 
-async function doCommit() {
+/**
+ * doCommit
+ * @description Commit and push the current file.
+ * @returns {Promise<{ok: boolean, transient?: boolean, message?: string}>} the
+ * outcome. `transient` marks a failure worth retrying (a network or push race);
+ * callers that report the outcome elsewhere — Let's Encode mode — rely on this.
+ * Interactive callers may ignore it: failures are reported in the UI regardless.
+ */
+async function doCommit(suppliedMessage = null) {
   const commitButton = document.getElementById('githubCommitButton');
   const messageInput = document.getElementById('commitMessageInput');
-  const message = messageInput.value;
+  // Let's Encode mode supplies the message and renders no commit UI at all, so
+  // the input may not exist; interactive callers still take it from the field.
+  const message = suppliedMessage !== null ? suppliedMessage : messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   // are there unmerged changes on the remote?
   // Guard the check itself: if it throws (e.g. repo in an unusable state after a failed
@@ -1548,12 +1606,18 @@ async function doCommit() {
     cm.setOption('readOnly', false);
     console.error("Couldn't check remote for changes before commit: ", e);
     v.showAlert("Couldn't commit - unable to check remote for changes: " + e);
-    return;
+    return { ok: false, transient: true, message: String(e) };
   }
   if (remoteChanges) {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push due to remote changes");
+    if (isLetsEncodeMode()) {
+      // The campaign's submission expects the encoding on the task branch it
+      // named, so diverting to a new branch and a pull request would leave the
+      // task looking untouched. Report it back instead of offering the choice.
+      return { ok: false, transient: false, message: translator.lang.letsEncodeRemoteChangedError.text };
+    }
     v.showUserPrompt(
       'The remote file has changed since your last commit, and you have local changes that cannot be merged automatically.',
       [
@@ -1596,6 +1660,8 @@ async function doCommit() {
       ],
       'warning'
     );
+    // the prompt's own buttons carry the outcome from here
+    return { ok: false, transient: false, message: 'Remote file has changed' };
   } else {
     try {
       await gm.add();
@@ -1608,7 +1674,7 @@ async function doCommit() {
       // trapping the user in the "remote has changed" modal (issue #185).
       updateGithubInLocalStorage();
       console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
-      messageInput.value = '';
+      if (messageInput) messageInput.value = '';
       console.log('Status after commit: ', await gm.status());
       setCommitUIEnabledStatus();
       updateFileStatusDisplay();
@@ -1616,11 +1682,13 @@ async function doCommit() {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.setOption('readOnly', false);
       fillInCommitLog('withRefresh');
+      return { ok: true };
     } catch (e) {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.setOption('readOnly', false);
       log("Sorry, couldn't commit (error during commit or push to GitHub)");
       console.error("Sorry, couldn't commit (error during commit or push)", e);
+      return { ok: false, transient: true, message: String(e) };
     }
   }
 } // doCommit()
@@ -1687,7 +1755,13 @@ function generateGithubActionsParamConfig(inputs, input, custom = false) {
   return inputConfig;
 }
 
-export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), branch = gm.branch) {
+export async function checkAndClone(
+  file,
+  branchurl = gm.cloud.getCloneURL(),
+  branch = gm.branch,
+  onError = showCloneErrorAlert,
+  onLoaded = () => {}
+) {
   // check if the repo is very large; if so, ask user to confirm
   let repo = gm.getRepoFromCloneURL(branchurl);
   let size = await gm.getRepoSize(repo);
@@ -1718,12 +1792,13 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
             }
             // proceed with clone
             gm.clone(branchurl, branch)
-              .then(() => {
-                loadFile(file);
+              .then(async () => {
+                const loaded = await loadFile(file);
                 updateFileStatusDisplay();
+                onLoaded(loaded);
               })
               .catch((e) => {
-                showCloneErrorAlert(e);
+                onError(e);
               });
           },
         },
@@ -1738,12 +1813,13 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
       remoteFileChanged.innerHTML = '';
     }
     gm.clone(branchurl, branch)
-      .then(() => {
-        loadFile(file);
+      .then(async () => {
+        const loaded = await loadFile(file);
         updateFileStatusDisplay();
+        onLoaded(loaded);
       })
       .catch((e) => {
-        showCloneErrorAlert(e);
+        onError(e);
       });
   }
 }

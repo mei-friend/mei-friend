@@ -61,6 +61,47 @@ export async function forceSetCheckbox(page: Page, selector: string, checked: bo
 }
 
 /**
+ * Drags a file from outside the browser onto the page and drops it, as synthetic
+ * drag events carrying a real DataTransfer (Playwright's own drag API only moves
+ * elements within the page). The drop lands on the overlay that the drag shows,
+ * as a real one would. Returns what the page did with the drag: whether it was
+ * accepted, the drop effect it asked for, and the overlay's text.
+ */
+export async function dropFile(page: Page, name: string, contents: string) {
+  return page.evaluate(
+    ({ name, contents }) => {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(new File([contents], name, { type: 'application/xml' }));
+      // Chromium ignores dropEffect on a constructed DataTransfer (it is 'none' and
+      // stays so), which would hide whether the page refused the drop. Record what
+      // the page asks for instead, starting from 'copy' as a browser's file drag does.
+      let requestedDropEffect = 'copy';
+      Object.defineProperty(dataTransfer, 'dropEffect', {
+        get: () => requestedDropEffect,
+        set: (value: string) => (requestedDropEffect = value),
+      });
+      const fire = (target: Element, type: string) => {
+        const ev = new DragEvent(type, { dataTransfer, bubbles: true, cancelable: true });
+        target.dispatchEvent(ev);
+        return ev;
+      };
+      fire(document.body, 'dragenter');
+      const over = fire(document.body, 'dragover');
+      const overlay = document.querySelector('.dragOverlay') as HTMLElement;
+      const seen = {
+        overlayShown: getComputedStyle(overlay).display !== 'none',
+        overlayText: (document.getElementById('dragOverlayText') as HTMLElement).textContent,
+        dropEffect: dataTransfer.dropEffect,
+        dragoverPrevented: over.defaultPrevented,
+      };
+      const drop = fire(overlay, 'drop');
+      return { ...seen, dropPrevented: drop.defaultPrevented, overlayShownAfterDrop: overlay.style.display !== 'none' };
+    },
+    { name, contents }
+  );
+}
+
+/**
  * Loads a local MEI file by intercepting the hidden file-chooser dialog that
  * `File → Open` opens. Use this when a test fixture needs to be self-contained
  * (not reachable over the network).
