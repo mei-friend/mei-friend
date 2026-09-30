@@ -342,6 +342,8 @@ function letsEncodeCommitMessage(kind = 'completed') {
 let letsEncodeCommitInFlight = false;
 let letsEncodeAutosaveTimer = null;
 let letsEncodeClockTimer = null;
+// the task menu's commit routine, kept for the Save shortcut
+let letsEncodeCommit = null;
 
 /**
  * letsEncodeAutosaveMinutes
@@ -556,6 +558,7 @@ export function renderLetsEncodeMenu(gm, commit) {
   // GitHub menu tall enough for its lists
   menu.classList.add('letsEncodeTaskMenu');
   menu.textContent = '';
+  letsEncodeCommit = commit;
 
   // The three items are named by their pack keys, so translateGui() relabels
   // them on a language change like any other menu entry.
@@ -868,6 +871,52 @@ export function retargetLogoLink() {
   link.rel = 'noopener';
   link.title = translator.lang.letsEncodeLogoLinkTitle.text;
 } // retargetLogoLink()
+
+/**
+ * Keymap commands of the File menu, which is hidden in Let's Encode mode: the
+ * editor is bound to the volunteer's task file, and opening or importing
+ * another encoding would have "Complete task" commit the wrong file. The
+ * downloads and the PDF preview are harmless but go too, with their menu.
+ * downloadSpeedMei has no menu entry but is a File action all the same.
+ */
+const letsEncodeBlockedCommands = new Set([
+  'open',
+  'downloadMei',
+  'downloadMeiBasic',
+  'downloadSpeedMei',
+  'togglePdfMode',
+  'generateUrl',
+]);
+
+/**
+ * hideFileMenu
+ * @description Remove the File menu from the navbar in Let's Encode mode (see
+ * letsEncodeBlockedCommands for why, and for its keyboard shortcuts).
+ */
+export function hideFileMenu() {
+  const fileMenu = document.getElementById('fileMenuTitle')?.closest('.dropdown');
+  if (fileMenu && letsEncodeTask) fileMenu.style.display = 'none';
+} // hideFileMenu()
+
+/**
+ * handleLetsEncodeShortcut
+ * @description Intercept the File menu's keyboard shortcuts in Let's Encode
+ * mode. Save (Cmd/Ctrl-S) saves the task, as the task menu's Save does; the
+ * rest do nothing. Nothing is saved before the task menu exists (not yet
+ * logged in), nor while an overlay is up, which a save would replace.
+ * @param {string} methodName the keymap command
+ * @returns {boolean} true when handled here, so the keymap must not run it
+ */
+export function handleLetsEncodeShortcut(methodName) {
+  if (!letsEncodeTask || !letsEncodeBlockedCommands.has(methodName)) return false;
+  const overlay = document.getElementById('letsEncodeOverlay');
+  if (methodName === 'downloadMei' && letsEncodeCommit && !overlay?.classList.contains('active')) {
+    saveLetsEncodeTask(letsEncodeCommit);
+  } else {
+    console.log('keyMap method ' + methodName + " disabled in Let's Encode mode.");
+  }
+  return true;
+} // handleLetsEncodeShortcut()
 
 /**
  * returnToLetsEncode

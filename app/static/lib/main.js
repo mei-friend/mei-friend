@@ -117,6 +117,8 @@ import {
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
   addLetsEncodeParams,
+  handleLetsEncodeShortcut,
+  hideFileMenu,
   initLetsEncodeMode,
   isLetsEncodeMode,
   noteLetsEncodeInitiatedLogin,
@@ -516,6 +518,7 @@ function onLanguageLoaded() {
     // done here, not after the splash: the logo is a live link behind the
     // overlay, and following it would cost the volunteer their work
     retargetLogoLink();
+    hideFileMenu();
     if (new Date(letsEncodeSplashDate) > new Date(splashDate)) {
       effectiveSplashDate = letsEncodeSplashDate;
     }
@@ -2915,6 +2918,9 @@ function setKeyMap() {
         if (methodName !== undefined) {
           ev.stopPropagation();
           ev.preventDefault();
+          // swallowed rather than passed on, or the browser would open its own
+          // save, print, or open-file dialog (the last navigates the tab away)
+          if (handleLetsEncodeShortcut(methodName)) return;
           console.log('keyMap method ' + methodName + '.', cmd[methodName]);
           cmd[methodName](); // execute the function
         }
