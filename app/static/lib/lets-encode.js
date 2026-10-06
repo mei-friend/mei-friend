@@ -16,7 +16,8 @@
  * <base>/<campaign>?task=<task>&mf_status=complete|failed[&mf_msg=...].
  */
 
-import { cm, storage, translator, version } from './main.js';
+import { cm, storage, translator, v, validator, version } from './main.js';
+import { isSafari } from './defaults.js';
 import { checkAndClone } from './github-menu.js';
 import { parseRawGithubUrl } from './fork-repository.js';
 
@@ -25,8 +26,8 @@ import { parseRawGithubUrl } from './fork-repository.js';
 // logged in, so the caller is better placed to say which instance to use.
 // Reporting an ARRIVAL failure is likewise left to main.js: `v` is assigned
 // late, in completeInitialLoad(), so it is not available that early. Everything
-// this module asks the volunteer is asked through its own overlay, so the
-// viewer is not needed here at all.
+// this module asks the volunteer is asked through its own overlay; the viewer
+// is consulted only for validation, which runs long after it exists.
 
 const defaultLetsEncodeBaseUrl = 'https://lets-encode.mdw.ac.at';
 
@@ -994,16 +995,58 @@ export async function openLetsEncodeFile(gm, url = letsEncodeTask.file) {
 } // openLetsEncodeFile()
 
 /**
+ * validateLetsEncodeTask
+ * @description Validates the encoding as it stands in the editor. Run afresh
+ * rather than read off the status icon, which lags behind edits and is never
+ * updated at all with auto-validation off. A schema that failed to load earlier
+ * is retried here, since the failure may well have been passing.
+ * @returns {Promise<Array|null>} the validator's messages (empty when valid), or
+ * null when the encoding could not be checked: no schema, the schema or the
+ * validator unavailable, or Safari, where validation is switched off
+ */
+async function validateLetsEncodeTask() {
+  if (isSafari || !v || !validator || !v.validatorInitialized) return null;
+  if (!v.validatorWithSchema && v.currentSchema) await v.replaceSchema(v.currentSchema);
+  if (!v.validatorWithSchema) return null;
+  try {
+    const messages = JSON.parse(await validator.validateNG(cm.getValue()));
+    return Array.isArray(messages) ? messages : null;
+  } catch (e) {
+    console.warn("Let's Encode: could not validate the encoding ", e);
+    return null;
+  }
+} // validateLetsEncodeTask()
+
+/**
  * completeLetsEncodeTask
- * @description "Complete task": commit, then return to the campaign. An
- * unchanged encoding still commits — the volunteer judging it already correct is
- * itself a contribution, and only a commit puts that judgement in the campaign's
- * log — but it asks first, so a misclick is not mistaken for a decision.
+ * @description "Complete task": commit, then return to the campaign. A campaign
+ * only takes valid MEI, so an encoding that is invalid, or that cannot be
+ * checked, is refused and the volunteer left to fix it; saving is unaffected.
+ * An unchanged encoding still commits — the volunteer judging it already
+ * correct is itself a contribution, and only a commit puts that judgement in
+ * the campaign's log — but it asks first, so a misclick is not mistaken for a
+ * decision.
  * @param {Function} commit an async commit taking a message and returning
  * { ok, transient, message }
  * @param {object} gm GitManager instance, consulted for whether anything changed
  */
 export async function completeLetsEncodeTask(commit, gm) {
+  showLetsEncodeOverlay({ message: translator.lang.letsEncodeValidating.text, state: 'busy' });
+  const mei = cm.getValue();
+  const messages = await validateLetsEncodeTask();
+  if (!messages || messages.length > 0) {
+    // underline the problems and open the report, as a manual validation would
+    if (messages) v.highlightValidation(mei, messages, true);
+    showLetsEncodeOverlay({
+      message: messages
+        ? translator.lang.letsEncodeInvalidPrompt.text
+        : translator.lang.letsEncodeCannotValidatePrompt.text,
+      state: 'confirm',
+      layout: 'inline',
+      buttons: [{ label: translator.lang.letsEncodeKeepWorking.value, action: () => hideLetsEncodeOverlay() }],
+    });
+    return;
+  }
   let changed = true;
   try {
     changed = await gm.fileChanged();
