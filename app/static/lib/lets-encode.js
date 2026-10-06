@@ -691,13 +691,15 @@ let letsEncodeClaimedAt = '';
 /**
  * loadLetsEncodeExpiry
  * @description Read how long the volunteer has left from the campaign's lock
- * table. Read from their own clone rather than upstream: a volunteer's own row
- * is not changed by anyone else's activity, so the fork's copy is good for this
- * purpose, and it costs no API call. The remaining time is taken ONLY from an
- * `expires` column — it is not derived from `timestamp` plus the campaign's
- * `stale_after_minutes`, which is becoming per-campaign configurable. Until
- * that column exists, this shows nothing rather than guessing.
- * @param {object} gm GitManager instance, holding the clone
+ * table, on the repository's default branch. NOT from the clone: Let's Encode
+ * cuts the task branch from the commit before the claim, and records the claim
+ * on the default branch only, so the task branch never holds this task's row.
+ * The default branch is asked for by leaving out `ref`, as its name is the
+ * campaign's to choose. The remaining time is taken ONLY from an `expires`
+ * column — it is not derived from `timestamp` plus the campaign's
+ * `stale_after_minutes`, which is becoming per-campaign configurable. Without
+ * that column, this shows nothing rather than guessing.
+ * @param {object} gm GitManager instance, bound to the task's repository
  */
 export async function loadLetsEncodeExpiry(gm) {
   // cleared up front and rendered on every exit, so a reading that is no longer
@@ -707,12 +709,20 @@ export async function loadLetsEncodeExpiry(gm) {
     if (!letsEncodeTask) return;
     let csv;
     try {
-      csv = await gm.readFile('tracking/lock.csv');
+      const res = await gm.cloud.githubFetch(`https://api.github.com/repos/${gm.repo}/contents/tracking/lock.csv`, {
+        method: 'GET',
+        headers: { ...gm.cloud.apiHeaders, Accept: 'application/vnd.github.raw' },
+        cache: 'no-store', // the claim was written moments before the volunteer arrived
+      });
+      if (!res.ok) {
+        console.log("Let's Encode: no lock table in this repository, so no time remaining is shown", res.status);
+        return;
+      }
+      csv = await res.text();
     } catch (e) {
-      console.log("Let's Encode: no lock table in this repository, so no time remaining is shown");
+      console.warn("Let's Encode: could not read the lock table ", e);
       return;
     }
-    if (typeof csv !== 'string') return;
     const lines = csv.split(/\r?\n/).filter((line) => line.trim());
     if (lines.length < 2) return;
     const header = lines[0].split(',').map((cell) => cell.trim());
@@ -984,8 +994,8 @@ export async function openLetsEncodeFile(gm, url = letsEncodeTask.file) {
         // the task is in the editor: hand it over (loadFile has already cleared
         // the editor's read-only state)
         hideLetsEncodeOverlay();
-        // the clone is present now, so the lock table is readable; the claim
-        // timestamp it yields then bounds the search for earlier saves
+        // the claim timestamp in the lock table bounds the search for earlier
+        // saves, so the expiry is read first
         loadLetsEncodeExpiry(gm).then(() => loadLetsEncodeLastSave(gm));
       } else {
         returnToLetsEncode('failed', translator.lang.letsEncodeFileError.text);
