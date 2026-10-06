@@ -1215,6 +1215,13 @@ export const lang = {
   letsEncodeConfirmCompletePrompt: {
     text: 'Ready to complete this task? Your work will be saved and passed on to ‘Let\'s\u00a0Encode!’, and the task will be closed.',
   },
+  letsEncodeValidating: { text: 'Checking your encoding…' },
+  letsEncodeInvalidPrompt: {
+    text: 'Your encoding isn’t valid MEI yet, and a task can only be completed once it is. The validation report lists the problems and where to find them. You can keep saving your work in the meantime.',
+  },
+  letsEncodeCannotValidatePrompt: {
+    text: 'Your encoding can’t be checked right now, and a task can only be completed once it is known to be valid MEI. Please save your work and try again later.',
+  },
   letsEncodeAbandonPrompt: {
     text: 'Abandon this task? Your work on it will be lost, including anything you have already saved, and ‘Let\'s\u00a0Encode!’ will be told that you did not complete the task.',
   },

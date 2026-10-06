@@ -19,7 +19,7 @@
         <score>
           <scoreDef>
             <staffGrp>
-              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" key.sig="0"/>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
             </staffGrp>
           </scoreDef>
           <section xml:id="topSection">

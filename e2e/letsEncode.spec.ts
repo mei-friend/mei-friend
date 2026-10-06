@@ -214,6 +214,68 @@ test.describe('2 File menu shortcuts', () => {
     await expect.poll(async () => (await commits()).length).toBe(2);
     expect(seen).toEqual([]); // never a download
   });
+
+  test("2.5 In Let's Encode, Complete task needs valid MEI", async ({ page }) => {
+    await setupLetsEncodePage(page);
+    // Stand in for the task file, which only arrives after the login these tests
+    // stop short of: into the editor, and its schema (from music-encoding.org)
+    // into the validator, as loadDataInEditor() does.
+    const mei = readFileSync(join(__dirname, 'fixtures', 'expansion-repeat.mei'), 'utf-8');
+    await page.evaluate(async (mei) => {
+      const m = await import('/static/lib/main.js');
+      m.cm.setValue(mei);
+      await m.v.checkSchema(mei);
+    }, mei);
+    await expect
+      .poll(() => page.evaluate(async () => !!(await import('/static/lib/main.js')).v?.validatorWithSchema), {
+        timeout: 30000,
+      })
+      .toBe(true);
+    // Complete the task with the editor's contents first rewritten by `edit`,
+    // then report what the overlay asked and whether anything was committed.
+    const complete = (edit: string) =>
+      page.evaluate(async (edit) => {
+        const m = await import('/static/lib/main.js');
+        const le = await import('/static/lib/lets-encode.js');
+        const commits: string[] = [];
+        if (edit === 'invalid') m.cm.setValue(m.cm.getValue().replace(/<note\b/, '<note bogus="1"'));
+        if (edit === 'unchecked') {
+          m.v.validatorWithSchema = false;
+          m.v.currentSchema = '';
+        }
+        await le.completeLetsEncodeTask(
+          async (msg: string) => {
+            commits.push(msg);
+            return { ok: false, transient: false };
+          },
+          { fileChanged: async () => true }
+        );
+        const buttons = ['letsEncodeOverlayButton1', 'letsEncodeOverlayButton2']
+          .map((id) => document.getElementById(id) as HTMLInputElement)
+          .filter((b) => b.style.display !== 'none')
+          .map((b) => b.value);
+        const message = document.getElementById('letsEncodeOverlayMessage')!.innerText;
+        const report = document.getElementById('validation-report')?.style.visibility;
+        le.hideLetsEncodeOverlay();
+        return { message, buttons, report, commits };
+      }, edit);
+
+    const valid = await complete('none');
+    expect(valid.message).toMatch(/^Ready to complete this task\?/);
+    expect(valid.buttons).toEqual(['Keep working', 'Complete task']);
+
+    const invalid = await complete('invalid');
+    expect(invalid.message).toMatch(/isn’t valid MEI yet/);
+    expect(invalid.buttons).toEqual(['Keep working']);
+    expect(invalid.report).toBe('visible'); // the problems are shown
+    expect(invalid.commits).toEqual([]);
+
+    // no schema to check against: refused too, rather than waved through
+    const unchecked = await complete('unchecked');
+    expect(unchecked.message).toMatch(/can’t be checked right now/);
+    expect(unchecked.buttons).toEqual(['Keep working']);
+    expect(unchecked.commits).toEqual([]);
+  });
 });
 
 test.describe('3 Drag and drop', () => {
