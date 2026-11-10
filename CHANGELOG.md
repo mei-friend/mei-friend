@@ -1,5 +1,10 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.6.1 patch: Verovio font registration
+
+* Prepare for Verovio's runtime font registration ([rism-digital/verovio#4404](https://github.com/rism-digital/verovio/pull/4404)): with toolkits that bundle only Leipzig and Bravura, selecting Gootville, Leland or Petaluma registers it from mei-friend's own copies (`static/fonts`, with SMuFL metadata) instead of silently rendering Leipzig. PDF export uses the same copies, which also fixes it for Gootville and Leland, whose previous download URLs had gone dead
+
+
 ### 1.6.0 Let's Encode! integration (develop)
 * Splash text updated to acknowledge Let's Encode! funding (for all users) and to provide LE-specific context when arriving from Let's Encode (see below). New letsEncodeSplashDate allows updating LE-only splash content in future
 * New "Let's Encode!" mode, entered with the `le_campaignname` and `le_taskid` URL parameters alongside `file`: logs the volunteer in to the handed-over repository, branch, and file through the GitHub integration so their work can be committed, turns the git menu into a "Task Management" menu, and returns them to the campaign they came from (`le_base` if given, else the referrer, else `lets-encode.mdw.ac.at`) with the outcome (`mf_status`, and `mf_msg` on failure). Failed commits are retried automatically, then leave the choice between another attempt and returning without committing.
