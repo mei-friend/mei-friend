@@ -45,14 +45,17 @@ console.error = function () {
   _origConsoleError.apply(console, arguments);
 };
 
-// music font list for PDF export
+// music font list: otf for PDF export; fonts with SMuFL metadata are those
+// Verovio no longer bundles (toolkits with registerMusicFont() ship only
+// Leipzig and Bravura), registered at runtime from mei-friend's own copies
 let fontList = {
-  Leipzig: 'https://raw.githubusercontent.com/rism-digital/leipzig/main/Leipzig.otf',
-  Bravura: 'https://raw.githubusercontent.com/steinbergmedia/bravura/master/redist/otf/Bravura.otf',
-  Gootville: 'https://raw.githubusercontent.com/musescore/MuseScore/master/fonts/gootville/Gootville.otf',
-  Leland: 'https://raw.githubusercontent.com/musescore/MuseScore/master/fonts/leland/Leland.otf',
-  Petaluma: 'https://raw.githubusercontent.com/steinbergmedia/petaluma/master/redist/otf/Petaluma.otf',
+  Leipzig: { otf: 'https://raw.githubusercontent.com/rism-digital/leipzig/main/Leipzig.otf' },
+  Bravura: { otf: 'https://raw.githubusercontent.com/steinbergmedia/bravura/master/redist/otf/Bravura.otf' },
+  Gootville: { otf: '../fonts/Gootville/Gootville.otf', metadata: '../fonts/Gootville/gootville_metadata.json' },
+  Leland: { otf: '../fonts/Leland/Leland.otf', metadata: '../fonts/Leland/leland_metadata.json' },
+  Petaluma: { otf: '../fonts/Petaluma/Petaluma.otf', metadata: '../fonts/Petaluma/petaluma_metadata.json' },
 };
+let registeredFonts = new Set(); // music fonts registration was attempted for, per toolkit instance
 
 loadVerovio = () => {
   /* create the worker toolkit instance */
@@ -66,6 +69,16 @@ loadVerovio = () => {
       loadDataInvoked = true;
       return _origLoadData(...args);
     };
+    // Wrap setOptions so that a music font the toolkit does not bundle is
+    // registered before it is selected (otherwise Verovio falls back to Leipzig)
+    registeredFonts = new Set();
+    if (typeof tk.registerMusicFont === 'function') {
+      const _origSetOptions = tk.setOptions.bind(tk);
+      tk.setOptions = function (options) {
+        if (options && options.font) registerMusicFont(options.font);
+        return _origSetOptions(options);
+      };
+    }
     tkOptions = {};
     let message = {
       cmd: 'vrvLoaded',
@@ -462,7 +475,7 @@ addEventListener(
         };
 
         // fetch font into a font buffer and await registration
-        fetch(fontList[tkOptions.font])
+        fetch(fontList[tkOptions.font].otf)
           .then((response) => response.arrayBuffer())
           .then((fontBuffer) => {
             doc.registerFont(tkOptions.font, fontBuffer);
@@ -616,6 +629,35 @@ addEventListener(
   },
   false
 );
+
+/**
+ * Registers a music font that the toolkit does not bundle, once per toolkit
+ * instance. Loads synchronously (allowed in workers), as the message handler
+ * calls setOptions synchronously.
+ * @param {string} fontName (e.g., 'Leland')
+ */
+function registerMusicFont(fontName) {
+  const font = fontList[fontName];
+  if (!font || !font.metadata || registeredFonts.has(fontName)) return;
+  registeredFonts.add(fontName);
+  try {
+    const family = tk.registerMusicFont(fetchSync(font.otf, 'arraybuffer'), fetchSync(font.metadata));
+    if (!family) throw new Error('rejected by Verovio');
+    console.info('VerovioWorker: Registered music font ' + family + '.');
+  } catch (err) {
+    // console.warn surfaces to the user with Verovio's own warnings
+    console.warn('Could not load music font ' + fontName + ' (' + err.message + '); using Leipzig instead.');
+  }
+} // registerMusicFont()
+
+function fetchSync(url, responseType = '') {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url, false);
+  xhr.responseType = responseType;
+  xhr.send();
+  if (xhr.status !== 200) throw new Error(url + ': HTTP ' + xhr.status);
+  return xhr.response;
+} // fetchSync()
 
 function postError(result, context, err) {
   const msg = context + ': ' + err;
