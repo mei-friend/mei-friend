@@ -15,7 +15,8 @@ import {
   measureIdsInEncoding,
 } from './setup';
 
-// Fixture layout (see e2e/fixtures/multi-mdiv-speed.mei):
+// Fixture layout (see e2e/fixtures/multi-mdiv-speed.mei), each mdiv carrying a
+// <staffGrp><label> of its own ('Mdiv One' / 'Mdiv Two' / 'Mdiv Three'):
 //   mdiv1: m1a, <pb>, m1b                          (1 staff)
 //   mdiv2: m2a, <pb>, m2b                           (2 staves) -- starts
 //          immediately after mdiv1 with NO separating break, so m1b and m2a
@@ -192,7 +193,47 @@ test.describe('1 Speed mode paginates and renders across multiple mdivs.', () =>
     });
   });
 
-  test("1.7 The section-select dropdown jumps to each mdiv's actual first page", async ({ page }) => {
+  test('1.7 Each mdiv shows its staffGrp label on the page that opens it', async ({ page }) => {
+    await loadFixture(page, 'multi-mdiv-speed.mei', multiMdiv, 'note-m1a-1');
+    await setSpeedMode(page, true, 'line');
+
+    // Two things Verovio only draws once per document: a <staffGrp><label> on
+    // the first system of a score, and the title block (here generated from
+    // <meiHead>) on the first page. Speed mode prepends a context page to
+    // every page but the first, so the label is only where it belongs if that
+    // context page is kept out of the mdiv it precedes -- and the title block
+    // only stays off the page the user sees as long as that context page
+    // remains a page of its own.
+    const labels = async () =>
+      (await page.locator('#verovio-panel g.label').allTextContents()).map((t) => t.trim()).filter(Boolean);
+    const pageHead = async () =>
+      (await page.locator('#verovio-panel g.pgHead, #verovio-panel g.pgHead2').allTextContents()).join(' ');
+    const title = 'Multi-mdiv speed-mode fixture';
+
+    // page 1 opens mdiv1 and is the document's title page
+    expect(await labels()).toEqual(['Mdiv One']);
+    expect(await pageHead()).toContain(title);
+
+    // page 2 continues mdiv1 (no label) and opens mdiv2 (label)
+    await page.locator('#nextPageButton').click();
+    await expect(page.locator('#note-m2a-s1-1')).toBeVisible();
+    expect(await labels()).toEqual(['Mdiv Two']);
+    expect(await pageHead()).not.toContain(title);
+
+    // page 3 merely continues mdiv2
+    await page.locator('#nextPageButton').click();
+    await expect(page.locator('#note-m2b-s1-1')).toBeVisible();
+    expect(await labels()).toEqual([]);
+    expect(await pageHead()).not.toContain(title);
+
+    // page 4 opens mdiv3 and is preceded by speed mode's context page
+    await page.locator('#nextPageButton').click();
+    await expect(page.locator('#note-m3a-1')).toBeVisible();
+    expect(await labels()).toEqual(['Mdiv Three']);
+    expect(await pageHead()).not.toContain(title);
+  });
+
+  test("1.8 The section-select dropdown jumps to each mdiv's actual first page", async ({ page }) => {
     await loadFixture(page, 'multi-mdiv-speed.mei', multiMdiv, 'note-m1a-1');
     await setSpeedMode(page, true, 'line');
 
@@ -219,7 +260,7 @@ test.describe('1 Speed mode paginates and renders across multiple mdivs.', () =>
     });
   });
 
-  test('1.8 A single-mdiv document still renders correctly in speed mode (regression)', async ({ page }) => {
+  test('1.9 A single-mdiv document still renders correctly in speed mode (regression)', async ({ page }) => {
     await test.step('Open a single-mdiv MEI file and enable speed mode', async () => {
       await openUrl(page, woo70Url);
       await expect(page.locator('#note-0000001631474113')).toBeVisible({ timeout: 30000 });
@@ -240,7 +281,7 @@ test.describe('1 Speed mode paginates and renders across multiple mdivs.', () =>
     });
   });
 
-  test('1.9 A real 7-movement multi-mdiv work pages through completely with no empty pages', async ({ page }) => {
+  test('1.10 A real 7-movement multi-mdiv work pages through completely with no empty pages', async ({ page }) => {
     test.setTimeout(180000);
     const encoding = await (await fetch(woo64Url)).text();
     const perMdiv = measureIdsPerMdiv(encoding);

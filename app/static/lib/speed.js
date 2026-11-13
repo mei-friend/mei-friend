@@ -82,7 +82,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   // page/measure counters, threaded across all scores below so counting
   // continues correctly across an mdiv boundary instead of restarting at
   // page 1 for every mdiv
-  let state = { p: 1, mNo: 1, done: false, matched: false, countNow: false };
+  let state = { p: 1, mNo: 1, done: false, matched: false, countNow: false, earlierContent: false };
   let anyDest = false; // has any mdiv contributed pageNo's content yet?
   /** @type {Element | null} */
   let lastScoreDef = null; // `<scoreDef>` of the last mdiv contributing to pageNo
@@ -123,6 +123,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     }
 
     state.matched = false; // reset: does THIS mdiv actually contain pageNo?
+    state.earlierContent = false; // reset: does THIS mdiv have content before pageNo?
     let digger = readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion);
     xmlScore.childNodes.forEach((item) => {
       if (item.nodeName === 'section') {
@@ -133,6 +134,24 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     });
 
     if (!state.matched) continue; // pageNo isn't in this mdiv; try the next one
+
+    if (!anyDest && !state.earlierContent) {
+      // No measure of this mdiv sits on an earlier page, so the requested page
+      // opens the mdiv, and is therefore this mdiv's first system. Verovio
+      // draws `<staffGrp><label>` (and anything else it only puts on a score's
+      // first system) on the first system it engraves -- which would be the
+      // leading dummy measure, i.e. the context page nobody ever sees. Move
+      // that dummy into an `<mdiv>` of its own so the requested page really is
+      // this mdiv's first system.
+      // The context page has to stay a page of its own: it also keeps whatever
+      // Verovio only puts on the first page of a document -- `<pgHead>`, or the
+      // title block it generates from `<meiHead>` -- off the requested page.
+      // The dummy stands in for the *previous* page, which belongs to the
+      // previous mdiv, so it takes that mdiv's staff count.
+      const prevScoreDef = s > 0 ? xmlScores[s - 1].querySelector('music scoreDef') : null;
+      const dummyMdiv = moveDummyMeasureToOwnMdiv(xmlDoc, baseSection, prevScoreDef || scoreDef);
+      if (dummyMdiv) bodyEl.appendChild(dummyMdiv);
+    }
 
     bodyEl.appendChild(mdiv);
     anyDest = true;
@@ -200,7 +219,8 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * closure takes as argument.
  * @param {Breaks} breaks
  * @param {string} countingMode
- * @param {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean}} state
+ * @param {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean,
+ *   earlierContent: boolean}} state
  * Page/measure counters shared across every `readSection()` call made for
  * one `getPageFromDom()` invocation (one call per candidate `<mdiv>`), so
  * counting continues correctly across an mdiv boundary instead of
@@ -214,7 +234,10 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * (once the first measure of the whole document is seen) must stay shared
  * too, so a later mdiv's own leading break is recognised as a real break
  * rather than re-triggering the "ignore breaks before the first measure"
- * rule for every mdiv.
+ * rule for every mdiv. `state.earlierContent` records whether the mdiv
+ * currently being walked has measures on a page before `pageNo`; the caller
+ * resets it per mdiv and uses it to tell a page that *opens* an mdiv from one
+ * that continues it.
  * @param {string} meiVersion  MEI version of the source document, deciding
  * whether key signatures are written as `@keysig` (MEI >= 5) or `@key.sig`.
  * @returns {function(Element): Element}  Recursive closure that takes an
@@ -253,6 +276,12 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
       // console.info('digDeeper(' + pageNo + '): p: ' + state.p +
       //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
+      // remember whether this mdiv already had measures on an earlier page
+      // (checked only until the first one is found, so at most a handful of
+      // lookups per mdiv)
+      if (state.p < pageNo && !state.earlierContent) {
+        if (currentNodeName === 'measure' || currentNode.querySelector('measure')) state.earlierContent = true;
+      }
       // copy expansion elements to new section
       if (currentNodeName === 'expansion') {
         newSection.appendChild(currentNode.cloneNode(true));
@@ -1336,6 +1365,45 @@ export function xmlDefs(meiVersion = defaultMeiVersion, meiProfile = defaultMeiP
     '" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>';
   return xml;
 } // xmlDefs()
+
+/**
+ * Takes the leading dummy measure and its `<pb>` out of `baseSection` and
+ * returns them wrapped in an `<mdiv>` of their own, so that the mdiv they were
+ * taken from starts on the page the user actually sees (see the call site).
+ * The returned `<mdiv>` gets its own copy of `scoreDefSrc`, stripped of
+ * `@xml:id`s (they would be duplicates of the real mdiv's) and of labels (they
+ * belong on the visible page, not on the dummy one).
+ * @param {Document} xmlDoc
+ * @param {Element} baseSection  `<section>` currently holding the dummy measure
+ * @param {Element} scoreDefSrc  `<scoreDef>` to model the dummy page on
+ * @returns {Element | null} The new `<mdiv>`, or `null` if `baseSection` does
+ * not start with a dummy measure followed by its `<pb>` (which is the case when
+ * `readSection()` moved the `<pb>` into an `<ending>`).
+ */
+function moveDummyMeasureToOwnMdiv(xmlDoc, baseSection, scoreDefSrc) {
+  const measure = baseSection.firstElementChild;
+  const pb = measure?.nextElementSibling;
+  if (measure?.getAttributeNS(xmlNameSpace, 'id') !== 'startingMeasure') return null;
+  if (pb?.getAttributeNS(xmlNameSpace, 'id') !== 'startingPb') return null;
+
+  const scoreDef = /** @type {Element} */ (scoreDefSrc.cloneNode(true));
+  scoreDef.querySelectorAll('label, labelAbbr').forEach((el) => el.remove());
+  for (const el of [scoreDef, ...scoreDef.querySelectorAll('*')]) el.removeAttributeNS(xmlNameSpace, 'id');
+
+  const mdiv = xmlDoc.createElementNS(meiNameSpace, 'mdiv');
+  const score = xmlDoc.createElementNS(meiNameSpace, 'score');
+  const section = xmlDoc.createElementNS(meiNameSpace, 'section');
+  mdiv.appendChild(score);
+  score.appendChild(scoreDef);
+  score.appendChild(section);
+  // rebuild the measure, as the dummy page now follows a different scoreDef
+  const dummy = dummyMeasure(xmlDoc, countStaves(scoreDef));
+  dummy.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
+  measure.remove();
+  section.appendChild(dummy);
+  section.appendChild(pb);
+  return mdiv;
+} // moveDummyMeasureToOwnMdiv()
 
 /**
  * @param {Document} document  Any Document. Is only needed for

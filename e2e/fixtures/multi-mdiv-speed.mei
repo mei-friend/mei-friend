@@ -19,6 +19,7 @@
         <score>
           <scoreDef>
             <staffGrp>
+              <label xml:id="labelMdiv1">Mdiv One</label>
               <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
             </staffGrp>
           </scoreDef>
@@ -54,6 +55,7 @@
         <score>
           <scoreDef>
             <staffGrp>
+              <label xml:id="labelMdiv2">Mdiv Two</label>
               <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" keysig="2s"/>
               <staffDef n="2" lines="5" clef.shape="F" clef.line="4" meter.count="3" meter.unit="4" keysig="2s"/>
             </staffGrp>
@@ -101,6 +103,7 @@
         <score>
           <scoreDef>
             <staffGrp>
+              <label xml:id="labelMdiv3">Mdiv Three</label>
               <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="4f"/>
             </staffGrp>
           </scoreDef>
