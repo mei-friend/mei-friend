@@ -20,6 +20,7 @@ import { codeCheckerHeight } from './resizer.js';
 import {
   cm,
   cmd,
+  handleEditorChanges,
   meiFileName,
   rngLoader,
   storage,
@@ -3717,12 +3718,7 @@ export default class Viewer {
     correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
-      let count = 0;
-      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
-      fixButtonList.forEach((button) => {
-        count++;
-        setTimeout(() => button.click(), 0);
-      });
+      const fixButtonList = Array.from(codeChecker.querySelectorAll('button.fix:not(.disabled)'));
       infoSpanCurrent.innerHTML = '0';
       infoSpanOf.innerHTML = '/';
       infoSpanTotal.innerHTML = fixButtonList.length;
@@ -3730,6 +3726,38 @@ export default class Viewer {
       correctAllButton.disabled = true;
       ignoreAllButton.classList.add('disabled');
       ignoreAllButton.disabled = true;
+      if (fixButtonList.length === 0) return;
+
+      // Apply the fixes in time slices, each as one CodeMirror operation.
+      // Editor change handling (DOM reparse, local storage, notation update)
+      // is blocked while fixing and run once at the end; cursor activity is
+      // suppressed so that no page flipping happens per fix.
+      const BUDGET_MS = 50; // per slice, before yielding to the GUI
+      let i = 0;
+      cm.blockChanges = true;
+      const applyFixes = () => {
+        try {
+          cm.operation(() => {
+            const t0 = performance.now();
+            while (i < fixButtonList.length) {
+              fixButtonList[i++].applyFix();
+              if (performance.now() - t0 > BUDGET_MS) break;
+            }
+            this.allowCursorActivity = false; // fix callbacks re-enable it; keep it off until done
+          });
+        } catch (err) {
+          console.error('Fix all: error applying fix ' + i + ':', err);
+          i = fixButtonList.length;
+        }
+        if (i < fixButtonList.length) {
+          setTimeout(applyFixes, 0);
+        } else {
+          cm.blockChanges = false;
+          this.allowCursorActivity = true;
+          handleEditorChanges();
+        }
+      };
+      setTimeout(applyFixes, 0);
     });
     headerDiv.appendChild(correctAllButton);
 
@@ -3815,7 +3843,9 @@ export default class Viewer {
       correctButton.innerHTML = translator.lang.codeCheckerFix.text;
       correctButton.classList.add('btn');
       correctButton.classList.add('fix');
-      correctButton.addEventListener('click', () => {
+      // applyFix() is also called directly by "Fix all", so that no click event
+      // has to be dispatched (and handled by document-wide listeners) per entry
+      correctButton.applyFix = () => {
         data.correct();
         let checked = document.createElement('span');
         checked.innerHTML = icon.check;
@@ -3832,7 +3862,8 @@ export default class Viewer {
           checked.innerHTML += icon.check;
           codeCheckerInfoCurrent.parentElement.appendChild(checked);
         }
-      });
+      };
+      correctButton.addEventListener('click', correctButton.applyFix);
       div.appendChild(correctButton);
 
       // Ignore Button

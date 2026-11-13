@@ -2258,9 +2258,12 @@ function isEmpty(str) {
  * @param {boolean} select keep node in editor selected? (important for auto indentation)
  * @param {Array[Element]} newNode an array of new nodes to replace the old one with
  * @param {boolean} replaceUnique replace unique elements without xml:id (special case, e.g. for <meiHead>)
- * @returns {object} range {start: integer, end: integer} or empty object, if nothing found
+ * @param {Object} searchFrom optional CodeMirror position to start searching from, e.g. the start
+ * of the previous replacement when applying many edits in document order; if the element is
+ * not found from there, the search is repeated from the start of the document
+ * @returns {object} range {start: Pos, end: Pos} (-1 if nothing found) or empty object, if nothing to search for
  */
-export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false) {
+export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false, searchFrom = null) {
   dutils.cleanNode(xmlNode);
   // construct new MEI if newNode has elements
   let newMei = '';
@@ -2280,47 +2283,124 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = [], repla
     console.warn('replaceInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
     return {};
   }
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([^>]*?)(?:/>)`;
-  // console.info('searchSelfClosing: ' + searchSelfClosing);
-  let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
-  if (sc.findNext()) {
-    sc.replace(newMei);
-  } else {
-    let searchFullElement =
-      '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
-    sc = cm.getSearchCursor(new RegExp(searchFullElement));
-    if (sc.findNext()) {
-      sc.replace(newMei);
-    }
-    // console.info('searchFullElement: ' + searchFullElement);
-  }
-  if (!sc.atOccurrence) {
+  let range = null;
+  if (searchFrom) range = findElementRange(cm, xmlNode.nodeName, xmlIdCheck, searchFrom);
+  if (!range) range = findElementRange(cm, xmlNode.nodeName, xmlIdCheck);
+  if (!range) {
     console.info('replaceInEditor(): nothing replaced for ' + itemId + '.');
     return {
       start: -1,
       end: -1,
     };
-  } else {
-    sc = cm.getSearchCursor(newMei);
-    if (sc.findNext()) {
-      let c = cm.getCursor();
-      for (let l = sc.from().line; l <= sc.to().line; l++) {
-        cm.indentLine(l, 'smart');
-        if (isEmpty(cm.getLine(l))) {
-          cm.setCursor(l, c.ch);
-          cm.execCommand('deleteLine');
-        }
-      }
-      if (select) {
-        cm.setSelection(sc.from(), sc.to());
-      }
+  }
+  const from = range.from;
+  const lines = CodeMirror.splitLines(newMei);
+  const to = CodeMirror.Pos(
+    from.line + lines.length - 1,
+    lines[lines.length - 1].length + (lines.length === 1 ? from.ch : 0)
+  );
+  cm.replaceRange(newMei, from, range.to);
+  let c = cm.getCursor();
+  for (let l = from.line; l <= to.line; l++) {
+    cm.indentLine(l, 'smart');
+    if (isEmpty(cm.getLine(l))) {
+      cm.setCursor(l, c.ch);
+      cm.execCommand('deleteLine');
     }
   }
+  if (select) {
+    cm.setSelection(from, to);
+  }
   return {
-    start: sc.from(),
-    end: sc.to(),
+    start: from,
+    end: to,
   };
 } // replaceInEditor()
+
+/**
+ * Sets an attribute on xmlNode and in its start tag in the editor, replacing an
+ * existing value or appending the attribute. Unlike replaceInEditor(), the element
+ * is not reserialized, so its content and formatting in the editor stay untouched.
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode element with xml:id
+ * @param {string} attrName
+ * @param {string} attrValue
+ * @param {Object} searchFrom optional CodeMirror position to start searching from (see replaceInEditor())
+ * @returns {object} range {start: Pos, end: Pos} of the start tag (-1 if nothing found) or empty object
+ */
+export function setAttributeInEditor(cm, xmlNode, attrName, attrValue, searchFrom = null) {
+  xmlNode.setAttribute(attrName, attrValue);
+  const itemId = xmlNode.getAttribute('xml:id');
+  if (!itemId) {
+    console.warn('setAttributeInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
+    return {};
+  }
+  const xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  let tag = null;
+  if (searchFrom) tag = findStartTagRange(cm, xmlNode.nodeName, xmlIdCheck, searchFrom);
+  if (!tag) tag = findStartTagRange(cm, xmlNode.nodeName, xmlIdCheck);
+  if (!tag) {
+    console.info('setAttributeInEditor(): element not found for ' + itemId + '.');
+    return { start: -1, end: -1 };
+  }
+  const text = cm.getRange(tag.from, tag.to);
+  const escapedName = attrName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const existing = new RegExp('(\\s' + escapedName + '\\s*=\\s*)(["\'])[^"\']*\\2');
+  let newText;
+  if (existing.test(text)) {
+    newText = text.replace(existing, '$1$2' + attrValue + '$2');
+  } else {
+    const closing = tag.selfClosing ? text.lastIndexOf('/>') : text.lastIndexOf('>');
+    newText =
+      text.slice(0, closing).replace(/\s+$/, '') + ' ' + attrName + '="' + attrValue + '"' + text.slice(closing);
+  }
+  cm.replaceRange(newText, tag.from, tag.to);
+  const lines = CodeMirror.splitLines(newText);
+  const to = CodeMirror.Pos(
+    tag.from.line + lines.length - 1,
+    lines[lines.length - 1].length + (lines.length === 1 ? tag.from.ch : 0)
+  );
+  return { start: tag.from, end: to };
+} // setAttributeInEditor()
+
+/**
+ * Finds the text range of an element's start tag in the editor, identified by
+ * nodeName and the xmlIdCheck pattern. Only the text from the search start to the
+ * element is scanned, so searching from a position close to the element is cheap.
+ * @param {CodeMirror} cm
+ * @param {string} nodeName
+ * @param {string} xmlIdCheck regular expression source following the element name
+ * @param {Object} [from] position to start searching from (default: start of document)
+ * @returns {{from: Object, to: Object, selfClosing: boolean} | null}
+ */
+function findStartTagRange(cm, nodeName, xmlIdCheck, from = null) {
+  const startTag = cm.getSearchCursor(new RegExp('<' + nodeName + xmlIdCheck), from);
+  if (!startTag.findNext()) return null;
+  // end of the start tag: first '>' after it ('>' cannot occur unescaped in attribute values)
+  const tagEnd = cm.getSearchCursor('>', startTag.to());
+  if (!tagEnd.findNext()) return null;
+  const end = tagEnd.to();
+  const selfClosing = end.ch >= 2 && cm.getRange(CodeMirror.Pos(end.line, end.ch - 2), end) === '/>';
+  return { from: startTag.from(), to: end, selfClosing };
+} // findStartTagRange()
+
+/**
+ * Finds the text range of an element in the editor: from its start tag to the end
+ * of its self-closing tag or of its closing tag.
+ * @param {CodeMirror} cm
+ * @param {string} nodeName
+ * @param {string} xmlIdCheck regular expression source following the element name
+ * @param {Object} [from] position to start searching from (default: start of document)
+ * @returns {{from: Object, to: Object} | null}
+ */
+function findElementRange(cm, nodeName, xmlIdCheck, from = null) {
+  const tag = findStartTagRange(cm, nodeName, xmlIdCheck, from);
+  if (!tag) return null;
+  if (tag.selfClosing) return { from: tag.from, to: tag.to };
+  const closeTag = cm.getSearchCursor(new RegExp('</' + nodeName + '[ ]*?>'), tag.to);
+  if (!closeTag.findNext()) return null;
+  return { from: tag.from, to: closeTag.to() };
+} // findElementRange()
 
 // ############################################################################
 // # (mostly) private functions                                               #

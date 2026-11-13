@@ -190,10 +190,23 @@ export function checkAccidGes(v, cm) {
   let tstamps = new Map(); // element → tstamp within the current measure
   let measureAccids = new Map(); // accidentals within the current measure, see getAccidsInMeasure()
   let currentMeasureN = '';
+  let lastFixPos = null; // editor position of the last fix, search hint for the next one
   let i = 0;
 
   setProgressBar(0);
   statusBar.innerHTML = 'Checking accid.ges... 0 of ' + list.length + ' elements checked.';
+
+  /**
+   * Writes the (modified) element back to the editor. Fixes are usually
+   * applied in document order, so the search starts at the previous fix.
+   * @param {Element} element
+   */
+  function writeToEditor(element) {
+    v.allowCursorActivity = false;
+    const range = editor.replaceInEditor(cm, element, false, [], false, lastFixPos);
+    if (range.start?.line >= 0) lastFixPos = range.start;
+    v.allowCursorActivity = true;
+  } // writeToEditor()
 
   /**
    * Iterate through all elements in the list and check for
@@ -327,10 +340,8 @@ export function checkAccidGes(v, cm) {
       data.html += '. ' + translator.lang.codeCheckerRemove.text + ' accid.ges';
       // remove @accid.ges in all cases
       data.correct = () => {
-        v.allowCursorActivity = false;
         element.removeAttribute('accid.ges');
-        editor.replaceInEditor(cm, element, false);
-        v.allowCursorActivity = true;
+        writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
     }
@@ -407,10 +418,8 @@ export function checkAccidGes(v, cm) {
               ('"' + startingAccidMeaning + '".') +
               (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
             data.correct = () => {
-              v.allowCursorActivity = false;
               element.setAttribute('accid.ges', startingAccidMeaning);
-              editor.replaceInEditor(cm, element, false);
-              v.allowCursorActivity = true;
+              writeToEditor(element);
             };
           } else {
             data.html +=
@@ -421,10 +430,8 @@ export function checkAccidGes(v, cm) {
               ('"' + startingAccidMeaning + '". ') +
               (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
             data.correct = () => {
-              v.allowCursorActivity = false;
               element.removeAttribute('accid.ges');
-              editor.replaceInEditor(cm, element, false);
-              v.allowCursorActivity = true;
+              writeToEditor(element);
             };
           }
           v.addCodeCheckerEntry(data);
@@ -453,10 +460,8 @@ export function checkAccidGes(v, cm) {
         translator.lang.codeCheckerBecauseAlreadyDefined.text +
         '.';
       data.correct = () => {
-        v.allowCursorActivity = false;
         element.setAttribute('accid.ges', mAccid);
-        editor.replaceInEditor(cm, element, false);
-        v.allowCursorActivity = true;
+        writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
       if (d) console.debug(data.html);
@@ -487,10 +492,8 @@ export function checkAccidGes(v, cm) {
         keySigAccid +
         '"';
       data.correct = () => {
-        v.allowCursorActivity = false;
         element.setAttribute('accid.ges', keySigAccid);
-        editor.replaceInEditor(cm, element, false);
-        v.allowCursorActivity = true;
+        writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
       if (d) console.debug(data.html);
@@ -521,15 +524,13 @@ export function checkAccidGes(v, cm) {
         accidGesEncoded +
         '".';
       data.correct = () => {
-        v.allowCursorActivity = false;
         let accidChild = element.querySelector('accid[accid\\.ges]');
         if (accidChild) {
           element.removeChild(accidChild);
         } else {
           element.removeAttribute('accid.ges');
         }
-        editor.replaceInEditor(cm, element, false);
-        v.allowCursorActivity = true;
+        writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
       if (d) console.debug(data.html);
@@ -565,6 +566,7 @@ export function checkMeterConformance(v, cm) {
   const list = v.xmlDoc.querySelectorAll(METER_SELECTOR + ',measure');
   const meters = new MeterTracker();
   const statusBar = document.getElementById('statusBar');
+  let lastFixPos = null; // editor position of the last fix, search hint for the next one
   setProgressBar(0);
   statusBar.innerHTML = 'Checking meter conformance... 0 of ' + list.length + ' elements checked.';
   let n = 0;
@@ -654,11 +656,15 @@ export function checkMeterConformance(v, cm) {
         '. ';
       data.correct = () => {
         v.allowCursorActivity = false;
-        // measure is the live element of v.xmlDoc, so the DOM is already up to date
-        // after setAttribute(); no forced reload needed (expensive with "Fix all")
-        measure.setAttribute('metcon', 'false');
-        editor.replaceInEditor(cm, measure, false);
-        utils.setCursorToId(cm, measure.getAttribute('xml:id'));
+        // Only the attribute is written into the measure's start tag, leaving the
+        // measure content untouched (no reserialization, no forced DOM reload). One
+        // measure gets an entry per non-conforming staff; it is written only once.
+        if (measure.getAttribute('metcon') !== 'false') {
+          const range = editor.setAttributeInEditor(cm, measure, 'metcon', 'false', lastFixPos);
+          if (range.start?.line >= 0) lastFixPos = range.start;
+        }
+        // jump to the measure for a single fix; "Fix all" blocks changes and scrolls nowhere
+        if (!cm.blockChanges) utils.setCursorToId(cm, measure.getAttribute('xml:id'));
         v.allowCursorActivity = true;
       };
       v.addCodeCheckerEntry(data);
