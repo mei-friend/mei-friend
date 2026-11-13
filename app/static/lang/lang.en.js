@@ -1296,6 +1296,8 @@ export const lang = {
   codeCheckerFixAll: { text: 'Fix all' },
   codeCheckerIgnore: { text: 'Ignore' },
   codeCheckerIgnoreAll: { text: 'Ignore all' },
+  codeCheckerStop: { text: 'Stop' },
+  codeCheckerStopped: { text: 'Check stopped.' },
   codeCheckerCheckingCode: { text: 'Checking code...' },
   codeCheckerNoAccidMessagesFound: { text: 'All accid.ges attributes seem correct.' },
   codeCheckerMeterConformanceMessage: { text: 'All measures conform to their time signatures.' },

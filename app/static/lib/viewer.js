@@ -3734,6 +3734,7 @@ export default class Viewer {
       // suppressed so that no page flipping happens per fix.
       const BUDGET_MS = 50; // per slice, before yielding to the GUI
       let i = 0;
+      this.showCodeCheckerStopButton(true);
       cm.blockChanges = true;
       const applyFixes = () => {
         try {
@@ -3749,11 +3750,19 @@ export default class Viewer {
           console.error('Fix all: error applying fix ' + i + ':', err);
           i = fixButtonList.length;
         }
-        if (i < fixButtonList.length) {
+        if (i < fixButtonList.length && !this.codeCheckerAbort) {
           setTimeout(applyFixes, 0);
         } else {
           cm.blockChanges = false;
           this.allowCursorActivity = true;
+          this.showCodeCheckerStopButton(false);
+          if (this.codeCheckerAbort) {
+            // stopped: let the user continue with the remaining entries
+            correctAllButton.classList.remove('disabled');
+            correctAllButton.disabled = false;
+            ignoreAllButton.classList.remove('disabled');
+            ignoreAllButton.disabled = false;
+          }
           handleEditorChanges();
         }
       };
@@ -3774,6 +3783,19 @@ export default class Viewer {
       });
     });
     headerDiv.appendChild(ignoreAllButton);
+
+    // Stop button: interrupts a running check or "Fix all" at the next time slice
+    this.codeCheckerAbort = false;
+    let stopButton = document.createElement('button');
+    stopButton.id = 'codeCheckerStopButton';
+    stopButton.innerHTML = translator.lang.codeCheckerStop.text;
+    stopButton.classList.add('btn');
+    stopButton.addEventListener('click', () => {
+      this.codeCheckerAbort = true;
+      stopButton.disabled = true;
+      stopButton.classList.add('disabled');
+    });
+    headerDiv.appendChild(stopButton);
 
     let infoSpanCurrent = document.createElement('span');
     infoSpanCurrent.id = 'codeCheckerInfoCurrent';
@@ -3895,7 +3917,22 @@ export default class Viewer {
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
 
+  /**
+   * Shows or hides the Stop button of the code checker panel; showing it
+   * (a check or "Fix all" starts) resets the abort flag
+   * @param {boolean} visible
+   */
+  showCodeCheckerStopButton(visible) {
+    if (visible) this.codeCheckerAbort = false;
+    const stopButton = document.getElementById('codeCheckerStopButton');
+    if (!stopButton) return;
+    stopButton.style.display = visible ? '' : 'none';
+    stopButton.disabled = false;
+    stopButton.classList.remove('disabled');
+  } // showCodeCheckerStopButton()
+
   finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
+    this.showCodeCheckerStopButton(false);
     let nothingFound = document.getElementById('codeCheckerCheckingCode');
     if (nothingFound) {
       nothingFound.innerHTML = allGoodString;

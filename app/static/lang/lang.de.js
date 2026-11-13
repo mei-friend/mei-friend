@@ -1238,6 +1238,8 @@ export const lang = {
   codeCheckerFixAll: { text: 'Alle korrigieren' },
   codeCheckerIgnore: { text: 'Ignorieren' },
   codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
+  codeCheckerStop: { text: 'Stopp' },
+  codeCheckerStopped: { text: 'Überprüfung abgebrochen.' },
   codeCheckerCheckingCode: { text: 'Überprüfe Kodierung...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
   codeCheckerMeterConformanceMessage: { text: 'Alle Systeme stimmen mit Taktangabe überein.' },

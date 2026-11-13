@@ -68,6 +68,22 @@ function hasMeterInfo(element) {
 } // hasMeterInfo()
 
 /**
+ * Finishes a check: resets the progress bar, writes the status bar text and
+ * finalizes the code checker panel. A check stopped through the Stop button
+ * (v.codeCheckerAbort) says so in status bar and panel.
+ * @param {Viewer} v
+ * @param {string} statusText
+ * @param {string} allGoodText shown in the panel when no entries were found
+ */
+function finishCheck(v, statusText, allGoodText) {
+  setProgressBar(0);
+  const stopped = v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text + ' ' : '';
+  document.getElementById('statusBar').innerHTML = stopped + statusText;
+  v.finalizeCodeCheckerPanel(v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text : allGoodText);
+  v.allowCursorActivity = true;
+} // finishCheck()
+
+/**
  * Elements under root matching selector that are not nested inside another
  * match (e.g. notes inside a chord). Linear replacement for dutils.filterChildren().
  * @param {Element} root
@@ -219,18 +235,17 @@ export function checkAccidGes(v, cm) {
       checkElement(list[i++]);
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (i < list.length) {
+    if (i < list.length && !v.codeCheckerAbort) {
       setProgressBar((100 * i) / list.length);
       statusBar.innerHTML = 'Checking accid.ges... ' + i + ' of ' + list.length + ' elements checked.';
       setTimeout(processAccidGes, 0);
     } else {
       console.debug('Found ' + count + ' accid.ges observations.');
-
-      setProgressBar(0);
-      statusBar.innerHTML = 'Accidental conformance: ' + count + ' accid.ges observations found.';
-
-      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerNoAccidMessagesFound.text);
-      v.allowCursorActivity = true;
+      finishCheck(
+        v,
+        'Accidental conformance: ' + count + ' accid.ges observations found.',
+        translator.lang.codeCheckerNoAccidMessagesFound.text
+      );
     }
   } // processAccidGes()
 
@@ -589,15 +604,16 @@ export function checkMeterConformance(v, cm) {
       }
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (n < list.length) {
+    if (n < list.length && !v.codeCheckerAbort) {
       setProgressBar((100 * n) / list.length);
       statusBar.innerHTML = 'Checking meter conformance... ' + n + ' of ' + list.length + ' elements checked.';
       setTimeout(processMeasures, 0);
     } else {
-      setProgressBar(0);
-      statusBar.innerHTML = 'Meter conformance: ' + measuresChecked + ' measures checked.';
-      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerMeterConformanceMessage.text);
-      v.allowCursorActivity = true;
+      finishCheck(
+        v,
+        'Meter conformance: ' + measuresChecked + ' measures checked.',
+        translator.lang.codeCheckerMeterConformanceMessage.text
+      );
     }
   } // processMeasures()
 
@@ -687,7 +703,7 @@ export function checkLinkedElements(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.linkedElementsCodeCheckerTitle.text);
   // No automatic fix exists for broken links — remove the Fix all / Ignore all buttons
-  document.querySelectorAll('#codeCheckerTitle .btn').forEach((btn) => btn.remove());
+  document.querySelectorAll('#codeCheckerTitle .btn:not(#codeCheckerStopButton)').forEach((btn) => btn.remove());
 
   try {
     v.loadXml(cm.getValue(), true);
@@ -715,13 +731,15 @@ export function checkLinkedElements(v, cm) {
           checkElement(elements[n++]);
           if (performance.now() - t0 > BUDGET_MS) break;
         }
-        if (n < elements.length) {
+        if (n < elements.length && !v.codeCheckerAbort) {
           setProgressBar((100 * n) / elements.length);
           setTimeout(processNext, 0);
         } else {
-          setProgressBar(0);
-          v.finalizeCodeCheckerPanel(translator.lang.codeCheckerNoLinkedElementsIssues.text);
-          v.allowCursorActivity = true;
+          finishCheck(
+            v,
+            'Linked elements: ' + n + ' of ' + elements.length + ' elements checked.',
+            translator.lang.codeCheckerNoLinkedElementsIssues.text
+          );
         }
       } catch (err) {
         console.error('checkLinkedElements processNext error at n=' + n + ':', err);
