@@ -692,103 +692,31 @@ export function checkLinkedElements(v, cm) {
   try {
     v.loadXml(cm.getValue(), true);
 
-    // Walk all elements once: collect xml:ids AND filter to those with linking attrs
+    // all xml:ids in the document, and all elements carrying linking attributes (in document order)
     const allIds = new Set();
-    const elements = [];
-    const allElements = v.xmlDoc.getElementsByTagName('*');
-    for (let i = 0; i < allElements.length; i++) {
-      const el = allElements[i];
+    v.xmlDoc.querySelectorAll('[*|id]').forEach((el) => {
       const id = el.getAttribute('xml:id');
       if (id) allIds.add(id);
-      if (att.attLinking.some((a) => el.hasAttribute(a))) elements.push(el);
-    }
+    });
+    const elements = v.xmlDoc.querySelectorAll(att.attLinking.map((a) => '[' + a + ']').join(','));
     console.log('checkLinkedElements: allIds=' + allIds.size + ', elements with linking attrs=' + elements.length);
 
     setProgressBar(0);
     let n = 0;
-    const increment = elements.length / 100;
-    let step = increment;
 
+    /**
+     * Checks the linking attributes of all elements. Works in time slices of
+     * BUDGET_MS and reschedules itself with setTimeout() for GUI updates.
+     */
     function processNext() {
       try {
+        const t0 = performance.now();
+        while (n < elements.length) {
+          checkElement(elements[n++]);
+          if (performance.now() - t0 > BUDGET_MS) break;
+        }
         if (n < elements.length) {
-          const el = elements[n];
-
-          if (n > step) {
-            setProgressBar((100 * n) / elements.length);
-            step += increment;
-          }
-
-          const elName = el.nodeName;
-          const elId = el.getAttribute('xml:id') || '';
-
-          for (const attrName of att.attLinking) {
-            const attrVal = el.getAttribute(attrName);
-            if (attrVal === null) continue; // attribute not present on this element
-
-            if (attrVal.trim() === '') {
-              const data = {};
-              data.xmlId = elId;
-              data.html =
-                `<b>${elName}</b>` +
-                (elId ? ` <code>#${elId}</code>` : '') +
-                `: @${attrName} ` +
-                translator.lang.codeCheckerLinkingAttrEmpty.text;
-              v.addCodeCheckerEntry(data);
-              continue;
-            }
-
-            // Check for multiple consecutive blanks (or leading/trailing whitespace) in plist
-            if (attrName === 'plist') {
-              const normalized = attrVal.trim().replace(/\s+/g, ' ');
-              if (attrVal !== normalized) {
-                const data = {};
-                data.xmlId = elId;
-                data.html =
-                  `<b>${elName}</b>` +
-                  (elId ? ` <code>#${elId}</code>` : '') +
-                  `: @plist ` +
-                  translator.lang.codeCheckerPlistMultipleBlanks.text;
-                data.correct = () => {
-                  v.allowCursorActivity = false;
-                  el.setAttribute('plist', normalized);
-                  editor.replaceInEditor(cm, el, false);
-                  v.allowCursorActivity = true;
-                };
-                v.addCodeCheckerEntry(data);
-              }
-            }
-
-            for (const ref of attrVal.trim().split(/\s+/)) {
-              // skip empty values and external links (URIs containing ':')
-              if (!ref || ref.includes(':')) continue;
-              const targetId = utils.rmHash(ref);
-              if (!targetId) {
-                const data = {};
-                data.xmlId = elId;
-                data.html =
-                  `<b>${elName}</b>` +
-                  (elId ? ` <code>#${elId}</code>` : '') +
-                  `: @${attrName}=<code>"${ref}"</code> ` +
-                  translator.lang.codeCheckerLinkingAttrEmpty.text;
-                v.addCodeCheckerEntry(data);
-                continue;
-              }
-
-              if (!allIds.has(targetId)) {
-                const data = {};
-                data.xmlId = elId;
-                data.html =
-                  `<b>${elName}</b>` +
-                  (elId ? ` <code>#${elId}</code>` : '') +
-                  `: @${attrName}=<code>"${ref}"</code> ` +
-                  translator.lang.codeCheckerLinkedElementNotFound.text;
-                v.addCodeCheckerEntry(data);
-              }
-            }
-          }
-
-          n++;
+          setProgressBar((100 * n) / elements.length);
           setTimeout(processNext, 0);
         } else {
           setProgressBar(0);
@@ -799,7 +727,83 @@ export function checkLinkedElements(v, cm) {
         console.error('checkLinkedElements processNext error at n=' + n + ':', err);
         v.allowCursorActivity = true;
       }
-    }
+    } // processNext()
+
+    /**
+     * Checks all linking attributes of one element.
+     * @param {Element} el
+     */
+    function checkElement(el) {
+      const elName = el.nodeName;
+      const elId = el.getAttribute('xml:id') || '';
+
+      for (const attrName of att.attLinking) {
+        const attrVal = el.getAttribute(attrName);
+        if (attrVal === null) continue; // attribute not present on this element
+
+        if (attrVal.trim() === '') {
+          const data = {};
+          data.xmlId = elId;
+          data.html =
+            `<b>${elName}</b>` +
+            (elId ? ` <code>#${elId}</code>` : '') +
+            `: @${attrName} ` +
+            translator.lang.codeCheckerLinkingAttrEmpty.text;
+          v.addCodeCheckerEntry(data);
+          continue;
+        }
+
+        // Check for multiple consecutive blanks (or leading/trailing whitespace) in plist
+        if (attrName === 'plist') {
+          const normalized = attrVal.trim().replace(/\s+/g, ' ');
+          if (attrVal !== normalized) {
+            const data = {};
+            data.xmlId = elId;
+            data.html =
+              `<b>${elName}</b>` +
+              (elId ? ` <code>#${elId}</code>` : '') +
+              `: @plist ` +
+              translator.lang.codeCheckerPlistMultipleBlanks.text;
+            data.correct = () => {
+              v.allowCursorActivity = false;
+              el.setAttribute('plist', normalized);
+              editor.replaceInEditor(cm, el, false);
+              v.allowCursorActivity = true;
+            };
+            v.addCodeCheckerEntry(data);
+          }
+        }
+
+        for (const ref of attrVal.trim().split(/\s+/)) {
+          // skip empty values and external links (URIs containing ':')
+          if (!ref || ref.includes(':')) continue;
+          const targetId = utils.rmHash(ref);
+          if (!targetId) {
+            const data = {};
+            data.xmlId = elId;
+            data.html =
+              `<b>${elName}</b>` +
+              (elId ? ` <code>#${elId}</code>` : '') +
+              `: @${attrName}=<code>"${ref}"</code> ` +
+              translator.lang.codeCheckerLinkingAttrEmpty.text;
+            v.addCodeCheckerEntry(data);
+            continue;
+          }
+
+          if (!allIds.has(targetId)) {
+            const data = {};
+            data.xmlId = elId;
+            data.html =
+              `<b>${elName}</b>` +
+              (elId ? ` <code>#${elId}</code>` : '') +
+              `: @${attrName}=<code>"${ref}"</code> ` +
+              translator.lang.codeCheckerLinkedElementNotFound.text;
+            v.addCodeCheckerEntry(data);
+          }
+        }
+      }
+    } // checkElement()
+
     processNext();
   } catch (err) {
     console.error('checkLinkedElements setup error:', err);
