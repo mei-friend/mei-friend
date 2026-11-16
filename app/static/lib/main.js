@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.6.1';
-export const versionDate = '13 Nov 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '16 Nov 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
 // Date of the Let's Encode paragraph, which only campaign volunteers ever see.
 // Bump this instead of splashDate when only that paragraph changes: volunteers
@@ -2047,8 +2047,9 @@ export let cmd = {
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
   reRenderMeiWithout: () => v.reRenderMei(cm, true),
-  addIds: () => e.manipulateXmlIds(v, cm, false),
-  removeIds: () => e.manipulateXmlIds(v, cm, true),
+  addIds: () => e.manipulateXmlIds(v, cm, 'add'),
+  removeIds: () => e.manipulateXmlIds(v, cm, 'remove'),
+  changeIds: () => e.manipulateXmlIds(v, cm, 'change'),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
   encloseSelectionWithTag: encloseSelectionWithTag,
@@ -2413,6 +2414,13 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
+  document.getElementById('changeIds').addEventListener('click', cmd.changeIds);
+  // menu items with class 'altKeyOnly' (e.g., 'Change ids') are only shown while ALT key is pressed
+  const toggleAltKeyOnly = (pressed) => document.body.classList.toggle('altKeyPressed', pressed);
+  window.addEventListener('keydown', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('keyup', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('mousemove', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('blur', () => toggleAltKeyOnly(false));
   // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
