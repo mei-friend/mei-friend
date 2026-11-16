@@ -182,12 +182,12 @@ export const lang = {
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
   removeIdsText: { text: 'Ids von MEI entfernen' },
   changeIdsText: {
-    text: 'Ids in MEI ändern (macht externe Verweise ungültig)',
+    text: 'Ids in MEI ändern (macht externe Links ungültig)',
     description:
-      'Weist jedem Element (oder den ausgewählten Elementen) eine neue xml:id zu. Verweise innerhalb dieser Datei werden aktualisiert, aber Verweise aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
+      'Weist jedem Element (oder den ausgewählten Elementen) eine neue xml:id zu. Links innerhalb dieser Datei werden aktualisiert, aber Links aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
   },
   changeIdsConfirmation: {
-    text: '<b>Ids in MEI ändern</b>\n\nAchtung: Dieser Vorgang macht externe Links ungültig.\n\n{changed} xml:ids werden geändert und {added} neue xml:ids hinzugefügt; {references} Verweise innerhalb dieser Datei werden aktualisiert.\n\nVerweise aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
+    text: '<b>Ids in MEI ändern</b>\n\nAchtung: Dieser Vorgang macht externe Links ungültig.\n\n{changed} xml:ids werden geändert und {added} neue xml:ids hinzugefügt; {references} Links innerhalb dieser Datei werden aktualisiert.\n\nLinks aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
   },
   changeIdsProceed: { text: 'Ids ändern' },
   changeIdsCancel: { text: 'Abbrechen' },
