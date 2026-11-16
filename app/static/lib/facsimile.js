@@ -7,10 +7,22 @@
 import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
-import { cm, fileLocationType, gm, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
-import { addZone, replaceInEditor, withSingleUndoStep } from './editor.js';
+import {
+  cm,
+  fileLocationType,
+  gm,
+  handleEditorChanges,
+  isCtrlOrCmd,
+  meiFileLocation,
+  setProgressBar,
+  translator,
+  v,
+} from './main.js';
+import { addZone, beginSingleUndoStep, endSingleUndoStep, replaceInEditor, setAttributeInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
+
+const BUDGET_MS = 16; // work per setTimeout slice before yielding to the GUI, roughly one frame
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
@@ -1015,88 +1027,236 @@ function ingestionInputHandler(ev) {
 } // ingestionInputHandler()
 
 /**
- * Handles ingestion of facsimile information into current MEI file
- * and adds a @facs attribute into each measure based on the @n attribute
+ * Handles ingestion of facsimile information into current MEI file:
+ * inserts the skeleton's facsimile element before body and adds a @facs
+ * attribute to each element that the skeleton points to (matched by element
+ * name from zone@type and by @n). Only the start tags of the pointed-to
+ * elements are touched in the editor; their content and formatting stay as
+ * they are. The zones are processed in time slices of BUDGET_MS with a
+ * blocking progress prompt (with Stop button) in between, and a final prompt
+ * reports what was done. The editor's change listener is blocked for the
+ * duration and called once at the end, so storage and git are written once
+ * rather than once per element. All edits form a single undo step.
  * @param {Object} reply
- * @returns
  */
 function handleFacsimileIngestion(reply) {
-  withSingleUndoStep(cm, () => {
-    busy();
-    console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
-    let skelXml = new DOMParser().parseFromString(reply.mei, 'text/xml');
-    let facsimile = skelXml.querySelector('facsimile');
-    let zones = facsimile.querySelectorAll('zone');
-    let music = v.xmlDoc.querySelector('music');
-    if (!music) {
-      return;
-    }
-    v.allowCursorActivity = false;
+  const startTime = Date.now();
+  console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
+  const fill = (key, values = {}) =>
+    Object.entries(values).reduce((t, [k, val]) => t.replaceAll('{' + k + '}', val), translator.lang[key].text);
+  const okButton = {
+    label: translator.lang.selectTagNameForEnclosureOkButton.value,
+    event: () => v.hideUserPrompt(),
+    cancel: true,
+  };
 
-    // ingest facsimile into target MEI (in music before body)
-    let body = music.querySelector('body');
-    if (body) {
+  const skelXml = new DOMParser().parseFromString(reply.mei, 'text/xml');
+  const facsimile = skelXml.querySelector('facsimile');
+  if (!facsimile) {
+    v.showUserPrompt(fill('ingestFacsimileNoFacsimile', { file: reply.fileName }), [okButton]);
+    return;
+  }
+  v.loadXml(cm.getValue()); // make sure xmlDoc matches the editor
+  const music = v.xmlDoc.querySelector('music');
+  const body = music?.querySelector('body');
+  if (!body) {
+    v.showUserPrompt(fill('ingestFacsimileNoBody'), [okButton]);
+    return;
+  }
+
+  const zones = Array.from(facsimile.querySelectorAll('zone'));
+  const surfaceCount = facsimile.querySelectorAll('surface').length;
+  const fileValues = { file: reply.fileName, surfaces: surfaceCount, zones: zones.length };
+  let warnings = []; // HTML strings
+  let added = 0;
+  let i = 0; // zones processed
+  let abort = false;
+  let lastPos = null; // editor position of the last edit, search hint for the next one
+
+  busy();
+  v.allowCursorActivity = false;
+  cm.blockChanges = true; // single handleEditorChanges() call in finish()
+  const undoState = beginSingleUndoStep(cm);
+
+  // progress prompt; Stop finishes with what has been done so far (undoable in one step)
+  v.showUserPrompt(
+    '<b>' + fill('ingestFacsimileTitle') + '</b><br><br><span id="ingestFacsimileProgress"></span>',
+    [{ label: translator.lang.codeCheckerStop.text, event: () => (abort = true), cancel: true }],
+    'info'
+  );
+  setProgressBar(0);
+  showProgress();
+  setTimeout(insertFacsimile, 0); // let the prompt paint first
+
+  function showProgress() {
+    const span = document.getElementById('ingestFacsimileProgress');
+    if (span) span.innerHTML = fill('ingestFacsimileProgress', { ...fileValues, done: i, total: zones.length });
+    setProgressBar(zones.length ? (100 * i) / zones.length : 0);
+  } // showProgress()
+
+  // 1) insert facsimile into target MEI (in music before body)
+  function insertFacsimile() {
+    cm.operation(() => {
       music.insertBefore(facsimile, body);
-      let id = body.getAttribute('xml:id');
-      let cr; // cursor
-      if (id) {
-        setCursorToId(cm, id);
+      let bodyPos = null;
+      const bodyId = body.getAttribute('xml:id');
+      if (bodyId) {
+        setCursorToId(cm, bodyId);
+        bodyPos = cm.getCursor();
+      }
+      if (!bodyPos || !cm.getLine(bodyPos.line).includes('<body')) {
+        const sc = cm.getSearchCursor('<body');
+        bodyPos = sc.findNext() ? sc.from() : null;
+      }
+      if (!bodyPos) {
+        warnings.push(fill('ingestFacsimileNoBodyInEditor'));
       } else {
-        // search for (first) body element in encoding
-        let sc = cm.getSearchCursor('<body');
-        if (sc.findNext()) {
-          cm.setCursor(sc.from());
-        } else {
-          let msg = 'Ingesting facsimile failed, because no body element was found. ';
-          v.showAlert(msg);
-        }
+        const indentUnit = ' '.repeat(cm.getOption('indentUnit'));
+        const baseIndent = cm.getLine(bodyPos.line).match(/^\s*/)[0];
+        const facsText = indentXml(xmlToString(facsimile), baseIndent, indentUnit) + '\n' + baseIndent;
+        cm.replaceRange(facsText, CodeMirror.Pos(bodyPos.line, baseIndent.length));
+        lastPos = bodyPos;
+        console.log('Adding facsimile before body', facsimile);
       }
-      cr = cm.getCursor();
-      cm.replaceRange(xmlToString(facsimile) + '\n', cr);
-      let cr2 = cm.getCursor();
-      for (let l = cr.line; l <= cr2.line; l++) {
-        cm.indentLine(l);
-      }
-      // loadFacsimile(v.xmlDoc);
-      console.log('Adding facsimile before body', facsimile);
-    }
-
-    let warnings = '';
-    zones.forEach((z) => {
-      let zoneId = '';
-      if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
-      let type = '';
-      if (z.hasAttribute('type')) type = z.getAttribute('type');
-      let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
-      ms.forEach((m) => {
-        let n = m.getAttribute('n');
-        let pointerElement = music.querySelectorAll(type + '[n="' + n + '"]');
-        if (pointerElement.length < 1) {
-          warnings += type + '@n not found: n=' + n + '.<br>';
-        }
-        if (pointerElement.length > 1) {
-          warnings += type + '@n not unique: n=' + n + '.<br>';
-        }
-        if (pointerElement.length === 1) {
-          // console.info('Adding @facs=' + zoneId + ' to ', pointerElement)
-          pointerElement.item(0).setAttribute('facs', '#' + zoneId);
-          replaceInEditor(cm, pointerElement.item(0));
-        }
-      });
     });
-    if (warnings) {
-      warnings = '<h2>Facsimile ingested.</h2>These problems were encountered during facsimile ingestion:<br>' + warnings;
-      v.showAlert(warnings, 'warning');
-      // console.log(warnings);
+    setTimeout(processZones, 0);
+  } // insertFacsimile()
+
+  // 2) the skeleton's pointers, collected once: zone xml:id -> elements with @facs pointing to it
+  const pointers = new Map();
+  skelXml.querySelectorAll('[facs]').forEach((el) => {
+    el.getAttribute('facs')
+      .split(/\s+/)
+      .filter((f) => f)
+      .forEach((f) => {
+        const zoneId = rmHash(f);
+        if (!pointers.has(zoneId)) pointers.set(zoneId, []);
+        pointers.get(zoneId).push(el);
+      });
+  });
+
+  // 3) lookup of target elements by @n, built once per element name (zone@type)
+  const targetsByType = new Map(); // element name -> Map(n -> [elements])
+  function getTargets(type, n) {
+    if (!targetsByType.has(type)) {
+      const byN = new Map();
+      music.querySelectorAll(type).forEach((el) => {
+        const elN = el.getAttribute('n');
+        if (elN === null) return;
+        if (!byN.has(elN)) byN.set(elN, []);
+        byN.get(elN).push(el);
+      });
+      targetsByType.set(type, byN);
     }
+    return targetsByType.get(type).get(n) || [];
+  } // getTargets()
+
+  // 4) add @facs to the start tags in the editor, searching forward from the
+  // previous edit (zones and measures are normally in document order)
+  function processZone(z) {
+    const zoneId = z.getAttribute('xml:id');
+    const type = z.getAttribute('type');
+    if (!zoneId || !type) return; // nothing can point to it, or no element name to match
+    (pointers.get(zoneId) || []).forEach((m) => {
+      const n = m.getAttribute('n');
+      const values = { type: type, n: n };
+      const targets = getTargets(type, n);
+      if (targets.length < 1) {
+        warnings.push(fill('ingestFacsimileNotFound', values));
+      } else if (targets.length > 1) {
+        warnings.push(fill('ingestFacsimileNotUnique', values));
+      } else if (!targets[0].hasAttribute('xml:id')) {
+        warnings.push(fill('ingestFacsimileNoId', values));
+      } else {
+        const range = setAttributeInEditor(cm, targets[0], 'facs', '#' + zoneId, lastPos);
+        if (range.start && range.start !== -1) {
+          lastPos = range.end;
+          added++;
+        } else {
+          warnings.push(fill('ingestFacsimileNotInEditor', values));
+        }
+      }
+    });
+  } // processZone()
+
+  // works in time slices of BUDGET_MS and reschedules itself for GUI updates
+  function processZones() {
+    const t0 = performance.now();
+    cm.operation(() => {
+      while (i < zones.length && !abort) {
+        processZone(zones[i++]);
+        if (performance.now() - t0 > BUDGET_MS) break;
+      }
+    });
+    if (i < zones.length && !abort) {
+      showProgress();
+      setTimeout(processZones, 0);
+    } else {
+      finish();
+    }
+  } // processZones()
+
+  // merges the undo step, runs the editor change handling once, and reports
+  function finish() {
+    endSingleUndoStep(cm, undoState);
+    cm.blockChanges = false;
+    handleEditorChanges();
+    setProgressBar(0);
+
+    const values = { ...fileValues, added: added, done: i };
+    let msg = '<b>' + fill(abort ? 'ingestFacsimileStoppedTitle' : 'ingestFacsimileDoneTitle') + '</b><br><br>';
+    msg += fill('ingestFacsimileSummary', values);
+    if (abort) msg += '<br>' + fill('ingestFacsimileStopped', values);
+    if (warnings.length > 0) {
+      msg += '<br><br>' + fill('ingestFacsimileProblems', { count: warnings.length });
+      msg += '<div class="promptScrollList">' + warnings.join('<br>') + '</div>';
+    }
+    console.log(
+      added +
+        ' @facs attributes added from ' +
+        reply.fileName +
+        (abort ? ' (stopped)' : '') +
+        ' (Processing time: ' +
+        (Date.now() - startTime) / 1000 +
+        ' s)'
+    );
+    v.showUserPrompt(msg, [okButton], warnings.length > 0 || abort ? 'warning' : 'info');
 
     // uncheck edit zones after ingest
     document.getElementById('editFacsimileZones').checked = false;
-    v.updateData(cm, false, true);
+    v.updateData(cm, false, false); // keep focus on the prompt
     v.allowCursorActivity = true;
     busy(false);
-  });
+  } // finish()
 } // handleFacsimileIngestion()
+
+/**
+ * Indents serialized XML (one tag per line, as produced by xmlToString())
+ * by nesting depth, prefixed with baseIndent. Cheaper than cm.indentLine()
+ * per line and independent of the skeleton file's own formatting.
+ * @param {string} xml
+ * @param {string} baseIndent indentation of the first line
+ * @param {string} indentUnit indentation per nesting level
+ * @returns {string}
+ */
+function indentXml(xml, baseIndent, indentUnit) {
+  let depth = 0;
+  return xml
+    .split('\n')
+    .map((line) => {
+      line = line.trim();
+      if (!line) return null;
+      if (line.startsWith('</')) depth = Math.max(0, depth - 1);
+      const indented = baseIndent + indentUnit.repeat(depth) + line;
+      // opening tag that is neither self-closing nor closed on the same line
+      if (line.startsWith('<') && !line.startsWith('</') && !line.startsWith('<?') && !line.startsWith('<!')) {
+        if (!line.endsWith('/>') && !/<\/[^>]+>$/.test(line)) depth++;
+      }
+      return indented;
+    })
+    .filter((line) => line !== null)
+    .join('\n');
+} // indentXml()
 
 /**
  * Set facsimile icon to busy (true) or idle (false)

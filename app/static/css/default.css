@@ -2834,6 +2834,17 @@ select > option {
   text-align: center;
 }
 
+/* scrollable list inside a user prompt (e.g., problems during facsimile ingestion) */
+#promptMessage .promptScrollList {
+  max-height: 30vh;
+  overflow-y: auto;
+  text-align: left;
+  margin-top: 0.5em;
+  padding: 0.3em 0.6em;
+  border: 1px solid var(--overlayBorderColor);
+  border-radius: 4px;
+}
+
 #promptButtons {
   display: none;
   text-align: center;

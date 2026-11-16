@@ -23,9 +23,31 @@ const dataURISet = new Set(att.dataURI); // attributes that may point to xml:ids
  * @returns {*} the return value of editFn
  */
 export function withSingleUndoStep(cm, editFn) {
-  const before = cm.getHistory();
-  const doneBefore = before.done.length;
+  const undoState = beginSingleUndoStep(cm);
   const result = editFn();
+  endSingleUndoStep(cm, undoState);
+  return result;
+} // withSingleUndoStep()
+
+/**
+ * Asynchronous variant of withSingleUndoStep(): records the undo history
+ * before a series of edits (which may be spread over several event loop
+ * turns); endSingleUndoStep() merges all edits made since into one undo step.
+ * @param {CodeMirror} cm
+ * @returns {Object} state to pass to endSingleUndoStep()
+ */
+export function beginSingleUndoStep(cm) {
+  const before = cm.getHistory();
+  return { before: before, doneBefore: before.done.length };
+} // beginSingleUndoStep()
+
+/**
+ * Merges all edits since beginSingleUndoStep() into a single undo step.
+ * @param {CodeMirror} cm
+ * @param {Object} undoState as returned by beginSingleUndoStep()
+ */
+export function endSingleUndoStep(cm, undoState) {
+  const { before, doneBefore } = undoState;
   const after = cm.getHistory();
   const added = after.done.slice(doneBefore);
   const changeEntries = added.filter((entry) => !entry.ranges);
@@ -38,8 +60,7 @@ export function withSingleUndoStep(cm, editFn) {
     if (selEntries.length > 0) done.push(selEntries[selEntries.length - 1]);
     cm.setHistory({ done, undone: after.undone });
   }
-  return result;
-} // withSingleUndoStep()
+} // endSingleUndoStep()
 
 /**
  * Smart indents selected region in editor, if none, do all

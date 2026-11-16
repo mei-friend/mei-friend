@@ -210,6 +210,24 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Rerender via Verovio' },
   addFacsimile: { text: 'Add facsimile element' },
   ingestFacsimileText: { text: 'Ingest facsimile' },
+  ingestFacsimileTitle: { text: 'Ingesting facsimile' },
+  ingestFacsimileProgress: { text: '{file}: {done} of {total} zones processed.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile ingested' },
+  ingestFacsimileStoppedTitle: { text: 'Facsimile ingestion stopped' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile from {file} with {surfaces} surfaces and {zones} zones inserted before body; @facs attributes added to {added} elements.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Stopped after {done} of {total} zones. The changes made so far can be undone in one step.',
+  },
+  ingestFacsimileProblems: { text: '{count} problems were encountered:' },
+  ingestFacsimileNotFound: { text: '{type} with n="{n}" not found.' },
+  ingestFacsimileNotUnique: { text: '{type} with n="{n}" not unique.' },
+  ingestFacsimileNoId: { text: '{type} with n="{n}" has no xml:id, @facs not added.' },
+  ingestFacsimileNotInEditor: { text: '{type} with n="{n}" not found in editor, @facs not added.' },
+  ingestFacsimileNoFacsimile: { text: 'Ingesting facsimile failed: no facsimile element found in {file}.' },
+  ingestFacsimileNoBody: { text: 'Ingesting facsimile failed: no body element found in the encoding.' },
+  ingestFacsimileNoBodyInEditor: { text: 'No body element found in the editor, facsimile element not inserted.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },

@@ -194,6 +194,24 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Mit Verovio neu rendern' },
   addFacsimile: { text: 'Faksimile-Element hinzufügen' },
   ingestFacsimileText: { text: 'Faksimile-Information einlesen' },
+  ingestFacsimileTitle: { text: 'Faksimile-Information wird eingelesen' },
+  ingestFacsimileProgress: { text: '{file}: {done} von {total} Zonen verarbeitet.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimile-Information eingelesen' },
+  ingestFacsimileStoppedTitle: { text: 'Einlesen der Faksimile-Information abgebrochen' },
+  ingestFacsimileSummary: {
+    text: 'Faksimile aus {file} mit {surfaces} Seiten (surface) und {zones} Zonen vor body eingefügt; @facs-Attribute zu {added} Elementen hinzugefügt.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Abgebrochen nach {done} von {total} Zonen. Die bisherigen Änderungen können in einem Schritt rückgängig gemacht werden.',
+  },
+  ingestFacsimileProblems: { text: '{count} Probleme sind aufgetreten:' },
+  ingestFacsimileNotFound: { text: '{type} mit n="{n}" nicht gefunden.' },
+  ingestFacsimileNotUnique: { text: '{type} mit n="{n}" nicht eindeutig.' },
+  ingestFacsimileNoId: { text: '{type} mit n="{n}" hat keine xml:id, @facs nicht hinzugefügt.' },
+  ingestFacsimileNotInEditor: { text: '{type} mit n="{n}" im Editor nicht gefunden, @facs nicht hinzugefügt.' },
+  ingestFacsimileNoFacsimile: { text: 'Einlesen fehlgeschlagen: kein facsimile-Element in {file} gefunden.' },
+  ingestFacsimileNoBody: { text: 'Einlesen fehlgeschlagen: kein body-Element in der Kodierung gefunden.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Kein body-Element im Editor gefunden, facsimile-Element nicht eingefügt.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
