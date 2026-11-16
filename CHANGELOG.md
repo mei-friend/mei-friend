@@ -8,6 +8,7 @@
 * `Add ids` and `remove ids` functions optimized; new `change ids` functionality added, hidden in the manipulate menu behind `ALT` key and an additional warning prompt.
 * Section selector (navigation bar) now shows `@label`, `@n` (as "ending 2") or `@source` (lem/rdg) of mdiv, section, ending, lem, and rdg elements instead of only the `xml:id`.
 * `Ingest facsimile` operation sped up substantially with a progress prompt including a Stop button and final summary with any problems (new warnings for elements without xml:id or not found in editor)
+* Facsimile bounding box numbers have same size regardless of image resolution
 
 ### 1.6.0 Let's Encode! integration (develop)
 * Splash text updated to acknowledge Let's Encode! funding (for all users) and to provide LE-specific context when arriving from Let's Encode (see below). New letsEncodeSplashDate allows updating LE-only splash content in future

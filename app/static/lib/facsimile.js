@@ -28,6 +28,8 @@ var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
 const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
+const zoneLabelReferenceFontSize = 28; // px, zone label font size for an image of reference width
+const zoneLabelReferenceImageWidth = 1400; // px, image width at which the reference font size applies
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
 var sourceImageBoxes = {}; // ulx, uly, lrx, lry of source image boxes per page
@@ -408,19 +410,34 @@ function drawBoundingBox(zoneId, svg) {
     // draw number-like info from element (e.g., measure)
     let zoneLabel = facs[zoneId]['zoneLabel'] || facs[zoneId]['pointerN']; // zone@label or element@n
     if (zoneLabel) {
+      let fontSize = zoneLabelFontSize(svg);
       let txt = document.createElementNS(svgNameSpace, 'text');
       svg.appendChild(txt);
-      txt.setAttribute('font-size', '28px');
+      txt.setAttribute('font-size', fontSize + 'px');
       txt.setAttribute('font-weight', 'bold');
       txt.setAttribute('fill', rectangleColor);
-      txt.setAttribute('x', x + 7);
-      txt.setAttribute('y', y + 29);
+      txt.setAttribute('x', x + fontSize / 4);
+      txt.setAttribute('y', y + fontSize);
       txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
       txt.textContent = zoneLabel;
       if (pointerId) txt.id = rectId;
     }
   }
 } // drawBoundingBox()
+
+/**
+ * Computes the font size (in SVG user units, i.e., image pixels) for zone labels,
+ * relative to the width of the source image, so that labels appear
+ * similarly large on screen independently of the image resolution.
+ * @param {SVGElement} svg source image svg (with data-width attribute)
+ * @returns {number} font size in image pixels
+ */
+function zoneLabelFontSize(svg) {
+  let imageWidth = parseFloat(svg.getAttribute('data-width'));
+  if (!imageWidth) imageWidth = parseFloat(svg.getAttribute('viewBox')?.split(' ')[2]);
+  if (!imageWidth) imageWidth = zoneLabelReferenceImageWidth;
+  return Math.round((imageWidth / zoneLabelReferenceImageWidth) * zoneLabelReferenceFontSize);
+} // zoneLabelFontSize()
 
 /**
  * Get image from source based on zone id
