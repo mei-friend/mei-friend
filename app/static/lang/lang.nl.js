@@ -176,6 +176,16 @@ export const lang = {
   renumberMeasuresExecText: { text: 'Herhaal maten (uitvoeren)' },
   addIdsText: { text: 'Ids toevoegen aan MEI' },
   removeIdsText: { text: 'Ids verwijderen uit MEI' },
+  changeIdsText: {
+    text: 'Ids in MEI wijzigen (verbreekt externe links)',
+    description:
+      'Kent aan elk element (of aan de geselecteerde elementen) een nieuwe xml:id toe. Verwijzingen binnen dit bestand worden bijgewerkt, maar links vanuit andere bestanden, annotaties, facsimile-tools of URL’s die naar de oude xml:ids verwijzen, werken daarna niet meer.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Ids in MEI wijzigen</b>\n\nLet op: deze bewerking verbreekt externe links.\n\n{changed} xml:ids worden gewijzigd en {added} nieuwe xml:ids toegevoegd; {references} verwijzingen binnen dit bestand worden bijgewerkt.\n\nLinks vanuit andere bestanden, annotaties, facsimile-tools of URL’s die naar de oude xml:ids verwijzen, werken daarna niet meer.',
+  },
+  changeIdsProceed: { text: 'Ids wijzigen' },
+  changeIdsCancel: { text: 'Annuleren' },
   reRenderMeiVerovio: { text: 'Opnieuw renderen via Verovio' },
   addFacsimile: { text: 'Facsimile element toevoegen' },
   ingestFacsimileText: { text: 'Facsimile verwerken' },

@@ -182,6 +182,16 @@ export const lang = {
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
   removeIdsText: { text: 'Elimina IDs de MEI' },
+  changeIdsText: {
+    text: 'Canvia IDs a MEI (trenca els enllaços externs)',
+    description:
+      'Assigna un nou xml:id a cada element (o als elements seleccionats). Les referències dins d’aquest fitxer s’actualitzen, però els enllaços des d’altres fitxers, anotacions, eines de facsímil o URL que apunten als xml:id antics deixaran de funcionar.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Canvia IDs a MEI</b>\n\nAtenció: aquesta operació trenca els enllaços externs.\n\nEs canviaran {changed} xml:id i s’afegiran {added} xml:id nous; s’actualitzaran {references} referències dins d’aquest fitxer.\n\nEls enllaços des d’altres fitxers, anotacions, eines de facsímil o URL que apunten als xml:id antics deixaran de funcionar.',
+  },
+  changeIdsProceed: { text: 'Canvia IDs' },
+  changeIdsCancel: { text: 'Cancel·la' },
   reRenderMeiVerovio: { text: 'Torna a renderitzar via Verovio' },
   addFacsimile: { text: 'Afegeix element facsímil' },
   ingestFacsimileText: { text: 'Incorpora facsímil' },

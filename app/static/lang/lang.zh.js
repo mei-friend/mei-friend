@@ -171,6 +171,16 @@ export const lang = {
   renumberMeasuresExecText: { text: '重编号小节（执行）' },
   addIdsText: { text: '为 MEI 添加 id' },
   removeIdsText: { text: '从 MEI 中移除 id' },
+  changeIdsText: {
+    text: '更改 MEI 中的 id（会使外部链接失效）',
+    description:
+      '为每个元素（或所选元素）分配新的 xml:id。此文件内的引用会被更新，但来自其他文件、注释、摹本工具或 URL 且指向旧 xml:id 的链接将不再有效。',
+  },
+  changeIdsConfirmation: {
+    text: '<b>更改 MEI 中的 id</b>\n\n警告：此操作会使外部链接失效。\n\n将更改 {changed} 个 xml:id，添加 {added} 个新 xml:id；此文件内的 {references} 个引用将被更新。\n\n来自其他文件、注释、摹本工具或 URL 且指向旧 xml:id 的链接将不再有效。',
+  },
+  changeIdsProceed: { text: '更改 id' },
+  changeIdsCancel: { text: '取消' },
   reRenderMeiVerovio: { text: '通过 Verovio 重新渲染' },
   addFacsimile: { text: '添加摹本元素' },
   ingestFacsimileText: { text: '摄取摹本' },

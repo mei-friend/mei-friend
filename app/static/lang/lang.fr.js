@@ -182,6 +182,16 @@ export const lang = {
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
   removeIdsText: { text: 'Supprimer les identifiants de MEI' },
+  changeIdsText: {
+    text: 'Modifier les identifiants dans MEI (rompt les liens externes)',
+    description:
+      'Attribue un nouvel xml:id à chaque élément (ou aux éléments sélectionnés). Les références dans ce fichier sont mises à jour, mais les liens provenant d’autres fichiers, d’annotations, d’outils de fac-similé ou d’URL qui pointent vers les anciens xml:id ne fonctionneront plus.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Modifier les identifiants dans MEI</b>\n\nAttention : cette opération rompt les liens externes.\n\n{changed} xml:id seront modifiés et {added} nouveaux xml:id ajoutés ; {references} références dans ce fichier seront mises à jour.\n\nLes liens provenant d’autres fichiers, d’annotations, d’outils de fac-similé ou d’URL qui pointent vers les anciens xml:id ne fonctionneront plus.',
+  },
+  changeIdsProceed: { text: 'Modifier les identifiants' },
+  changeIdsCancel: { text: 'Annuler' },
   reRenderMeiVerovio: { text: 'Rendu à nouveau via Verovio' },
   addFacsimile: { text: 'Ajouter un élément de fac-similé' },
   ingestFacsimileText: { text: 'Ingestion de fac-similé' },

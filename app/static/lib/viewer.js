@@ -3239,10 +3239,15 @@ export default class Viewer {
   } // showAlert()
 
   /**
-   * Show a user prompt in #alertOverlay
-   * Pretty similar to showAlert() but with buttons and returning user response
-   * @param {string} message user message
-   * @param {Array} buttons button labels and onclick functions
+   * Show a blocking user prompt in #promptOverlay
+   * Similar to showAlert(), but with buttons; a backdrop (#promptBackdrop) blocks
+   * the rest of the page until one of the buttons is chosen.
+   * Keyboard: focus is put on the cancel button (or the first button), Tab cycles
+   * through the buttons, ESC activates the cancel button. All other key strokes
+   * are kept away from the page behind the prompt.
+   * @param {string} message user message (HTML)
+   * @param {Array<{label: string, event: Function, cancel?: boolean}>} buttons button
+   *        labels and onclick functions; the button with cancel: true is triggered by ESC
    * @param {*} type ['error'] 'warning' 'info'
    */
   showUserPrompt(message, buttons, type = 'error') {
@@ -3266,22 +3271,64 @@ export default class Viewer {
     }
     promptMessage.innerHTML = message;
 
-    buttons.forEach((button) => {
+    let cancelButton = null;
+    const buttonElements = buttons.map((button) => {
       let newButton = document.createElement('button');
       newButton.classList.add('promptButton');
       newButton.textContent = button.label;
       newButton.addEventListener('click', button.event);
+      if (button.cancel) {
+        newButton.classList.add('promptCancelButton');
+        cancelButton = newButton;
+      }
       promptButtons.appendChild(newButton);
+      return newButton;
     });
     promptButtons.style.display = 'block';
 
+    // remove handler of a previous prompt, if still active
+    if (this.promptKeyHandler) window.removeEventListener('keydown', this.promptKeyHandler, true);
+    if (!promptOverlay.contains(document.activeElement)) this.promptPreviousFocus = document.activeElement;
+    this.promptKeyHandler = (ev) => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (cancelButton) cancelButton.click();
+      } else if (ev.key === 'Tab') {
+        // keep focus within the prompt buttons
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (buttonElements.length === 0) return;
+        let i = buttonElements.indexOf(document.activeElement);
+        i = i < 0 ? 0 : (i + (ev.shiftKey ? -1 : 1) + buttonElements.length) % buttonElements.length;
+        buttonElements[i].focus();
+      } else if (!promptOverlay.contains(ev.target)) {
+        // block all other key strokes (editor, keyboard shortcuts) while prompt is shown
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', this.promptKeyHandler, true);
+
+    document.getElementById('promptBackdrop').style.display = 'block';
     promptOverlay.style.display = 'flex';
-    this.setFocusToVerovioPane();
+    (cancelButton || buttonElements[0])?.focus();
   } // showUserPrompt()
 
+  /**
+   * Hides the user prompt and its backdrop, and returns focus to where it was
+   * @param {string} modalid
+   */
   hideUserPrompt(modalid = 'promptOverlay') {
     document.getElementById(modalid).style.display = 'none';
-  }
+    document.getElementById('promptBackdrop').style.display = 'none';
+    if (this.promptKeyHandler) {
+      window.removeEventListener('keydown', this.promptKeyHandler, true);
+      this.promptKeyHandler = null;
+    }
+    if (this.promptPreviousFocus && document.contains(this.promptPreviousFocus)) this.promptPreviousFocus.focus();
+    this.promptPreviousFocus = null;
+  } // hideUserPrompt()
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {

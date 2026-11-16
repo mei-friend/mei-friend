@@ -170,6 +170,16 @@ export const lang = {
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
   addIdsText: { text: 'MEIにIDを追加' },
   removeIdsText: { text: 'MEIからIDを削除' },
+  changeIdsText: {
+    text: 'MEIのIDを変更（外部リンクが無効になります）',
+    description:
+      'すべての要素（または選択した要素）に新しいxml:idを割り当てます。このファイル内の参照は更新されますが、古いxml:idを指す他のファイル、注釈、ファクシミリツール、URLからのリンクは機能しなくなります。',
+  },
+  changeIdsConfirmation: {
+    text: '<b>MEIのIDを変更</b>\n\n注意：この操作により外部リンクが無効になります。\n\n{changed}個のxml:idが変更され、{added}個の新しいxml:idが追加されます。このファイル内の{references}個の参照が更新されます。\n\n古いxml:idを指す他のファイル、注釈、ファクシミリツール、URLからのリンクは機能しなくなります。',
+  },
+  changeIdsProceed: { text: 'IDを変更' },
+  changeIdsCancel: { text: 'キャンセル' },
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
   addFacsimile: { text: 'ファクシミリを追加' },
   ingestFacsimileText: { text: 'ファクシミリ取り込み' },
