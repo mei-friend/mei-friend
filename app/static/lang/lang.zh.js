@@ -184,6 +184,22 @@ export const lang = {
   reRenderMeiVerovio: { text: '通过 Verovio 重新渲染' },
   addFacsimile: { text: '添加摹本元素' },
   ingestFacsimileText: { text: '摄取摹本' },
+  ingestFacsimileTitle: { text: '正在摄取摹本' },
+  ingestFacsimileProgress: { text: '{file}：已处理 {done}/{total} 个区域。' },
+  ingestFacsimileDoneTitle: { text: '摹本已摄取' },
+  ingestFacsimileStoppedTitle: { text: '摹本摄取已停止' },
+  ingestFacsimileSummary: {
+    text: '已将来自 {file} 的摹本（{surfaces} 个 surface，{zones} 个区域）插入到 body 之前；已为 {added} 个元素添加 @facs 属性。',
+  },
+  ingestFacsimileStopped: { text: '在处理 {done}/{total} 个区域后停止。目前的更改可以一步撤销。' },
+  ingestFacsimileProblems: { text: '遇到 {count} 个问题：' },
+  ingestFacsimileNotFound: { text: '未找到 n="{n}" 的 {type}。' },
+  ingestFacsimileNotUnique: { text: 'n="{n}" 的 {type} 不唯一。' },
+  ingestFacsimileNoId: { text: 'n="{n}" 的 {type} 没有 xml:id，未添加 @facs。' },
+  ingestFacsimileNotInEditor: { text: '在编辑器中未找到 n="{n}" 的 {type}，未添加 @facs。' },
+  ingestFacsimileNoFacsimile: { text: '摄取摹本失败：在 {file} 中未找到 facsimile 元素。' },
+  ingestFacsimileNoBody: { text: '摄取摹本失败：在编码中未找到 body 元素。' },
+  ingestFacsimileNoBodyInEditor: { text: '在编辑器中未找到 body 元素，未插入 facsimile 元素。' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: '插入' },

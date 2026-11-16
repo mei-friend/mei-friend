@@ -189,6 +189,24 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Opnieuw renderen via Verovio' },
   addFacsimile: { text: 'Facsimile element toevoegen' },
   ingestFacsimileText: { text: 'Facsimile verwerken' },
+  ingestFacsimileTitle: { text: 'Facsimile wordt verwerkt' },
+  ingestFacsimileProgress: { text: '{file}: {done} van {total} zones verwerkt.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile verwerkt' },
+  ingestFacsimileStoppedTitle: { text: 'Verwerken van facsimile gestopt' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile uit {file} met {surfaces} surfaces en {zones} zones ingevoegd vóór body; @facs-attributen toegevoegd aan {added} elementen.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Gestopt na {done} van {total} zones. De wijzigingen tot nu toe kunnen in één stap ongedaan worden gemaakt.',
+  },
+  ingestFacsimileProblems: { text: 'Er zijn {count} problemen opgetreden:' },
+  ingestFacsimileNotFound: { text: '{type} met n="{n}" niet gevonden.' },
+  ingestFacsimileNotUnique: { text: '{type} met n="{n}" niet uniek.' },
+  ingestFacsimileNoId: { text: '{type} met n="{n}" heeft geen xml:id, @facs niet toegevoegd.' },
+  ingestFacsimileNotInEditor: { text: '{type} met n="{n}" niet gevonden in de editor, @facs niet toegevoegd.' },
+  ingestFacsimileNoFacsimile: { text: 'Verwerken van facsimile mislukt: geen facsimile-element gevonden in {file}.' },
+  ingestFacsimileNoBody: { text: 'Verwerken van facsimile mislukt: geen body-element gevonden in de codering.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Geen body-element gevonden in de editor, facsimile-element niet ingevoegd.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Invoegen' },

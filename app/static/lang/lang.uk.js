@@ -187,6 +187,24 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Перерендерити через Verovio' },
   addFacsimile: { text: 'Додати елемент факсиміле' },
   ingestFacsimileText: { text: 'Завантажити факсиміле' },
+  ingestFacsimileTitle: { text: 'Завантаження факсиміле' },
+  ingestFacsimileProgress: { text: '{file}: оброблено {done} з {total} областей.' },
+  ingestFacsimileDoneTitle: { text: 'Факсиміле завантажено' },
+  ingestFacsimileStoppedTitle: { text: 'Завантаження факсиміле зупинено' },
+  ingestFacsimileSummary: {
+    text: 'Факсиміле з {file} із {surfaces} поверхнями (surface) та {zones} областями вставлено перед body; атрибути @facs додано до {added} елементів.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Зупинено після {done} з {total} областей. Зроблені зміни можна скасувати одним кроком.',
+  },
+  ingestFacsimileProblems: { text: 'Виявлено {count} проблем:' },
+  ingestFacsimileNotFound: { text: '{type} з n="{n}" не знайдено.' },
+  ingestFacsimileNotUnique: { text: '{type} з n="{n}" не унікальний.' },
+  ingestFacsimileNoId: { text: '{type} з n="{n}" не має xml:id, @facs не додано.' },
+  ingestFacsimileNotInEditor: { text: '{type} з n="{n}" не знайдено в редакторі, @facs не додано.' },
+  ingestFacsimileNoFacsimile: { text: 'Завантаження факсиміле не вдалося: елемент facsimile не знайдено у {file}.' },
+  ingestFacsimileNoBody: { text: 'Завантаження факсиміле не вдалося: елемент body не знайдено в кодуванні.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Елемент body не знайдено в редакторі, елемент facsimile не вставлено.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Вставити' },

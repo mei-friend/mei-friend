@@ -196,6 +196,26 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Ridisegna tramite Verovio' },
   addFacsimile: { text: 'Aggiungi elemento facsimile' },
   ingestFacsimileText: { text: 'Incorpora facsimile' },
+  ingestFacsimileTitle: { text: 'Incorporazione del facsimile' },
+  ingestFacsimileProgress: { text: '{file}: {done} di {total} zone elaborate.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile incorporato' },
+  ingestFacsimileStoppedTitle: { text: 'Incorporazione del facsimile interrotta' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile da {file} con {surfaces} superfici (surface) e {zones} zone inserito prima di body; attributi @facs aggiunti a {added} elementi.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Interrotto dopo {done} di {total} zone. Le modifiche fatte finora possono essere annullate in un solo passaggio.',
+  },
+  ingestFacsimileProblems: { text: 'Sono stati riscontrati {count} problemi:' },
+  ingestFacsimileNotFound: { text: '{type} con n="{n}" non trovato.' },
+  ingestFacsimileNotUnique: { text: '{type} con n="{n}" non univoco.' },
+  ingestFacsimileNoId: { text: '{type} con n="{n}" senza xml:id, @facs non aggiunto.' },
+  ingestFacsimileNotInEditor: { text: '{type} con n="{n}" non trovato nell\'editor, @facs non aggiunto.' },
+  ingestFacsimileNoFacsimile: {
+    text: 'Incorporazione del facsimile fallita: nessun elemento facsimile trovato in {file}.',
+  },
+  ingestFacsimileNoBody: { text: 'Incorporazione del facsimile fallita: nessun elemento body trovato nella codifica.' },
+  ingestFacsimileNoBodyInEditor: { text: "Nessun elemento body trovato nell'editor, elemento facsimile non inserito." },
 
   // INSERT MENU ITEM / INSERISCI VOCE DI MENU
   insertMenuTitle: { text: 'Inserisci' },

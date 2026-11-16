@@ -193,6 +193,26 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Genrender via Verovio' },
   addFacsimile: { text: 'Tilføj facsimile element' },
   ingestFacsimileText: { text: 'Indtag facsimile' },
+  ingestFacsimileTitle: { text: 'Indlæser facsimile' },
+  ingestFacsimileProgress: { text: '{file}: {done} af {total} zoner behandlet.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile indlæst' },
+  ingestFacsimileStoppedTitle: { text: 'Indlæsning af facsimile stoppet' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile fra {file} med {surfaces} sider (surface) og {zones} zoner indsat før body; @facs-attributter tilføjet til {added} elementer.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Stoppet efter {done} af {total} zoner. De hidtidige ændringer kan fortrydes i ét trin.',
+  },
+  ingestFacsimileProblems: { text: 'Der opstod {count} problemer:' },
+  ingestFacsimileNotFound: { text: '{type} med n="{n}" ikke fundet.' },
+  ingestFacsimileNotUnique: { text: '{type} med n="{n}" ikke entydig.' },
+  ingestFacsimileNoId: { text: '{type} med n="{n}" har ingen xml:id, @facs ikke tilføjet.' },
+  ingestFacsimileNotInEditor: { text: '{type} med n="{n}" ikke fundet i editoren, @facs ikke tilføjet.' },
+  ingestFacsimileNoFacsimile: { text: 'Indlæsning af facsimile mislykkedes: intet facsimile-element fundet i {file}.' },
+  ingestFacsimileNoBody: { text: 'Indlæsning af facsimile mislykkedes: intet body-element fundet i kodningen.' },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'Intet body-element fundet i editoren, facsimile-elementet blev ikke indsat.',
+  },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Indsæt' },

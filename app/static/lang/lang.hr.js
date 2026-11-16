@@ -188,6 +188,24 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Ponovo renderuj putem Verovio' },
   addFacsimile: { text: 'Dodaj element faksimila' },
   ingestFacsimileText: { text: 'Unesi faksimil' },
+  ingestFacsimileTitle: { text: 'Unos faksimila' },
+  ingestFacsimileProgress: { text: '{file}: obrađeno {done} od {total} zona.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimil unesen' },
+  ingestFacsimileStoppedTitle: { text: 'Unos faksimila prekinut' },
+  ingestFacsimileSummary: {
+    text: 'Faksimil iz {file} s {surfaces} površina (surface) i {zones} zona umetnut prije body; atributi @facs dodani u {added} elemenata.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Prekinuto nakon {done} od {total} zona. Dosadašnje promjene mogu se poništiti u jednom koraku.',
+  },
+  ingestFacsimileProblems: { text: 'Pojavilo se {count} problema:' },
+  ingestFacsimileNotFound: { text: '{type} s n="{n}" nije pronađen.' },
+  ingestFacsimileNotUnique: { text: '{type} s n="{n}" nije jedinstven.' },
+  ingestFacsimileNoId: { text: '{type} s n="{n}" nema xml:id, @facs nije dodan.' },
+  ingestFacsimileNotInEditor: { text: '{type} s n="{n}" nije pronađen u uređivaču, @facs nije dodan.' },
+  ingestFacsimileNoFacsimile: { text: 'Unos faksimila nije uspio: u {file} nije pronađen element facsimile.' },
+  ingestFacsimileNoBody: { text: 'Unos faksimila nije uspio: u kodiranju nije pronađen element body.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Element body nije pronađen u uređivaču, element facsimile nije umetnut.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Umetni' },

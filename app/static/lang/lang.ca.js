@@ -195,6 +195,30 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Torna a renderitzar via Verovio' },
   addFacsimile: { text: 'Afegeix element facsímil' },
   ingestFacsimileText: { text: 'Incorpora facsímil' },
+  ingestFacsimileTitle: { text: 'Incorporant el facsímil' },
+  ingestFacsimileProgress: { text: '{file}: {done} de {total} zones processades.' },
+  ingestFacsimileDoneTitle: { text: 'Facsímil incorporat' },
+  ingestFacsimileStoppedTitle: { text: 'Incorporació del facsímil aturada' },
+  ingestFacsimileSummary: {
+    text: 'Facsímil de {file} amb {surfaces} superfícies (surface) i {zones} zones inserit abans de body; atributs @facs afegits a {added} elements.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Aturat després de {done} de {total} zones. Els canvis fets fins ara es poden desfer en un sol pas.',
+  },
+  ingestFacsimileProblems: { text: "S'han trobat {count} problemes:" },
+  ingestFacsimileNotFound: { text: '{type} amb n="{n}" no trobat.' },
+  ingestFacsimileNotUnique: { text: '{type} amb n="{n}" no és únic.' },
+  ingestFacsimileNoId: { text: '{type} amb n="{n}" no té xml:id, @facs no afegit.' },
+  ingestFacsimileNotInEditor: { text: '{type} amb n="{n}" no trobat a l\'editor, @facs no afegit.' },
+  ingestFacsimileNoFacsimile: {
+    text: "La incorporació del facsímil ha fallat: no s'ha trobat cap element facsimile a {file}.",
+  },
+  ingestFacsimileNoBody: {
+    text: "La incorporació del facsímil ha fallat: no s'ha trobat cap element body a la codificació.",
+  },
+  ingestFacsimileNoBodyInEditor: {
+    text: "No s'ha trobat cap element body a l'editor, l'element facsimile no s'ha inserit.",
+  },
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },

@@ -191,6 +191,28 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Reeldoni per Verovio' },
   addFacsimile: { text: 'Aldoni facsimilan elementon' },
   ingestFacsimileText: { text: 'Enkonsumi facsimilan' },
+  ingestFacsimileTitle: { text: 'Enkonsumado de faksimilo' },
+  ingestFacsimileProgress: { text: '{file}: {done} el {total} zonoj traktitaj.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimilo enkonsumita' },
+  ingestFacsimileStoppedTitle: { text: 'Enkonsumado de faksimilo haltigita' },
+  ingestFacsimileSummary: {
+    text: 'Faksimilo el {file} kun {surfaces} surfacoj (surface) kaj {zones} zonoj enmetita antaŭ body; atributoj @facs aldonitaj al {added} elementoj.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Haltigita post {done} el {total} zonoj. La ĝisnunaj ŝanĝoj estas malfareblaj per unu paŝo.',
+  },
+  ingestFacsimileProblems: { text: '{count} problemoj okazis:' },
+  ingestFacsimileNotFound: { text: '{type} kun n="{n}" ne trovita.' },
+  ingestFacsimileNotUnique: { text: '{type} kun n="{n}" ne unika.' },
+  ingestFacsimileNoId: { text: '{type} kun n="{n}" ne havas xml:id, @facs ne aldonita.' },
+  ingestFacsimileNotInEditor: { text: '{type} kun n="{n}" ne trovita en la redaktilo, @facs ne aldonita.' },
+  ingestFacsimileNoFacsimile: {
+    text: 'Enkonsumado de faksimilo malsukcesis: neniu elemento facsimile trovita en {file}.',
+  },
+  ingestFacsimileNoBody: { text: 'Enkonsumado de faksimilo malsukcesis: neniu elemento body trovita en la kodigo.' },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'Neniu elemento body trovita en la redaktilo, elemento facsimile ne enmetita.',
+  },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Enmeti' },

@@ -196,6 +196,26 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Ponownie renderuj za pomocą Verovio' },
   addFacsimile: { text: 'Dodaj element faksymile' },
   ingestFacsimileText: { text: 'Zaimportuj faksymile' },
+  ingestFacsimileTitle: { text: 'Importowanie faksymile' },
+  ingestFacsimileProgress: { text: '{file}: przetworzono {done} z {total} obszarów.' },
+  ingestFacsimileDoneTitle: { text: 'Faksymile zaimportowane' },
+  ingestFacsimileStoppedTitle: { text: 'Import faksymile zatrzymany' },
+  ingestFacsimileSummary: {
+    text: 'Faksymile z {file} z {surfaces} powierzchniami (surface) i {zones} obszarami wstawione przed body; atrybuty @facs dodano do {added} elementów.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Zatrzymano po {done} z {total} obszarów. Dotychczasowe zmiany można cofnąć w jednym kroku.',
+  },
+  ingestFacsimileProblems: { text: 'Napotkano {count} problemów:' },
+  ingestFacsimileNotFound: { text: 'Nie znaleziono {type} z n="{n}".' },
+  ingestFacsimileNotUnique: { text: '{type} z n="{n}" nie jest unikalny.' },
+  ingestFacsimileNoId: { text: '{type} z n="{n}" nie ma xml:id, @facs nie dodano.' },
+  ingestFacsimileNotInEditor: { text: 'Nie znaleziono {type} z n="{n}" w edytorze, @facs nie dodano.' },
+  ingestFacsimileNoFacsimile: { text: 'Import faksymile nie powiódł się: nie znaleziono elementu facsimile w {file}.' },
+  ingestFacsimileNoBody: { text: 'Import faksymile nie powiódł się: nie znaleziono elementu body w kodowaniu.' },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'Nie znaleziono elementu body w edytorze, element facsimile nie został wstawiony.',
+  },
 
   // INSERT MENU ITEM // WSTAW ELEMENT MENU
   insertMenuTitle: { text: 'Wstaw' },

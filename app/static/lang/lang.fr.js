@@ -195,6 +195,26 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Rendu à nouveau via Verovio' },
   addFacsimile: { text: 'Ajouter un élément de fac-similé' },
   ingestFacsimileText: { text: 'Ingestion de fac-similé' },
+  ingestFacsimileTitle: { text: 'Ingestion du fac-similé' },
+  ingestFacsimileProgress: { text: '{file} : {done} zones sur {total} traitées.' },
+  ingestFacsimileDoneTitle: { text: 'Fac-similé ingéré' },
+  ingestFacsimileStoppedTitle: { text: 'Ingestion du fac-similé arrêtée' },
+  ingestFacsimileSummary: {
+    text: 'Fac-similé de {file} avec {surfaces} surfaces et {zones} zones inséré avant body ; attributs @facs ajoutés à {added} éléments.',
+  },
+  ingestFacsimileStopped: {
+    text: "Arrêté après {done} zones sur {total}. Les modifications effectuées jusqu'ici peuvent être annulées en une seule étape.",
+  },
+  ingestFacsimileProblems: { text: '{count} problèmes rencontrés :' },
+  ingestFacsimileNotFound: { text: '{type} avec n="{n}" introuvable.' },
+  ingestFacsimileNotUnique: { text: '{type} avec n="{n}" non unique.' },
+  ingestFacsimileNoId: { text: '{type} avec n="{n}" sans xml:id, @facs non ajouté.' },
+  ingestFacsimileNotInEditor: { text: '{type} avec n="{n}" introuvable dans l\'éditeur, @facs non ajouté.' },
+  ingestFacsimileNoFacsimile: {
+    text: "Échec de l'ingestion du fac-similé : aucun élément facsimile trouvé dans {file}.",
+  },
+  ingestFacsimileNoBody: { text: "Échec de l'ingestion du fac-similé : aucun élément body trouvé dans l'encodage." },
+  ingestFacsimileNoBodyInEditor: { text: "Aucun élément body trouvé dans l'éditeur, élément facsimile non inséré." },
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },

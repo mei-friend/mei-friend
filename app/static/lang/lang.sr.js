@@ -187,6 +187,24 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Поново рендеруј путем Веровио' },
   addFacsimile: { text: 'Додај елемент факсимила' },
   ingestFacsimileText: { text: 'Унеси факсимил' },
+  ingestFacsimileTitle: { text: 'Унос факсимила' },
+  ingestFacsimileProgress: { text: '{file}: обрађено {done} од {total} зона.' },
+  ingestFacsimileDoneTitle: { text: 'Факсимил унесен' },
+  ingestFacsimileStoppedTitle: { text: 'Унос факсимила прекинут' },
+  ingestFacsimileSummary: {
+    text: 'Факсимил из {file} са {surfaces} површина (surface) и {zones} зона уметнут пре body; атрибути @facs додати у {added} елемената.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Прекинуто након {done} од {total} зона. Досадашње измене могу се поништити у једном кораку.',
+  },
+  ingestFacsimileProblems: { text: 'Појавило се {count} проблема:' },
+  ingestFacsimileNotFound: { text: '{type} са n="{n}" није пронађен.' },
+  ingestFacsimileNotUnique: { text: '{type} са n="{n}" није јединствен.' },
+  ingestFacsimileNoId: { text: '{type} са n="{n}" нема xml:id, @facs није додат.' },
+  ingestFacsimileNotInEditor: { text: '{type} са n="{n}" није пронађен у едитору, @facs није додат.' },
+  ingestFacsimileNoFacsimile: { text: 'Унос факсимила није успео: у {file} није пронађен елемент facsimile.' },
+  ingestFacsimileNoBody: { text: 'Унос факсимила није успео: у кодирању није пронађен елемент body.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Елемент body није пронађен у едитору, елемент facsimile није уметнут.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Уметни' },

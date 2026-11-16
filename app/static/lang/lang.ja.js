@@ -183,6 +183,32 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
   addFacsimile: { text: 'ファクシミリを追加' },
   ingestFacsimileText: { text: 'ファクシミリ取り込み' },
+  ingestFacsimileTitle: { text: 'ファクシミリを取り込み中' },
+  ingestFacsimileProgress: { text: '{file}: {total} 個中 {done} 個のゾーンを処理しました。' },
+  ingestFacsimileDoneTitle: { text: 'ファクシミリを取り込みました' },
+  ingestFacsimileStoppedTitle: { text: 'ファクシミリの取り込みを停止しました' },
+  ingestFacsimileSummary: {
+    text: '{file} のファクシミリ（{surfaces} 個の surface、{zones} 個のゾーン）を body の前に挿入し、{added} 個の要素に @facs 属性を追加しました。',
+  },
+  ingestFacsimileStopped: {
+    text: '{total} 個中 {done} 個のゾーンで停止しました。これまでの変更は一度に元に戻せます。',
+  },
+  ingestFacsimileProblems: { text: '{count} 件の問題が発生しました：' },
+  ingestFacsimileNotFound: { text: 'n="{n}" の {type} が見つかりません。' },
+  ingestFacsimileNotUnique: { text: 'n="{n}" の {type} が一意ではありません。' },
+  ingestFacsimileNoId: { text: 'n="{n}" の {type} に xml:id がないため、@facs を追加しませんでした。' },
+  ingestFacsimileNotInEditor: {
+    text: 'n="{n}" の {type} がエディターで見つからないため、@facs を追加しませんでした。',
+  },
+  ingestFacsimileNoFacsimile: {
+    text: 'ファクシミリの取り込みに失敗しました：{file} に facsimile 要素が見つかりません。',
+  },
+  ingestFacsimileNoBody: {
+    text: 'ファクシミリの取り込みに失敗しました：エンコーディングに body 要素が見つかりません。',
+  },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'エディターに body 要素が見つからないため、facsimile 要素を挿入しませんでした。',
+  },
 
   // INSERT MENU
   insertMenuTitle: { text: '挿入' },

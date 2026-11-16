@@ -192,6 +192,30 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Volver a renderizar con Verovio' },
   addFacsimile: { text: 'Añadir elemento de faksimile' },
   ingestFacsimileText: { text: 'Leer información de faksimile' },
+  ingestFacsimileTitle: { text: 'Leyendo información de facsímil' },
+  ingestFacsimileProgress: { text: '{file}: {done} de {total} zonas procesadas.' },
+  ingestFacsimileDoneTitle: { text: 'Información de facsímil leída' },
+  ingestFacsimileStoppedTitle: { text: 'Lectura de facsímil detenida' },
+  ingestFacsimileSummary: {
+    text: 'Facsímil de {file} con {surfaces} superficies (surface) y {zones} zonas insertado antes de body; atributos @facs añadidos a {added} elementos.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Detenido tras {done} de {total} zonas. Los cambios realizados hasta ahora se pueden deshacer en un solo paso.',
+  },
+  ingestFacsimileProblems: { text: 'Se encontraron {count} problemas:' },
+  ingestFacsimileNotFound: { text: '{type} con n="{n}" no encontrado.' },
+  ingestFacsimileNotUnique: { text: '{type} con n="{n}" no es único.' },
+  ingestFacsimileNoId: { text: '{type} con n="{n}" no tiene xml:id, @facs no añadido.' },
+  ingestFacsimileNotInEditor: { text: '{type} con n="{n}" no encontrado en el editor, @facs no añadido.' },
+  ingestFacsimileNoFacsimile: {
+    text: 'La lectura del facsímil falló: no se encontró ningún elemento facsimile en {file}.',
+  },
+  ingestFacsimileNoBody: {
+    text: 'La lectura del facsímil falló: no se encontró ningún elemento body en la codificación.',
+  },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'No se encontró ningún elemento body en el editor, el elemento facsimile no se insertó.',
+  },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insertar' },
