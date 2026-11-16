@@ -11,6 +11,8 @@ import * as facs from './facsimile.js';
 import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
+const dataURISet = new Set(att.dataURI); // attributes that may point to xml:ids
+
 /**
  * Runs editFn and, if it produced more than one CodeMirror history entry,
  * collapses them into a single 'done' entry in cm's undo history. This makes
@@ -1482,9 +1484,9 @@ export function renumberMeasures(v, cm, change = false) {
 export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = [], showReport = true) {
   withSingleUndoStep(cm, () => {
     let startTime = Date.now();
-    let report = { added: 0, removed: 0 };
-    let skipList = []; // list of xml:ids that will not be removed
-    let selectionKept = 0; // IDs found in selection that were kept because pointed to
+    let report = { added: 0, removed: 0, kept: 0 }; // kept: xml:ids not removed because pointed to
+    let skipList = new Set(); // xml:ids that are pointed to and will not be removed
+    let existingIds = new Set(); // xml:ids present in the document (to guarantee uniqueness of new ones)
 
     v.allowCursorActivity = false;
     cm.blockChanges = true;
@@ -1505,26 +1507,35 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     // Load full XML document (needed for skipList and DOM manipulation)
     v.loadXml(cm.getValue(), true);
 
+    const rootList = Array.from(v.xmlDoc.getElementsByTagName('mei'));
+    const changedElements = []; // elements that received a new xml:id (need attribute sorting)
+
+    if (removeIds) {
+      // Build skipList from the full document so cross-references (also those
+      // outside a selection) are respected when removing IDs
+      collectPointedIds();
+    } else {
+      // Collect existing ids so that newly generated ids are guaranteed to be unique
+      v.xmlDoc.querySelectorAll('[*|id]').forEach((el) => existingIds.add(el.getAttribute('xml:id')));
+    }
+
     if (hasSelection) {
       // === Selection-only mode ===
-      // Build skipList from the full document so cross-references outside the
-      // selection are respected when removing IDs
-      v.xmlDoc.querySelectorAll('mei').forEach((e) => dig(e, true));
-
       const selText = cm.getRange(selFrom, selTo);
 
       if (removeIds) {
         // Find all xml:ids present in the selected text by regex, then remove them
-        // from the full XML DOM — no fragment reconstruction needed
+        // from the full XML DOM in a single pass — no fragment reconstruction needed
         const xmlIdPattern = /xml:id=["']([^"']+)["']/g;
+        const idsToRemove = new Set();
         let m;
         while ((m = xmlIdPattern.exec(selText)) !== null) {
-          const id = m[1];
-          if (skipList.includes(id)) {
-            selectionKept++;
-          } else {
-            const el = v.xmlDoc.querySelector(`[*|id="${CSS.escape(id)}"]`);
-            if (el) {
+          if (skipList.has(m[1])) report.kept++;
+          else idsToRemove.add(m[1]);
+        }
+        if (idsToRemove.size > 0) {
+          for (const el of v.xmlDoc.querySelectorAll('[*|id]')) {
+            if (idsToRemove.has(el.getAttribute('xml:id'))) {
               el.removeAttribute('xml:id');
               report.removed++;
             }
@@ -1577,8 +1588,7 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
               textPos = tagIdx + 1;
               if (tagIdx >= selEnd) break;
               if (tagIdx >= selStart && (selectedElements.length === 0 || selectedElements.includes(el.nodeName))) {
-                el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
-                report.added++;
+                addXmlId(el);
               }
             }
           }
@@ -1587,7 +1597,8 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
       }
 
       // Serialize the modified full DOM back into the editor
-      v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
+      // (new xml:ids are appended last; sort them to be the first attribute)
+      changedElements.forEach((e) => dutils.sortNodeAttributes(e));
       cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
       addApplicationInfo(v, cm);
 
@@ -1595,18 +1606,26 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
       cm.setSelection(selFrom, selTo);
     } else {
       // === Full-document mode (no selection) ===
-      const rootList = v.xmlDoc.querySelectorAll('mei');
-
-      // determine skipList to securely remove ids
-      if (removeIds) {
-        rootList.forEach((e) => dig(e, true));
+      const selectedSet = new Set(selectedElements);
+      for (const root of rootList) {
+        for (const el of [root, ...root.getElementsByTagName('*')]) {
+          if (selectedSet.size > 0 && !selectedSet.has(el.nodeName)) continue;
+          const id = el.getAttribute('xml:id');
+          if (!removeIds && id === null) {
+            addXmlId(el);
+          } else if (removeIds && id !== null) {
+            if (skipList.has(id)) {
+              report.kept++;
+            } else {
+              el.removeAttribute('xml:id');
+              report.removed++;
+            }
+          }
+        }
       }
 
-      // manipulate xml tree starting from selector
-      rootList.forEach((e) => dig(e));
-
-      // before serialization, sort xml attributes with xml:id first, then alphabetically
-      v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
+      // before serialization, sort xml attributes of new xml:ids with xml:id first, then alphabetically
+      changedElements.forEach((e) => dutils.sortNodeAttributes(e));
       cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
       addApplicationInfo(v, cm);
 
@@ -1627,8 +1646,7 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     let msg;
     if (removeIds) {
       msg = report.removed + ' xml:ids removed' + scope + ', ';
-      const kept = hasSelection ? selectionKept : skipList.length;
-      msg += kept + ' xml:ids kept, because they are pointed to.';
+      msg += report.kept + ' xml:ids kept, because they are pointed to.';
     } else {
       msg = report.added + ' new xml:ids added' + scope;
       if (report.added > 0) {
@@ -1659,35 +1677,31 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
       v.showAlert(msg, 'success');
     }
 
-    // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
-    function dig(el, explore = false) {
-      if (el.nodeType === Node.ELEMENT_NODE) {
-        if (explore) {
-          // just go through xml structure and search for pointing ids
-          for (let attrName of att.dataURI) {
-            let value = el.getAttribute(attrName);
-            if (value) {
+    // collects all xml:ids that are pointed to (by data.URI attributes) into skipList
+    function collectPointedIds() {
+      for (const root of rootList) {
+        for (const el of [root, ...root.getElementsByTagName('*')]) {
+          for (const attr of el.attributes) {
+            if (dataURISet.has(attr.name) && attr.value) {
               // split value string by whitespace
-              value.split(/[\s]+/).forEach((v) => skipList.push(utils.rmHash(v)));
-            }
-          }
-        } else if (selectedElements.includes(el.nodeName) || selectedElements.length === 0) {
-          if (!removeIds && !el.hasAttribute('xml:id')) {
-            // add xml:id when missing
-            el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
-            report.added++;
-          } else if (removeIds && el.hasAttribute('xml:id')) {
-            // remove xml:id, unless pointed to
-            if (!skipList.includes(el.getAttribute('xml:id'))) {
-              el.removeAttribute('xml:id');
-              report.removed++;
+              attr.value.split(/\s+/).forEach((v) => v && skipList.add(utils.rmHash(v)));
             }
           }
         }
-        // recursively through the xml tree
-        el.childNodes.forEach((e) => dig(e, explore));
       }
-    } // dig()
+    } // collectPointedIds()
+
+    // adds a new xml:id to el that is unique within the document
+    function addXmlId(el) {
+      let id;
+      do {
+        id = utils.generateXmlId(el.nodeName, v.xmlIdStyle);
+      } while (existingIds.has(id));
+      existingIds.add(id);
+      el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', id);
+      changedElements.push(el);
+      report.added++;
+    } // addXmlId()
   });
 } // manipulateXmlIds()
 
