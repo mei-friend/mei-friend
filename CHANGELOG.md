@@ -4,9 +4,9 @@
 
 * Prepare for Verovio's runtime font registration ([rism-digital/verovio#4404](https://github.com/rism-digital/verovio/pull/4404)): with toolkits that bundle only Leipzig and Bravura, selecting Gootville, Leland or Petaluma registers it from mei-friend's own copies (`static/fonts`, with SMuFL metadata) instead of silently rendering Leipzig. PDF export uses the same copies, which also fixes it for Gootville and Leland, whose previous download URLs had gone dead
 * Add Verovio toolkit version 6.4.1 to select menu, with release date 3 November 2026
-* Substantial speed improvements for accid.ges, metcon, and linking checker
+* Substantial speed improvements for accid.ges, metcon, and linking checker functions
 * `Add ids` and `remove ids` functions optimized; new `change ids` functionality added, hidden in the manipulate menu behind `ALT` key and an additional warning prompt.
-
+* Section selector (navigation bar) now shows `@label`, `@n` (as "ending 2") or `@source` (lem/rdg) of mdiv, section, ending, lem, and rdg elements instead of only the `xml:id`.
 
 ### 1.6.0 Let's Encode! integration (develop)
 * Splash text updated to acknowledge Let's Encode! funding (for all users) and to provide LE-specific context when arriving from Let's Encode (see below). New letsEncodeSplashDate allows updating LE-only splash content in future
