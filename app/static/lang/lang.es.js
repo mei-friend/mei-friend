@@ -179,6 +179,16 @@ export const lang = {
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },
   addIdsText: { text: 'Añadir IDs a MEI' },
   removeIdsText: { text: 'Eliminar IDs de MEI' },
+  changeIdsText: {
+    text: 'Cambiar IDs en MEI (rompe los enlaces externos)',
+    description:
+      'Asigna un nuevo xml:id a cada elemento (o a los elementos seleccionados). Las referencias dentro de este archivo se actualizan, pero los enlaces desde otros archivos, anotaciones, herramientas de facsímil o URL que apuntan a los xml:id antiguos dejarán de funcionar.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Cambiar IDs en MEI</b>\n\nAtención: esta operación rompe los enlaces externos.\n\nSe cambiarán {changed} xml:id y se añadirán {added} xml:id nuevos; se actualizarán {references} referencias dentro de este archivo.\n\nLos enlaces desde otros archivos, anotaciones, herramientas de facsímil o URL que apuntan a los xml:id antiguos dejarán de funcionar.',
+  },
+  changeIdsProceed: { text: 'Cambiar IDs' },
+  changeIdsCancel: { text: 'Cancelar' },
   reRenderMeiVerovio: { text: 'Volver a renderizar con Verovio' },
   addFacsimile: { text: 'Añadir elemento de faksimile' },
   ingestFacsimileText: { text: 'Leer información de faksimile' },

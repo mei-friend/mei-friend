@@ -2817,6 +2817,18 @@ select > option {
   color: black;
 }
 
+/* Blocks the page while a user prompt is shown */
+#promptBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+}
+
+#promptOverlay {
+  z-index: 1001;
+}
+
 #promptContent {
   margin: auto;
   text-align: center;

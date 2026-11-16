@@ -175,6 +175,16 @@ export const lang = {
   renumberMeasuresExecText: { text: ' Renumeriraj mere (izvrši)' },
   addIdsText: { text: 'Dodaj ID-ove MEI' },
   removeIdsText: { text: 'Ukloni ID-ove iz MEI' },
+  changeIdsText: {
+    text: 'Promijeni ID-ove u MEI (prekida vanjske poveznice)',
+    description:
+      'Dodjeljuje novi xml:id svakom elementu (ili odabranim elementima). Reference unutar ove datoteke se ažuriraju, ali poveznice iz drugih datoteka, anotacija, alata za faksimile ili URL-ova koje upućuju na stare xml:id-ove više neće raditi.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Promijeni ID-ove u MEI</b>\n\nPažnja: ova operacija prekida vanjske poveznice.\n\nBit će promijenjeno {changed} xml:id-ova i dodano {added} novih xml:id-ova; bit će ažurirano {references} referenci unutar ove datoteke.\n\nPoveznice iz drugih datoteka, anotacija, alata za faksimile ili URL-ova koje upućuju na stare xml:id-ove više neće raditi.',
+  },
+  changeIdsProceed: { text: 'Promijeni ID-ove' },
+  changeIdsCancel: { text: 'Odustani' },
   reRenderMeiVerovio: { text: ' Ponovo renderuj putem Verovio' },
   addFacsimile: { text: 'Dodaj element faksimila' },
   ingestFacsimileText: { text: 'Unesi faksimil' },

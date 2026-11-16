@@ -178,6 +178,16 @@ export const lang = {
   renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
   removeIdsText: { text: 'Forigi id-ojn el MEI' },
+  changeIdsText: {
+    text: 'Ŝanĝi id-ojn en MEI (rompas eksterajn ligilojn)',
+    description:
+      'Atribuas novan xml:id al ĉiu elemento (aŭ al la elektitaj elementoj). Referencoj ene de ĉi tiu dosiero estas ĝisdatigitaj, sed ligiloj el aliaj dosieroj, prinotoj, faksimilaj iloj aŭ URL-oj, kiuj montras al la malnovaj xml:id-oj, ne plu funkcios.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Ŝanĝi id-ojn en MEI</b>\n\nAtentu: ĉi tiu operacio rompas eksterajn ligilojn.\n\n{changed} xml:id-oj estos ŝanĝitaj kaj {added} novaj xml:id-oj aldonitaj; {references} referencoj ene de ĉi tiu dosiero estos ĝisdatigitaj.\n\nLigiloj el aliaj dosieroj, prinotoj, faksimilaj iloj aŭ URL-oj, kiuj montras al la malnovaj xml:id-oj, ne plu funkcios.',
+  },
+  changeIdsProceed: { text: 'Ŝanĝi id-ojn' },
+  changeIdsCancel: { text: 'Nuligi' },
   reRenderMeiVerovio: { text: ' Reeldoni per Verovio' },
   addFacsimile: { text: 'Aldoni facsimilan elementon' },
   ingestFacsimileText: { text: 'Enkonsumi facsimilan' },

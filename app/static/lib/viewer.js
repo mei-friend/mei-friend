@@ -20,6 +20,7 @@ import { codeCheckerHeight } from './resizer.js';
 import {
   cm,
   cmd,
+  handleEditorChanges,
   meiFileName,
   rngLoader,
   storage,
@@ -3238,10 +3239,15 @@ export default class Viewer {
   } // showAlert()
 
   /**
-   * Show a user prompt in #alertOverlay
-   * Pretty similar to showAlert() but with buttons and returning user response
-   * @param {string} message user message
-   * @param {Array} buttons button labels and onclick functions
+   * Show a blocking user prompt in #promptOverlay
+   * Similar to showAlert(), but with buttons; a backdrop (#promptBackdrop) blocks
+   * the rest of the page until one of the buttons is chosen.
+   * Keyboard: focus is put on the cancel button (or the first button), Tab cycles
+   * through the buttons, ESC activates the cancel button. All other key strokes
+   * are kept away from the page behind the prompt.
+   * @param {string} message user message (HTML)
+   * @param {Array<{label: string, event: Function, cancel?: boolean}>} buttons button
+   *        labels and onclick functions; the button with cancel: true is triggered by ESC
    * @param {*} type ['error'] 'warning' 'info'
    */
   showUserPrompt(message, buttons, type = 'error') {
@@ -3265,22 +3271,64 @@ export default class Viewer {
     }
     promptMessage.innerHTML = message;
 
-    buttons.forEach((button) => {
+    let cancelButton = null;
+    const buttonElements = buttons.map((button) => {
       let newButton = document.createElement('button');
       newButton.classList.add('promptButton');
       newButton.textContent = button.label;
       newButton.addEventListener('click', button.event);
+      if (button.cancel) {
+        newButton.classList.add('promptCancelButton');
+        cancelButton = newButton;
+      }
       promptButtons.appendChild(newButton);
+      return newButton;
     });
     promptButtons.style.display = 'block';
 
+    // remove handler of a previous prompt, if still active
+    if (this.promptKeyHandler) window.removeEventListener('keydown', this.promptKeyHandler, true);
+    if (!promptOverlay.contains(document.activeElement)) this.promptPreviousFocus = document.activeElement;
+    this.promptKeyHandler = (ev) => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (cancelButton) cancelButton.click();
+      } else if (ev.key === 'Tab') {
+        // keep focus within the prompt buttons
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (buttonElements.length === 0) return;
+        let i = buttonElements.indexOf(document.activeElement);
+        i = i < 0 ? 0 : (i + (ev.shiftKey ? -1 : 1) + buttonElements.length) % buttonElements.length;
+        buttonElements[i].focus();
+      } else if (!promptOverlay.contains(ev.target)) {
+        // block all other key strokes (editor, keyboard shortcuts) while prompt is shown
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', this.promptKeyHandler, true);
+
+    document.getElementById('promptBackdrop').style.display = 'block';
     promptOverlay.style.display = 'flex';
-    this.setFocusToVerovioPane();
+    (cancelButton || buttonElements[0])?.focus();
   } // showUserPrompt()
 
+  /**
+   * Hides the user prompt and its backdrop, and returns focus to where it was
+   * @param {string} modalid
+   */
   hideUserPrompt(modalid = 'promptOverlay') {
     document.getElementById(modalid).style.display = 'none';
-  }
+    document.getElementById('promptBackdrop').style.display = 'none';
+    if (this.promptKeyHandler) {
+      window.removeEventListener('keydown', this.promptKeyHandler, true);
+      this.promptKeyHandler = null;
+    }
+    if (this.promptPreviousFocus && document.contains(this.promptPreviousFocus)) this.promptPreviousFocus.focus();
+    this.promptPreviousFocus = null;
+  } // hideUserPrompt()
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
@@ -3717,12 +3765,7 @@ export default class Viewer {
     correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
-      let count = 0;
-      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
-      fixButtonList.forEach((button) => {
-        count++;
-        setTimeout(() => button.click(), 0);
-      });
+      const fixButtonList = Array.from(codeChecker.querySelectorAll('button.fix:not(.disabled)'));
       infoSpanCurrent.innerHTML = '0';
       infoSpanOf.innerHTML = '/';
       infoSpanTotal.innerHTML = fixButtonList.length;
@@ -3730,6 +3773,47 @@ export default class Viewer {
       correctAllButton.disabled = true;
       ignoreAllButton.classList.add('disabled');
       ignoreAllButton.disabled = true;
+      if (fixButtonList.length === 0) return;
+
+      // Apply the fixes in time slices, each as one CodeMirror operation.
+      // Editor change handling (DOM reparse, local storage, notation update)
+      // is blocked while fixing and run once at the end; cursor activity is
+      // suppressed so that no page flipping happens per fix.
+      const BUDGET_MS = 50; // per slice, before yielding to the GUI
+      let i = 0;
+      this.showCodeCheckerStopButton(true);
+      cm.blockChanges = true;
+      const applyFixes = () => {
+        try {
+          cm.operation(() => {
+            const t0 = performance.now();
+            while (i < fixButtonList.length) {
+              fixButtonList[i++].applyFix();
+              if (performance.now() - t0 > BUDGET_MS) break;
+            }
+            this.allowCursorActivity = false; // fix callbacks re-enable it; keep it off until done
+          });
+        } catch (err) {
+          console.error('Fix all: error applying fix ' + i + ':', err);
+          i = fixButtonList.length;
+        }
+        if (i < fixButtonList.length && !this.codeCheckerAbort) {
+          setTimeout(applyFixes, 0);
+        } else {
+          cm.blockChanges = false;
+          this.allowCursorActivity = true;
+          this.showCodeCheckerStopButton(false);
+          if (this.codeCheckerAbort) {
+            // stopped: let the user continue with the remaining entries
+            correctAllButton.classList.remove('disabled');
+            correctAllButton.disabled = false;
+            ignoreAllButton.classList.remove('disabled');
+            ignoreAllButton.disabled = false;
+          }
+          handleEditorChanges();
+        }
+      };
+      setTimeout(applyFixes, 0);
     });
     headerDiv.appendChild(correctAllButton);
 
@@ -3746,6 +3830,19 @@ export default class Viewer {
       });
     });
     headerDiv.appendChild(ignoreAllButton);
+
+    // Stop button: interrupts a running check or "Fix all" at the next time slice
+    this.codeCheckerAbort = false;
+    let stopButton = document.createElement('button');
+    stopButton.id = 'codeCheckerStopButton';
+    stopButton.innerHTML = translator.lang.codeCheckerStop.text;
+    stopButton.classList.add('btn');
+    stopButton.addEventListener('click', () => {
+      this.codeCheckerAbort = true;
+      stopButton.disabled = true;
+      stopButton.classList.add('disabled');
+    });
+    headerDiv.appendChild(stopButton);
 
     let infoSpanCurrent = document.createElement('span');
     infoSpanCurrent.id = 'codeCheckerInfoCurrent';
@@ -3815,7 +3912,9 @@ export default class Viewer {
       correctButton.innerHTML = translator.lang.codeCheckerFix.text;
       correctButton.classList.add('btn');
       correctButton.classList.add('fix');
-      correctButton.addEventListener('click', () => {
+      // applyFix() is also called directly by "Fix all", so that no click event
+      // has to be dispatched (and handled by document-wide listeners) per entry
+      correctButton.applyFix = () => {
         data.correct();
         let checked = document.createElement('span');
         checked.innerHTML = icon.check;
@@ -3832,7 +3931,8 @@ export default class Viewer {
           checked.innerHTML += icon.check;
           codeCheckerInfoCurrent.parentElement.appendChild(checked);
         }
-      });
+      };
+      correctButton.addEventListener('click', correctButton.applyFix);
       div.appendChild(correctButton);
 
       // Ignore Button
@@ -3864,7 +3964,22 @@ export default class Viewer {
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
 
+  /**
+   * Shows or hides the Stop button of the code checker panel; showing it
+   * (a check or "Fix all" starts) resets the abort flag
+   * @param {boolean} visible
+   */
+  showCodeCheckerStopButton(visible) {
+    if (visible) this.codeCheckerAbort = false;
+    const stopButton = document.getElementById('codeCheckerStopButton');
+    if (!stopButton) return;
+    stopButton.style.display = visible ? '' : 'none';
+    stopButton.disabled = false;
+    stopButton.classList.remove('disabled');
+  } // showCodeCheckerStopButton()
+
   finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
+    this.showCodeCheckerStopButton(false);
     let nothingFound = document.getElementById('codeCheckerCheckingCode');
     if (nothingFound) {
       nothingFound.innerHTML = allGoodString;

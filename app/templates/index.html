@@ -435,6 +435,9 @@
               <span id="removeIdsText">Remove ids from MEI</span>
               <span class="keyShortCut shiftKey cmdKey">M</span>
             </a>
+            <a id="changeIds" class="altKeyOnly" href="#">
+              <span id="changeIdsText" title="Assigns a new xml:id to every element (or to the selected elements). References within this file are updated, but links from other files, annotations, facsimile tools or URLs that point to the old xml:ids will no longer work.">Change ids in MEI (breaks external links)</span>
+            </a>
             <hr class="dropdownLine" />
             <a id="reRenderMeiVerovio" href="#">Rerender via Verovio</a>
             <!-- <a id="reRenderMeiWithout" href="#">Rerender via Verovio (remove ids)</a> -->
@@ -955,6 +958,7 @@
           <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
           <span class="alertCloseButton" onclick="this.parentElement.style.display = 'none'">&times;</span>
         </div>
+        <div id="promptBackdrop" style="display: none"></div>
         <div id="promptOverlay" class="alert" style="display: none">
           <span id="promptIcon" class="alertIcon"></span>
           <div id="promptContent">

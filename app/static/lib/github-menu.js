@@ -1623,6 +1623,7 @@ async function doCommit(suppliedMessage = null) {
       [
         {
           label: 'Cancel - do not commit',
+          cancel: true,
           event: () => {
             v.hideUserPrompt();
           },
@@ -1774,6 +1775,7 @@ export async function checkAndClone(
       [
         {
           label: translator.lang.repoSizeWarningCancel.text,
+          cancel: true,
           event: () => {
             v.hideUserPrompt();
           },

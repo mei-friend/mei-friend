@@ -1074,7 +1074,7 @@ export function setChoiceOptions(active, selector) {
  * @param {Document} xmlDoc - The XML document to check
  * @returns {string} - The CSS selector
  */
-function getSectionSelectSelector(xmlDoc) {
+export function getSectionSelectSelector(xmlDoc) {
   let selector = 'section,ending,lem,rdg';
   let baseSection = xmlDoc.querySelector('music body');
   if (baseSection && baseSection.querySelectorAll('mdiv').length > 1) {
@@ -1084,11 +1084,42 @@ function getSectionSelectSelector(xmlDoc) {
 } // getSectionSelectSelector()
 
 /**
+ * Display text for an element in the section selector. None of the navigable
+ * elements allow a <head> child, so the name comes from attributes, first match wins:
+ * @label; @n (prefixed with the element name, so "ending 2" and "section 2" stay
+ * apart); @source for lem/rdg, where a reading is usually identified by its
+ * source rather than a label; and the xml:id as last resort.
+ * @param {Element} el - mdiv, section, ending, lem, or rdg element
+ * @returns {string} - display text
+ */
+function sectionDisplayText(el) {
+  const name = el.localName;
+  if (el.hasAttribute('label')) return el.getAttribute('label');
+  if (el.hasAttribute('n')) return name + ' ' + el.getAttribute('n');
+  if ((name === 'lem' || name === 'rdg') && el.hasAttribute('source')) return name + ' ' + el.getAttribute('source');
+  return el.getAttribute('xml:id');
+} // sectionDisplayText()
+
+/**
+ * Tooltip for an element in the section selector: element name and xml:id
+ * (labels are not guaranteed to be unique, so the id stays reachable on hover),
+ * plus @type if present.
+ * @param {Element} el - mdiv, section, ending, lem, or rdg element
+ * @returns {string} - tooltip text
+ */
+function sectionTooltip(el) {
+  let tooltip = el.localName + ' ' + el.getAttribute('xml:id');
+  if (el.hasAttribute('type')) tooltip += ' (' + el.getAttribute('type') + ')';
+  return tooltip;
+} // sectionTooltip()
+
+/**
  * Checks xmlDoc for mdiv, section, ending, lem, rdg elements
  * for quick navigation. mdiv is only added if there are multiple
- * mdivs in the document.
+ * mdivs in the document. Elements without xml:id are skipped, as they
+ * cannot be navigated to (see addMissingSectionIds() for adding them).
  * @param {Document} xmlDoc - The XML document to check
- * @returns {Array} - An array of section options
+ * @returns {Array} - An array of section options [displayText, xmlId, tooltip]
  */
 export function generateSectionSelect(xmlDoc) {
   let selector = getSectionSelectSelector(xmlDoc);
@@ -1096,13 +1127,14 @@ export function generateSectionSelect(xmlDoc) {
   let baseSection = xmlDoc.querySelector('music body');
   if (baseSection) {
     baseSection.querySelectorAll(selector).forEach((el) => {
+      if (!el.hasAttribute('xml:id')) return;
       let str = '';
       let parent = el.parentElement.closest(selector);
       if (parent) {
         str += '│ ';
         while ((parent = parent.parentElement.closest(selector))) str += '│ '; // &#9474;&nbsp; for indentation
       }
-      sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
+      sections.push([str + sectionDisplayText(el), el.getAttribute('xml:id'), sectionTooltip(el)]);
     });
   }
   return sections;

@@ -11,6 +11,8 @@ import * as facs from './facsimile.js';
 import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
+const dataURISet = new Set(att.dataURI); // attributes that may point to xml:ids
+
 /**
  * Runs editFn and, if it produced more than one CodeMirror history entry,
  * collapses them into a single 'done' entry in cm's undo history. This makes
@@ -1469,151 +1471,202 @@ export function renumberMeasures(v, cm, change = false) {
 } // renumberMeasures()
 
 /**
- * Function for adding/removing xml:ids in xmlDoc & reloading MEI into cm.
+ * Function for adding/removing/changing xml:ids in xmlDoc & reloading MEI into cm.
  * When a non-empty CodeMirror selection exists, only the selected XML is
  * processed. For incomplete XML selections, xml:ids are identified by regex.
+ * Mode 'change' assigns a new xml:id (in the current xml:id style) to each
+ * element and updates all references (data.URI attributes) within the encoding.
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {boolean} removeIds
+ * @param {'add'|'remove'|'change'} mode
  * @param {Array<string>} selectedElements optional, array of node names,
  *                                         adds/removes only from these elements
  * @param {boolean} showReport optional, whether to show a report alert after manipulation
  */
-export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = [], showReport = true) {
-  withSingleUndoStep(cm, () => {
-    let startTime = Date.now();
-    let report = { added: 0, removed: 0 };
-    let skipList = []; // list of xml:ids that will not be removed
-    let selectionKept = 0; // IDs found in selection that were kept because pointed to
+export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], showReport = true) {
+  const removeIds = mode === 'remove';
+  const changeIds = mode === 'change';
+  let startTime = Date.now();
+  let waitingTime = 0; // time spent waiting for the user to confirm (not counted as processing time)
+  // kept: xml:ids not removed because pointed to; changed: existing xml:ids replaced by new ones;
+  // references: pointers (data.URI attribute values) updated to changed xml:ids
+  let report = { added: 0, removed: 0, kept: 0, changed: 0, references: 0 };
+  const idMap = new Map(); // old xml:id -> new xml:id (mode 'change')
+  let skipList = new Set(); // xml:ids that are pointed to and will not be removed
+  let existingIds = new Set(); // xml:ids present in the document (to guarantee uniqueness of new ones)
 
-    v.allowCursorActivity = false;
-    cm.blockChanges = true;
+  v.allowCursorActivity = false;
+  cm.blockChanges = true;
 
-    // Save cursor position and editor viewport, restore after XML id updates
-    let cursorPosition = cm.getCursor();
-    let scrollInfo = cm.getScrollInfo();
+  // Save cursor position and editor viewport, restore after XML id updates
+  let cursorPosition = cm.getCursor();
+  let scrollInfo = cm.getScrollInfo();
 
-    // Determine whether a non-empty selection exists in CodeMirror
-    const cmSel = cm.listSelections()[0];
-    const selFrom =
-      cmSel.anchor.line < cmSel.head.line || (cmSel.anchor.line === cmSel.head.line && cmSel.anchor.ch <= cmSel.head.ch)
-        ? cmSel.anchor
-        : cmSel.head;
-    const selTo = selFrom === cmSel.anchor ? cmSel.head : cmSel.anchor;
-    const hasSelection = selFrom.line !== selTo.line || selFrom.ch !== selTo.ch;
+  // Determine whether a non-empty selection exists in CodeMirror
+  const cmSel = cm.listSelections()[0];
+  const selFrom =
+    cmSel.anchor.line < cmSel.head.line || (cmSel.anchor.line === cmSel.head.line && cmSel.anchor.ch <= cmSel.head.ch)
+      ? cmSel.anchor
+      : cmSel.head;
+  const selTo = selFrom === cmSel.anchor ? cmSel.head : cmSel.anchor;
+  const hasSelection = selFrom.line !== selTo.line || selFrom.ch !== selTo.ch;
 
-    // Load full XML document (needed for skipList and DOM manipulation)
-    v.loadXml(cm.getValue(), true);
+  // Load full XML document (needed for skipList and DOM manipulation)
+  v.loadXml(cm.getValue(), true);
 
-    if (hasSelection) {
-      // === Selection-only mode ===
-      // Build skipList from the full document so cross-references outside the
-      // selection are respected when removing IDs
-      v.xmlDoc.querySelectorAll('mei').forEach((e) => dig(e, true));
+  const rootList = Array.from(v.xmlDoc.getElementsByTagName('mei'));
+  const changedElements = []; // elements that received a new xml:id (need attribute sorting)
 
-      const selText = cm.getRange(selFrom, selTo);
+  if (removeIds) {
+    // Build skipList from the full document so cross-references (also those
+    // outside a selection) are respected when removing IDs
+    collectPointedIds();
+  } else {
+    // Collect existing ids so that newly generated ids are guaranteed to be unique
+    v.xmlDoc.querySelectorAll('[*|id]').forEach((el) => existingIds.add(el.getAttribute('xml:id')));
+  }
 
-      if (removeIds) {
-        // Find all xml:ids present in the selected text by regex, then remove them
-        // from the full XML DOM — no fragment reconstruction needed
-        const xmlIdPattern = /xml:id=["']([^"']+)["']/g;
-        let m;
-        while ((m = xmlIdPattern.exec(selText)) !== null) {
-          const id = m[1];
-          if (skipList.includes(id)) {
-            selectionKept++;
+  if (hasSelection) {
+    // === Selection-only mode ===
+    const selText = cm.getRange(selFrom, selTo);
+
+    if (removeIds) {
+      // Find all xml:ids present in the selected text by regex, then remove them
+      // from the full XML DOM in a single pass — no fragment reconstruction needed
+      const xmlIdPattern = /xml:id=["']([^"']+)["']/g;
+      const idsToRemove = new Set();
+      let m;
+      while ((m = xmlIdPattern.exec(selText)) !== null) {
+        if (skipList.has(m[1])) report.kept++;
+        else idsToRemove.add(m[1]);
+      }
+      if (idsToRemove.size > 0) {
+        for (const el of v.xmlDoc.querySelectorAll('[*|id]')) {
+          if (idsToRemove.has(el.getAttribute('xml:id'))) {
+            el.removeAttribute('xml:id');
+            report.removed++;
+          }
+        }
+      }
+    } else {
+      // addIds/changeIds: walk the DOM in document order, using the last xml:id before the
+      // selection as a text-position anchor so the scan starts close to the
+      // selection rather than at position 0 — critical for large files.
+      const fullText = cm.getValue();
+      const selStart = cm.indexFromPos(selFrom);
+      const selEnd = cm.indexFromPos(selTo);
+
+      // Scan backwards through the text prefix to find the last xml:id before selStart.
+      const prefixText = fullText.slice(0, selStart);
+      const lastDbl = prefixText.lastIndexOf('xml:id="');
+      const lastSgl = prefixText.lastIndexOf("xml:id='");
+      const lastIdPos = Math.max(lastDbl, lastSgl); // -1 when none found
+
+      let textPos = 0;
+      const treeWalker = v.xmlDoc.createTreeWalker(v.xmlDoc, NodeFilter.SHOW_ELEMENT);
+
+      if (lastIdPos >= 0) {
+        // 'xml:id=' is 7 chars, so lastIdPos+7 is the opening quote character.
+        const quoteChar = fullText[lastIdPos + 7];
+        const anchorId = fullText.slice(lastIdPos + 8, fullText.indexOf(quoteChar, lastIdPos + 8));
+        const anchorEl = anchorId ? v.xmlDoc.querySelector(`[*|id="${CSS.escape(anchorId)}"]`) : null;
+        if (anchorEl) {
+          treeWalker.currentNode = anchorEl; // nextNode() starts just after this element
+          textPos = lastIdPos + 1;
+        }
+      }
+
+      // Walk forward from the anchor (or document root) in document order.
+      // Stop as soon as the tracked text position passes selEnd.
+      let el = treeWalker.nextNode();
+      while (el) {
+        if (el.hasAttribute('xml:id')) {
+          const id = el.getAttribute('xml:id');
+          const idxDbl = fullText.indexOf(`xml:id="${id}"`, textPos);
+          const idxSgl = fullText.indexOf(`xml:id='${id}'`, textPos);
+          const idIdx = idxDbl < 0 ? idxSgl : idxSgl < 0 ? idxDbl : Math.min(idxDbl, idxSgl);
+          if (idIdx >= 0) {
+            textPos = idIdx + 1;
+            if (textPos > selEnd) break;
+            if (
+              changeIds &&
+              idIdx >= selStart &&
+              (selectedElements.length === 0 || selectedElements.includes(el.nodeName))
+            ) {
+              addXmlId(el);
+            }
+          }
+        } else {
+          const tagIdx = fullText.indexOf(`<${el.nodeName}`, textPos);
+          if (tagIdx >= 0) {
+            textPos = tagIdx + 1;
+            if (tagIdx >= selEnd) break;
+            if (tagIdx >= selStart && (selectedElements.length === 0 || selectedElements.includes(el.nodeName))) {
+              addXmlId(el);
+            }
+          }
+        }
+        el = treeWalker.nextNode();
+      }
+    }
+  } else {
+    // === Full-document mode (no selection) ===
+    const selectedSet = new Set(selectedElements);
+    for (const root of rootList) {
+      for (const el of [root, ...root.getElementsByTagName('*')]) {
+        if (selectedSet.size > 0 && !selectedSet.has(el.nodeName)) continue;
+        const id = el.getAttribute('xml:id');
+        if (changeIds || (!removeIds && id === null)) {
+          addXmlId(el);
+        } else if (removeIds && id !== null) {
+          if (skipList.has(id)) {
+            report.kept++;
           } else {
-            const el = v.xmlDoc.querySelector(`[*|id="${CSS.escape(id)}"]`);
-            if (el) {
-              el.removeAttribute('xml:id');
-              report.removed++;
-            }
+            el.removeAttribute('xml:id');
+            report.removed++;
           }
         }
-      } else {
-        // addIds: walk the DOM in document order, using the last xml:id before the
-        // selection as a text-position anchor so the scan starts close to the
-        // selection rather than at position 0 — critical for large files.
-        const fullText = cm.getValue();
-        const selStart = cm.indexFromPos(selFrom);
-        const selEnd = cm.indexFromPos(selTo);
+      }
+    }
+  }
 
-        // Scan backwards through the text prefix to find the last xml:id before selStart.
-        const prefixText = fullText.slice(0, selStart);
-        const lastDbl = prefixText.lastIndexOf('xml:id="');
-        const lastSgl = prefixText.lastIndexOf("xml:id='");
-        const lastIdPos = Math.max(lastDbl, lastSgl); // -1 when none found
+  if (changeIds) updateReferences();
 
-        let textPos = 0;
-        const treeWalker = v.xmlDoc.createTreeWalker(v.xmlDoc, NodeFilter.SHOW_ELEMENT);
+  // Changing xml:ids breaks links from outside the encoding: ask the user before
+  // writing the changes into the editor (the blocking prompt keeps the encoding unchanged meanwhile)
+  if (changeIds && report.changed + report.added > 0) {
+    confirmChangeIds();
+  } else {
+    applyChanges();
+  }
 
-        if (lastIdPos >= 0) {
-          // 'xml:id=' is 7 chars, so lastIdPos+7 is the opening quote character.
-          const quoteChar = fullText[lastIdPos + 7];
-          const anchorId = fullText.slice(lastIdPos + 8, fullText.indexOf(quoteChar, lastIdPos + 8));
-          const anchorEl = anchorId ? v.xmlDoc.querySelector(`[*|id="${CSS.escape(anchorId)}"]`) : null;
-          if (anchorEl) {
-            treeWalker.currentNode = anchorEl; // nextNode() starts just after this element
-            textPos = lastIdPos + 1;
-          }
-        }
-
-        // Walk forward from the anchor (or document root) in document order.
-        // Stop as soon as the tracked text position passes selEnd.
-        let el = treeWalker.nextNode();
-        while (el) {
-          if (el.hasAttribute('xml:id')) {
-            const id = el.getAttribute('xml:id');
-            const idxDbl = fullText.indexOf(`xml:id="${id}"`, textPos);
-            const idxSgl = fullText.indexOf(`xml:id='${id}'`, textPos);
-            const idIdx = idxDbl < 0 ? idxSgl : idxSgl < 0 ? idxDbl : Math.min(idxDbl, idxSgl);
-            if (idIdx >= 0) {
-              textPos = idIdx + 1;
-              if (textPos > selEnd) break;
-            }
-          } else {
-            const tagIdx = fullText.indexOf(`<${el.nodeName}`, textPos);
-            if (tagIdx >= 0) {
-              textPos = tagIdx + 1;
-              if (tagIdx >= selEnd) break;
-              if (tagIdx >= selStart && (selectedElements.length === 0 || selectedElements.includes(el.nodeName))) {
-                el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
-                report.added++;
-              }
-            }
-          }
-          el = treeWalker.nextNode();
-        }
+  // writes the modified DOM into the editor (as a single undo step), restores
+  // selection/cursor and viewport, and reports the result
+  function applyChanges() {
+    withSingleUndoStep(cm, () => {
+      if (changeIds && !hasSelection) {
+        // keep selected elements (and last note) in the viewer selected under their new ids
+        v.selectedElements = v.selectedElements.map((id) => idMap.get(id) || id);
+        if (idMap.has(v.lastNoteId)) v.lastNoteId = idMap.get(v.lastNoteId);
       }
 
       // Serialize the modified full DOM back into the editor
-      v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
+      // (new xml:ids are appended last; sort them to be the first attribute)
+      changedElements.forEach((e) => dutils.sortNodeAttributes(e));
       cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
       addApplicationInfo(v, cm);
 
-      // Restore the selection so the user can see the processed region
-      cm.setSelection(selFrom, selTo);
-    } else {
-      // === Full-document mode (no selection) ===
-      const rootList = v.xmlDoc.querySelectorAll('mei');
-
-      // determine skipList to securely remove ids
-      if (removeIds) {
-        rootList.forEach((e) => dig(e, true));
+      if (hasSelection) {
+        // Restore the selection so the user can see the processed region
+        cm.setSelection(selFrom, selTo);
+      } else {
+        cm.setCursor(cursorPosition);
       }
+      reportAndFinish();
+    });
+  } // applyChanges()
 
-      // manipulate xml tree starting from selector
-      rootList.forEach((e) => dig(e));
-
-      // before serialization, sort xml attributes with xml:id first, then alphabetically
-      v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
-      cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
-      addApplicationInfo(v, cm);
-
-      // Restore cursor position (selection path keeps its setSelection instead)
-      cm.setCursor(cursorPosition);
-    }
-
+  function reportAndFinish() {
     // Restore editor viewport for both paths so cm.setValue doesn't jump the view
     cm.scrollIntoView({
       left: scrollInfo.left,
@@ -1627,8 +1680,12 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     let msg;
     if (removeIds) {
       msg = report.removed + ' xml:ids removed' + scope + ', ';
-      const kept = hasSelection ? selectionKept : skipList.length;
-      msg += kept + ' xml:ids kept, because they are pointed to.';
+      msg += report.kept + ' xml:ids kept, because they are pointed to.';
+    } else if (changeIds) {
+      msg = report.changed + ' xml:ids changed and ' + report.added + ' new xml:ids added' + scope;
+      msg += ', ' + report.references + ' references updated';
+      let el = document.getElementById('selectIdStyle');
+      msg += ' (xml:id style: ' + el.value + '; e.g., "' + el.options[el.options.selectedIndex].title + '").';
     } else {
       msg = report.added + ' new xml:ids added' + scope;
       if (report.added > 0) {
@@ -1637,7 +1694,7 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
       }
       msg += '.';
     }
-    msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
+    msg += ' (Processing time: ' + (Date.now() - startTime - waitingTime) / 1000 + ' s)';
     console.log(msg);
     v.allowCursorActivity = true;
     cm.blockChanges = false;
@@ -1658,37 +1715,101 @@ export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = []
     if (showReport) {
       v.showAlert(msg, 'success');
     }
+  } // reportAndFinish()
 
-    // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
-    function dig(el, explore = false) {
-      if (el.nodeType === Node.ELEMENT_NODE) {
-        if (explore) {
-          // just go through xml structure and search for pointing ids
-          for (let attrName of att.dataURI) {
-            let value = el.getAttribute(attrName);
-            if (value) {
-              // split value string by whitespace
-              value.split(/[\s]+/).forEach((v) => skipList.push(utils.rmHash(v)));
-            }
-          }
-        } else if (selectedElements.includes(el.nodeName) || selectedElements.length === 0) {
-          if (!removeIds && !el.hasAttribute('xml:id')) {
-            // add xml:id when missing
-            el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
-            report.added++;
-          } else if (removeIds && el.hasAttribute('xml:id')) {
-            // remove xml:id, unless pointed to
-            if (!skipList.includes(el.getAttribute('xml:id'))) {
-              el.removeAttribute('xml:id');
-              report.removed++;
-            }
+  // collects all xml:ids that are pointed to (by data.URI attributes) into skipList
+  function collectPointedIds() {
+    for (const root of rootList) {
+      for (const el of [root, ...root.getElementsByTagName('*')]) {
+        for (const attr of el.attributes) {
+          if (dataURISet.has(attr.name) && attr.value) {
+            // split value string by whitespace
+            attr.value.split(/\s+/).forEach((v) => v && skipList.add(utils.rmHash(v)));
           }
         }
-        // recursively through the xml tree
-        el.childNodes.forEach((e) => dig(e, explore));
       }
-    } // dig()
-  });
+    }
+  } // collectPointedIds()
+
+  // adds a new xml:id to el that is unique within the document;
+  // replaces an existing xml:id (in place) and records it in idMap
+  function addXmlId(el) {
+    let id;
+    do {
+      id = utils.generateXmlId(el.nodeName, v.xmlIdStyle);
+    } while (existingIds.has(id));
+    existingIds.add(id);
+    const oldId = el.getAttribute('xml:id');
+    el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', id);
+    if (oldId === null) {
+      changedElements.push(el); // new attribute appended last, needs sorting
+      report.added++;
+    } else {
+      idMap.set(oldId, id);
+      report.changed++;
+    }
+  } // addXmlId()
+
+  // asks the user (in a blocking prompt) to confirm changing xml:ids, which breaks links
+  // from outside the encoding; applies the changes when confirmed, discards them otherwise
+  function confirmChangeIds() {
+    const message = translator.lang.changeIdsConfirmation.text
+      .replace('{changed}', report.changed)
+      .replace('{added}', report.added)
+      .replace('{references}', report.references)
+      .split('\n\n')
+      .map((paragraph) => '<p>' + paragraph + '</p>')
+      .join('');
+    const waitingSince = Date.now();
+    v.showUserPrompt(
+      message,
+      [
+        {
+          label: translator.lang.changeIdsCancel.text,
+          cancel: true,
+          event: () => {
+            v.hideUserPrompt();
+            v.loadXml(cm.getValue(), true); // discard DOM changes
+            v.allowCursorActivity = true;
+            cm.blockChanges = false;
+            console.log('Changing xml:ids cancelled by user.');
+          },
+        },
+        {
+          label: translator.lang.changeIdsProceed.text,
+          event: () => {
+            v.hideUserPrompt();
+            waitingTime = Date.now() - waitingSince;
+            applyChanges();
+          },
+        },
+      ],
+      'warning'
+    );
+  } // confirmChangeIds()
+
+  // rewrites all references ('#id' or 'id' tokens in data.URI attributes) to changed xml:ids;
+  // references to other files (e.g., 'other.mei#id') are left untouched
+  function updateReferences() {
+    if (idMap.size === 0) return;
+    for (const root of rootList) {
+      for (const el of [root, ...root.getElementsByTagName('*')]) {
+        for (const attr of Array.from(el.attributes)) {
+          if (!dataURISet.has(attr.name) || !attr.value) continue;
+          let modified = false;
+          const tokens = attr.value.split(/(\s+)/).map((token) => {
+            const hash = token.startsWith('#');
+            const newId = idMap.get(hash ? token.slice(1) : token);
+            if (!newId) return token;
+            modified = true;
+            report.references++;
+            return (hash ? '#' : '') + newId;
+          });
+          if (modified) attr.value = tokens.join('');
+        }
+      }
+    }
+  } // updateReferences()
 } // manipulateXmlIds()
 
 /**
@@ -2258,9 +2379,12 @@ function isEmpty(str) {
  * @param {boolean} select keep node in editor selected? (important for auto indentation)
  * @param {Array[Element]} newNode an array of new nodes to replace the old one with
  * @param {boolean} replaceUnique replace unique elements without xml:id (special case, e.g. for <meiHead>)
- * @returns {object} range {start: integer, end: integer} or empty object, if nothing found
+ * @param {Object} searchFrom optional CodeMirror position to start searching from, e.g. the start
+ * of the previous replacement when applying many edits in document order; if the element is
+ * not found from there, the search is repeated from the start of the document
+ * @returns {object} range {start: Pos, end: Pos} (-1 if nothing found) or empty object, if nothing to search for
  */
-export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false) {
+export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false, searchFrom = null) {
   dutils.cleanNode(xmlNode);
   // construct new MEI if newNode has elements
   let newMei = '';
@@ -2280,47 +2404,124 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = [], repla
     console.warn('replaceInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
     return {};
   }
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([^>]*?)(?:/>)`;
-  // console.info('searchSelfClosing: ' + searchSelfClosing);
-  let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
-  if (sc.findNext()) {
-    sc.replace(newMei);
-  } else {
-    let searchFullElement =
-      '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
-    sc = cm.getSearchCursor(new RegExp(searchFullElement));
-    if (sc.findNext()) {
-      sc.replace(newMei);
-    }
-    // console.info('searchFullElement: ' + searchFullElement);
-  }
-  if (!sc.atOccurrence) {
+  let range = null;
+  if (searchFrom) range = findElementRange(cm, xmlNode.nodeName, xmlIdCheck, searchFrom);
+  if (!range) range = findElementRange(cm, xmlNode.nodeName, xmlIdCheck);
+  if (!range) {
     console.info('replaceInEditor(): nothing replaced for ' + itemId + '.');
     return {
       start: -1,
       end: -1,
     };
-  } else {
-    sc = cm.getSearchCursor(newMei);
-    if (sc.findNext()) {
-      let c = cm.getCursor();
-      for (let l = sc.from().line; l <= sc.to().line; l++) {
-        cm.indentLine(l, 'smart');
-        if (isEmpty(cm.getLine(l))) {
-          cm.setCursor(l, c.ch);
-          cm.execCommand('deleteLine');
-        }
-      }
-      if (select) {
-        cm.setSelection(sc.from(), sc.to());
-      }
+  }
+  const from = range.from;
+  const lines = CodeMirror.splitLines(newMei);
+  const to = CodeMirror.Pos(
+    from.line + lines.length - 1,
+    lines[lines.length - 1].length + (lines.length === 1 ? from.ch : 0)
+  );
+  cm.replaceRange(newMei, from, range.to);
+  let c = cm.getCursor();
+  for (let l = from.line; l <= to.line; l++) {
+    cm.indentLine(l, 'smart');
+    if (isEmpty(cm.getLine(l))) {
+      cm.setCursor(l, c.ch);
+      cm.execCommand('deleteLine');
     }
   }
+  if (select) {
+    cm.setSelection(from, to);
+  }
   return {
-    start: sc.from(),
-    end: sc.to(),
+    start: from,
+    end: to,
   };
 } // replaceInEditor()
+
+/**
+ * Sets an attribute on xmlNode and in its start tag in the editor, replacing an
+ * existing value or appending the attribute. Unlike replaceInEditor(), the element
+ * is not reserialized, so its content and formatting in the editor stay untouched.
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode element with xml:id
+ * @param {string} attrName
+ * @param {string} attrValue
+ * @param {Object} searchFrom optional CodeMirror position to start searching from (see replaceInEditor())
+ * @returns {object} range {start: Pos, end: Pos} of the start tag (-1 if nothing found) or empty object
+ */
+export function setAttributeInEditor(cm, xmlNode, attrName, attrValue, searchFrom = null) {
+  xmlNode.setAttribute(attrName, attrValue);
+  const itemId = xmlNode.getAttribute('xml:id');
+  if (!itemId) {
+    console.warn('setAttributeInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
+    return {};
+  }
+  const xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  let tag = null;
+  if (searchFrom) tag = findStartTagRange(cm, xmlNode.nodeName, xmlIdCheck, searchFrom);
+  if (!tag) tag = findStartTagRange(cm, xmlNode.nodeName, xmlIdCheck);
+  if (!tag) {
+    console.info('setAttributeInEditor(): element not found for ' + itemId + '.');
+    return { start: -1, end: -1 };
+  }
+  const text = cm.getRange(tag.from, tag.to);
+  const escapedName = attrName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const existing = new RegExp('(\\s' + escapedName + '\\s*=\\s*)(["\'])[^"\']*\\2');
+  let newText;
+  if (existing.test(text)) {
+    newText = text.replace(existing, '$1$2' + attrValue + '$2');
+  } else {
+    const closing = tag.selfClosing ? text.lastIndexOf('/>') : text.lastIndexOf('>');
+    newText =
+      text.slice(0, closing).replace(/\s+$/, '') + ' ' + attrName + '="' + attrValue + '"' + text.slice(closing);
+  }
+  cm.replaceRange(newText, tag.from, tag.to);
+  const lines = CodeMirror.splitLines(newText);
+  const to = CodeMirror.Pos(
+    tag.from.line + lines.length - 1,
+    lines[lines.length - 1].length + (lines.length === 1 ? tag.from.ch : 0)
+  );
+  return { start: tag.from, end: to };
+} // setAttributeInEditor()
+
+/**
+ * Finds the text range of an element's start tag in the editor, identified by
+ * nodeName and the xmlIdCheck pattern. Only the text from the search start to the
+ * element is scanned, so searching from a position close to the element is cheap.
+ * @param {CodeMirror} cm
+ * @param {string} nodeName
+ * @param {string} xmlIdCheck regular expression source following the element name
+ * @param {Object} [from] position to start searching from (default: start of document)
+ * @returns {{from: Object, to: Object, selfClosing: boolean} | null}
+ */
+function findStartTagRange(cm, nodeName, xmlIdCheck, from = null) {
+  const startTag = cm.getSearchCursor(new RegExp('<' + nodeName + xmlIdCheck), from);
+  if (!startTag.findNext()) return null;
+  // end of the start tag: first '>' after it ('>' cannot occur unescaped in attribute values)
+  const tagEnd = cm.getSearchCursor('>', startTag.to());
+  if (!tagEnd.findNext()) return null;
+  const end = tagEnd.to();
+  const selfClosing = end.ch >= 2 && cm.getRange(CodeMirror.Pos(end.line, end.ch - 2), end) === '/>';
+  return { from: startTag.from(), to: end, selfClosing };
+} // findStartTagRange()
+
+/**
+ * Finds the text range of an element in the editor: from its start tag to the end
+ * of its self-closing tag or of its closing tag.
+ * @param {CodeMirror} cm
+ * @param {string} nodeName
+ * @param {string} xmlIdCheck regular expression source following the element name
+ * @param {Object} [from] position to start searching from (default: start of document)
+ * @returns {{from: Object, to: Object} | null}
+ */
+function findElementRange(cm, nodeName, xmlIdCheck, from = null) {
+  const tag = findStartTagRange(cm, nodeName, xmlIdCheck, from);
+  if (!tag) return null;
+  if (tag.selfClosing) return { from: tag.from, to: tag.to };
+  const closeTag = cm.getSearchCursor(new RegExp('</' + nodeName + '[ ]*?>'), tag.to);
+  if (!closeTag.findNext()) return null;
+  return { from: tag.from, to: closeTag.to() };
+} // findElementRange()
 
 // ############################################################################
 // # (mostly) private functions                                               #

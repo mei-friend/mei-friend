@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.6.0';
-export const versionDate = '06 Oct 2026'; // use full or 3-character english months, will be translated
+export const version = '1.6.1';
+export const versionDate = '16 Nov 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
 // Date of the Let's Encode paragraph, which only campaign volunteers ever see.
 // Bump this instead of splashDate when only that paragraph changes: volunteers
@@ -79,6 +79,7 @@ import {
   createNotationDiv,
   createEncodingPanel,
   generateSectionSelect,
+  getSectionSelectSelector,
   handleSmartBreaksOption,
   manualCurrentPage,
   setBreaksOptions,
@@ -1191,13 +1192,21 @@ async function vrvWorkerEventsHandler(ev) {
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
+      // the section selector navigates by xml:id, so elements without one get
+      // an xml:id added to the encoding (this re-renders and comes back here)
+      addMissingSectionIds();
+
       // add section selector (or hide it if only one section)
       let sectionSelect = document.getElementById('sectionSelect');
       let previousSectionSelectValue = sectionSelect.value; // preserve selection across the rebuild below
       while (sectionSelect.options.length > 0) sectionSelect.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
-        sections.forEach((opt) => sectionSelect.options.add(new Option(opt[0], opt[1])));
+        sections.forEach((opt) => {
+          let option = new Option(opt[0], opt[1]);
+          option.title = opt[2];
+          sectionSelect.options.add(option);
+        });
         sectionSelect.style.display = 'block';
         sectionSelect.value = previousSectionSelectValue;
       } else {
@@ -2047,8 +2056,9 @@ export let cmd = {
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
   reRenderMeiWithout: () => v.reRenderMei(cm, true),
-  addIds: () => e.manipulateXmlIds(v, cm, false),
-  removeIds: () => e.manipulateXmlIds(v, cm, true),
+  addIds: () => e.manipulateXmlIds(v, cm, 'add'),
+  removeIds: () => e.manipulateXmlIds(v, cm, 'remove'),
+  changeIds: () => e.manipulateXmlIds(v, cm, 'change'),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
   encloseSelectionWithTag: encloseSelectionWithTag,
@@ -2413,6 +2423,13 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
+  document.getElementById('changeIds').addEventListener('click', cmd.changeIds);
+  // menu items with class 'altKeyOnly' (e.g., 'Change ids') are only shown while ALT key is pressed
+  const toggleAltKeyOnly = (pressed) => document.body.classList.toggle('altKeyPressed', pressed);
+  window.addEventListener('keydown', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('keyup', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('mousemove', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('blur', () => toggleAltKeyOnly(false));
   // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
@@ -2763,6 +2780,24 @@ export function setStandoffAnnotationEnabledStatus() {
 }
 
 // handles any changes in CodeMirror
+/**
+ * Adds xml:ids to the elements listed in the section selector (mdiv, section,
+ * ending, lem, rdg) that have none, so that they can be navigated to. Writes
+ * the ids into the encoding (as a single undo step, marking the file as
+ * changed), which triggers a re-render. Does nothing if all have an xml:id.
+ */
+function addMissingSectionIds() {
+  if (!v.xmlDoc) return;
+  const nodeNames = new Set();
+  v.xmlDoc.querySelectorAll(getSectionSelectSelector(v.xmlDoc)).forEach((el) => {
+    if (!el.hasAttribute('xml:id')) nodeNames.add(el.nodeName);
+  });
+  if (nodeNames.size > 0) {
+    console.log('addMissingSectionIds(): adding xml:ids to ' + Array.from(nodeNames).join(', '));
+    e.manipulateXmlIds(v, cm, 'add', Array.from(nodeNames), false);
+  }
+} // addMissingSectionIds()
+
 export async function handleEditorChanges() {
   v.notationUpdated(cm);
   // fileChanged flag may have been set from storage

@@ -590,6 +590,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
             },
             {
               label: translator.lang.handleMissingParentIdAbort.text, //'Abort action',
+              cancel: true,
               event: (abort) => {
                 reject('promptOverlay', abort);
               },

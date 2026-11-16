@@ -197,6 +197,16 @@ export const lang = {
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
   addIdsText: { text: 'Add ids to MEI' },
   removeIdsText: { text: 'Remove ids from MEI' },
+  changeIdsText: {
+    text: 'Change ids in MEI (breaks external links)',
+    description:
+      'Assigns a new xml:id to every element (or to the selected elements). References within this file are updated, but links from other files, annotations, facsimile tools or URLs that point to the old xml:ids will no longer work.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Change ids in MEI</b>\n\nWarning: this operation breaks external links.\n\n{changed} xml:ids will be changed and {added} new xml:ids added; {references} references within this file will be updated.\n\nLinks from other files, annotations, facsimile tools or URLs that point to the old xml:ids will no longer work.',
+  },
+  changeIdsProceed: { text: 'Change ids' },
+  changeIdsCancel: { text: 'Cancel' },
   reRenderMeiVerovio: { text: ' Rerender via Verovio' },
   addFacsimile: { text: 'Add facsimile element' },
   ingestFacsimileText: { text: 'Ingest facsimile' },
@@ -1296,6 +1306,8 @@ export const lang = {
   codeCheckerFixAll: { text: 'Fix all' },
   codeCheckerIgnore: { text: 'Ignore' },
   codeCheckerIgnoreAll: { text: 'Ignore all' },
+  codeCheckerStop: { text: 'Stop' },
+  codeCheckerStopped: { text: 'Check stopped.' },
   codeCheckerCheckingCode: { text: 'Checking code...' },
   codeCheckerNoAccidMessagesFound: { text: 'All accid.ges attributes seem correct.' },
   codeCheckerMeterConformanceMessage: { text: 'All measures conform to their time signatures.' },
