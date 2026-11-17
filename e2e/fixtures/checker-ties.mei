@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tied notes for the accid.ges code checker.
+
+     The note ending a tie sounds with the accidental of the note starting it,
+     even when that accidental is not encoded at the starting note itself but
+     comes from an accidental earlier in its measure or from the key signature.
+
+     Measures 1-8 are encoded correctly as far as the tie endings are concerned:
+     no message may name a3, b3, c3 or d3. Measures 9-16 are encoded wrongly and
+     every tie ending there must be reported. -->
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>tie accidentals</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"><keySig xml:id="k1" sig="1s"/></staffDef></staffGrp>
+    </scoreDef>
+    <section>
+      <!-- a: the starting note sounds sharp through an accidental earlier in its measure -->
+      <measure n="1" xml:id="ma1">
+        <staff n="1" xml:id="ma1s1"><layer n="1">
+          <note xml:id="a1" pname="g" oct="4" dur="2" accid="s"/>
+          <note xml:id="a2" pname="g" oct="4" dur="2" accid.ges="s"/>
+        </layer></staff>
+        <tie xml:id="ta" startid="#a2" endid="#a3"/>
+      </measure>
+      <measure n="2" xml:id="ma2"><staff n="1" xml:id="ma2s1"><layer n="1">
+        <note xml:id="a3" pname="g" oct="4" dur="2" accid.ges="s"/>
+        <note xml:id="a4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- b: the starting note sounds sharp through the key signature, correctly encoded -->
+      <measure n="3" xml:id="mb1">
+        <staff n="1" xml:id="mb1s1"><layer n="1">
+          <note xml:id="b1" pname="e" oct="4" dur="2"/>
+          <note xml:id="b2" pname="f" oct="4" dur="2" accid.ges="s"/>
+        </layer></staff>
+        <tie xml:id="tb" startid="#b2" endid="#b3"/>
+      </measure>
+      <measure n="4" xml:id="mb2"><staff n="1" xml:id="mb2s1"><layer n="1">
+        <note xml:id="b3" pname="f" oct="4" dur="2" accid.ges="s"/>
+        <note xml:id="b4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- c: the starting note carries no accid.ges, its sharp comes from its measure -->
+      <measure n="5" xml:id="mc1">
+        <staff n="1" xml:id="mc1s1"><layer n="1">
+          <note xml:id="c1" pname="d" oct="5" dur="2" accid="s"/>
+          <note xml:id="c2" pname="d" oct="5" dur="2"/>
+        </layer></staff>
+        <tie xml:id="tc" startid="#c2" endid="#c3"/>
+      </measure>
+      <measure n="6" xml:id="mc2"><staff n="1" xml:id="mc2s1"><layer n="1">
+        <note xml:id="c3" pname="d" oct="5" dur="2" accid.ges="s"/>
+        <note xml:id="c4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- d: the starting note carries no accid.ges, its sharp comes from the key signature -->
+      <measure n="7" xml:id="md1">
+        <staff n="1" xml:id="md1s1"><layer n="1">
+          <note xml:id="d1" pname="f" oct="5" dur="2"/>
+          <note xml:id="d2" pname="e" oct="4" dur="2"/>
+        </layer></staff>
+        <tie xml:id="td" startid="#d1" endid="#d3"/>
+      </measure>
+      <measure n="8" xml:id="md2"><staff n="1" xml:id="md2s1"><layer n="1">
+        <note xml:id="d3" pname="f" oct="5" dur="2" accid.ges="s"/>
+        <note xml:id="d4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- e: the starting note sounds sharp, the ending note claims a flat -->
+      <measure n="9" xml:id="me1">
+        <staff n="1" xml:id="me1s1"><layer n="1">
+          <note xml:id="e1" pname="e" oct="4" dur="2"/>
+          <note xml:id="e2" pname="f" oct="4" dur="2" accid.ges="s"/>
+        </layer></staff>
+        <tie xml:id="te" startid="#e2" endid="#e3"/>
+      </measure>
+      <measure n="10" xml:id="me2"><staff n="1" xml:id="me2s1"><layer n="1">
+        <note xml:id="e3" pname="f" oct="4" dur="2" accid.ges="f"/>
+        <note xml:id="e4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- f: the starting note sounds natural, the ending note has a superfluous sharp -->
+      <measure n="11" xml:id="mf1">
+        <staff n="1" xml:id="mf1s1"><layer n="1">
+          <note xml:id="f1" pname="e" oct="4" dur="2"/>
+          <note xml:id="f2" pname="a" oct="4" dur="2"/>
+        </layer></staff>
+        <tie xml:id="tf" startid="#f2" endid="#f3"/>
+      </measure>
+      <measure n="12" xml:id="mf2"><staff n="1" xml:id="mf2s1"><layer n="1">
+        <note xml:id="f3" pname="a" oct="4" dur="2" accid.ges="s"/>
+        <note xml:id="f4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- g: the starting note carries a notated sharp, the ending note lacks accid.ges -->
+      <measure n="13" xml:id="mg1">
+        <staff n="1" xml:id="mg1s1"><layer n="1">
+          <note xml:id="g1" pname="e" oct="4" dur="2"/>
+          <note xml:id="g2" pname="c" oct="5" dur="2" accid="s"/>
+        </layer></staff>
+        <tie xml:id="tg" startid="#g2" endid="#g3"/>
+      </measure>
+      <measure n="14" xml:id="mg2"><staff n="1" xml:id="mg2s1"><layer n="1">
+        <note xml:id="g3" pname="c" oct="5" dur="2"/>
+        <note xml:id="g4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- h: the tie ends on a different pitch and octave -->
+      <measure n="15" xml:id="mh1">
+        <staff n="1" xml:id="mh1s1"><layer n="1">
+          <note xml:id="h1" pname="e" oct="4" dur="2"/>
+          <note xml:id="h2" pname="d" oct="5" dur="2" accid="f"/>
+        </layer></staff>
+        <tie xml:id="th" startid="#h2" endid="#h3"/>
+      </measure>
+      <measure n="16" xml:id="mh2"><staff n="1" xml:id="mh2s1"><layer n="1">
+        <note xml:id="h3" pname="c" oct="4" dur="2" accid.ges="f"/>
+        <note xml:id="h4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

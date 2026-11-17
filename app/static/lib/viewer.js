@@ -3762,6 +3762,7 @@ export default class Viewer {
 
     // Correct/Fix all
     let correctAllButton = document.createElement('button');
+    correctAllButton.id = 'codeCheckerFixAllButton';
     correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
@@ -3818,6 +3819,7 @@ export default class Viewer {
     headerDiv.appendChild(correctAllButton);
 
     let ignoreAllButton = document.createElement('button');
+    ignoreAllButton.id = 'codeCheckerIgnoreAllButton';
     ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
     ignoreAllButton.classList.add('btn');
     ignoreAllButton.addEventListener('click', () => {

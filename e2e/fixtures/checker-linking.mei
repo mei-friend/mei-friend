@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Linking attributes for the linked elements code checker.
+     The slur resolves, the tie points at an id that does not exist, the first
+     dir has an empty @startid, the second one a plist with surrounding and
+     doubled blanks plus one missing target, and an external @corresp that has
+     to be skipped. -->
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>linked elements</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp>
+    </scoreDef>
+    <section>
+      <measure n="1" xml:id="l1">
+        <staff n="1" xml:id="l1s1"><layer n="1">
+          <note xml:id="ln1" pname="c" oct="5" dur="2"/>
+          <note xml:id="ln2" pname="d" oct="5" dur="2"/>
+        </layer></staff>
+        <slur xml:id="lsl" startid="#ln1" endid="#ln2"/>
+        <tie xml:id="lti" startid="#ln1" endid="#nowhere"/>
+        <dir xml:id="ld1" startid="" tstamp="1">empty</dir>
+        <dir xml:id="ld2" tstamp="2" plist="  #ln1   #alsonowhere " corresp="http://example.org/thing">plist</dir>
+      </measure>
+      <measure n="2" xml:id="l2">
+        <staff n="1" xml:id="l2s1"><layer n="1"><note xml:id="ln3" pname="e" oct="5" dur="1"/></layer></staff>
+      </measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>
