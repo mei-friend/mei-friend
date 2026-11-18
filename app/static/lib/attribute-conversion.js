@@ -696,3 +696,481 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
     }
   } // insertIndented()
 } // convertAttributesToElements()
+
+// ############################################################################
+// elements to attributes
+// ############################################################################
+
+// element attributes and their counterparts on staffDef/scoreDef, per MEI version
+const defAttributes = {
+  clef: {
+    4: { shape: 'clef.shape', line: 'clef.line', dis: 'clef.dis', 'dis.place': 'clef.dis.place', color: 'clef.color', visible: 'clef.visible' },
+    5: { shape: 'clef.shape', line: 'clef.line', dis: 'clef.dis', 'dis.place': 'clef.dis.place', color: 'clef.color', visible: 'clef.visible' },
+  },
+  keySig: {
+    4: { sig: 'key.sig', pname: 'key.pname', accid: 'key.accid', mode: 'key.mode', visible: 'keysig.show', 'sig.showchange': 'keysig.showchange' },
+    5: { sig: 'keysig', pname: 'key.pname', accid: 'key.accid', mode: 'key.mode', visible: 'keysig.visible', cancelaccid: 'keysig.cancelaccid' },
+  },
+  meterSig: {
+    4: { count: 'meter.count', unit: 'meter.unit', sym: 'meter.sym', form: 'meter.form' },
+    5: { count: 'meter.count', unit: 'meter.unit', sym: 'meter.sym', form: 'meter.form', visible: 'meter.visible' },
+  },
+  mensur: {
+    4: { sign: 'mensur.sign', dot: 'mensur.dot', slash: 'mensur.slash', orient: 'mensur.orient', color: 'mensur.color', form: 'mensur.form', loc: 'mensur.loc' },
+    5: { sign: 'mensur.sign', dot: 'mensur.dot', slash: 'mensur.slash', orient: 'mensur.orient', color: 'mensur.color', form: 'mensur.form', loc: 'mensur.loc' },
+  },
+};
+const defParents = { clef: ['staffDef'], keySig: ['staffDef', 'scoreDef'], meterSig: ['staffDef', 'scoreDef'], mensur: ['staffDef'] };
+
+// positional attributes of control events that are redundant once expressed on the start/end element
+const controlEventAttributes = ['startid', 'endid', 'staff', 'layer', 'tstamp', 'tstamp2'];
+
+/**
+ * Converts elements in xmlDoc that can be expressed as attributes into these
+ * attributes (the reverse of convertAttributesToElements()), such as
+ *   <accid> in note -> note@accid/@accid.ges, <tie startid endid> -> @tie="i"/"t".
+ * Elements are only converted when no information is lost: elements with
+ * attributes or content that the attribute cannot express (e.g., accid@func,
+ * slur@curvedir, syl@wordpos), elements referenced by xml:id from elsewhere,
+ * control events without @startid/@endid (e.g., only @tstamp) and elements
+ * within editorial markup are kept and reported as warnings.
+ * Modifies xmlDoc in place.
+ * @param {Document} xmlDoc
+ * @param {Object} options
+ * @param {Iterable<string>} options.groups groups of elements to be converted (see
+ *   conversionGroups), all groups if omitted
+ * @returns {{counts: Object<string, number>, changes: Array<Object>, warnings: Array<Object>, changedElements: Array<Element>}}
+ *   counts: number of removed elements per element name;
+ *   changes: one entry per conversion, {name, removed: [{element, text}], targets: [{element, attributes}]},
+ *     with the removed elements and the elements that received attributes;
+ *   warnings: elements that could not be converted, [{element, message}];
+ *   changedElements: always empty (no new xml:ids)
+ */
+export function convertElementsToAttributes(xmlDoc, options = {}) {
+  const groups = new Set(options.groups || conversionGroups);
+  const counts = {};
+  const changes = [];
+  const warnings = [];
+  const music = xmlDoc.querySelector('music') || xmlDoc.documentElement;
+  if (!music) return { counts, changes, warnings, changedElements: [] };
+  const meiVersion = parseInt(xmlDoc.querySelector('mei')?.getAttribute('meiversion') || '', 10);
+  const version = meiVersion < 5 ? 4 : 5;
+
+  // elements by xml:id, and xml:ids referenced anywhere (by '#id' pointers)
+  const byId = new Map();
+  const referenced = new Set();
+  for (const el of xmlDoc.getElementsByTagName('*')) {
+    const id = el.getAttribute('xml:id');
+    if (id) byId.set(id, el);
+    for (const a of el.attributes) {
+      if (!a.value.includes('#')) continue;
+      for (const token of a.value.split(/\s+/)) {
+        const i = token.indexOf('#');
+        if (i >= 0) referenced.add(token.slice(i + 1));
+      }
+    }
+  }
+
+  if (groups.has('definitions')) definitionsToAttributes();
+  if (groups.has('labels')) labelsToAttributes();
+  if (groups.has('accid')) accidToAttributes();
+  if (groups.has('artic')) articToAttributes();
+  if (groups.has('syl')) sylToAttributes();
+  if (groups.has('fermata')) fermataToAttributes();
+  if (groups.has('tie')) pairedToAttributes('tie', ['note', 'chord']);
+  if (groups.has('gliss')) pairedToAttributes('gliss', ['note']);
+  if (groups.has('slur')) slursToAttributes();
+
+  return { counts, changes, warnings, changedElements: [] };
+
+  // ##########################################################################
+  // staffGrp, staffDef, scoreDef
+  // ##########################################################################
+
+  function definitionsToAttributes() {
+    for (const name of Object.keys(defAttributes)) {
+      const mapping = defAttributes[name][version];
+      for (const parent of music.querySelectorAll(defParents[name].join(','))) {
+        const children = directChildren(parent, name);
+        if (children.length === 0) continue;
+        if (children.length > 1) {
+          warn(parent, 'several ' + name + ' elements, not converted');
+          continue;
+        }
+        const el = children[0];
+        if (!convertible(el, Object.keys(mapping))) continue;
+        const attrs = {};
+        for (const a of el.attributes) if (a.name !== 'xml:id') attrs[mapping[a.name]] = a.value;
+        if (Object.keys(attrs).length === 0) continue; // empty element, nothing to express
+        if (!noConflicts(parent, attrs, el)) continue;
+        apply(name, el, [[parent, attrs]]);
+      }
+    }
+  } // definitionsToAttributes()
+
+  function labelsToAttributes() {
+    for (const staffGrp of music.querySelectorAll('staffGrp')) {
+      const grpSyms = directChildren(staffGrp, 'grpSym');
+      if (grpSyms.length === 0) continue;
+      if (grpSyms.length > 1) {
+        warn(staffGrp, 'several grpSym elements, not converted');
+        continue;
+      }
+      const el = grpSyms[0];
+      if (!convertible(el, ['symbol'])) continue;
+      const attrs = { symbol: el.getAttribute('symbol') };
+      if (noConflicts(staffGrp, attrs, el)) apply('grpSym', el, [[staffGrp, attrs]]);
+    }
+    // display labels as attributes only up to MEI 4 (MEI 4 has no @label.abbr)
+    if (version >= 5) return;
+    for (const parent of music.querySelectorAll('staffDef, staffGrp')) {
+      const labels = directChildren(parent, 'label');
+      if (labels.length !== 1) {
+        if (labels.length > 1) warn(parent, 'several label elements, not converted');
+        continue;
+      }
+      const el = labels[0];
+      if (!convertible(el, [], true)) continue;
+      const attrs = { label: el.textContent.trim() };
+      if (noConflicts(parent, attrs, el)) apply('label', el, [[parent, attrs]]);
+    }
+  } // labelsToAttributes()
+
+  // ##########################################################################
+  // accid, artic, syl
+  // ##########################################################################
+
+  function accidToAttributes() {
+    for (const note of music.querySelectorAll('note')) {
+      const accids = directChildren(note, 'accid');
+      if (accids.length === 0) continue;
+      if (accids.length > 1) {
+        warn(note, 'several accid elements, not converted');
+        continue;
+      }
+      const el = accids[0];
+      if (!convertible(el, ['accid', 'accid.ges'])) continue;
+      const attrs = {};
+      for (const a of ['accid', 'accid.ges']) if (el.hasAttribute(a)) attrs[a] = el.getAttribute(a);
+      if (Object.keys(attrs).length === 0) continue; // empty accid
+      if (noConflicts(note, attrs, el)) apply('accid', el, [[note, attrs]]);
+    }
+  } // accidToAttributes()
+
+  function articToAttributes() {
+    for (const host of music.querySelectorAll('note, chord')) {
+      const artics = directChildren(host, 'artic').filter((el) => convertible(el, ['artic', 'artic.ges']));
+      if (artics.length === 0) continue;
+      const values = { artic: tokens(host.getAttribute('artic')), 'artic.ges': tokens(host.getAttribute('artic.ges')) };
+      for (const el of artics) {
+        for (const a of ['artic', 'artic.ges']) {
+          for (const v of tokens(el.getAttribute(a))) if (!values[a].includes(v)) values[a].push(v);
+        }
+      }
+      const attrs = {};
+      for (const a of ['artic', 'artic.ges']) if (values[a].length > 0) attrs[a] = values[a].join(' ');
+      apply('artic', artics, [[host, attrs]]);
+    }
+  } // articToAttributes()
+
+  function sylToAttributes() {
+    for (const host of music.querySelectorAll('note, chord')) {
+      const verses = directChildren(host, 'verse');
+      const syls = directChildren(host, 'syl');
+      if (verses.length + syls.length === 0) continue;
+      if (verses.length + syls.length > 1) {
+        warn(host, 'several verse/syl elements, not converted');
+        continue;
+      }
+      let removed;
+      let syl;
+      if (verses.length === 1) {
+        const verse = verses[0];
+        if (verse.hasAttribute('n') && verse.getAttribute('n') !== '1') {
+          warn(verse, 'verse n="' + verse.getAttribute('n') + '" cannot be expressed by @syl');
+          continue;
+        }
+        if (!convertible(verse, ['n'], false, true)) continue;
+        const children = Array.from(verse.children);
+        if (children.length !== 1 || children[0].localName !== 'syl') {
+          warn(verse, 'verse with content other than one syl element, not converted');
+          continue;
+        }
+        removed = verse;
+        syl = children[0];
+      } else {
+        removed = syls[0];
+        syl = syls[0];
+      }
+      if (syl.hasAttribute('con') || syl.hasAttribute('wordpos')) {
+        warn(syl, '@con/@wordpos (syllable connection) cannot be expressed by @syl');
+        continue;
+      }
+      if (!convertible(syl, [], true)) continue;
+      const attrs = { syl: syl.textContent.trim() };
+      if (noConflicts(host, attrs, removed)) apply('syl', removed, [[host, attrs]]);
+    }
+  } // sylToAttributes()
+
+  // ##########################################################################
+  // control events: fermata, tie, gliss, slur
+  // ##########################################################################
+
+  function fermataToAttributes() {
+    for (const el of music.querySelectorAll('fermata')) {
+      const target = controlEventTarget(el, 'startid', fermataElements);
+      if (!target || !convertible(el, controlEventAttributes.concat(['place']))) continue;
+      const place = el.getAttribute('place') || 'above';
+      if (!['above', 'below'].includes(place)) {
+        warn(el, '@place="' + place + '" cannot be expressed by @fermata');
+        continue;
+      }
+      const attrs = { fermata: place };
+      if (noConflicts(target, attrs, el)) apply('fermata', el, [[target, attrs]]);
+    }
+  } // fermataToAttributes()
+
+  // tie and gliss: start element receives 'i', end element 't' (or 'm' when combined)
+  function pairedToAttributes(name, allowedTargets) {
+    const measureIndex = new Map();
+    music.querySelectorAll('measure').forEach((m, i) => measureIndex.set(m, i));
+    for (const el of music.querySelectorAll(name)) {
+      const start = controlEventTarget(el, 'startid', allowedTargets);
+      const end = start && controlEventTarget(el, 'endid', allowedTargets);
+      if (!end || !convertible(el, controlEventAttributes)) continue;
+      if (start === end) {
+        warn(el, 'start and end element are identical, not converted');
+        continue;
+      }
+      if (name === 'tie' && !tieMatchable(el, start, end, measureIndex)) continue;
+      const startValue = combineFlag(start.getAttribute(name), 'i');
+      const endValue = combineFlag(end.getAttribute(name), 't');
+      if (!startValue || !endValue) {
+        warn(el, (startValue ? end : start).localName + ' already carries this @' + name + ' value, not converted');
+        continue;
+      }
+      apply(name, el, [
+        [start, { [name]: startValue }],
+        [end, { [name]: endValue }],
+      ]);
+    }
+  } // pairedToAttributes()
+
+  /**
+   * Slurs receive numbers (1-6) such that slurs overlapping in document order
+   * have different numbers; numbers used by existing @slur attributes are avoided.
+   */
+  function slursToAttributes() {
+    const index = new Map();
+    music.querySelectorAll('note, chord').forEach((el, i) => index.set(el, i));
+    const reserved = new Set();
+    music.querySelectorAll('[slur]').forEach((el) =>
+      tokens(el.getAttribute('slur')).forEach((t) => reserved.add(t.replace(/^[imt]/, '')))
+    );
+    const slurs = [];
+    for (const el of music.querySelectorAll('slur')) {
+      const start = controlEventTarget(el, 'startid', ['note', 'chord']);
+      const end = start && controlEventTarget(el, 'endid', ['note', 'chord']);
+      if (!end || !convertible(el, controlEventAttributes)) continue;
+      if (index.get(start) >= index.get(end)) {
+        warn(el, 'end element does not follow start element, not converted');
+        continue;
+      }
+      slurs.push({ el, start, end, from: index.get(start), to: index.get(end) });
+    }
+    slurs.sort((a, b) => a.from - b.from);
+    const assigned = [];
+    for (const s of slurs) {
+      let n = 0;
+      for (let k = 1; k <= 6 && !n; k++) {
+        const overlapping = assigned.some((a) => a.n === k && a.from < s.to && s.from < a.to);
+        if (!reserved.has(String(k)) && !overlapping) n = k;
+      }
+      if (!n) {
+        warn(s.el, 'no free slur number (1-6) for overlapping slurs, not converted');
+        continue;
+      }
+      s.n = n;
+      assigned.push(s);
+      const addToken = (el, token) => tokens(el.getAttribute('slur')).concat([token]).join(' ');
+      apply('slur', s.el, [
+        [s.start, { slur: addToken(s.start, 'i' + n) }],
+        [s.end, { slur: addToken(s.end, 't' + n) }],
+      ]);
+    }
+  } // slursToAttributes()
+
+  // ##########################################################################
+  // helpers
+  // ##########################################################################
+
+  /**
+   * Checks whether el can be removed without loss: only allowed attributes
+   * (and xml:id), no content (or only text, if textAllowed; only child elements,
+   * if childrenAllowed), not referenced by xml:id, and not inside editorial markup.
+   */
+  function convertible(el, allowed, textAllowed = false, childrenAllowed = false) {
+    const extra = Array.from(el.attributes)
+      .map((a) => a.name)
+      .filter((a) => a !== 'xml:id' && !allowed.includes(a));
+    if (extra.length > 0) {
+      warn(el, extra.map((a) => '@' + a).join(', ') + ' cannot be expressed as attribute');
+      return false;
+    }
+    const hasText = Array.from(el.childNodes).some((c) => c.nodeType === Node.TEXT_NODE && c.nodeValue.trim());
+    if ((el.children.length > 0 && !childrenAllowed) || (hasText && !textAllowed)) {
+      warn(el, 'element content cannot be expressed as attribute');
+      return false;
+    }
+    const id = el.getAttribute('xml:id');
+    if (id && referenced.has(id)) {
+      warn(el, 'xml:id is referenced from elsewhere, not converted');
+      return false;
+    }
+    return true;
+  } // convertible()
+
+  // element pointed to by a single-valued @startid/@endid of a control event in a measure
+  function controlEventTarget(el, attr, allowedTargets) {
+    if (el.parentElement?.localName !== 'measure') {
+      warn(el, 'not a direct child of measure (e.g., within editorial markup), not converted');
+      return null;
+    }
+    const value = (el.getAttribute(attr) || '').trim();
+    if (!value) {
+      warn(el, 'no @' + attr + ' (e.g., only @tstamp), not converted');
+      return null;
+    }
+    const target = value.startsWith('#') ? byId.get(value.slice(1)) : null;
+    if (!target || !allowedTargets.includes(target.localName)) {
+      warn(el, '@' + attr + '="' + value + '" does not point to a ' + allowedTargets.join('/') + ' in this file');
+      return null;
+    }
+    return target;
+  } // controlEventTarget()
+
+  /**
+   * @tie="i"/"t" are only matched (by Verovio, and by convertAttributesToElements())
+   * between notes of the same pitch in the same staff, within the same or the next
+   * measure. Ties between notes of different pitch (invalid, but drawn by Verovio),
+   * across staves or spanning more measures remain elements.
+   */
+  function tieMatchable(el, start, end, measureIndex) {
+    const startPitch = pitchesOf(start);
+    const endPitch = pitchesOf(end);
+    if (!startPitch || startPitch !== endPitch) {
+      warn(
+        el,
+        'start and end notes differ in pitch (' +
+          (startPitch || '?') +
+          ' / ' +
+          (endPitch || '?') +
+          '), @tie would not be matched, not converted'
+      );
+      return false;
+    }
+    const staffOf = (e) => e.closest('staff')?.getAttribute('n') || '';
+    if (staffOf(start) !== staffOf(end)) {
+      warn(el, 'start and end notes are in different staves, @tie would not be matched, not converted');
+      return false;
+    }
+    const distance = measureIndex.get(end.closest('measure')) - measureIndex.get(start.closest('measure'));
+    if (!(distance >= 0 && distance <= 1)) {
+      warn(el, 'end note is not in the same or the next measure, @tie would not be matched, not converted');
+      return false;
+    }
+    return true;
+  } // tieMatchable()
+
+  // adds flag 'i' or 't' to an existing i/m/t value; returns '' if already present
+  function combineFlag(value, flag) {
+    const t = tokens(value);
+    const hasStart = t.includes('i') || t.includes('m');
+    const hasEnd = t.includes('t') || t.includes('m');
+    if ((flag === 'i' && hasStart) || (flag === 't' && hasEnd)) return '';
+    const start = hasStart || flag === 'i';
+    const end = hasEnd || flag === 't';
+    return start && end ? 'm' : start ? 'i' : 't';
+  } // combineFlag()
+
+  // checks that target does not already carry attributes with different values
+  function noConflicts(target, attrs, el) {
+    for (const [a, value] of Object.entries(attrs)) {
+      if (target.hasAttribute(a) && target.getAttribute(a) !== value) {
+        warn(el, target.localName + ' already has @' + a + '="' + target.getAttribute(a) + '", not converted');
+        return false;
+      }
+    }
+    return true;
+  } // noConflicts()
+
+  /**
+   * Sets attributes on targets, removes element(s) and records the change
+   * @param {string} name
+   * @param {Element|Array<Element>} elements to be removed
+   * @param {Array<[Element, Object]>} targets elements and attributes to be set
+   */
+  function apply(name, elements, targets) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    for (const [target, attrs] of targets) {
+      for (const [a, value] of Object.entries(attrs)) target.setAttribute(a, value);
+    }
+    const removed = elements.map((el) => ({ element: el, text: '<' + el.localName + '>' }));
+    elements.forEach((el) => removeIndented(el));
+    counts[name] = (counts[name] || 0) + elements.length;
+    changes.push({
+      name,
+      removed,
+      targets: targets.map(([target, attrs]) => ({
+        element: target,
+        attributes: Object.entries(attrs)
+          .map(([a, value]) => '@' + a + '="' + value + '"')
+          .join(' '),
+      })),
+    });
+  } // apply()
+
+  function warn(element, message) {
+    warnings.push({ element, message });
+  }
+} // convertElementsToAttributes()
+
+// pitch of a note (written pitch preferred, e.g. 'c5'), or null if none
+function pitchOf(note) {
+  const pname = note.getAttribute('pname') || note.getAttribute('pname.ges');
+  const oct = note.getAttribute('oct') || note.getAttribute('oct.ges');
+  if (pname && oct) return pname + oct;
+  const course = note.getAttribute('tab.course');
+  if (course) return 'tab' + course + '.' + (note.getAttribute('tab.fret') || '');
+  return null;
+} // pitchOf()
+
+// pitch(es) of a note or chord as sorted string (e.g. 'e4 g4'), or null if a pitch is missing
+function pitchesOf(el) {
+  const notes = el.localName === 'chord' ? Array.from(el.querySelectorAll('note')) : [el];
+  const pitches = notes.map(pitchOf);
+  if (pitches.length === 0 || pitches.includes(null)) return null;
+  return [...new Set(pitches)].sort().join(' ');
+} // pitchesOf()
+
+function tokens(str) {
+  return (str || '').trim().split(/\s+/).filter((t) => t);
+}
+
+function directChildren(el, name) {
+  return Array.from(el.children).filter((c) => c.localName === name);
+}
+
+/**
+ * Removes el together with the whitespace before it; a parent left with
+ * whitespace only becomes empty (serialized as self-closing tag)
+ */
+function removeIndented(el) {
+  const parent = el.parentNode;
+  const prev = el.previousSibling;
+  if (prev && prev.nodeType === Node.TEXT_NODE && /^\s*$/.test(prev.nodeValue)) prev.remove();
+  el.remove();
+  if (parent && Array.from(parent.childNodes).every((c) => c.nodeType === Node.TEXT_NODE && /^\s*$/.test(c.nodeValue))) {
+    while (parent.firstChild) parent.firstChild.remove();
+  }
+} // removeIndented()

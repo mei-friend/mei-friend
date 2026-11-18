@@ -1641,6 +1641,18 @@ input.urlResolves {
   margin-left: 0;
 }
 
+.ccActions.ccActionRows {
+  /* one pair of buttons per direction: side by side if there is room, else stacked */
+  column-gap: 1.5em;
+  row-gap: 4px;
+}
+
+.ccActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 /* results */
 .ccResults {
   flex: 1;

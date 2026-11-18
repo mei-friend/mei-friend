@@ -8,7 +8,7 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as facs from './facsimile.js';
-import { convertAttributesToElements as convertAttrs } from './attribute-conversion.js';
+import { convertAttributesToElements as convertAttrs, convertElementsToAttributes as convertEls } from './attribute-conversion.js';
 import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
@@ -1511,7 +1511,10 @@ export function renumberMeasures(v, cm, change = false, options = {}) {
  * @param {Object} options
  * @param {Array<string>} options.groups attribute groups to be converted (see attribute-conversion.js)
  * @param {boolean} options.test only report what would be converted
+ * @param {boolean} options.reverse convert elements to attributes instead
+ *   (attribute-conversion.js convertElementsToAttributes())
  * @returns {Object} result of attribute-conversion.js convertAttributesToElements()
+ *   or convertElementsToAttributes()
  */
 export function convertAttributesToElements(v, cm, options = {}) {
   const startTime = Date.now();
@@ -1522,11 +1525,13 @@ export function convertAttributesToElements(v, cm, options = {}) {
 
   v.loadXml(cm.getValue(), true);
   const indent = cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit') || 2);
-  const result = convertAttrs(v.xmlDoc, {
-    generateId: (nodeName) => utils.generateXmlId(nodeName, v.xmlIdStyle),
-    indent: indent,
-    groups: options.groups,
-  });
+  const result = options.reverse
+    ? convertEls(v.xmlDoc, { groups: options.groups })
+    : convertAttrs(v.xmlDoc, {
+        generateId: (nodeName) => utils.generateXmlId(nodeName, v.xmlIdStyle),
+        indent: indent,
+        groups: options.groups,
+      });
   const total = Object.values(result.counts).reduce((sum, n) => sum + n, 0);
 
   if (total > 0 && !options.test) {
@@ -1550,7 +1555,8 @@ export function convertAttributesToElements(v, cm, options = {}) {
   cm.blockChanges = false;
   if (total > 0 && !options.test) handleEditorChanges();
   console.log(
-    'convertAttributesToElements()' + (options.test ? ' (test): ' : ': '),
+    (options.reverse ? 'convertElementsToAttributes()' : 'convertAttributesToElements()') +
+      (options.test ? ' (test): ' : ': '),
     result.counts,
     '(Processing time: ' + (Date.now() - startTime) / 1000 + ' s)'
   );

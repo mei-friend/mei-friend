@@ -262,35 +262,36 @@ export function runCheck(type = '') {
 } // runCheck()
 
 /**
- * Converts attributes to elements (or, in test mode, lists what would be converted)
- * for the attribute groups selected in the Convert tab
+ * Converts attributes to elements, or elements to attributes (reverse), for the
+ * groups selected in the Convert tab; in test mode, only lists what would be converted
  * @param {boolean} test
+ * @param {boolean} reverse elements to attributes
  */
-export function runConvert(test = false) {
+export function runConvert(test = false, reverse = false) {
   openCheckerPanel('convert');
   const p = panes.convert;
   const groups = selectedGroups();
-  p.lastAction = () => runConvert(test);
-  startRun('convert', t('checkerPanelAttrToElButton', 'Attributes → elements') + (test ? testSuffix() : ''));
+  p.lastAction = () => runConvert(test, reverse);
+  const key = reverse ? 'convertElementsToAttributes' : 'convertAttributesToElements';
+  const title = reverse
+    ? t('checkerPanelElToAttrButton', 'Elements → attributes')
+    : t('checkerPanelAttrToElButton', 'Attributes → elements');
+  startRun('convert', title + (test ? testSuffix() : ''));
   setTimeout(() => {
-    const result = e.convertAttributesToElements(v, cm, { groups, test });
+    const result = e.convertAttributesToElements(v, cm, { groups, test, reverse });
     const total = Object.values(result.counts).reduce((sum, n) => sum + n, 0);
     let summary = '';
     if (total > 0) {
       const list = Object.entries(result.counts)
         .map(([name, n]) => n + '&times;&nbsp;&lt;' + name + '&gt;')
         .join(', ');
-      summary = t(test ? 'convertAttributesToElementsTestSummary' : 'convertAttributesToElementsSummary').replace(
-        '{list}',
-        list
-      );
+      summary = t(key + (test ? 'TestSummary' : 'Summary')).replace('{list}', list);
     }
     if (result.warnings.length > 0) {
-      summary += ' ' + t('convertAttributesToElementsProblems').replace('{count}', result.warnings.length);
+      summary += ' ' + t(key + 'Problems').replace('{count}', result.warnings.length);
     }
-    addEntriesSliced('convert', conversionEntries(result, test), () =>
-      finishRun(t('convertAttributesToElementsNone'), summary)
-    );
+    const entries = reverse ? reverseConversionEntries(result, test) : conversionEntries(result, test);
+    addEntriesSliced('convert', entries, () => finishRun(t(key + 'None'), summary));
   }, 10);
 } // runConvert()
 
@@ -517,11 +518,24 @@ function buildConvertOptions(content, p) {
   all.addEventListener('click', () => setAll(true));
   none.addEventListener('click', () => setAll(false));
 
-  const buttons = actions([
-    { lang: 'checkerPanelTestButton', action: () => runConvert(true) },
-    { lang: 'checkerPanelAttrToElButton', action: () => runConvert(false) },
-    { lang: 'checkerPanelElToAttrButton', action: null }, // not yet implemented
-  ]);
+  // one row per direction, each with its Test button
+  const buttons = el('div', 'ccActions ccActionRows');
+  buttons.append(
+    actions(
+      [
+        { lang: 'checkerPanelTestButton', action: () => runConvert(true) },
+        { lang: 'checkerPanelAttrToElButton', action: () => runConvert(false) },
+      ],
+      'ccActionRow'
+    ),
+    actions(
+      [
+        { lang: 'checkerPanelTestButton', action: () => runConvert(true, true) },
+        { lang: 'checkerPanelElToAttrButton', action: () => runConvert(false, true) },
+      ],
+      'ccActionRow'
+    )
+  );
   content.appendChild(buttons);
   // disable action buttons when no group is selected
   const updateButtons = () => {
@@ -609,8 +623,8 @@ function buildRenumberOptions(content, p) {
 } // buildRenumberOptions()
 
 // row of action buttons; buttons without action are disabled (not yet implemented)
-function actions(buttons) {
-  const div = el('div', 'ccActions');
+function actions(buttons, className = 'ccActions') {
+  const div = el('div', className);
   for (const b of buttons) {
     const button = el('button', 'btn');
     button.dataset.lang = b.lang;
@@ -696,6 +710,37 @@ function conversionEntries(result, test) {
     });
   return entries;
 } // conversionEntries()
+
+// result entries of the reverse conversion: unconverted elements first, then conversions
+function reverseConversionEntries(result, test) {
+  const idOf = (el) => el.getAttribute('xml:id') || '';
+  const inDocumentOrder = (a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+  const entries = [];
+  result.warnings
+    .sort((a, b) => inDocumentOrder(a.element, b.element))
+    .forEach((w) =>
+      entries.push({
+        xmlId: idOf(w.element) || idOf(w.element.closest('[*|id]') || w.element),
+        className: 'ccWarning',
+        html: '&#9888; <b>&lt;' + w.element.localName + '&gt;</b>' + idHtml(w.element) + ': ' + esc(w.message),
+      })
+    );
+  result.changes
+    .sort((a, b) => inDocumentOrder(a.targets[0].element, b.targets[0].element))
+    .forEach((c) => {
+      // in test mode, the elements are still in the editor; otherwise jump to the element receiving the attribute
+      const target =
+        (test && c.removed.map((r) => r.element).find((el) => idOf(el))) || c.targets.find((tg) => idOf(tg.element))?.element;
+      entries.push({
+        xmlId: target ? idOf(target) : '',
+        html:
+          c.removed.map((r) => '<b>&lt;' + r.element.localName + '&gt;</b>' + idHtml(r.element)).join(', ') +
+          ' &rarr; ' +
+          c.targets.map((tg) => '<b>' + tg.element.localName + '</b>' + idHtml(tg.element) + ' ' + esc(tg.attributes)).join(', '),
+      });
+    });
+  return entries;
+} // reverseConversionEntries()
 
 function shownEntries(p) {
   return Array.from(p.list.querySelectorAll('.ccEntry')).filter((div) => div.style.display !== 'none');
