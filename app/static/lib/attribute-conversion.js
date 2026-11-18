@@ -261,6 +261,10 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
     for (const note of music.querySelectorAll('note[accid], note[accid\\.ges]')) {
       const attrs = ['accid', 'accid.ges'].filter((a) => note.hasAttribute(a));
       const accids = directChildren(note, 'accid');
+      if (inEditorialMarkup(note, 'accid')) {
+        warn(note, attrs.map((a) => '@' + a).join(', ') + ' not converted, accid element within editorial markup exists');
+        continue;
+      }
       if (accids.length > 1) {
         warn(note, attrs.map((a) => '@' + a).join(', ') + ' not converted, several accid elements exist');
         continue;
@@ -295,6 +299,10 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   function convertArtic() {
     for (const el of music.querySelectorAll('note[artic], chord[artic], note[artic\\.ges], chord[artic\\.ges]')) {
+      if (inEditorialMarkup(el, 'artic')) {
+        warn(el, '@artic not converted, artic element within editorial markup exists');
+        continue;
+      }
       const artics = tokens(el.getAttribute('artic'));
       const articGes = tokens(el.getAttribute('artic.ges'));
       // pair written and gestural values by position if lists have equal length
@@ -407,18 +415,20 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
     if (flags.size === 0) return;
 
     const notes = Array.from(flags.keys());
-    // starts and ends already encoded as control elements
-    const existingEnds = new Set();
-    music.querySelectorAll(element + '[endid]').forEach((c) => existingEnds.add(c.getAttribute('endid')));
-    for (const note of notes) {
-      if (!note.hasAttribute('xml:id')) continue;
-      const f = flags.get(note);
-      const ref = '#' + note.getAttribute('xml:id');
-      if (f.start && existingControlEvents.has(element + '|' + ref)) {
-        f.startDone = true;
-        record(element, [f.source], [existingControlEvents.get(element + '|' + ref)]);
-      }
-      if (f.end && existingEnds.has(ref)) f.endDone = true;
+    // ties/glissandi already encoded as control elements: an existing element accounts
+    // for the start value of its start note and, only then, for the end value of its end
+    // note (an element starting elsewhere does not consume the end value of another pair)
+    const noteById = new Map();
+    notes.forEach((n) => n.hasAttribute('xml:id') && noteById.set(n.getAttribute('xml:id'), n));
+    for (const ctrl of music.querySelectorAll(element + '[startid]')) {
+      const start = noteById.get(ctrl.getAttribute('startid').replace(/^#/, ''));
+      const f = start && flags.get(start);
+      if (!f || !f.start || f.startDone) continue;
+      f.startDone = true;
+      record(element, [f.source], [ctrl]);
+      const end = noteById.get((ctrl.getAttribute('endid') || '').replace(/^#/, ''));
+      const fe = end && flags.get(end);
+      if (fe && fe.end && !fe.endDone) fe.endDone = true;
     }
 
     for (let i = 0; i < notes.length; i++) {
@@ -605,6 +615,14 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   function tokens(str) {
     return (str || '').trim().split(/\s+/).filter((t) => t);
+  }
+
+  // whether host contains an element (of its own, not of a chord note) within editorial
+  // markup, e.g. <supplied><accid/></supplied>; a direct child next to it would duplicate it
+  function inEditorialMarkup(host, name) {
+    return Array.from(host.querySelectorAll(name)).some(
+      (e) => e.parentElement !== host && e.parentElement.closest('note, chord') === host
+    );
   }
 
   function directChildren(el, name) {
@@ -859,7 +877,13 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
 
   function articToAttributes() {
     for (const host of music.querySelectorAll('note, chord')) {
-      const artics = directChildren(host, 'artic').filter((el) => convertible(el, ['artic', 'artic.ges']));
+      const artics = directChildren(host, 'artic').filter((el) => {
+        if (!el.hasAttribute('artic') && !el.hasAttribute('artic.ges')) {
+          warn(el, 'no @artic or @artic.ges, not converted');
+          return false;
+        }
+        return convertible(el, ['artic', 'artic.ges']);
+      });
       if (artics.length === 0) continue;
       const values = { artic: tokens(host.getAttribute('artic')), 'artic.ges': tokens(host.getAttribute('artic.ges')) };
       for (const el of artics) {
@@ -919,7 +943,13 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
   function fermataToAttributes() {
     for (const el of music.querySelectorAll('fermata')) {
       const target = controlEventTarget(el, 'startid', fermataElements);
-      if (!target || !convertible(el, controlEventAttributes.concat(['place']))) continue;
+      if (!target) continue;
+      // @form="norm" is the default form and can be dropped; other forms cannot be expressed
+      if (el.hasAttribute('form') && el.getAttribute('form') !== 'norm') {
+        warn(el, '@form="' + el.getAttribute('form') + '" cannot be expressed by @fermata');
+        continue;
+      }
+      if (!convertible(el, controlEventAttributes.concat(['place', 'form']))) continue;
       const place = el.getAttribute('place') || 'above';
       if (!['above', 'below'].includes(place)) {
         warn(el, '@place="' + place + '" cannot be expressed by @fermata');
