@@ -1365,26 +1365,31 @@ input.urlResolves {
   text-decoration: line-through;
 }
 
+/* Checker panel below the encoding (checker-panel.js): tabs Check, Convert, Renumber.
+   Narrow panel: options above the results, folded away after a run;
+   wide panel (container query below): options beside the results. */
 #codeChecker {
   display: none;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
+  container-type: inline-size;
   color: var(--textColor);
   background-color: var(--settingsBackgroundAlternativeColor);
-  font-family: monospace;
 }
 
-#codeChecker div:nth-child(even) {
-  background: var(--settingsBackgroundColor);
-}
-
-#codeChecker button {
+#codeChecker button.btn {
   background-color: var(--backgroundColor) !important;
   border-color: var(--dropdownBorderColor) !important;
-  padding-left: 2px;
-  padding-right: 2px;
+  color: var(--textColor);
+  padding-left: 4px;
+  padding-right: 4px;
   min-width: fit-content;
-  margin-left: 2px; /* Add spacing between buttons */
+  margin-left: 2px;
+}
+
+#codeChecker button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 #codeChecker svg {
@@ -1403,13 +1408,362 @@ input.urlResolves {
   max-height: 16px;
 }
 
-#codeCheckerCloseButton {
-  margin-right: 10px;
-  margin-top: 0.5px;
+.ccHeader {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  background-color: var(--navbarBackgroundColor);
 }
 
-#codeCheckerInfoTotal {
-  margin-right: 35px;
+.ccTab {
+  color: var(--textColor);
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 3px 12px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.ccTab:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.ccTab.active {
+  background-color: var(--settingsBackgroundColor);
+  border-bottom-color: var(--highlightColor);
+  font-weight: bold;
+}
+
+.ccSpacer {
+  flex: 1;
+}
+
+.ccClose {
+  cursor: pointer;
+  padding: 2px 10px;
+  font-size: 1.2em;
+}
+
+.ccPane {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.ccPane.active {
+  display: flex;
+}
+
+/* options */
+.ccOptions {
+  flex: 0 0 auto;
+  max-height: 70%;
+  overflow-y: auto;
+  font-size: 0.9em;
+  border-bottom: 1px solid var(--dropdownBorderColor);
+  background-color: var(--settingsBackgroundColor);
+}
+
+.ccOptionsContent {
+  position: relative;
+  padding: 4px 8px;
+}
+
+.ccOptionsSummary {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.ccOptionsSummaryText {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ccOptions.collapsed .ccOptionsContent {
+  display: none;
+}
+
+.ccOptions.collapsed .ccOptionsSummary {
+  display: flex;
+}
+
+.ccFold {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  cursor: pointer;
+}
+
+.ccOptionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 30em; /* keep labels and controls together in a wide narrow-mode panel */
+  padding-right: 1em; /* room for the fold icon */
+}
+
+.ccOptionGroup.ccGrid {
+  max-width: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16em, 1fr));
+  column-gap: 0.5em;
+  row-gap: 1px;
+}
+
+.ccOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 1.8em;
+}
+
+#codeChecker input[type='radio'],
+#codeChecker input[type='checkbox'] {
+  accent-color: var(--highlightColor);
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* selectable rows (check types, attribute groups); colors theme-neutral */
+.ccChoice {
+  align-items: flex-start;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.ccChoice input {
+  margin-top: 0.2em !important;
+}
+
+.ccChoice:hover {
+  background-color: rgba(127, 127, 127, 0.12);
+}
+
+.ccChoice:has(input[type='radio']:checked) {
+  background-color: rgba(127, 127, 127, 0.2);
+  border-left-color: var(--highlightColor);
+}
+
+.ccDetail {
+  font-family: monospace;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.ccDetail-block {
+  display: block;
+  margin-top: 1px;
+}
+
+.ccDetail-inline {
+  margin-left: 0.4em;
+}
+
+/* label left, control right (renumber options) */
+.ccOption.ccRow {
+  justify-content: space-between;
+  padding: 1px 8px;
+}
+
+/* rows with every second one brighter, as in the settings panel */
+.ccOptionGroup.ccStriped {
+  gap: 0;
+}
+
+.ccStriped > .ccOption:nth-child(odd) {
+  background-color: var(--settingsBackgroundAlternativeColor);
+}
+
+.ccStriped input[type='checkbox'] {
+  margin-right: 2px !important;
+}
+
+.ccOption.disabled {
+  opacity: 0.45;
+}
+
+#codeChecker select,
+#codeChecker input[type='number'] {
+  height: 1.7em;
+  padding: 0 4px;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--backgroundColor);
+  color: var(--textColor);
+  font-size: 0.95em;
+}
+
+#codeChecker select {
+  min-width: 7em;
+  text-align: left;
+}
+
+.ccNumber {
+  width: 5em;
+  text-align: right;
+}
+
+.ccAllNone {
+  margin-bottom: 2px;
+}
+
+.ccLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--textColor);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.ccActions {
+  position: sticky; /* keep the buttons visible when the options scroll */
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 3px 0;
+  background-color: var(--settingsBackgroundColor);
+}
+
+.ccActions button.btn {
+  margin-left: 0;
+}
+
+/* results */
+.ccResults {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ccResultsHeader {
+  font-size: 0.9em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background-color: var(--settingsBackgroundColor);
+  border-bottom: 1px solid var(--dropdownBorderColor);
+}
+
+.ccRunTitleWrapper {
+  flex: 1 1 12em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ccRunTitle {
+  font-weight: bold;
+}
+
+.ccRunSummary {
+  margin-left: 0.5em;
+}
+
+.ccStale {
+  display: none;
+  margin-left: 0.5em;
+  color: var(--fileStatusWarnColor);
+}
+
+.ccPane.stale .ccStale {
+  display: inline;
+}
+
+.ccFilter {
+  width: 12em;
+  height: 1.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  outline: 0;
+}
+
+.ccCount {
+  white-space: nowrap;
+}
+
+.ccPane:not(.running) .ccStop {
+  display: none;
+}
+
+.ccList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ccList .ccEntry {
+  font-family: monospace;
+}
+
+.ccList .validation-item {
+  padding: 0 4px;
+}
+
+.ccList .validation-item.odd {
+  background-color: var(--settingsBackgroundColor);
+}
+
+.ccList .ccEntry .codeCheckerMessage {
+  cursor: pointer;
+}
+
+.ccList .ccMuted {
+  opacity: 0.6;
+}
+
+.ccList .ccWarning .codeCheckerMessage {
+  color: var(--fileStatusWarnColor);
+}
+
+.ccList .ccInfo {
+  padding: 4px 8px;
+  opacity: 0.75;
+  cursor: default;
+}
+
+/* wide panel: options beside the results, always unfolded */
+@container (min-width: 720px) {
+  .ccPane.active {
+    flex-direction: row;
+  }
+
+  .ccOptions {
+    flex: 0 0 22em;
+    max-height: none;
+    border-bottom: none;
+    border-right: 1px solid var(--dropdownBorderColor);
+  }
+
+  .ccOptions.collapsed .ccOptionsContent {
+    display: block;
+  }
+
+  .ccOptions.collapsed .ccOptionsSummary,
+  .ccFold {
+    display: none;
+  }
+
+  .ccOptionGroup.ccGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .codeCheckerMessage {
@@ -1421,17 +1775,6 @@ input.urlResolves {
   cursor: default;
   position: relative;
   padding-left: 2px;
-}
-
-#codeCheckerTitle {
-  position: absolute;
-  width: 100%;
-  background-color: var(--navbarBackgroundColor);
-  z-index: 1;
-}
-
-.codeCheckerInfoEmpty {
-  min-height: 2em;
 }
 
 #validation-status {

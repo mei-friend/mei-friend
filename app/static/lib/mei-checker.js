@@ -702,8 +702,6 @@ export function checkMeterConformance(v, cm) {
 export function checkLinkedElements(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.linkedElementsCodeCheckerTitle.text);
-  // No automatic fix exists for broken links — remove the Fix all / Ignore all buttons
-  document.querySelectorAll('#codeCheckerTitle .btn:not(#codeCheckerStopButton)').forEach((btn) => btn.remove());
 
   try {
     v.loadXml(cm.getValue(), true);

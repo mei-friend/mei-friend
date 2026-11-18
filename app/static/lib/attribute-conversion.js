@@ -104,12 +104,23 @@ const fermataElements = ['note', 'chord', 'rest', 'mRest', 'space', 'mSpace'];
 const lyricsElements = ['verse', 'syl', 'refrain'];
 
 /**
+ * Groups of attributes that can be converted selectively (options.groups):
+ *   accid: note@accid, @accid.ges; artic: note|chord@artic, @artic.ges; syl: note|chord@syl;
+ *   fermata: @fermata; tie: @tie; slur: @slur; gliss: note@gliss;
+ *   definitions: clef, key, meter and mensuration attributes on staffDef/scoreDef;
+ *   labels: staffGrp@symbol and (MEI < 5) staffDef|staffGrp@label, @label.abbr
+ */
+export const conversionGroups = ['accid', 'artic', 'syl', 'fermata', 'tie', 'slur', 'gliss', 'definitions', 'labels'];
+
+/**
  * Converts all attributes in xmlDoc that have an element equivalent into
  * elements. Modifies xmlDoc in place.
  * @param {Document} xmlDoc
  * @param {Object} options
  * @param {Function} options.generateId function(nodeName) returning a new xml:id
  * @param {string} options.indent indentation unit (e.g., '  ' or '\t')
+ * @param {Iterable<string>} options.groups groups of attributes to be converted (see
+ *   conversionGroups), all groups if omitted
  * @returns {{counts: Object<string, number>, changes: Array<Object>, warnings: Array<Object>, changedElements: Array<Element>}}
  *   counts: number of conversions per created element name;
  *   changes: one entry per conversion, {name, sources: [{element, attributes}], targets: [Element]},
@@ -121,6 +132,7 @@ const lyricsElements = ['verse', 'syl', 'refrain'];
 export function convertAttributesToElements(xmlDoc, options = {}) {
   const generateId = options.generateId || ((name) => name + '-' + Math.random().toString(36).slice(2, 10));
   const indentUnit = options.indent ?? '  ';
+  const groups = new Set(options.groups || conversionGroups);
   const counts = {};
   const changes = [];
   const warnings = [];
@@ -144,14 +156,19 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   const meiVersion = parseInt(xmlDoc.querySelector('mei')?.getAttribute('meiversion') || '', 10);
 
-  convertDefinitions();
-  convertAccid();
-  convertArtic();
-  convertSyl();
-  convertFermata();
-  convertPairedAttribute({ attribute: 'tie', element: 'tie', samePitch: true, chordInheritance: true });
-  convertPairedAttribute({ attribute: 'gliss', element: 'gliss', samePitch: false, chordInheritance: false });
-  convertSlur();
+  if (groups.has('definitions')) convertDefinitions();
+  if (groups.has('labels')) convertLabels();
+  if (groups.has('accid')) convertAccid();
+  if (groups.has('artic')) convertArtic();
+  if (groups.has('syl')) convertSyl();
+  if (groups.has('fermata')) convertFermata();
+  if (groups.has('tie')) {
+    convertPairedAttribute({ attribute: 'tie', element: 'tie', samePitch: true, chordInheritance: true });
+  }
+  if (groups.has('gliss')) {
+    convertPairedAttribute({ attribute: 'gliss', element: 'gliss', samePitch: false, chordInheritance: false });
+  }
+  if (groups.has('slur')) convertSlur();
 
   return { counts, changes, warnings, changedElements };
 
@@ -183,6 +200,9 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
       }
     }
 
+  } // convertDefinitions()
+
+  function convertLabels() {
     // staffGrp@symbol -> grpSym
     for (const staffGrp of music.querySelectorAll('staffGrp[symbol]')) {
       const symbol = staffGrp.getAttribute('symbol');
@@ -220,7 +240,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
         record(elName, [source], [el]);
       }
     }
-  } // convertDefinitions()
+  } // convertLabels()
 
   // inserts a child element into staffGrp/staffDef/scoreDef in canonical order
   function insertDefChild(parent, el) {

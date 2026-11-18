@@ -872,39 +872,6 @@ export const meiFriendSettingsOptions = {
     description: 'filled in by language packs',
     type: 'button',
   },
-  // renumber measures
-  renumberMeasuresHeading: {
-    title: 'Renumber measures',
-    description: 'filled in by language packs',
-    type: 'header',
-    default: true,
-  },
-  renumberMeasureContinueAcrossIncompleteMeasures: {
-    title: 'Continue across incomplete measures',
-    description: 'filled in by language packs',
-    type: 'bool',
-    default: false,
-  },
-  renumberMeasuresUseSuffixAtMeasures: {
-    title: 'Suffix at incomplete measures',
-    description: 'filled in by language packs',
-    type: 'select',
-    values: ['none', '-cont'],
-    default: false,
-  },
-  renumberMeasuresContinueAcrossEndings: {
-    title: 'Continue across endings',
-    description: 'filled in by language packs',
-    type: 'bool',
-    default: false,
-  },
-  renumberMeasuresUseSuffixAtEndings: {
-    title: 'Suffix at endings',
-    description: 'filled in by language packs',
-    type: 'select',
-    values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-    default: 'a/b/c',
-  },
   // Annotations
   titleAnnotations: {
     title: 'Annotations',
@@ -1269,5 +1236,5 @@ export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 export const defaultFacsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
 export const defaultFacsimileProportion = 0.5;
-export const defaultCodeCheckerHeight = 175; // px, height of code checker panel
+export const defaultCodeCheckerHeight = 260; // px, height of code checker panel
 export const annotationPanelExtent = 250; // px, width/height of annotation panel, taken away from width of friendContainer

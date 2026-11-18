@@ -91,7 +91,7 @@ import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
-import * as checker from './mei-checker.js';
+import * as checkerPanel from './checker-panel.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -2049,17 +2049,17 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  correctAccid: () => checker.checkAccidGes(v, cm),
-  checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
-  checkLinkedElements: () => setTimeout(() => checker.checkLinkedElements(v, cm), 10),
-  renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
-  renumberMeasures: () => e.renumberMeasures(v, cm, true),
+  correctAccid: () => checkerPanel.runCheck('accidGes'),
+  checkMeterConformance: () => checkerPanel.runCheck('metcon'),
+  checkLinkedElements: () => checkerPanel.runCheck('linked'),
+  renumberMeasuresTest: () => checkerPanel.runRenumber(false),
+  renumberMeasures: () => checkerPanel.runRenumber(true),
   reRenderMei: () => v.reRenderMei(cm, false),
   reRenderMeiWithout: () => v.reRenderMei(cm, true),
   addIds: () => e.manipulateXmlIds(v, cm, 'add'),
   removeIds: () => e.manipulateXmlIds(v, cm, 'remove'),
   changeIds: () => e.manipulateXmlIds(v, cm, 'change'),
-  convertAttributesToElements: () => e.convertAttributesToElements(v, cm),
+  convertAttributesToElements: () => checkerPanel.openCheckerPanel('convert'),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
   encloseSelectionWithTag: encloseSelectionWithTag,
@@ -2416,8 +2416,8 @@ function addEventListeners(v, cm) {
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
   document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
-  document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
-  document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
+  document.getElementById('renumberMeasuresTest').addEventListener('click', cmd.renumberMeasuresTest);
+  document.getElementById('renumberMeasuresExec').addEventListener('click', cmd.renumberMeasures);
   document.getElementById('convertAttributesToElements').addEventListener('click', cmd.convertAttributesToElements);
   // rerender through Verovio
   document.getElementById('reRenderMeiVerovio').addEventListener('click', cmd.reRenderMei);
