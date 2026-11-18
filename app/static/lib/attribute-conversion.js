@@ -22,19 +22,16 @@
 const meiNameSpace = 'http://www.music-encoding.org/ns/mei';
 const xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
 
-// canonical order of (prefatory) child elements in staffGrp, staffDef and scoreDef
-const defChildOrder = [
-  'label',
-  'labelAbbr',
-  'grpSym',
-  'clef',
-  'clefGrp',
-  'keySig',
-  'meterSig',
-  'meterSigGrp',
-  'mensur',
-  'proport',
-];
+// order of the leading child elements of staffGrp, staffDef and scoreDef (MEI 5.1):
+// new elements are inserted after the elements listed before them, and before
+// any other element (e.g., staffGrp: grpSym*, label/labelAbbr*, instrDef*, staffGrp/staffDef+;
+// staffDef: label/labelAbbr*, clef/keySig/meterSig/mensur/instrDef/layerDef* (any order), ambitus?;
+// scoreDef: chordTable?, symbolTable*, keySig?, meterSig?, pgHead*, ..., staffGrp?)
+const defChildOrder = {
+  staffGrp: ['grpSym', 'label', 'labelAbbr'],
+  staffDef: ['label', 'labelAbbr', 'clef', 'clefGrp', 'keySig', 'meterSig', 'meterSigGrp', 'mensur', 'proport'],
+  scoreDef: ['chordTable', 'symbolTable', 'keySig', 'meterSig', 'meterSigGrp'],
+};
 
 // staffDef/scoreDef attributes and their counterparts on the corresponding element;
 // an element is only created when at least one of the required attributes is present
@@ -227,9 +224,10 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   // inserts a child element into staffGrp/staffDef/scoreDef in canonical order
   function insertDefChild(parent, el) {
-    const rank = defChildOrder.indexOf(el.localName);
+    const order = defChildOrder[parent.localName] || [];
+    const rank = order.indexOf(el.localName);
     const before = Array.from(parent.children).find((c) => {
-      const r = defChildOrder.indexOf(c.localName);
+      const r = order.indexOf(c.localName);
       return r < 0 || r > rank;
     });
     insertIndented(parent, el, before || null);
