@@ -180,6 +180,15 @@ export const lang = {
   meterConformanceText: { text: 'Vérifier les @metcon' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
+  convertAttributesToElementsText: {
+    text: 'Convertir les attributs en éléments',
+    description:
+      'Convertit les attributs qui peuvent aussi être exprimés sous forme d\'éléments en ces éléments, p. ex. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss sur les notes et accords, ou les attributs de clé, d\'armure et de mesure sur staffDef et scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributs convertis en {list}.' },
+  convertAttributesToElementsNone: { text: 'Aucun attribut convertible en élément trouvé.' },
+  convertAttributesToElementsProblems: { text: '{count} attributs n\'ont pas pu être convertis.' },
+  convertAttributesToElementsDetails: { text: 'Toutes les conversions sont listées dans le panneau sous l\'encodage ; cliquez sur une entrée pour y accéder dans l\'éditeur.' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
   removeIdsText: { text: 'Supprimer les identifiants de MEI' },
   changeIdsText: {

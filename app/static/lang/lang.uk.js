@@ -172,6 +172,15 @@ export const lang = {
   meterConformanceText: { text: 'Перевірити @metcon' },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },
+  convertAttributesToElementsText: {
+    text: 'Перетворити атрибути на елементи',
+    description:
+      'Перетворює атрибути, які також можна виразити як елементи, на ці елементи, напр. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss у нотах і акордах або атрибути ключа, тональності та розміру в staffDef і scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Атрибути перетворено на {list}.' },
+  convertAttributesToElementsNone: { text: 'Не знайдено атрибутів, які можна перетворити на елементи.' },
+  convertAttributesToElementsProblems: { text: 'Не вдалося перетворити {count} атрибутів.' },
+  convertAttributesToElementsDetails: { text: 'Усі перетворення наведено на панелі під кодуванням; клацніть запис, щоб перейти до нього в редакторі.' },
   addIdsText: { text: 'Додати ідентифікатори до MEI' },
   removeIdsText: { text: 'Видалити ідентифікатори з MEI' },
   changeIdsText: {

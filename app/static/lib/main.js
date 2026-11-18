@@ -2059,6 +2059,7 @@ export let cmd = {
   addIds: () => e.manipulateXmlIds(v, cm, 'add'),
   removeIds: () => e.manipulateXmlIds(v, cm, 'remove'),
   changeIds: () => e.manipulateXmlIds(v, cm, 'change'),
+  convertAttributesToElements: () => e.convertAttributesToElements(v, cm),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
   encloseSelectionWithTag: encloseSelectionWithTag,
@@ -2417,6 +2418,7 @@ function addEventListeners(v, cm) {
   document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
+  document.getElementById('convertAttributesToElements').addEventListener('click', cmd.convertAttributesToElements);
   // rerender through Verovio
   document.getElementById('reRenderMeiVerovio').addEventListener('click', cmd.reRenderMei);
   // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);

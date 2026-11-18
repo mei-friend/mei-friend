@@ -178,6 +178,15 @@ export const lang = {
   meterConformanceText: { text: 'Kontroller @metcon' },
   renumberMeasuresTestText: { text: 'Omdøbn mål (test)' },
   renumberMeasuresExecText: { text: 'Omdøbn mål (exec)' },
+  convertAttributesToElementsText: {
+    text: 'Konverter attributter til elementer',
+    description:
+      'Konverterer attributter, der også kan udtrykkes som elementer, til disse elementer, f.eks. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss på noder og akkorder eller nøgle-, toneart- og taktattributter på staffDef og scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributter konverteret til {list}.' },
+  convertAttributesToElementsNone: { text: 'Ingen attributter fundet, der kan konverteres til elementer.' },
+  convertAttributesToElementsProblems: { text: '{count} attributter kunne ikke konverteres.' },
+  convertAttributesToElementsDetails: { text: 'Alle konverteringer er vist i panelet under kodningen; klik på en post for at springe til den i editoren.' },
   addIdsText: { text: 'Tilføj ids til MEI' },
   removeIdsText: { text: 'Fjern ids fra MEI' },
   changeIdsText: {

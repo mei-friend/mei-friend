@@ -168,6 +168,15 @@ export const lang = {
   meterConformanceText: { text: '@metconを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
+  convertAttributesToElementsText: {
+    text: '属性を要素に変換',
+    description:
+      '要素としても表現できる属性をその要素に変換します（例：音符や和音の @accid、@artic、@syl、@fermata、@tie、@slur、@gliss、staffDef や scoreDef の音部記号・調号・拍子の属性）。',
+  },
+  convertAttributesToElementsSummary: { text: '属性を {list} に変換しました。' },
+  convertAttributesToElementsNone: { text: '要素に変換できる属性は見つかりませんでした。' },
+  convertAttributesToElementsProblems: { text: '{count} 個の属性を変換できませんでした。' },
+  convertAttributesToElementsDetails: { text: 'すべての変換はエンコーディングの下のパネルに一覧表示されます。項目をクリックするとエディタ内の該当箇所に移動します。' },
   addIdsText: { text: 'MEIにIDを追加' },
   removeIdsText: { text: 'MEIからIDを削除' },
   changeIdsText: {

@@ -8,6 +8,7 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as facs from './facsimile.js';
+import { convertAttributesToElements as convertAttrs } from './attribute-conversion.js';
 import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
@@ -1490,6 +1491,138 @@ export function renumberMeasures(v, cm, change = false) {
     handleEditorChanges();
   });
 } // renumberMeasures()
+
+/**
+ * Converts all attributes of the encoding that can be expressed as elements into
+ * these elements (e.g., note@accid -> accid, note@tie -> tie, note@slur -> slur,
+ * staffDef@clef.shape -> clef), see attribute-conversion.js, and reloads the
+ * encoding into the editor as a single undo step.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertAttributesToElements(v, cm) {
+  const startTime = Date.now();
+  v.allowCursorActivity = false;
+  cm.blockChanges = true;
+  const cursorPosition = cm.getCursor();
+  const scrollInfo = cm.getScrollInfo();
+
+  v.loadXml(cm.getValue(), true);
+  const indent = cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit') || 2);
+  const result = convertAttrs(v.xmlDoc, {
+    generateId: (nodeName) => utils.generateXmlId(nodeName, v.xmlIdStyle),
+    indent: indent,
+  });
+  const total = Object.values(result.counts).reduce((sum, n) => sum + n, 0);
+
+  if (total > 0) {
+    withSingleUndoStep(cm, () => {
+      // new xml:ids are appended last; sort them to be the first attribute
+      result.changedElements.forEach((el) => dutils.sortNodeAttributes(el));
+      cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+      addApplicationInfo(v, cm);
+      cm.setCursor(cursorPosition);
+    });
+    cm.scrollIntoView({
+      left: scrollInfo.left,
+      top: scrollInfo.top,
+      right: scrollInfo.left + scrollInfo.width,
+      bottom: scrollInfo.top + scrollInfo.height,
+    });
+  } else {
+    v.loadXml(cm.getValue(), true); // discard any DOM changes
+  }
+  v.allowCursorActivity = true;
+  cm.blockChanges = false;
+  if (total > 0) handleEditorChanges();
+
+  // reporting
+  const lang = translator.lang;
+  let msg = '<b>' + lang.convertAttributesToElementsText.text + '</b><br/><br/>';
+  if (total > 0) {
+    const list = Object.entries(result.counts)
+      .map(([name, n]) => n + '&times;&nbsp;&lt;' + name + '&gt;')
+      .join(', ');
+    msg += lang.convertAttributesToElementsSummary.text.replace('{list}', list);
+  } else {
+    msg += lang.convertAttributesToElementsNone.text;
+  }
+  if (result.warnings.length > 0) {
+    msg += '<br/><br/>' + lang.convertAttributesToElementsProblems.text.replace('{count}', result.warnings.length);
+  }
+  if (total + result.warnings.length > 0) {
+    msg += '<br/><br/>' + lang.convertAttributesToElementsDetails.text;
+  }
+  console.log(
+    'convertAttributesToElements(): ',
+    result.counts,
+    '(Processing time: ' + (Date.now() - startTime) / 1000 + ' s)'
+  );
+  v.showAlert(msg, result.warnings.length > 0 ? 'warning' : 'success', -1); // no time out
+  reportAttributeConversion(v, result);
+} // convertAttributesToElements()
+
+/**
+ * Lists the result of convertAttributesToElements() in the code checker panel:
+ * first the attributes that could not be converted, then each conversion in
+ * document order. Clicking an entry moves the cursor to the new element (or
+ * to the element that carried the attribute, if the new one has no xml:id).
+ * @param {Viewer} v
+ * @param {Object} result as returned by attribute-conversion.js
+ */
+function reportAttributeConversion(v, result) {
+  const lang = translator.lang;
+  const esc = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const idOf = (el) => el.getAttribute('xml:id') || '';
+  const idHtml = (el) => (idOf(el) ? ' <code>#' + esc(idOf(el)) + '</code>' : '');
+  const sourceHtml = (s) => '<b>' + s.element.localName + '</b>' + idHtml(s.element) + ' ' + esc(s.attributes);
+  const targetHtml = (el) => '<b>&lt;' + el.localName + '&gt;</b>' + idHtml(el);
+  const inDocumentOrder = (a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+
+  const entries = [];
+  result.warnings
+    .sort((a, b) => inDocumentOrder(a.element, b.element))
+    .forEach((w) =>
+      entries.push({
+        xmlId: idOf(w.element),
+        html: '&#9888; <b>' + w.element.localName + '</b>' + idHtml(w.element) + ': ' + esc(w.message),
+      })
+    );
+  result.changes
+    .sort((a, b) => inDocumentOrder(a.sources[0].element, b.sources[0].element))
+    .forEach((c) => {
+      const target = c.targets.find((t) => idOf(t)) || c.sources.find((s) => idOf(s.element))?.element;
+      entries.push({
+        xmlId: target ? idOf(target) : '',
+        html: c.sources.map(sourceHtml).join(', ') + ' &rarr; ' + c.targets.map(targetHtml).join(', '),
+      });
+    });
+
+  v.initCodeCheckerPanel(lang.convertAttributesToElementsText.text);
+  // nothing to fix or ignore: remove the Fix all / Ignore all buttons
+  document.querySelectorAll('#codeCheckerTitle .btn:not(#codeCheckerStopButton)').forEach((btn) => btn.remove());
+  v.showCodeCheckerStopButton(false);
+
+  // add entries in time slices to keep the GUI responsive for large encodings
+  let i = 0;
+  const addEntries = () => {
+    const t0 = performance.now();
+    while (i < entries.length && performance.now() - t0 < 50) v.addCodeCheckerEntry(entries[i++]);
+    if (i < entries.length) {
+      setTimeout(addEntries, 0);
+    } else {
+      v.finalizeCodeCheckerPanel(lang.convertAttributesToElementsNone.text);
+      // no fixes to count: show only the number of entries
+      const current = document.getElementById('codeCheckerInfoCurrent');
+      const of = document.getElementById('codeCheckerInfoOf');
+      const totalSpan = document.getElementById('codeCheckerInfoTotal');
+      if (current) current.innerHTML = '';
+      if (of) of.innerHTML = '';
+      if (totalSpan && entries.length > 0) totalSpan.innerHTML = entries.length;
+    }
+  };
+  addEntries();
+} // reportAttributeConversion()
 
 /**
  * Function for adding/removing/changing xml:ids in xmlDoc & reloading MEI into cm.

@@ -176,6 +176,15 @@ export const lang = {
   meterConformanceText: { text: 'Kontroli @metcon' },
   renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
+  convertAttributesToElementsText: {
+    text: 'Konverti atributojn al elementoj',
+    description:
+      'Konvertas atributojn, kiuj ankaŭ esprimeblas kiel elementoj, al tiuj elementoj, ekz. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss ĉe notoj kaj akordoj, aŭ kleflajn, tonalajn kaj taktajn atributojn ĉe staffDef kaj scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributoj konvertitaj al {list}.' },
+  convertAttributesToElementsNone: { text: 'Neniuj atributoj troviĝis, kiuj konverteblas al elementoj.' },
+  convertAttributesToElementsProblems: { text: '{count} atributoj ne konverteblis.' },
+  convertAttributesToElementsDetails: { text: 'Ĉiuj konvertoj estas listigitaj en la panelo sub la kodado; alklaku eron por salti al ĝi en la redaktilo.' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
   removeIdsText: { text: 'Forigi id-ojn el MEI' },
   changeIdsText: {

@@ -179,6 +179,15 @@ export const lang = {
   meterConformanceText: { text: '@metcon überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
+  convertAttributesToElementsText: {
+    text: 'Attribute in Elemente umwandeln',
+    description:
+      'Wandelt Attribute, die auch als Elemente ausgedrückt werden können, in diese Elemente um, z. B. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss an Noten und Akkorden oder Schlüssel-, Tonart- und Taktattribute an staffDef und scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attribute umgewandelt in {list}.' },
+  convertAttributesToElementsNone: { text: 'Keine Attribute gefunden, die in Elemente umgewandelt werden können.' },
+  convertAttributesToElementsProblems: { text: '{count} Attribute konnten nicht umgewandelt werden.' },
+  convertAttributesToElementsDetails: { text: 'Alle Umwandlungen sind im Bereich unterhalb der Kodierung aufgelistet; ein Klick auf einen Eintrag springt im Editor dorthin.' },
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
   removeIdsText: { text: 'Ids von MEI entfernen' },
   changeIdsText: {

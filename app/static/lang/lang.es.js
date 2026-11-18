@@ -177,6 +177,15 @@ export const lang = {
   meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Renumerar compases (prueba)' },
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },
+  convertAttributesToElementsText: {
+    text: 'Convertir atributos en elementos',
+    description:
+      'Convierte los atributos que también pueden expresarse como elementos en dichos elementos, p. ej. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss en notas y acordes, o los atributos de clave, armadura y compás en staffDef y scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributos convertidos en {list}.' },
+  convertAttributesToElementsNone: { text: 'No se encontraron atributos que puedan convertirse en elementos.' },
+  convertAttributesToElementsProblems: { text: 'No se pudieron convertir {count} atributos.' },
+  convertAttributesToElementsDetails: { text: 'Todas las conversiones se listan en el panel bajo la codificación; haga clic en una entrada para saltar a ella en el editor.' },
   addIdsText: { text: 'Añadir IDs a MEI' },
   removeIdsText: { text: 'Eliminar IDs de MEI' },
   changeIdsText: {

@@ -172,6 +172,15 @@ export const lang = {
   meterConformanceText: { text: 'Провери @metcon' },
   renumberMeasuresTestText: { text: ' Ренумерирај мере (тест)' },
   renumberMeasuresExecText: { text: ' Ренумерирај мере (изврши)' },
+  convertAttributesToElementsText: {
+    text: 'Претвори атрибуте у елементе',
+    description:
+      'Претвара атрибуте који се могу изразити и као елементи у те елементе, нпр. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss на нотама и акордима, или атрибуте кључа, предзнака и такта на staffDef и scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Атрибути претворени у {list}.' },
+  convertAttributesToElementsNone: { text: 'Нису пронађени атрибути који се могу претворити у елементе.' },
+  convertAttributesToElementsProblems: { text: '{count} атрибута није могуће претворити.' },
+  convertAttributesToElementsDetails: { text: 'Све претворбе су наведене у панелу испод кодирања; кликните на ставку да бисте скочили на њу у едитору.' },
   addIdsText: { text: 'Додај ИД-ове МЕИ' },
   removeIdsText: { text: 'Уклони ИД-ове из МЕИ' },
   changeIdsText: {

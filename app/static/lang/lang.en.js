@@ -195,6 +195,15 @@ export const lang = {
   checkLinkedElementsText: { text: 'Check linked elements' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
+  convertAttributesToElementsText: {
+    text: 'Convert attributes to elements',
+    description:
+      'Converts attributes that can also be expressed as elements into these elements, e.g., @accid, @artic, @syl, @fermata, @tie, @slur, @gliss on notes and chords, or clef, key and meter attributes on staffDef and scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributes converted to {list}.' },
+  convertAttributesToElementsNone: { text: 'No attributes found that could be converted to elements.' },
+  convertAttributesToElementsProblems: { text: '{count} attributes could not be converted.' },
+  convertAttributesToElementsDetails: { text: 'All conversions are listed in the panel below the encoding; click an entry to jump to it in the editor.' },
   addIdsText: { text: 'Add ids to MEI' },
   removeIdsText: { text: 'Remove ids from MEI' },
   changeIdsText: {

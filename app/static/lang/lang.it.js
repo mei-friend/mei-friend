@@ -181,6 +181,15 @@ export const lang = {
   meterConformanceText: { text: 'Verificare @metcon' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },
+  convertAttributesToElementsText: {
+    text: 'Converti attributi in elementi',
+    description:
+      'Converte gli attributi che possono essere espressi anche come elementi in tali elementi, ad es. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss su note e accordi, o gli attributi di chiave, armatura e tempo su staffDef e scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributi convertiti in {list}.' },
+  convertAttributesToElementsNone: { text: 'Nessun attributo trovato che possa essere convertito in elementi.' },
+  convertAttributesToElementsProblems: { text: 'Non è stato possibile convertire {count} attributi.' },
+  convertAttributesToElementsDetails: { text: 'Tutte le conversioni sono elencate nel pannello sotto la codifica; fai clic su una voce per raggiungerla nell\'editor.' },
   addIdsText: { text: 'Aggiungi ids a MEI' },
   removeIdsText: { text: 'Rimuovi ids da MEI' },
   changeIdsText: {

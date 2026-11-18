@@ -169,6 +169,15 @@ export const lang = {
   meterConformanceText: { text: '检查 @metcon' },
   renumberMeasuresTestText: { text: '重编号小节（测试）' },
   renumberMeasuresExecText: { text: '重编号小节（执行）' },
+  convertAttributesToElementsText: {
+    text: '将属性转换为元素',
+    description:
+      '将也可以用元素表示的属性转换为相应元素，例如音符和和弦上的 @accid、@artic、@syl、@fermata、@tie、@slur、@gliss，或 staffDef 和 scoreDef 上的谱号、调号和拍号属性。',
+  },
+  convertAttributesToElementsSummary: { text: '属性已转换为 {list}。' },
+  convertAttributesToElementsNone: { text: '未找到可转换为元素的属性。' },
+  convertAttributesToElementsProblems: { text: '{count} 个属性无法转换。' },
+  convertAttributesToElementsDetails: { text: '所有转换都列在编码下方的面板中；点击条目即可跳转到编辑器中的相应位置。' },
   addIdsText: { text: '为 MEI 添加 id' },
   removeIdsText: { text: '从 MEI 中移除 id' },
   changeIdsText: {

@@ -174,6 +174,15 @@ export const lang = {
   meterConformanceText: { text: 'Controleer @metcon' },
   renumberMeasuresTestText: { text: 'Herhaal maten (test)' },
   renumberMeasuresExecText: { text: 'Herhaal maten (uitvoeren)' },
+  convertAttributesToElementsText: {
+    text: 'Attributen naar elementen omzetten',
+    description:
+      'Zet attributen die ook als elementen kunnen worden uitgedrukt om naar deze elementen, bijv. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss op noten en akkoorden, of sleutel-, toonsoort- en maatsoortattributen op staffDef en scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributen omgezet naar {list}.' },
+  convertAttributesToElementsNone: { text: 'Geen attributen gevonden die naar elementen kunnen worden omgezet.' },
+  convertAttributesToElementsProblems: { text: '{count} attributen konden niet worden omgezet.' },
+  convertAttributesToElementsDetails: { text: 'Alle omzettingen staan in het paneel onder de codering; klik op een item om er in de editor naartoe te springen.' },
   addIdsText: { text: 'Ids toevoegen aan MEI' },
   removeIdsText: { text: 'Ids verwijderen uit MEI' },
   changeIdsText: {

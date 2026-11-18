@@ -180,6 +180,15 @@ export const lang = {
   meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
+  convertAttributesToElementsText: {
+    text: 'Converteix atributs en elements',
+    description:
+      'Converteix els atributs que també es poden expressar com a elements en aquests elements, p. ex. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss en notes i acords, o els atributs de clau, armadura i compàs a staffDef i scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributs convertits en {list}.' },
+  convertAttributesToElementsNone: { text: 'No s\'han trobat atributs que es puguin convertir en elements.' },
+  convertAttributesToElementsProblems: { text: '{count} atributs no s\'han pogut convertir.' },
+  convertAttributesToElementsDetails: { text: 'Totes les conversions es llisten al panell sota la codificació; feu clic en una entrada per anar-hi a l\'editor.' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
   removeIdsText: { text: 'Elimina IDs de MEI' },
   changeIdsText: {
