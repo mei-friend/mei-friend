@@ -218,6 +218,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Elementen zouden worden omgezet naar attributen: {list}.' },
   convertElementsToAttributesProblems: { text: '{count} elementen konden niet worden omgezet.' },
   convertElementsToAttributesNone: { text: 'Geen elementen gevonden die naar attributen kunnen worden omgezet.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementen → attributen</b>\n\nLet op: deze bewerking kan externe links verbreken.\n\n{count} van de om te zetten elementen hebben een xml:id, die samen met het element wordt verwijderd. Elementen waarnaar binnen dit bestand wordt verwezen, worden niet omgezet.\n\nLinks vanuit andere bestanden, annotaties die buiten dit bestand zijn opgeslagen, facsimile-tools of URL\'s die naar deze xml:id\'s verwijzen, werken daarna niet meer.' },
+  elementsToAttributesProceed: { text: 'Omzetten' },
+  elementsToAttributesCancel: { text: 'Annuleren' },
+  convertScopeAll: { text: 'Bereik: volledige codering (selecteer tekst in de editor om de omzetting te beperken)' },
+  convertScopeSelection: { text: 'Bereik: selectie, regels {from}–{to}' },
+  convertSelectionSuffix: { text: 'selectie' },
   renumberMeasuresStartNumber: { text: 'Startnummer' },
   renumberMeasuresUnchanged: { text: 'ongewijzigd' },
   renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
@@ -835,10 +841,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Maten hernummeren',
-    description: 'Instellingen voor het hernummeren van maten',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Doorgaan bij onvolledige maten',
     description: 'Doorgaan met maatnummers bij onvolledige maten (@metcon="false")',
@@ -1157,11 +1159,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Maten hernummeren' },
-  renumberMeasuresModalTest: { text: 'Testen' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'zou zijn' },
-  renumberMeasuresChangedTo: { text: 'veranderd naar' },
-  renumberMeasureMeasuresRenumbered: { text: 'maten hernummerd' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

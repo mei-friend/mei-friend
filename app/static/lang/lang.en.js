@@ -239,6 +239,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Elements would be converted to attributes: {list}.' },
   convertElementsToAttributesProblems: { text: '{count} elements could not be converted.' },
   convertElementsToAttributesNone: { text: 'No elements found that could be converted to attributes.' },
+  elementsToAttributesConfirmation: { text: '<b>Elements → attributes</b>\n\nWarning: this operation may break external links.\n\n{count} of the elements to be converted have an xml:id, which is removed together with the element. Elements referenced within this file are not converted.\n\nLinks from other files, annotations stored outside this file, facsimile tools or URLs that point to these xml:ids will no longer work.' },
+  elementsToAttributesProceed: { text: 'Convert' },
+  elementsToAttributesCancel: { text: 'Cancel' },
+  convertScopeAll: { text: 'Scope: entire encoding (select text in the editor to restrict the conversion)' },
+  convertScopeSelection: { text: 'Scope: selection, lines {from}–{to}' },
+  convertSelectionSuffix: { text: 'selection' },
   renumberMeasuresStartNumber: { text: 'Start number' },
   renumberMeasuresUnchanged: { text: 'unchanged' },
   renumberMeasuresSummary: { text: '{total} measures, {changed} renumbered.' },
@@ -990,10 +996,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Renumber measures',
-    description: 'Settings for renumbering measures',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continue across incomplete measures',
     description: 'Continue measure numbers across incomplete measures (@metcon="false")',
@@ -1356,11 +1358,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Renumber measures' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'would be' },
-  renumberMeasuresChangedTo: { text: 'changed to' },
-  renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

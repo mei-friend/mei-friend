@@ -213,6 +213,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: '元素将被转换为属性：{list}。' },
   convertElementsToAttributesProblems: { text: '{count} 个元素无法转换。' },
   convertElementsToAttributesNone: { text: '未找到可转换为属性的元素。' },
+  elementsToAttributesConfirmation: { text: '<b>元素 → 属性</b>\n\n警告：此操作可能会破坏外部链接。\n\n要转换的元素中有 {count} 个带有 xml:id，它们会随元素一起被删除。本文件内被引用的元素不会被转换。\n\n来自其他文件、保存在本文件之外的注释、摹本工具或指向这些 xml:id 的 URL 的链接将不再有效。' },
+  elementsToAttributesProceed: { text: '转换' },
+  elementsToAttributesCancel: { text: '取消' },
+  convertScopeAll: { text: '范围：整个编码（在编辑器中选择文本以限制转换）' },
+  convertScopeSelection: { text: '范围：所选内容，第 {from}–{to} 行' },
+  convertSelectionSuffix: { text: '所选内容' },
   renumberMeasuresStartNumber: { text: '起始编号' },
   renumberMeasuresUnchanged: { text: '未更改' },
   renumberMeasuresSummary: { text: '{total} 个小节，{changed} 个已重新编号。' },
@@ -790,10 +796,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: '重新编号小节',
-    description: '重新编号小节的设置',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: '跨不完整小节继续',
     description: '跨不完整小节继续编号（@metcon="false"）',
@@ -1094,11 +1096,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: '重新编号小节' },
-  renumberMeasuresModalTest: { text: '测试' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: '将被' },
-  renumberMeasuresChangedTo: { text: '更改为' },
-  renumberMeasureMeasuresRenumbered: { text: '小节重新编号' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '检查 @accid.ges 属性（针对调号、小节内音调和连音）。' },

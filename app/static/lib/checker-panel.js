@@ -263,22 +263,32 @@ export function runCheck(type = '') {
 
 /**
  * Converts attributes to elements, or elements to attributes (reverse), for the
- * groups selected in the Convert tab; in test mode, only lists what would be converted
+ * groups selected in the Convert tab, restricted to the editor selection if text is
+ * selected; in test mode, only lists what would be converted. Before converting
+ * elements to attributes, the user confirms the removal of xml:ids (see confirmElementRemoval()).
  * @param {boolean} test
  * @param {boolean} reverse elements to attributes
+ * @param {boolean} confirmed removal of xml:ids already confirmed by the user
  */
-export function runConvert(test = false, reverse = false) {
+export function runConvert(test = false, reverse = false, confirmed = false) {
   openCheckerPanel('convert');
   const p = panes.convert;
   const groups = selectedGroups();
+  if (reverse && !test && !confirmed) {
+    confirmElementRemoval(groups, () => runConvert(test, reverse, true));
+    return;
+  }
   p.lastAction = () => runConvert(test, reverse);
   const key = reverse ? 'convertElementsToAttributes' : 'convertAttributesToElements';
   const title = reverse
     ? t('checkerPanelElToAttrButton', 'Elements → attributes')
     : t('checkerPanelAttrToElButton', 'Attributes → elements');
-  startRun('convert', title + (test ? testSuffix() : ''));
+  const suffix = [];
+  if (test) suffix.push(t('checkerPanelTestButton', 'Test'));
+  if (cm.somethingSelected()) suffix.push(t('convertSelectionSuffix', 'selection'));
+  startRun('convert', title + (suffix.length > 0 ? ' (' + suffix.join(', ') + ')' : ''));
   setTimeout(() => {
-    const result = e.convertAttributesToElements(v, cm, { groups, test, reverse });
+    const result = e.convertAttributesToElements(v, cm, { groups, test, reverse, selection: true });
     const total = Object.values(result.counts).reduce((sum, n) => sum + n, 0);
     let summary = '';
     if (total > 0) {
@@ -330,6 +340,42 @@ export function runRenumber(change = false) {
     addEntriesSliced('renumber', entries, () => finishRun(t('renumberMeasuresNoMeasures'), summary));
   }, 10);
 } // runRenumber()
+
+/**
+ * Elements converted to attributes lose their xml:ids. References within the file
+ * are respected by the conversion, but links from elsewhere (other files, annotations
+ * stored outside the file, facsimile tools, URLs) would break: the user confirms
+ * the conversion in a prompt stating the number of affected xml:ids.
+ * @param {Array<string>} groups
+ * @param {Function} proceed called when confirmed
+ */
+function confirmElementRemoval(groups, proceed) {
+  const test = e.convertAttributesToElements(v, cm, { groups, test: true, reverse: true, selection: true });
+  const count = test.changes.flatMap((c) => c.removed).filter((r) => r.element.hasAttribute('xml:id')).length;
+  if (count === 0) {
+    proceed();
+    return;
+  }
+  const message = t('elementsToAttributesConfirmation')
+    .replace('{count}', count)
+    .split('\n\n')
+    .map((paragraph) => '<p>' + paragraph + '</p>')
+    .join('');
+  v.showUserPrompt(
+    message,
+    [
+      { label: t('elementsToAttributesCancel', 'Cancel'), cancel: true, event: () => v.hideUserPrompt() },
+      {
+        label: t('elementsToAttributesProceed', 'Convert'),
+        event: () => {
+          v.hideUserPrompt();
+          proceed();
+        },
+      },
+    ],
+    'warning'
+  );
+} // confirmElementRemoval()
 
 // ############################################################################
 // building the panel
@@ -537,6 +583,23 @@ function buildConvertOptions(content, p) {
     )
   );
   content.appendChild(buttons);
+  // scope (entire encoding or editor selection), shown in the sticky row of buttons
+  // so that it remains visible
+  const scope = el('div', 'ccScope');
+  buttons.prepend(scope);
+  p.updateScope = () => {
+    if (cm.somethingSelected()) {
+      scope.textContent = t('convertScopeSelection', 'Scope: selection, lines {from}–{to}')
+        .replace('{from}', cm.getCursor('from').line + 1)
+        .replace('{to}', cm.getCursor('to').line + 1);
+      scope.classList.add('ccScopeSelection');
+    } else {
+      scope.textContent = t('convertScopeAll', 'Scope: entire encoding');
+      scope.classList.remove('ccScopeSelection');
+    }
+  };
+  p.updateScope();
+  cm.on('cursorActivity', p.updateScope);
   // disable action buttons when no group is selected
   const updateButtons = () => {
     const anySelected = selectedGroups().length > 0;
@@ -907,6 +970,7 @@ function applyTexts() {
     updateOptionsSummary(tab);
     updateCounts(panes[tab]);
   });
+  panes.convert?.updateScope?.();
 } // applyTexts()
 
 function t(key, fallback = '') {

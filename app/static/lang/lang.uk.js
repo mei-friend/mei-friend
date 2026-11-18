@@ -216,6 +216,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Елементи було б перетворено на атрибути: {list}.' },
   convertElementsToAttributesProblems: { text: 'Не вдалося перетворити {count} елементів.' },
   convertElementsToAttributesNone: { text: 'Не знайдено елементів, які можна перетворити на атрибути.' },
+  elementsToAttributesConfirmation: { text: '<b>Елементи → атрибути</b>\n\nУвага: ця операція може зламати зовнішні посилання.\n\n{count} з елементів, що перетворюються, мають xml:id, який буде видалено разом з елементом. Елементи, на які є посилання в цьому файлі, не перетворюються.\n\nПосилання з інших файлів, анотації, збережені поза цим файлом, інструменти факсиміле або URL-адреси, що вказують на ці xml:id, більше не працюватимуть.' },
+  elementsToAttributesProceed: { text: 'Перетворити' },
+  elementsToAttributesCancel: { text: 'Скасувати' },
+  convertScopeAll: { text: 'Обсяг: усе кодування (виділіть текст у редакторі, щоб обмежити перетворення)' },
+  convertScopeSelection: { text: 'Обсяг: виділення, рядки {from}–{to}' },
+  convertSelectionSuffix: { text: 'виділення' },
   renumberMeasuresStartNumber: { text: 'Початковий номер' },
   renumberMeasuresUnchanged: { text: 'без змін' },
   renumberMeasuresSummary: { text: '{total} тактів, {changed} перенумеровано.' },
@@ -917,10 +923,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Перенумерувати такти',
-    description: 'Налаштування для перенумерування тактів',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Продовжити через неповні такти',
     description: 'Продовжити номери тактів через неповні такти (@metcon="false")',
@@ -1266,11 +1268,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Перенумерувати такти' },
-  renumberMeasuresModalTest: { text: 'Тест' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'буде' },
-  renumberMeasuresChangedTo: { text: 'змінено на' },
-  renumberMeasureMeasuresRenumbered: { text: 'перенумеровані такти' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

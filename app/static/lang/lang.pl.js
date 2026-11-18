@@ -225,6 +225,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Elementy zostałyby przekonwertowane na atrybuty: {list}.' },
   convertElementsToAttributesProblems: { text: 'Nie udało się przekonwertować {count} elementów.' },
   convertElementsToAttributesNone: { text: 'Nie znaleziono elementów, które można przekonwertować na atrybuty.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementy → atrybuty</b>\n\nUwaga: ta operacja może zerwać linki zewnętrzne.\n\n{count} z konwertowanych elementów ma xml:id, który zostanie usunięty razem z elementem. Elementy, do których odwołuje się ten plik, nie są konwertowane.\n\nLinki z innych plików, adnotacje przechowywane poza tym plikiem, narzędzia faksymilowe lub adresy URL wskazujące na te xml:id przestaną działać.' },
+  elementsToAttributesProceed: { text: 'Konwertuj' },
+  elementsToAttributesCancel: { text: 'Anuluj' },
+  convertScopeAll: { text: 'Zakres: całe kodowanie (zaznacz tekst w edytorze, aby ograniczyć konwersję)' },
+  convertScopeSelection: { text: 'Zakres: zaznaczenie, wiersze {from}–{to}' },
+  convertSelectionSuffix: { text: 'zaznaczenie' },
   renumberMeasuresStartNumber: { text: 'Numer początkowy' },
   renumberMeasuresUnchanged: { text: 'bez zmian' },
   renumberMeasuresSummary: { text: '{total} taktów, {changed} przenumerowano.' },
@@ -942,10 +948,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Przyporządkuj ponownie taktowanie',
-    description: 'Ustawienia przyporządkowywania ponownego taktowania',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Kontynuuj przez niedokończone taktowania',
     description: 'Kontynuuj numerację taktów przez niedokończone taktowania (@metcon="false")',
@@ -1299,11 +1301,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Numeruj takty' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: 'będą' },
-  renumberMeasuresWouldBe: { text: 'byłyby' },
-  renumberMeasuresChangedTo: { text: 'zmienione na' },
-  renumberMeasureMeasuresRenumbered: { text: 'takty zostały ponumerowane' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

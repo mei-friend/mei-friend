@@ -225,6 +225,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Gli elementi verrebbero convertiti in attributi: {list}.' },
   convertElementsToAttributesProblems: { text: 'Non è stato possibile convertire {count} elementi.' },
   convertElementsToAttributesNone: { text: 'Nessun elemento trovato che possa essere convertito in attributi.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementi → attributi</b>\n\nAttenzione: questa operazione può interrompere i link esterni.\n\n{count} degli elementi da convertire hanno un xml:id, che viene rimosso insieme all\'elemento. Gli elementi referenziati all\'interno di questo file non vengono convertiti.\n\nI link da altri file, le annotazioni salvate al di fuori di questo file, gli strumenti per facsimili o gli URL che puntano a questi xml:id non funzioneranno più.' },
+  elementsToAttributesProceed: { text: 'Converti' },
+  elementsToAttributesCancel: { text: 'Annulla' },
+  convertScopeAll: { text: 'Ambito: intera codifica (seleziona del testo nell\'editor per limitare la conversione)' },
+  convertScopeSelection: { text: 'Ambito: selezione, righe {from}–{to}' },
+  convertSelectionSuffix: { text: 'selezione' },
   renumberMeasuresStartNumber: { text: 'Numero iniziale' },
   renumberMeasuresUnchanged: { text: 'invariato' },
   renumberMeasuresSummary: { text: '{total} misure, {changed} rinumerate.' },
@@ -949,10 +955,6 @@ export const lang = {
   },
 
   // Renumber measures / Rinumerazione misure
-  renumberMeasuresHeading: {
-    text: 'Rinumera misure',
-    description: 'Impostazioni per la rinumerazione delle misure',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continua tra le misure incomplete',
     description: 'Continua i numeri delle misure tra le misure incomplete (@metcon="false")',
@@ -1311,11 +1313,6 @@ export const lang = {
 
   // utils renumber measures
   renumberMeasuresModalText: { text: 'Rinumera misure' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'sarebbe' },
-  renumberMeasuresChangedTo: { text: 'cambiato in' },
-  renumberMeasureMeasuresRenumbered: { text: 'misure rinumerate' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

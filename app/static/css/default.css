@@ -1641,6 +1641,18 @@ input.urlResolves {
   margin-left: 0;
 }
 
+.ccScope {
+  flex-basis: 100%;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.ccScope.ccScopeSelection {
+  opacity: 1;
+  font-weight: bold;
+  color: var(--highlightColor);
+}
+
 .ccActions.ccActionRows {
   /* one pair of buttons per direction: side by side if there is room, else stacked */
   column-gap: 1.5em;

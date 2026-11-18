@@ -224,6 +224,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Els elements es convertirien en atributs: {list}.' },
   convertElementsToAttributesProblems: { text: 'No s\'han pogut convertir {count} elements.' },
   convertElementsToAttributesNone: { text: 'No s\'han trobat elements que es puguin convertir en atributs.' },
+  elementsToAttributesConfirmation: { text: '<b>Elements → atributs</b>\n\nAtenció: aquesta operació pot trencar enllaços externs.\n\n{count} dels elements que es convertiran tenen un xml:id, que s\'elimina juntament amb l\'element. Els elements referenciats dins d\'aquest fitxer no es converteixen.\n\nEls enllaços d\'altres fitxers, les anotacions desades fora d\'aquest fitxer, les eines de facsímil o els URL que apunten a aquests xml:id deixaran de funcionar.' },
+  elementsToAttributesProceed: { text: 'Converteix' },
+  elementsToAttributesCancel: { text: 'Cancel·la' },
+  convertScopeAll: { text: 'Abast: tota la codificació (seleccioneu text a l\'editor per restringir la conversió)' },
+  convertScopeSelection: { text: 'Abast: selecció, línies {from}–{to}' },
+  convertSelectionSuffix: { text: 'selecció' },
   renumberMeasuresStartNumber: { text: 'Número inicial' },
   renumberMeasuresUnchanged: { text: 'sense canvis' },
   renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
@@ -947,10 +953,6 @@ export const lang = {
   },
 
   // Renumber measures / Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Reenumerar compassos',
-    description: 'Opcions per reenumerar els compassos',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continuar a través de compassos incomplets',
     description: "Continuar la numeració de compassos a través de compassos incomplets (@metcon='false')",
@@ -1305,11 +1307,6 @@ export const lang = {
 
   // utils renumber measures / fork-repository.js
   renumberMeasuresModalText: { text: 'Reenumerar compassos' },
-  renumberMeasuresModalTest: { text: 'Prova' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'seria' },
-  renumberMeasuresChangedTo: { text: 'canviat a' },
-  renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

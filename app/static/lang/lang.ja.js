@@ -212,6 +212,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: '要素は属性に変換されます: {list}。' },
   convertElementsToAttributesProblems: { text: '{count} 個の要素を変換できませんでした。' },
   convertElementsToAttributesNone: { text: '属性に変換できる要素は見つかりませんでした。' },
+  elementsToAttributesConfirmation: { text: '<b>要素 → 属性</b>\n\n注意: この操作により外部リンクが切れる可能性があります。\n\n変換される要素のうち {count} 個に xml:id があり、要素とともに削除されます。このファイル内で参照されている要素は変換されません。\n\n他のファイル、このファイルの外に保存された注釈、ファクシミリツール、またはこれらの xml:id を指す URL からのリンクは機能しなくなります。' },
+  elementsToAttributesProceed: { text: '変換' },
+  elementsToAttributesCancel: { text: 'キャンセル' },
+  convertScopeAll: { text: '範囲: エンコーディング全体（変換を限定するにはエディタでテキストを選択してください）' },
+  convertScopeSelection: { text: '範囲: 選択範囲、{from}–{to} 行' },
+  convertSelectionSuffix: { text: '選択範囲' },
   renumberMeasuresStartNumber: { text: '開始番号' },
   renumberMeasuresUnchanged: { text: '変更なし' },
   renumberMeasuresSummary: { text: '{total} 小節、{changed} 小節の番号を振り直しました。' },
@@ -911,10 +917,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: '小節番号の振り直し',
-    description: '小節番号の振り直しの設定',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: '不完全な小節を振り直し続ける',
     description: '不完全な小節（@metcon="false"の場合）を振り直し続ける',
@@ -1247,11 +1249,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: '小節番号を更新' },
-  renumberMeasuresModalTest: { text: 'テスト' },
-  renumberMeasuresWillBe: { text: 'は次の番号に更新されます。' },
-  renumberMeasuresWouldBe: { text: 'は次の番号に更新されます。' },
-  renumberMeasuresChangedTo: { text: '' },
-  renumberMeasureMeasuresRenumbered: { text: '小節が更新されました' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },

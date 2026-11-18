@@ -1513,8 +1513,10 @@ export function renumberMeasures(v, cm, change = false, options = {}) {
  * @param {boolean} options.test only report what would be converted
  * @param {boolean} options.reverse convert elements to attributes instead
  *   (attribute-conversion.js convertElementsToAttributes())
+ * @param {boolean} options.selection restrict the conversion to the elements in the
+ *   editor selection, if text is selected (see elementsInSelection())
  * @returns {Object} result of attribute-conversion.js convertAttributesToElements()
- *   or convertElementsToAttributes()
+ *   or convertElementsToAttributes(), with result.scoped = true if restricted to the selection
  */
 export function convertAttributesToElements(v, cm, options = {}) {
   const startTime = Date.now();
@@ -1524,14 +1526,18 @@ export function convertAttributesToElements(v, cm, options = {}) {
   const scrollInfo = cm.getScrollInfo();
 
   v.loadXml(cm.getValue(), true);
+  const selected = options.selection ? elementsInSelection(v.xmlDoc, cm) : null;
+  const scope = selected ? (el) => selected.has(el) : undefined;
   const indent = cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit') || 2);
   const result = options.reverse
-    ? convertEls(v.xmlDoc, { groups: options.groups })
+    ? convertEls(v.xmlDoc, { groups: options.groups, scope })
     : convertAttrs(v.xmlDoc, {
         generateId: (nodeName) => utils.generateXmlId(nodeName, v.xmlIdStyle),
         indent: indent,
         groups: options.groups,
+        scope,
       });
+  result.scoped = !!selected;
   const total = Object.values(result.counts).reduce((sum, n) => sum + n, 0);
 
   if (total > 0 && !options.test) {
@@ -1562,6 +1568,47 @@ export function convertAttributesToElements(v, cm, options = {}) {
   );
   return result;
 } // convertAttributesToElements()
+
+/**
+ * Returns the elements of xmlDoc whose start tag lies within the (primary)
+ * selection of the editor, or null if no text is selected. xmlDoc must be parsed
+ * from the current editor content. Elements are located in the text in document
+ * order, by their xml:id or, if they have none, by their tag name.
+ * @param {Document} xmlDoc
+ * @param {CodeMirror} cm
+ * @returns {Set<Element>|null}
+ */
+export function elementsInSelection(xmlDoc, cm) {
+  if (!cm.somethingSelected()) return null;
+  const from = cm.indexFromPos(cm.getCursor('from'));
+  const to = cm.indexFromPos(cm.getCursor('to'));
+  const text = cm.getValue();
+  const selected = new Set();
+  // start of the next tag with this name (not, e.g., <notesStmt> for <note>) at or after start
+  const findTag = (name, start) => {
+    for (let i = text.indexOf('<' + name, start); i >= 0; i = text.indexOf('<' + name, i + 1)) {
+      if (/[\s/>]/.test(text[i + name.length + 1] || '')) return i;
+    }
+    return -1;
+  };
+  let pos = 0;
+  const walker = xmlDoc.createTreeWalker(xmlDoc.documentElement, NodeFilter.SHOW_ELEMENT);
+  for (let el = walker.currentNode; el; el = walker.nextNode()) {
+    const id = el.getAttribute('xml:id');
+    let idx = -1;
+    if (id) {
+      let i = text.indexOf('xml:id="' + id + '"', pos);
+      if (i < 0) i = text.indexOf("xml:id='" + id + "'", pos);
+      if (i >= 0) idx = text.lastIndexOf('<', i);
+    }
+    if (idx < 0) idx = findTag(el.nodeName, pos);
+    if (idx < 0) continue;
+    if (idx >= to) break;
+    pos = idx + 1;
+    if (idx >= from) selected.add(el);
+  }
+  return selected;
+} // elementsInSelection()
 
 /**
  * Function for adding/removing/changing xml:ids in xmlDoc & reloading MEI into cm.

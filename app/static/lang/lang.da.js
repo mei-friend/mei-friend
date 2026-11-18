@@ -222,6 +222,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Elementer ville blive konverteret til attributter: {list}.' },
   convertElementsToAttributesProblems: { text: '{count} elementer kunne ikke konverteres.' },
   convertElementsToAttributesNone: { text: 'Ingen elementer fundet, der kan konverteres til attributter.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementer → attributter</b>\n\nAdvarsel: denne handling kan ødelægge eksterne links.\n\n{count} af de elementer, der konverteres, har en xml:id, som fjernes sammen med elementet. Elementer, der henvises til i denne fil, konverteres ikke.\n\nLinks fra andre filer, annotationer gemt uden for denne fil, faksimileværktøjer eller URL\'er, der peger på disse xml:id\'er, vil ikke længere virke.' },
+  elementsToAttributesProceed: { text: 'Konverter' },
+  elementsToAttributesCancel: { text: 'Annuller' },
+  convertScopeAll: { text: 'Omfang: hele kodningen (markér tekst i editoren for at begrænse konverteringen)' },
+  convertScopeSelection: { text: 'Omfang: markering, linje {from}–{to}' },
+  convertSelectionSuffix: { text: 'markering' },
   renumberMeasuresStartNumber: { text: 'Startnummer' },
   renumberMeasuresUnchanged: { text: 'uændret' },
   renumberMeasuresSummary: { text: '{total} takter, {changed} omnummereret.' },
@@ -833,10 +839,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Omdøb mål',
-    description: 'Indstillinger for omdøbning af mål',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Fortsæt på tværs af ufuldstændige mål',
     description: 'Fortsæt målnumre på tværs af ufuldstændige mål (@metcon="false")',
@@ -1151,11 +1153,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Omdøb mål' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'ville være' },
-  renumberMeasuresChangedTo: { text: 'ændret til' },
-  renumberMeasureMeasuresRenumbered: { text: 'mål omdøbt' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: 'Kontroller @accid.ges attributter (mod toneart, mål accids og bindinger).' },

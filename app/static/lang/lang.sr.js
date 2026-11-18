@@ -216,6 +216,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Елементи би били претворени у атрибуте: {list}.' },
   convertElementsToAttributesProblems: { text: '{count} елемената није могуће претворити.' },
   convertElementsToAttributesNone: { text: 'Нису пронађени елементи који се могу претворити у атрибуте.' },
+  elementsToAttributesConfirmation: { text: '<b>Елементи → атрибути</b>\n\nПажња: ова операција може прекинути спољне везе.\n\n{count} елемената који се претварају има xml:id, који се уклања заједно са елементом. Елементи на које се упућује унутар ове датотеке се не претварају.\n\nВезе из других датотека, анотације сачуване изван ове датотеке, алати за факсимиле или URL-ови који упућују на ове xml:id-ове више неће радити.' },
+  elementsToAttributesProceed: { text: 'Претвори' },
+  elementsToAttributesCancel: { text: 'Откажи' },
+  convertScopeAll: { text: 'Опсег: цело кодирање (означите текст у едитору да ограничите претварање)' },
+  convertScopeSelection: { text: 'Опсег: избор, редови {from}–{to}' },
+  convertSelectionSuffix: { text: 'избор' },
   renumberMeasuresStartNumber: { text: 'Почетни број' },
   renumberMeasuresUnchanged: { text: 'непромењено' },
   renumberMeasuresSummary: { text: '{total} тактова, {changed} ренумерисано.' },
@@ -823,10 +829,6 @@ export const lang = {
   },
 
   // Ренумерација такта
-  renumberMeasuresHeading: {
-    text: 'Ренумерација такта',
-    description: 'Поставке за ренумерацију тактова',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Настави преко непотпуних тактова',
     description: 'Настави бројање тактова преко непотпуних тактова (@metcon="false")',
@@ -1144,11 +1146,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Пребројавање тактова' },
-  renumberMeasuresModalTest: { text: 'Тест' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'било би' },
-  renumberMeasuresChangedTo: { text: 'промењено у' },
-  renumberMeasureMeasuresRenumbered: { text: 'тактова је пребројано' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

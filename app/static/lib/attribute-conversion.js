@@ -121,6 +121,10 @@ export const conversionGroups = ['accid', 'artic', 'syl', 'fermata', 'tie', 'slu
  * @param {string} options.indent indentation unit (e.g., '  ' or '\t')
  * @param {Iterable<string>} options.groups groups of attributes to be converted (see
  *   conversionGroups), all groups if omitted
+ * @param {Function} options.scope function(Element) returning whether an element is within
+ *   the scope of the conversion (e.g., the editor selection); all elements if omitted.
+ *   An attribute is converted if the element carrying it is within the scope; ties,
+ *   slurs and glissandi if their start or end element is.
  * @returns {{counts: Object<string, number>, changes: Array<Object>, warnings: Array<Object>, changedElements: Array<Element>}}
  *   counts: number of conversions per created element name;
  *   changes: one entry per conversion, {name, sources: [{element, attributes}], targets: [Element]},
@@ -133,6 +137,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
   const generateId = options.generateId || ((name) => name + '-' + Math.random().toString(36).slice(2, 10));
   const indentUnit = options.indent ?? '  ';
   const groups = new Set(options.groups || conversionGroups);
+  const inScope = options.scope || (() => true);
   const counts = {};
   const changes = [];
   const warnings = [];
@@ -179,6 +184,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
   function convertDefinitions() {
     for (const conv of defConversions) {
       for (const parent of music.querySelectorAll(conv.parents.join(','))) {
+        if (!inScope(parent)) continue;
         const attrs = Object.keys(conv.attributes).filter((a) => parent.hasAttribute(a));
         if (attrs.length === 0) continue;
         if (!conv.required.some((a) => parent.hasAttribute(a))) {
@@ -205,6 +211,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
   function convertLabels() {
     // staffGrp@symbol -> grpSym
     for (const staffGrp of music.querySelectorAll('staffGrp[symbol]')) {
+      if (!inScope(staffGrp)) continue;
       const symbol = staffGrp.getAttribute('symbol');
       if (symbol === 'none') continue; // no grpSym equivalent
       if (directChildren(staffGrp, 'grpSym').some((g) => !g.hasAttribute('startid'))) {
@@ -223,6 +230,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
     // generic tool-tip label without element equivalent)
     const labelElements = meiVersion < 5 ? music.querySelectorAll('staffDef, staffGrp') : [];
     for (const parent of labelElements) {
+      if (!inScope(parent)) continue;
       for (const [attr, elName] of [
         ['label', 'label'],
         ['label.abbr', 'labelAbbr'],
@@ -259,6 +267,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   function convertAccid() {
     for (const note of music.querySelectorAll('note[accid], note[accid\\.ges]')) {
+      if (!inScope(note)) continue;
       const attrs = ['accid', 'accid.ges'].filter((a) => note.hasAttribute(a));
       const accids = directChildren(note, 'accid');
       if (inEditorialMarkup(note, 'accid')) {
@@ -299,6 +308,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   function convertArtic() {
     for (const el of music.querySelectorAll('note[artic], chord[artic], note[artic\\.ges], chord[artic\\.ges]')) {
+      if (!inScope(el)) continue;
       if (inEditorialMarkup(el, 'artic')) {
         warn(el, '@artic not converted, artic element within editorial markup exists');
         continue;
@@ -337,6 +347,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   function convertSyl() {
     for (const el of music.querySelectorAll('note[syl], chord[syl]')) {
+      if (!inScope(el)) continue;
       if (directChildren(el, 'verse').length > 0 || directChildren(el, 'syl').length > 0) {
         warn(el, '@syl not converted, verse/syl element exists');
         continue;
@@ -361,6 +372,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
   function convertFermata() {
     const selector = fermataElements.map((e) => e + '[fermata]').join(',');
     for (const el of music.querySelectorAll(selector)) {
+      if (!inScope(el)) continue;
       const measure = el.closest('measure');
       if (!measure) {
         warn(el, '@fermata not converted, no measure found');
@@ -424,9 +436,10 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
       const start = noteById.get(ctrl.getAttribute('startid').replace(/^#/, ''));
       const f = start && flags.get(start);
       if (!f || !f.start || f.startDone) continue;
+      const end = noteById.get((ctrl.getAttribute('endid') || '').replace(/^#/, ''));
+      if (!inScope(start) && !(end && inScope(end))) continue;
       f.startDone = true;
       record(element, [f.source], [ctrl]);
-      const end = noteById.get((ctrl.getAttribute('endid') || '').replace(/^#/, ''));
       const fe = end && flags.get(end);
       if (fe && fe.end && !fe.endDone) fe.endDone = true;
     }
@@ -460,7 +473,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
         if (!fallback) fallback = cand;
       }
       match = match || fallback;
-      if (!match) continue;
+      if (!match || (!inScope(note) && !inScope(match))) continue;
       const ctrl = createElement(element, true);
       if (staff) ctrl.setAttribute('staff', staff);
       ctrl.setAttribute('startid', '#' + ensureId(note));
@@ -477,7 +490,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
       if (chordNotes.some((n) => flags.get(n).startDone || flags.get(n).endDone)) continue;
       chords.delete(chord);
       chordNotes.forEach((n) => flags.delete(n));
-      warn(chord, '@' + attribute + '="' + chord.getAttribute(attribute) + '" not converted, no matching notes found');
+      if (inScope(chord)) warn(chord, '@' + attribute + '="' + chord.getAttribute(attribute) + '" not converted, no matching notes found');
     }
 
     // rewrite attributes: keep only unresolved values (chord values are moved to its notes)
@@ -489,7 +502,9 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
       const value = start && end ? 'm' : start ? 'i' : end ? 't' : '';
       if (value) {
         note.setAttribute(attribute, value);
-        warn(note, '@' + attribute + '="' + value + '" not converted, no matching ' + (start ? 'end' : 'start') + ' found');
+        if (inScope(note)) {
+          warn(note, '@' + attribute + '="' + value + '" not converted, no matching ' + (start ? 'end' : 'start') + ' found');
+        }
       } else {
         note.removeAttribute(attribute);
       }
@@ -545,7 +560,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
           else anywhere = anywhere || candidate;
         }
         const found = sameLayer || sameStaff || anywhere;
-        if (!found) continue;
+        if (!found || (!inScope(el) && !inScope(found.cand))) continue;
         const startid = '#' + ensureId(el);
         const endid = '#' + ensureId(found.cand);
         let slur = existingControlEvents.get('slur|' + startid + '|' + endid);
@@ -584,7 +599,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
       if (remaining.length > 0) {
         const value = remaining.map((t) => t.type + t.n).join(' ');
         el.setAttribute('slur', value);
-        warn(el, '@slur="' + value + '" not converted, no matching start/end found');
+        if (inScope(el)) warn(el, '@slur="' + value + '" not converted, no matching start/end found');
       } else {
         el.removeAttribute('slur');
       }
@@ -757,6 +772,9 @@ const controlEventAttributes = ['startid', 'endid', 'staff', 'layer', 'tstamp', 
  * @param {Object} options
  * @param {Iterable<string>} options.groups groups of elements to be converted (see
  *   conversionGroups), all groups if omitted
+ * @param {Function} options.scope function(Element) returning whether an element is within
+ *   the scope of the conversion (e.g., the editor selection); all elements if omitted.
+ *   An element is converted if it, or an element receiving its attribute, is within the scope.
  * @returns {{counts: Object<string, number>, changes: Array<Object>, warnings: Array<Object>, changedElements: Array<Element>}}
  *   counts: number of removed elements per element name;
  *   changes: one entry per conversion, {name, removed: [{element, text}], targets: [{element, attributes}]},
@@ -766,6 +784,7 @@ const controlEventAttributes = ['startid', 'endid', 'staff', 'layer', 'tstamp', 
  */
 export function convertElementsToAttributes(xmlDoc, options = {}) {
   const groups = new Set(options.groups || conversionGroups);
+  const inScope = options.scope || (() => true);
   const counts = {};
   const changes = [];
   const warnings = [];
@@ -810,7 +829,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
       const mapping = defAttributes[name][version];
       for (const parent of music.querySelectorAll(defParents[name].join(','))) {
         const children = directChildren(parent, name);
-        if (children.length === 0) continue;
+        if (children.length === 0 || (!inScope(parent) && !children.some(inScope))) continue;
         if (children.length > 1) {
           warn(parent, 'several ' + name + ' elements, not converted');
           continue;
@@ -829,7 +848,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
   function labelsToAttributes() {
     for (const staffGrp of music.querySelectorAll('staffGrp')) {
       const grpSyms = directChildren(staffGrp, 'grpSym');
-      if (grpSyms.length === 0) continue;
+      if (grpSyms.length === 0 || (!inScope(staffGrp) && !grpSyms.some(inScope))) continue;
       if (grpSyms.length > 1) {
         warn(staffGrp, 'several grpSym elements, not converted');
         continue;
@@ -843,6 +862,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
     if (version >= 5) return;
     for (const parent of music.querySelectorAll('staffDef, staffGrp')) {
       const labels = directChildren(parent, 'label');
+      if (!inScope(parent) && !labels.some(inScope)) continue;
       if (labels.length !== 1) {
         if (labels.length > 1) warn(parent, 'several label elements, not converted');
         continue;
@@ -861,7 +881,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
   function accidToAttributes() {
     for (const note of music.querySelectorAll('note')) {
       const accids = directChildren(note, 'accid');
-      if (accids.length === 0) continue;
+      if (accids.length === 0 || (!inScope(note) && !accids.some(inScope))) continue;
       if (accids.length > 1) {
         warn(note, 'several accid elements, not converted');
         continue;
@@ -877,7 +897,9 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
 
   function articToAttributes() {
     for (const host of music.querySelectorAll('note, chord')) {
+      const hostInScope = inScope(host);
       const artics = directChildren(host, 'artic').filter((el) => {
+        if (!hostInScope && !inScope(el)) return false;
         if (!el.hasAttribute('artic') && !el.hasAttribute('artic.ges')) {
           warn(el, 'no @artic or @artic.ges, not converted');
           return false;
@@ -902,6 +924,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
       const verses = directChildren(host, 'verse');
       const syls = directChildren(host, 'syl');
       if (verses.length + syls.length === 0) continue;
+      if (!inScope(host) && !verses.concat(syls).some(inScope)) continue;
       if (verses.length + syls.length > 1) {
         warn(host, 'several verse/syl elements, not converted');
         continue;
@@ -942,6 +965,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
 
   function fermataToAttributes() {
     for (const el of music.querySelectorAll('fermata')) {
+      if (!controlEventInScope(el)) continue;
       const target = controlEventTarget(el, 'startid', fermataElements);
       if (!target) continue;
       // @form="norm" is the default form and can be dropped; other forms cannot be expressed
@@ -965,6 +989,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
     const measureIndex = new Map();
     music.querySelectorAll('measure').forEach((m, i) => measureIndex.set(m, i));
     for (const el of music.querySelectorAll(name)) {
+      if (!controlEventInScope(el)) continue;
       const start = controlEventTarget(el, 'startid', allowedTargets);
       const end = start && controlEventTarget(el, 'endid', allowedTargets);
       if (!end || !convertible(el, controlEventAttributes)) continue;
@@ -999,6 +1024,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
     );
     const slurs = [];
     for (const el of music.querySelectorAll('slur')) {
+      if (!controlEventInScope(el)) continue;
       const start = controlEventTarget(el, 'startid', ['note', 'chord']);
       const end = start && controlEventTarget(el, 'endid', ['note', 'chord']);
       if (!end || !convertible(el, controlEventAttributes)) continue;
@@ -1059,6 +1085,15 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
     }
     return true;
   } // convertible()
+
+  // whether a control event, or its start or end element, is within the scope
+  function controlEventInScope(el) {
+    if (inScope(el)) return true;
+    return ['startid', 'endid'].some((attr) => {
+      const target = byId.get((el.getAttribute(attr) || '').trim().replace(/^#/, ''));
+      return target ? inScope(target) : false;
+    });
+  } // controlEventInScope()
 
   // element pointed to by a single-valued @startid/@endid of a control event in a measure
   function controlEventTarget(el, attr, allowedTargets) {

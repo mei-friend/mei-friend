@@ -47,7 +47,12 @@ async function convert(
       const doc = new DOMParser().parseFromString(xml, 'application/xml');
       let k = 0;
       const fn = direction === 'toElements' ? m.convertAttributesToElements : m.convertElementsToAttributes;
-      const r = fn(doc, { generateId: (n: string) => n + '-test' + ++k, indent: '  ', ...options });
+      // options.scopeMeasures: restrict the conversion to elements within these measures
+      const { scopeMeasures, ...opts } = options as any;
+      const scope = scopeMeasures
+        ? (el: Element) => scopeMeasures.includes(el.closest('measure')?.getAttribute('xml:id'))
+        : undefined;
+      const r = fn(doc, { generateId: (n: string) => n + '-test' + ++k, indent: '  ', scope, ...opts });
       const attrsOf = (el: Element) => {
         const attrs: Record<string, string> = {};
         for (const a of Array.from(el.attributes)) if (a.name !== 'xml:id') attrs[a.name] = a.value;
@@ -269,6 +274,22 @@ test.describe('1 Attributes to elements', () => {
     const none = await convert(page, attributesMei, 'toElements', { groups: [] });
     expect(none.counts).toEqual({});
   });
+
+  test('1.13 Scope: only attributes within the scope (ties starting there) are converted', async ({ page }) => {
+    const m5 = await convert(page, attributesMei, 'toElements', { scopeMeasures: ['m5'] });
+    expect(m5.counts).toEqual({ tie: 5 });
+    expect(m5.warnings).toEqual([]); // unresolved values outside the scope are not reported
+    // the existing tie element t0 (n26>#n29) is part of the encoding already
+    expect(pairs(m5, 'tie')).toEqual(
+      ['#n16>#n20', '#n17>#n22', '#n18>#n21', '#c4a>#c5a', '#c4b>#c5b', '#n26>#n29'].sort()
+    );
+    // n22 (outside) keeps its start value for the tie to n24, also outside the scope
+    expect(m5.elements['n22'].attrs.tie).toBe('i');
+    expect(m5.elements['n24'].attrs.tie).toBe('t');
+    expect(m5.elements['n1'].attrs.accid).toBe('s');
+    expect(m5.elements['c4'].attrs.tie).toBeUndefined();
+    expect(m5.elements['c5'].attrs.tie).toBeUndefined();
+  });
 });
 
 test.describe('2 Elements to attributes', () => {
@@ -410,6 +431,20 @@ test.describe('2 Elements to attributes', () => {
   test('2.10 A second run converts nothing more', async ({ page }) => {
     const second = await convert(page, s.xml, 'toAttributes');
     expect(second.counts).toEqual({});
+  });
+
+  test('2.11 Scope: only elements within the scope are converted', async ({ page }) => {
+    const m4 = await convert(page, elementsMei, 'toAttributes', { scopeMeasures: ['m4'] });
+    expect(m4.counts).toEqual({ tie: 1, slur: 2 });
+    expect(m4.warnings.map((w) => w.split(':')[0]).sort()).toEqual(
+      ['tie#t2', 'tie#t3', 'tie#t4', 'tie#t5', 'slur#sl3', 'slur#sl4', 'slur#sl6', 'slur#sl7'].sort()
+    );
+    expect(m4.elements['a1']).toBeDefined(); // m1: outside the scope
+    expect(m4.elements['g1']).toBeDefined(); // m5: outside the scope
+    // a control event outside the scope is converted when its start or end element is within
+    const notes = await convert(page, elementsMei, 'toAttributes', { scopeMeasures: ['m5'], groups: ['tie'] });
+    expect(notes.counts).toEqual({ tie: 1 }); // t1 in m4, ending on n19 in m5
+    expect(notes.elements['n19'].attrs.tie).toBe('t');
   });
 });
 
@@ -576,12 +611,16 @@ test.describe('4 Convert tab of the checker panel', () => {
     await expect(page.locator('#n1')).toBeVisible({ timeout: 30000 });
     await openConvertTab(page);
 
-    await test.step('Convert elements to attributes; kept elements are listed as warnings', async () => {
+    await test.step('Convert elements to attributes after confirming the removal of xml:ids', async () => {
       await convertButton(page, 1, 1).click();
+      await expect(page.locator('#promptOverlay')).toBeVisible();
+      await expect(page.locator('#promptOverlay')).toContainText('xml:id');
+      await page.locator('#promptOverlay button').last().click(); // proceed
       await expect(async () => {
         expect(await getEditorValue(page)).toContain('accid="s"/>');
       }).toPass({ timeout: 5000 });
       await expect(pane.locator('.ccEntry.ccWarning')).toHaveCount(25);
+      await expect(pane.locator('.ccRunTitle')).not.toContainText('(');
       await expect(pane).not.toHaveClass(/stale/);
     });
 
@@ -591,6 +630,57 @@ test.describe('4 Convert tab of the checker panel', () => {
         cm.replaceRange('\n', { line: 1, ch: 0 });
       });
       await expect(pane).toHaveClass(/stale/);
+    });
+  });
+
+  test('4.3 Conversion restricted to the editor selection; cancelling the confirmation', async ({ page }) => {
+    const pane = page.locator('.ccPane[data-tab="convert"]');
+    await openLocalMei(page, 'attribute-conversion-attributes.mei', attributesMei);
+    await expect(page.locator('#n1')).toBeVisible({ timeout: 30000 });
+    await openConvertTab(page);
+    await expect(pane.locator('.ccScope')).not.toHaveClass(/ccScopeSelection/);
+
+    await test.step('Select measure 1 in the editor', async () => {
+      await page.evaluate(() => {
+        const cm = (document.querySelector('.CodeMirror') as any).CodeMirror;
+        const lines = cm.getValue().split('\n');
+        const from = lines.findIndex((l: string) => l.includes('<measure xml:id="m1"'));
+        const to = lines.findIndex((l: string, i: number) => i > from && l.includes('</measure>'));
+        cm.setSelection({ line: from, ch: 0 }, { line: to + 1, ch: 0 });
+      });
+      await expect(pane.locator('.ccScope')).toHaveClass(/ccScopeSelection/);
+    });
+
+    await test.step('Test lists only the attributes of measure 1', async () => {
+      const before = await getEditorValue(page);
+      await convertButton(page, 0, 0).click();
+      // n1-n4 converted, n5 and n6 with warnings
+      await expect(pane.locator('.ccEntry')).toHaveCount(6);
+      await expect(pane.locator('.ccRunTitle')).toContainText(',');
+      expect(await getEditorValue(page)).toEqual(before);
+    });
+
+    await test.step('Convert changes only measure 1', async () => {
+      await unfoldOptions(page);
+      await convertButton(page, 0, 1).click();
+      await expect(async () => {
+        // n1 (measure 1) received an accid child element
+        expect(await getEditorValue(page)).toContain('<note xml:id="n1" pname="c" oct="5" dur="4">');
+      }).toPass({ timeout: 5000 });
+      const value = await getEditorValue(page);
+      expect(value).toContain('<note xml:id="n16" pname="c" oct="5" dur="2" tie="i"/>'); // outside: unchanged
+      expect(value).toContain('<note xml:id="n7" pname="c" oct="5" dur="4" artic="stacc"/>');
+    });
+
+    await test.step('Cancelling the confirmation of elements to attributes leaves the encoding unchanged', async () => {
+      await page.evaluate(() => (document.querySelector('.CodeMirror') as any).CodeMirror.setCursor({ line: 0, ch: 0 }));
+      const before = await getEditorValue(page);
+      await unfoldOptions(page);
+      await convertButton(page, 1, 1).click();
+      await expect(page.locator('#promptOverlay')).toBeVisible();
+      await page.locator('#promptOverlay button').first().click(); // cancel
+      await expect(page.locator('#promptOverlay')).not.toBeVisible();
+      expect(await getEditorValue(page)).toEqual(before);
     });
   });
 });

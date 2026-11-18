@@ -223,6 +223,12 @@ export const lang = {
   convertElementsToAttributesTestSummary: { text: 'Elemente würden in Attribute umgewandelt: {list}.' },
   convertElementsToAttributesProblems: { text: '{count} Elemente konnten nicht umgewandelt werden.' },
   convertElementsToAttributesNone: { text: 'Keine Elemente gefunden, die in Attribute umgewandelt werden können.' },
+  elementsToAttributesConfirmation: { text: '<b>Elemente → Attribute</b>\n\nAchtung: Dieser Vorgang kann externe Links ungültig machen.\n\n{count} der umzuwandelnden Elemente haben eine xml:id, die zusammen mit dem Element entfernt wird. Elemente, auf die innerhalb dieser Datei verwiesen wird, werden nicht umgewandelt.\n\nLinks aus anderen Dateien, außerhalb dieser Datei gespeicherte Annotationen, Faksimile-Werkzeuge oder URLs, die auf diese xml:ids verweisen, funktionieren danach nicht mehr.' },
+  elementsToAttributesProceed: { text: 'Umwandeln' },
+  elementsToAttributesCancel: { text: 'Abbrechen' },
+  convertScopeAll: { text: 'Bereich: gesamte Kodierung (Text im Editor markieren, um die Umwandlung einzuschränken)' },
+  convertScopeSelection: { text: 'Bereich: Auswahl, Zeilen {from}–{to}' },
+  convertSelectionSuffix: { text: 'Auswahl' },
   renumberMeasuresStartNumber: { text: 'Startnummer' },
   renumberMeasuresUnchanged: { text: 'unverändert' },
   renumberMeasuresSummary: { text: '{total} Takte, {changed} neu nummeriert.' },
@@ -950,10 +956,6 @@ export const lang = {
       '"Mit Verovio neu rendern" im Dropdown-Menü "Manipulieren".',
   },
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Takte neu nummerieren',
-    description: 'Einstellungen für Takte neu nummerieren',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Weiter bei unvollständigen Takten',
     description: 'Taktnummer wird bei unvollständigen Takten erhöht (@metcon="false")',
@@ -1298,11 +1300,6 @@ export const lang = {
 
   // utils renumber measures
   renumberMeasuresModalText: { text: 'Takte neu nummerieren' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'würde' },
-  renumberMeasuresChangedTo: { text: 'geändert in' },
-  renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {
