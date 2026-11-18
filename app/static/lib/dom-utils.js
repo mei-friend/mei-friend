@@ -349,15 +349,20 @@ export function xmlToString(xmlNode) {
 } // xmlToString()
 
 /**
- * Sort element attributes alphabetically, keeping xml:id first attribute
+ * Sorts the attributes of an element: namespace declarations first, then xml:id,
+ * then all other attributes alphabetically. Attribute nodes are moved as such, so
+ * that namespaced attributes (e.g., xlink:href) keep their namespace.
  * @param {Element} xmlNode
  */
 export function sortNodeAttributes(xmlNode) {
-  let attributeNames = xmlNode.getAttributeNames();
-  attributeNames.splice(attributeNames.indexOf('xml:id'), 1); // remove xmlId from attribute names list
-  let attributePairs = attributeNames.map((attName) => [attName, xmlNode.getAttribute(attName)]);
-  attributeNames.forEach((attName) => xmlNode.removeAttribute(attName)); // remove all, but xml:id
-  attributePairs.sort().forEach((attPair) => xmlNode.setAttribute(attPair.at(0), attPair.at(1)));
+  const rank = (attr) => (attr.name === 'xmlns' || attr.name.startsWith('xmlns:') ? 0 : attr.name === 'xml:id' ? 1 : 2);
+  const attrs = Array.from(xmlNode.attributes);
+  const sorted = attrs
+    .slice()
+    .sort((a, b) => rank(a) - rank(b) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  if (sorted.every((attr, i) => attr === attrs[i])) return; // already in order
+  attrs.forEach((attr) => xmlNode.removeAttributeNode(attr));
+  sorted.forEach((attr) => xmlNode.setAttributeNodeNS(attr));
 } // sortNodeAttributes()
 
 /**

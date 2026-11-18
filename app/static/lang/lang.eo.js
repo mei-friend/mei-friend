@@ -134,6 +134,13 @@ export const lang = {
   replaceMenuText: { text: 'Anstataŭi' },
   replaceAllMenuText: { text: 'Anstataŭi ĉion' },
   indentSelectionText: { text: 'Indentigi elekton' },
+  reformatEncodingText: {
+    text: 'Reformati per XML-analizilo',
+    description:
+      'Reformatas la tutan kodadon per la XML-analizilo: atributoj ordigitaj (unue xml:id, poste alfabete), normigita XML-seriigo (ekz. duoblaj citiloj, malplenaj elementoj kiel memfermaj etikedoj, signoreferencoj kiel signoj), ĉiuj linioj krommarĝenigitaj.',
+  },
+  reformatEncodingDone: { text: 'Kodado reformatita per la XML-analizilo ({lines} linioj).' },
+  reformatEncodingParseError: { text: 'Ne eblas reformati: la kodado ne estas bone formita XML.' },
   surroundWithTagsText: { text: 'Ĉirkaŭi per etikedoj' },
   surroundWithLastTagText: { text: 'Ĉirkaŭi per ' },
   jumpToLineText: { text: 'Salti al linio' },

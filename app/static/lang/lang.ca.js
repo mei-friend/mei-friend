@@ -138,6 +138,13 @@ export const lang = {
   replaceMenuText: { text: 'Reemplaça' },
   replaceAllMenuText: { text: 'Reemplaça-ho tot' },
   indentSelectionText: { text: 'Indentar selecció' },
+  reformatEncodingText: {
+    text: 'Reformata amb l\'analitzador XML',
+    description:
+      'Reformata tota la codificació amb l\'analitzador XML: atributs ordenats (primer xml:id, després alfabèticament), serialització XML normalitzada (p. ex. cometes dobles, elements buits com a etiquetes autotancades, referències de caràcter com a caràcters), totes les línies sagnades.',
+  },
+  reformatEncodingDone: { text: 'Codificació reformatada amb l\'analitzador XML ({lines} línies).' },
+  reformatEncodingParseError: { text: 'No es pot reformatar: la codificació no és XML ben format.' },
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a la línia' },

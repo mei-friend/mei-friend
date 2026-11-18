@@ -134,6 +134,13 @@ export const lang = {
   replaceMenuText: { text: 'Erstat' },
   replaceAllMenuText: { text: 'Erstat alle' },
   indentSelectionText: { text: 'Indryk markering' },
+  reformatEncodingText: {
+    text: 'Omformater via XML-parser',
+    description:
+      'Omformaterer hele kodningen via XML-parseren: attributter sorteret (xml:id først, derefter alfabetisk), normaliseret XML-serialisering (f.eks. dobbelte anførselstegn, tomme elementer som selvlukkende tags, tegnreferencer som tegn), alle linjer indrykket.',
+  },
+  reformatEncodingDone: { text: 'Kodningen er omformateret via XML-parseren ({lines} linjer).' },
+  reformatEncodingParseError: { text: 'Kan ikke omformatere: kodningen er ikke velformet XML.' },
   surroundWithTagsText: { text: 'Omslut med tags' },
   surroundWithLastTagText: { text: 'Omslut med ' },
   jumpToLineText: { text: 'Hop til linje' },

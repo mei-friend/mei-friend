@@ -131,6 +131,13 @@ export const lang = {
   replaceMenuText: { text: 'Zameni' },
   replaceAllMenuText: { text: 'Zameni sve' },
   indentSelectionText: { text: 'Uvuci izbor' },
+  reformatEncodingText: {
+    text: 'Preformatiraj putem XML parsera',
+    description:
+      'Preformatira cijelo kodiranje putem XML parsera: atributi sortirani (najprije xml:id, zatim abecedno), normalizirana XML serijalizacija (npr. dvostruki navodnici, prazni elementi kao samozatvarajuće oznake, reference znakova kao znakovi), svi retci uvučeni.',
+  },
+  reformatEncodingDone: { text: 'Kodiranje preformatirano putem XML parsera ({lines} redaka).' },
+  reformatEncodingParseError: { text: 'Preformatiranje nije moguće: kodiranje nije dobro oblikovan XML.' },
   surroundWithTagsText: { text: 'Ograniči oznakama' },
   surroundWithLastTagText: { text: 'Ograniči sa ' },
   jumpToLineText: { text: 'Idi na liniju' },

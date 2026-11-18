@@ -132,6 +132,13 @@ export const lang = {
   replaceMenuText: { text: 'Vervangen' },
   replaceAllMenuText: { text: 'Alles vervangen' },
   indentSelectionText: { text: 'Selectie inspringen' },
+  reformatEncodingText: {
+    text: 'Herformatteren via XML-parser',
+    description:
+      'Herformatteert de volledige codering via de XML-parser: attributen gesorteerd (eerst xml:id, daarna alfabetisch), genormaliseerde XML-serialisatie (bijv. dubbele aanhalingstekens, lege elementen als zelfsluitende tags, tekenreferenties als tekens), alle regels ingesprongen.',
+  },
+  reformatEncodingDone: { text: 'Codering geherformatteerd via de XML-parser ({lines} regels).' },
+  reformatEncodingParseError: { text: 'Herformatteren niet mogelijk: de codering is geen welgevormde XML.' },
   surroundWithTagsText: { text: 'Omringen met tags' },
   surroundWithLastTagText: { text: 'Omringen met' },
   jumpToLineText: { text: 'Ga naar regel' },

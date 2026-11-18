@@ -130,6 +130,13 @@ export const lang = {
   replaceMenuText: { text: 'Замінити' },
   replaceAllMenuText: { text: 'Замінити все' },
   indentSelectionText: { text: 'Вставити відступ в виділене' },
+  reformatEncodingText: {
+    text: 'Переформатувати через XML-парсер',
+    description:
+      'Переформатовує все кодування через XML-парсер: атрибути впорядковано (спочатку xml:id, потім за абеткою), нормалізована серіалізація XML (напр. подвійні лапки, порожні елементи як самозакривні теги, посилання на символи як символи), усі рядки з відступами.',
+  },
+  reformatEncodingDone: { text: 'Кодування переформатовано через XML-парсер ({lines} рядків).' },
+  reformatEncodingParseError: { text: 'Неможливо переформатувати: кодування не є правильно сформованим XML.' },
   surroundWithTagsText: { text: 'Обгорнути тегами' },
   surroundWithLastTagText: { text: 'Обгорнути останнім тегом' },
   jumpToLineText: { text: 'Перейти до рядка' },

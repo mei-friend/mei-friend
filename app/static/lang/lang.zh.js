@@ -127,6 +127,13 @@ export const lang = {
   replaceMenuText: { text: '替换' },
   replaceAllMenuText: { text: '全部替换' },
   indentSelectionText: { text: '缩进选择' },
+  reformatEncodingText: {
+    text: '通过 XML 解析器重新格式化',
+    description:
+      '通过 XML 解析器重新格式化整个编码：属性排序（xml:id 在前，其余按字母顺序），规范化的 XML 序列化（例如双引号、空元素为自闭合标签、字符引用转为字符），所有行缩进。',
+  },
+  reformatEncodingDone: { text: '已通过 XML 解析器重新格式化编码（{lines} 行）。' },
+  reformatEncodingParseError: { text: '无法重新格式化：编码不是格式良好的 XML。' },
   surroundWithTagsText: { text: '用标签包围' },
   surroundWithLastTagText: { text: '用上一个标签包围' },
   jumpToLineText: { text: '跳到行' },

@@ -137,6 +137,13 @@ export const lang = {
   replaceMenuText: { text: 'Ersetzen' },
   replaceAllMenuText: { text: 'Alles ersetzen' },
   indentSelectionText: { text: 'Auswahl einrücken' },
+  reformatEncodingText: {
+    text: 'Über XML-Parser neu formatieren',
+    description:
+      'Formatiert die gesamte Kodierung über den XML-Parser neu: Attribute sortiert (xml:id zuerst, dann alphabetisch), normalisierte XML-Serialisierung (z. B. doppelte Anführungszeichen, leere Elemente als selbstschließende Tags, Zeichenreferenzen als Zeichen), alle Zeilen eingerückt.',
+  },
+  reformatEncodingDone: { text: 'Kodierung über den XML-Parser neu formatiert ({lines} Zeilen).' },
+  reformatEncodingParseError: { text: 'Neuformatierung nicht möglich: Die Kodierung ist kein wohlgeformtes XML.' },
   surroundWithTagsText: { text: 'Mit Tags umschließen' },
   surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },

@@ -138,6 +138,13 @@ export const lang = {
   replaceMenuText: { text: 'Remplacer' },
   replaceAllMenuText: { text: 'Tout remplacer' },
   indentSelectionText: { text: "Sélection d'indentation" },
+  reformatEncodingText: {
+    text: 'Reformater via l\'analyseur XML',
+    description:
+      'Reformate tout l\'encodage via l\'analyseur XML : attributs triés (xml:id d\'abord, puis par ordre alphabétique), sérialisation XML normalisée (p. ex. guillemets doubles, éléments vides en balises auto-fermantes, références de caractères en caractères), toutes les lignes indentées.',
+  },
+  reformatEncodingDone: { text: 'Encodage reformaté via l\'analyseur XML ({lines} lignes).' },
+  reformatEncodingParseError: { text: 'Impossible de reformater : l\'encodage n\'est pas un XML bien formé.' },
   surroundWithTagsText: { text: 'Entourer de tags' },
   surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },

@@ -139,6 +139,13 @@ export const lang = {
   replaceMenuText: { text: 'Zastąp' },
   replaceAllMenuText: { text: 'Zastąp wszystko' },
   indentSelectionText: { text: 'Wcięcie zaznaczenia' },
+  reformatEncodingText: {
+    text: 'Przeformatuj za pomocą parsera XML',
+    description:
+      'Przeformatowuje całe kodowanie za pomocą parsera XML: atrybuty posortowane (najpierw xml:id, potem alfabetycznie), znormalizowana serializacja XML (np. podwójne cudzysłowy, puste elementy jako znaczniki samozamykające, odwołania znakowe jako znaki), wszystkie wiersze z wcięciami.',
+  },
+  reformatEncodingDone: { text: 'Kodowanie przeformatowane za pomocą parsera XML ({lines} wierszy).' },
+  reformatEncodingParseError: { text: 'Nie można przeformatować: kodowanie nie jest poprawnie sformułowanym XML.' },
   surroundWithTagsText: { text: 'Obejmij znacznikami' },
   surroundWithLastTagText: { text: 'Obejmij ostatnim znacznikiem ' },
   jumpToLineText: { text: 'Skocz do wiersza' },

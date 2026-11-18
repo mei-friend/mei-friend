@@ -1959,6 +1959,7 @@ export let cmd = {
     }
   },
   indentSelection: () => e.indentSelection(v, cm),
+  reformatEncoding: () => e.reformatEncoding(v, cm),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
   notesZoomOut: () => v.zoom(-1, storage),
@@ -2259,6 +2260,7 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', indentSelection);
+  document.getElementById('reformatEncoding').addEventListener('click', cmd.reformatEncoding);
   document.getElementById('surroundWithTags').addEventListener('click', cmd.encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', cmd.encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));

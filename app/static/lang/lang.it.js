@@ -139,6 +139,13 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
+  reformatEncodingText: {
+    text: 'Riformatta tramite parser XML',
+    description:
+      'Riformatta l\'intera codifica tramite il parser XML: attributi ordinati (prima xml:id, poi in ordine alfabetico), serializzazione XML normalizzata (ad es. virgolette doppie, elementi vuoti come tag autochiudenti, riferimenti di carattere come caratteri), tutte le righe indentate.',
+  },
+  reformatEncodingDone: { text: 'Codifica riformattata tramite il parser XML ({lines} righe).' },
+  reformatEncodingParseError: { text: 'Impossibile riformattare: la codifica non è XML ben formato.' },
   surroundWithTagsText: { text: 'Circonda con tags' },
   surroundWithLastTagText: { text: 'Circonda con' },
   jumpToLineText: { text: 'Vai alla riga' },

@@ -135,6 +135,13 @@ export const lang = {
   replaceMenuText: { text: 'Reemplazar' },
   replaceAllMenuText: { text: 'Reemplazar todo' },
   indentSelectionText: { text: 'Indentar selección' },
+  reformatEncodingText: {
+    text: 'Reformatear mediante el analizador XML',
+    description:
+      'Reformatea toda la codificación mediante el analizador XML: atributos ordenados (primero xml:id, luego alfabéticamente), serialización XML normalizada (p. ej. comillas dobles, elementos vacíos como etiquetas autocerradas, referencias de caracteres como caracteres), todas las líneas sangradas.',
+  },
+  reformatEncodingDone: { text: 'Codificación reformateada mediante el analizador XML ({lines} líneas).' },
+  reformatEncodingParseError: { text: 'No se puede reformatear: la codificación no es XML bien formado.' },
   surroundWithTagsText: { text: 'Envolver con tags' },
   surroundWithLastTagText: { text: 'Envolver con ' },
   jumpToLineText: { text: 'Ir a línea' },

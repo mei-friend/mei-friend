@@ -96,6 +96,87 @@ export function indentSelection(v, cm) {
 } // indentSelection()
 
 /**
+ * Reformats the entire encoding through the XML parser: parses the encoding,
+ * removes redundant namespace declarations, sorts the attributes of all elements
+ * (namespace declarations, xml:id, then all others alphabetically, see
+ * dutils.sortNodeAttributes()), serializes it and indents all lines, as a single undo step.
+ * The XML declaration and the line breaks between top-level nodes (e.g., comments,
+ * processing instructions such as xml-model) are kept. Note that serialization
+ * normalizes the XML (e.g., double quotes for attribute values, character
+ * references as characters, empty elements as self-closing tags).
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function reformatEncoding(v, cm) {
+  const text = cm.getValue();
+  const xmlDoc = new DOMParser().parseFromString(text, 'application/xml');
+  if (xmlDoc.querySelector('parsererror')) {
+    v.showAlert(translator.lang.reformatEncodingParseError.text, 'error');
+    return;
+  }
+  for (const el of xmlDoc.getElementsByTagName('*')) {
+    removeRedundantNamespaceDeclarations(el);
+    dutils.sortNodeAttributes(el);
+  }
+  const reformatted = serializeXmlDocument(xmlDoc, text);
+
+  const cursor = cm.getCursor();
+  const scrollInfo = cm.getScrollInfo();
+  withSingleUndoStep(cm, () => {
+    v.allowCursorActivity = false;
+    cm.blockChanges = true;
+    cm.operation(() => {
+      cm.setValue(reformatted);
+      for (let l = 0; l <= cm.lastLine(); l++) cm.indentLine(l, 'smart');
+    });
+    cm.setCursor({ line: Math.min(cursor.line, cm.lastLine()), ch: cursor.ch });
+    cm.blockChanges = false;
+    v.allowCursorActivity = true;
+  });
+  cm.scrollTo(scrollInfo.left, scrollInfo.top);
+  handleEditorChanges();
+  v.showAlert(translator.lang.reformatEncodingDone.text.replace('{lines}', cm.lineCount()), 'success', 4000);
+} // reformatEncoding()
+
+/**
+ * Serializes an XML document as text for the editor. Unlike XMLSerializer for the
+ * whole document, keeps the XML declaration of the original text and puts top-level
+ * nodes (XML declaration, processing instructions such as xml-model, comments, root
+ * element) on lines of their own.
+ * @param {Document} xmlDoc
+ * @param {string} originalText text the document was parsed from (for its XML declaration)
+ * @returns {string}
+ */
+export function serializeXmlDocument(xmlDoc, originalText = '') {
+  const serializer = new XMLSerializer();
+  const declaration = originalText.match(/^\s*(<\?xml\s[^?]*\?>)/)?.[1];
+  return (
+    (declaration ? declaration + '\n' : '') +
+    Array.from(xmlDoc.childNodes)
+      .map((node) => serializer.serializeToString(node))
+      .join('\n') +
+    '\n'
+  );
+} // serializeXmlDocument()
+
+/**
+ * Removes namespace declarations (xmlns, xmlns:prefix) from an element that repeat
+ * a declaration already in effect on an ancestor (e.g., xmlns:xlink declared again
+ * on an element within meiHead).
+ * @param {Element} el
+ */
+export function removeRedundantNamespaceDeclarations(el) {
+  const parent = el.parentElement;
+  if (!parent) return;
+  for (const attr of Array.from(el.attributes)) {
+    if (attr.namespaceURI !== 'http://www.w3.org/2000/xmlns/') continue;
+    const prefix = attr.name === 'xmlns' ? null : attr.localName;
+    if (parent.lookupNamespaceURI(prefix) === attr.value) el.removeAttributeNode(attr);
+  }
+} // removeRedundantNamespaceDeclarations()
+
+
+/**
  * Go from cursor position to matchin tag, and set new cursor position there.
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -1544,7 +1625,7 @@ export function convertAttributesToElements(v, cm, options = {}) {
     withSingleUndoStep(cm, () => {
       // new xml:ids are appended last; sort them to be the first attribute
       result.changedElements.forEach((el) => dutils.sortNodeAttributes(el));
-      cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+      cm.setValue(serializeXmlDocument(v.xmlDoc, cm.getValue()));
       addApplicationInfo(v, cm);
       cm.setCursor(cursorPosition);
     });
@@ -1793,7 +1874,7 @@ export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], sho
       // Serialize the modified full DOM back into the editor
       // (new xml:ids are appended last; sort them to be the first attribute)
       changedElements.forEach((e) => dutils.sortNodeAttributes(e));
-      cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+      cm.setValue(serializeXmlDocument(v.xmlDoc, cm.getValue()));
       addApplicationInfo(v, cm);
 
       if (hasSelection) {

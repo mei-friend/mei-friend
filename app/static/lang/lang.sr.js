@@ -130,6 +130,13 @@ export const lang = {
   replaceMenuText: { text: 'Замени' },
   replaceAllMenuText: { text: 'Замени све' },
   indentSelectionText: { text: 'Увуци избор' },
+  reformatEncodingText: {
+    text: 'Преформатирај путем XML парсера',
+    description:
+      'Преформатира цело кодирање путем XML парсера: атрибути сортирани (прво xml:id, затим абецедно), нормализована XML серијализација (нпр. двоструки наводници, празни елементи као самозатварајуће ознаке, референце знакова као знакови), сви редови увучени.',
+  },
+  reformatEncodingDone: { text: 'Кодирање преформатирано путем XML парсера ({lines} редова).' },
+  reformatEncodingParseError: { text: 'Преформатирање није могуће: кодирање није добро формиран XML.' },
   surroundWithTagsText: { text: 'Ограничи ознакама' },
   surroundWithLastTagText: { text: 'Ограничи са ' },
   jumpToLineText: { text: 'Иди на линију' },

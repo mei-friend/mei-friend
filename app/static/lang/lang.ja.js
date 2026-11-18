@@ -126,6 +126,13 @@ export const lang = {
   replaceMenuText: { text: '置換' },
   replaceAllMenuText: { text: 'すべて置換' },
   indentSelectionText: { text: '選択範囲をインデント' },
+  reformatEncodingText: {
+    text: 'XML パーサーで再フォーマット',
+    description:
+      'エンコーディング全体を XML パーサーで再フォーマットします: 属性を並べ替え（xml:id を先頭、その他はアルファベット順）、XML のシリアル化を正規化（例: 二重引用符、空要素を自己終了タグに、文字参照を文字に）、すべての行をインデントします。',
+  },
+  reformatEncodingDone: { text: 'XML パーサーでエンコーディングを再フォーマットしました（{lines} 行）。' },
+  reformatEncodingParseError: { text: '再フォーマットできません: エンコーディングが整形式の XML ではありません。' },
   surroundWithTagsText: { text: 'タグで囲む' },
   surroundWithLastTagText: { text: '前のタグで囲む' },
   jumpToLineText: { text: '行にジャンプ' },

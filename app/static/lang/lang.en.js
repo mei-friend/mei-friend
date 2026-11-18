@@ -152,6 +152,13 @@ export const lang = {
   replaceMenuText: { text: 'Replace' },
   replaceAllMenuText: { text: 'Replace all' },
   indentSelectionText: { text: 'Indent selection' },
+  reformatEncodingText: {
+    text: 'Reformat via XML parser',
+    description:
+      'Reformats the entire encoding through the XML parser: attributes sorted (xml:id first, then alphabetically), normalized XML serialization (e.g., double quotes, empty elements as self-closing tags, character references as characters), all lines indented.',
+  },
+  reformatEncodingDone: { text: 'Encoding reformatted through the XML parser ({lines} lines).' },
+  reformatEncodingParseError: { text: 'Cannot reformat: the encoding is not well-formed XML.' },
   surroundWithTagsText: { text: 'Surround with tags' },
   surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
