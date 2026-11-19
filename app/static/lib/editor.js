@@ -106,13 +106,15 @@ export function indentSelection(v, cm) {
  * references as characters, empty elements as self-closing tags).
  * @param {Viewer} v
  * @param {CodeMirror} cm
+ * @returns {number|null} the resulting number of lines, or null if the encoding
+ *   could not be parsed
  */
 export function reformatEncoding(v, cm) {
   const text = cm.getValue();
   const xmlDoc = new DOMParser().parseFromString(text, 'application/xml');
   if (xmlDoc.querySelector('parsererror')) {
     v.showAlert(translator.lang.reformatEncodingParseError.text, 'error');
-    return;
+    return null;
   }
   for (const el of xmlDoc.getElementsByTagName('*')) {
     removeRedundantNamespaceDeclarations(el);
@@ -136,6 +138,7 @@ export function reformatEncoding(v, cm) {
   cm.scrollTo(scrollInfo.left, scrollInfo.top);
   handleEditorChanges();
   v.showAlert(translator.lang.reformatEncodingDone.text.replace('{lines}', cm.lineCount()), 'success', 4000);
+  return cm.lineCount();
 } // reformatEncoding()
 
 /**
@@ -1703,15 +1706,19 @@ export function elementsInSelection(xmlDoc, cm) {
  * @param {Array<string>} selectedElements optional, array of node names,
  *                                         adds/removes only from these elements
  * @param {boolean} showReport optional, whether to show a report alert after manipulation
+ * @param {Function} onDone optional, called with the report once the manipulation
+ *   has been applied (or discarded): {added, removed, kept, changed, references,
+ *   cancelled, inSelection, keptIds}. Mode 'change' asks the user to confirm first,
+ *   so the call may happen well after manipulateXmlIds() has returned.
  */
-export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], showReport = true) {
+export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], showReport = true, onDone = null) {
   const removeIds = mode === 'remove';
   const changeIds = mode === 'change';
   let startTime = Date.now();
   let waitingTime = 0; // time spent waiting for the user to confirm (not counted as processing time)
   // kept: xml:ids not removed because pointed to; changed: existing xml:ids replaced by new ones;
   // references: pointers (data.URI attribute values) updated to changed xml:ids
-  let report = { added: 0, removed: 0, kept: 0, changed: 0, references: 0 };
+  let report = { added: 0, removed: 0, kept: 0, changed: 0, references: 0, keptIds: [] };
   const idMap = new Map(); // old xml:id -> new xml:id (mode 'change')
   let skipList = new Set(); // xml:ids that are pointed to and will not be removed
   let existingIds = new Set(); // xml:ids present in the document (to guarantee uniqueness of new ones)
@@ -1758,8 +1765,10 @@ export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], sho
       const idsToRemove = new Set();
       let m;
       while ((m = xmlIdPattern.exec(selText)) !== null) {
-        if (skipList.has(m[1])) report.kept++;
-        else idsToRemove.add(m[1]);
+        if (skipList.has(m[1])) {
+          report.kept++;
+          report.keptIds.push(m[1]);
+        } else idsToRemove.add(m[1]);
       }
       if (idsToRemove.size > 0) {
         for (const el of v.xmlDoc.querySelectorAll('[*|id]')) {
@@ -1842,6 +1851,7 @@ export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], sho
         } else if (removeIds && id !== null) {
           if (skipList.has(id)) {
             report.kept++;
+            report.keptIds.push(id);
           } else {
             el.removeAttribute('xml:id');
             report.removed++;
@@ -1936,6 +1946,7 @@ export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], sho
     if (showReport) {
       v.showAlert(msg, 'success');
     }
+    if (onDone) onDone({ ...report, inSelection: hasSelection, cancelled: false });
   } // reportAndFinish()
 
   // collects all xml:ids that are pointed to (by data.URI attributes) into skipList
@@ -1994,6 +2005,7 @@ export function manipulateXmlIds(v, cm, mode = 'add', selectedElements = [], sho
             v.allowCursorActivity = true;
             cm.blockChanges = false;
             console.log('Changing xml:ids cancelled by user.');
+            if (onDone) onDone({ ...report, inSelection: hasSelection, cancelled: true });
           },
         },
         {

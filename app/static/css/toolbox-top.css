@@ -1,0 +1,17 @@
+/* MEI toolbox at the top of the encoding panel (see resizer.setOrientation()).
+   The toolbox is the last child of #encoding, so the flex direction decides
+   which side it ends up on. */
+#encoding {
+  flex-direction: column-reverse;
+}
+
+#meiToolboxResizer {
+  cursor: row-resize;
+  width: 100%;
+  height: 6px;
+}
+
+#meiToolboxResizer svg {
+  min-height: 16px;
+  max-height: 16px;
+}

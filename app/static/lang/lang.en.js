@@ -175,10 +175,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Annotations panel' },
   showFacsimileMenuText: { text: 'Facsimile panel' },
   showPlaybackControlsText: { text: 'Playback controls' },
+  showMeiToolboxMenuText: { text: 'MEI toolbox' },
   facsimileTop: { text: 'Facsimile top' },
   facsimileBottom: { text: 'Facsimile bottom' },
   facsimileLeft: { text: 'Facsimile left' },
   facsimileRight: { text: 'Facsimile right' },
+  meiToolboxTop: { text: 'MEI toolbox top' },
+  meiToolboxBottom: { text: 'MEI toolbox bottom' },
+  meiToolboxLeft: { text: 'MEI toolbox left' },
+  meiToolboxRight: { text: 'MEI toolbox right' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Manipulate' },
@@ -210,26 +215,84 @@ export const lang = {
   convertAttributesToElementsSummary: { text: 'Attributes converted to {list}.' },
   convertAttributesToElementsNone: { text: 'No attributes found that could be converted to elements.' },
   convertAttributesToElementsProblems: { text: '{count} attributes could not be converted.' },
-  // CHECKER PANEL
-  checkerPanelTabCheck: { text: 'Check' },
-  checkerPanelTabConvert: { text: 'Convert' },
-  checkerPanelTabRenumber: { text: 'Renumber' },
-  checkerPanelCheckButton: { text: 'Check' },
-  checkerPanelTestButton: { text: 'Test', description: 'List what would be changed, without changing the encoding' },
-  checkerPanelRenumberButton: { text: 'Renumber' },
-  checkerPanelAttrToElButton: { text: 'Attributes → elements' },
-  checkerPanelElToAttrButton: { text: 'Elements → attributes', description: 'Converts elements into attributes where no information is lost; other elements are kept and listed.' },
-  checkerPanelAll: { text: 'all' },
-  checkerPanelNone: { text: 'none' },
-  checkerPanelFilter: { text: 'Filter results' },
-  checkerPanelRunAgain: { text: 'Run again' },
-  checkerPanelHideOptions: { text: 'Hide options' },
-  checkerPanelOutdated: { text: '(encoding changed since, results may be outdated)' },
-  checkerPanelNoResults: { text: 'No results yet. Choose the options and run.' },
-  checkerPanelGroupsSelected: { text: '{n} of {total} attribute groups' },
-  checkerPanelCheckAccidGes: { text: 'Accidentals (@accid.ges)' },
-  checkerPanelCheckMetcon: { text: 'Measure durations (@metcon)' },
-  checkerPanelCheckLinked: { text: 'Linked elements (@startid, @endid, @plist, …)' },
+  // MEI TOOLBOX
+  meiToolboxClose: { text: 'Close MEI toolbox' },
+  meiToolboxTabCheck: { text: 'Check' },
+  meiToolboxTabConvert: { text: 'Convert' },
+  meiToolboxTabRenumber: { text: 'Renumber' },
+  meiToolboxTabIds: { text: 'Ids' },
+  meiToolboxTabFacsimile: { text: 'Facsimile' },
+  meiToolboxTabReformat: { text: 'Reformat' },
+  meiToolboxCheckButton: { text: 'Check' },
+  meiToolboxTestButton: { text: 'Test', description: 'List what would be changed, without changing the encoding' },
+  meiToolboxRenumberButton: { text: 'Renumber' },
+  meiToolboxAttrToElButton: { text: 'Attributes → elements' },
+  meiToolboxElToAttrButton: { text: 'Elements → attributes', description: 'Converts elements into attributes where no information is lost; other elements are kept and listed.' },
+  meiToolboxAll: { text: 'all' },
+  meiToolboxNone: { text: 'none' },
+  meiToolboxFilter: { text: 'Filter results' },
+  meiToolboxRunAgain: { text: 'Run again' },
+  meiToolboxHideOptions: { text: 'Hide options' },
+  meiToolboxOutdated: { text: '(encoding changed since, results may be outdated)' },
+  meiToolboxNoResults: { text: 'No results yet. Choose the options and run.' },
+  meiToolboxGroupsSelected: { text: '{n} of {total} attribute groups' },
+  meiToolboxCheckAccidGes: { text: 'Accidentals (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Measure durations (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Linked elements (@startid, @endid, @plist, …)' },
+
+  // MEI TOOLBOX: Ids tab
+  meiToolboxIdsAdd: { text: 'Add xml:ids (to elements without one)' },
+  meiToolboxIdsChange: {
+    text: 'Change xml:ids (a new one for every element)',
+    description:
+      'Assigns a new xml:id to every element. References within this encoding are updated, but links from other files, annotations, facsimile tools or URLs that point to the old xml:ids will no longer work.',
+  },
+  meiToolboxIdsRemove: { text: 'Remove xml:ids (except those pointed to)' },
+  meiToolboxIdsButton: { text: 'Apply' },
+  meiToolboxIdsAdded: { text: '{n} added' },
+  meiToolboxIdsChanged: { text: '{n} changed' },
+  meiToolboxIdsRemoved: { text: '{n} removed' },
+  meiToolboxIdsKept: { text: '{n} kept' },
+  meiToolboxIdsReferences: { text: '{n} references updated' },
+  meiToolboxIdsKeptReason: { text: 'pointed to within the encoding' },
+  meiToolboxIdsNothing: { text: 'Nothing to do: no xml:ids were added, changed or removed.' },
+  meiToolboxIdsCancelled: { text: 'Cancelled, the encoding is unchanged.' },
+
+  // MEI TOOLBOX: Facsimile tab
+  meiToolboxFacsimileInfo: {
+    text: 'Link the encoding to page images: ingest a facsimile from another file, or add an empty facsimile with one surface per page break.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Ingest facsimile…' },
+  meiToolboxFacsimileAddEmpty: { text: 'Add empty facsimile' },
+  meiToolboxFacsimileZones: { text: '{n} zones' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
+  meiToolboxFacsimileNone: { text: 'This encoding has no facsimile.' },
+
+  // MEI TOOLBOX: Rerender tab
+  meiToolboxReformatVerovio: {
+    text: 'Via Verovio',
+    description: 'Lets Verovio write the encoding anew from its own representation.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio writes the encoding from its own representation, in its own formatting and attribute order.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Via XML parser',
+    description:
+      'Reformats the encoding through the XML parser: the content is kept, only the formatting and the attribute order change. Same as Code → Reformat via XML parser.',
+  },
+  meiToolboxReformatUnchanged: { text: 'The encoding is unchanged.' },
+  meiToolboxReformatDone: { text: '{lines} lines' },
+  meiToolboxAttributeOrder: {
+    text: 'Attribute order',
+    labels: ['as encoded', 'alphabetically', 'xml:id first, then alphabetically', 'custom…'],
+    description: 'The order in which attributes are written whenever mei-friend writes an element back.',
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Order pattern',
+    description:
+      'Attribute names separated by spaces or commas, in the order you want them, e.g. “xml:id n label *”. A name ending in * matches all attributes with that prefix (clef.*). A single * stands for all attributes not named, in alphabetical order; without it they keep their order at the end. Namespace declarations always come first.',
+  },
   codeCheckerFixShown: { text: 'Fix {n} shown' },
   codeCheckerIgnoreShown: { text: 'Ignore {n} shown' },
   convertGroupAccid: { text: 'Accidentals (@accid, @accid.ges)' },
@@ -1051,6 +1114,19 @@ export const lang = {
   selectFacsimilePanelOrientation: {
     text: 'Facsimile panel position',
     description: 'Select facsimile panel position relative to notation',
+    labels: ['left', 'right', 'top', 'bottom'],
+  },
+  titleMeiToolbox: {
+    text: 'MEI toolbox',
+    description: 'Checks and manipulations of the encoding, in a panel beside the editor',
+  },
+  showMeiToolbox: {
+    text: 'Show MEI toolbox',
+    description: 'Show the MEI toolbox with its Check, Convert, Renumber, Ids, Facsimile and Rerender tabs',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'MEI toolbox position',
+    description: 'Select the position of the MEI toolbox relative to the editor',
     labels: ['left', 'right', 'top', 'bottom'],
   },
   facsimileZoomInput: {

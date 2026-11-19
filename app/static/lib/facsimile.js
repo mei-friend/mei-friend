@@ -1002,21 +1002,57 @@ function adjustCoordinates(x, y, width, height) {
  * to be ingested into the existing MEI file, and
  * adds ingestionInputHander to input element.
  */
-export function ingestFacsimile() {
+export function ingestFacsimile(reporter = promptReporter()) {
   let input = document.createElement('input');
   input.type = 'file';
   let accept = '.mei,.xml,.musicxml,.txt';
   input.accept = accept;
-  input.addEventListener('change', (ev) => ingestionInputHandler(ev));
+  input.addEventListener('change', (ev) => ingestionInputHandler(ev, reporter));
   input.click();
 } // ingestFacsimile()
+
+/**
+ * Where the ingestion reports to. The MEI toolbox passes its own reporter, so that
+ * progress, problems and the summary appear in its result list instead of in modal
+ * prompts; this one keeps the prompts for any other caller.
+ * @returns {Object} reporter
+ */
+function promptReporter() {
+  let aborted = false;
+  const okButton = {
+    label: translator.lang.selectTagNameForEnclosureOkButton.value,
+    event: () => v.hideUserPrompt(),
+    cancel: true,
+  };
+  const warnings = [];
+  return {
+    started: (title) =>
+      v.showUserPrompt(
+        '<b>' + title + '</b><br><br><span id="ingestFacsimileProgress"></span>',
+        [{ label: translator.lang.codeCheckerStop.text, event: () => (aborted = true), cancel: true }],
+        'info'
+      ),
+    progress: (text) => {
+      const span = document.getElementById('ingestFacsimileProgress');
+      if (span) span.innerHTML = text;
+    },
+    warn: (entry) => warnings.push(entry.html),
+    aborted: () => aborted,
+    failed: (message) => v.showUserPrompt(message, [okButton]),
+    finished: (title, summary) => {
+      let msg = '<b>' + title + '</b><br><br>' + summary;
+      if (warnings.length > 0) msg += '<div class="promptScrollList">' + warnings.join('<br>') + '</div>';
+      v.showUserPrompt(msg, [okButton], warnings.length > 0 || aborted ? 'warning' : 'info');
+    },
+  };
+} // promptReporter()
 
 /**
  * Handles loading of ingestion file and calls
  * handleFacsimileIngestion() to finalize ingestion
  * @param {event} ev
  */
-function ingestionInputHandler(ev) {
+function ingestionInputHandler(ev, reporter) {
   let files = Array.from(ev.target.files);
   let reply = {};
 

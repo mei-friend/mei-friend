@@ -15,7 +15,7 @@ import {
 } from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
-import * as checkerPanel from './checker-panel.js';
+import * as meiToolbox from './mei-toolbox.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
@@ -2159,6 +2159,12 @@ export default class Viewer {
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
+          case 'showMeiToolbox':
+            value ? cmd.showMeiToolbox() : cmd.hideMeiToolbox();
+            break;
+          case 'selectMeiToolboxOrientation':
+            setOrientation(cm, '', '', this);
+            break;
           case 'selectFacsimilePanelOrientation':
             facs.drawFacsimile();
             break;
@@ -3703,31 +3709,31 @@ export default class Viewer {
   } // toggleValidationReportVisibility()
 
   /**
-   * Starts a new run of a check in the Check tab of the checker panel (see
-   * checker-panel.js), which lists entries added through addCodeCheckerEntry(data).
+   * Starts a new run of a check in the Check tab of the MEI toolbox (see
+   * mei-toolbox.js), which lists entries added through addCodeCheckerEntry(data).
    * @param {string} title
    */
   initCodeCheckerPanel(title = 'Code Checker') {
-    checkerPanel.startRun('check', title);
+    meiToolbox.startRun('check', title);
   } // initCodeCheckerPanel()
 
   /**
-   * Adds an entry to the result list of the current checker panel run
+   * Adds an entry to the result list of the current MEI toolbox run
    * @param {Object} data {xmlId, html, correct}, with optional fix callback correct()
    */
   addCodeCheckerEntry(data) {
-    checkerPanel.addEntry(data);
+    meiToolbox.addEntry(data);
   } // addCodeCheckerEntry()
 
   /**
-   * Finishes the current checker panel run
+   * Finishes the current MEI toolbox run
    * @param {string} allGoodString shown when no entries were found
    */
   finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
-    checkerPanel.finishRun(allGoodString);
+    meiToolbox.finishRun(allGoodString);
   } // finalizeCodeCheckerPanel()
 
   hideCodeCheckerPanel() {
-    checkerPanel.resetCheckerPanel();
+    meiToolbox.resetToolbox();
   }
 } // class Viewer

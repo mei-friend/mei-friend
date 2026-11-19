@@ -6,7 +6,7 @@ import { setupPage, defaultUrl, openLocalMei } from './setup';
 /**
  * Tests for converting attributes to elements and elements to attributes
  * (app/static/lib/attribute-conversion.js) and for the Convert tab of the
- * checker panel. Fixtures (all schema-valid, MEI 5.1 or MEI 4.0.1):
+ * MEI toolbox. Fixtures (all schema-valid, MEI 5.1 or MEI 4.0.1):
  *   attribute-conversion-attributes.mei  attributes, one topic per measure
  *   attribute-conversion-elements.mei    elements, incl. cases that must be kept
  *                                        (modelled on trompamusic-encodings and
@@ -532,7 +532,7 @@ test.describe('3 Round trips', () => {
 });
 
 // ############################################################################
-// Convert tab of the checker panel
+// Convert tab of the MEI toolbox
 // ############################################################################
 
 async function getEditorValue(page: Page): Promise<string> {
@@ -540,31 +540,31 @@ async function getEditorValue(page: Page): Promise<string> {
 }
 
 async function openConvertTab(page: Page) {
-  await page.locator('#manipulateMenuTitle').click();
-  await expect(page.locator('#convertAttributesToElements')).toBeVisible();
-  await page.locator('#convertAttributesToElements').click();
-  await expect(page.locator('.ccPane[data-tab="convert"]')).toBeVisible();
+  await page.locator('#showMeiToolboxButton').click();
+  await expect(page.locator('#meiToolbox')).toBeVisible();
+  await page.locator('.mtTab[data-tab="convert"]').click();
+  await expect(page.locator('.mtPane[data-tab="convert"]')).toBeVisible();
 }
 
 // button of the Convert tab: row 0 attributes -> elements, row 1 elements -> attributes; index 0 is Test
 function convertButton(page: Page, row: number, index: number) {
-  return page.locator('.ccPane[data-tab="convert"] .ccActionRow').nth(row).locator('button').nth(index);
+  return page.locator('.mtPane[data-tab="convert"] .mtActionRow').nth(row).locator('button').nth(index);
 }
 
 async function unfoldOptions(page: Page) {
   // in a narrow panel, the options fold away after a run
   await page.evaluate(() =>
-    document.querySelector('.ccPane[data-tab="convert"] .ccOptions')!.classList.remove('collapsed')
+    document.querySelector('.mtPane[data-tab="convert"] .mtOptions')!.classList.remove('collapsed')
   );
 }
 
-test.describe('4 Convert tab of the checker panel', () => {
+test.describe('4 Convert tab of the MEI toolbox', () => {
   test.beforeEach(async ({ page }) => {
     await setupPage(page);
   });
 
   test('4.1 Test, convert, filter and undo attributes to elements', async ({ page }) => {
-    const pane = page.locator('.ccPane[data-tab="convert"]');
+    const pane = page.locator('.mtPane[data-tab="convert"]');
     await openLocalMei(page, 'attribute-conversion-attributes.mei', attributesMei);
     await expect(page.locator('#n1')).toBeVisible({ timeout: 30000 });
     const before = await getEditorValue(page);
@@ -572,9 +572,9 @@ test.describe('4 Convert tab of the checker panel', () => {
 
     await test.step('Test lists conversions without changing the encoding', async () => {
       await convertButton(page, 0, 0).click();
-      await expect(pane.locator('.ccEntry').first()).toBeVisible();
+      await expect(pane.locator('.mtEntry').first()).toBeVisible();
       // 8 warnings + 35 conversions (one entry per element carrying attributes, see 1.1)
-      await expect(pane.locator('.ccEntry')).toHaveCount(43);
+      await expect(pane.locator('.mtEntry')).toHaveCount(43);
       expect(await getEditorValue(page)).toEqual(before);
     });
 
@@ -584,14 +584,14 @@ test.describe('4 Convert tab of the checker panel', () => {
       await expect(async () => {
         expect(await getEditorValue(page)).toContain('<tie ');
       }).toPass({ timeout: 5000 });
-      await expect(pane.locator('.ccEntry')).toHaveCount(43);
+      await expect(pane.locator('.mtEntry')).toHaveCount(43);
     });
 
     await test.step('Filter narrows the result list; clicking an entry moves the cursor', async () => {
-      await pane.locator('.ccFilter').fill('#n16');
-      await expect(pane.locator('.ccEntry:visible')).toHaveCount(1);
-      await expect(pane.locator('.ccCount')).toHaveText('1 / 43');
-      await pane.locator('.ccEntry:visible .codeCheckerMessage').click();
+      await pane.locator('.mtFilter').fill('#n16');
+      await expect(pane.locator('.mtEntry:visible')).toHaveCount(1);
+      await expect(pane.locator('.mtCount')).toHaveText('1 / 43');
+      await pane.locator('.mtEntry:visible .codeCheckerMessage').click();
       const line = await page.evaluate(() => {
         const cm = (document.querySelector('.CodeMirror') as any).CodeMirror;
         return cm.getLine(cm.getCursor().line);
@@ -606,7 +606,7 @@ test.describe('4 Convert tab of the checker panel', () => {
   });
 
   test('4.2 Elements to attributes and outdated results', async ({ page }) => {
-    const pane = page.locator('.ccPane[data-tab="convert"]');
+    const pane = page.locator('.mtPane[data-tab="convert"]');
     await openLocalMei(page, 'attribute-conversion-elements.mei', elementsMei);
     await expect(page.locator('#n1')).toBeVisible({ timeout: 30000 });
     await openConvertTab(page);
@@ -619,8 +619,8 @@ test.describe('4 Convert tab of the checker panel', () => {
       await expect(async () => {
         expect(await getEditorValue(page)).toContain('accid="s"/>');
       }).toPass({ timeout: 5000 });
-      await expect(pane.locator('.ccEntry.ccWarning')).toHaveCount(25);
-      await expect(pane.locator('.ccRunTitle')).not.toContainText('(');
+      await expect(pane.locator('.mtEntry.mtWarning')).toHaveCount(25);
+      await expect(pane.locator('.mtRunTitle')).not.toContainText('(');
       await expect(pane).not.toHaveClass(/stale/);
     });
 
@@ -634,11 +634,11 @@ test.describe('4 Convert tab of the checker panel', () => {
   });
 
   test('4.3 Conversion restricted to the editor selection; cancelling the confirmation', async ({ page }) => {
-    const pane = page.locator('.ccPane[data-tab="convert"]');
+    const pane = page.locator('.mtPane[data-tab="convert"]');
     await openLocalMei(page, 'attribute-conversion-attributes.mei', attributesMei);
     await expect(page.locator('#n1')).toBeVisible({ timeout: 30000 });
     await openConvertTab(page);
-    await expect(pane.locator('.ccScope')).not.toHaveClass(/ccScopeSelection/);
+    await expect(pane.locator('.mtScope')).not.toHaveClass(/mtScopeSelection/);
 
     await test.step('Select measure 1 in the editor', async () => {
       await page.evaluate(() => {
@@ -648,15 +648,15 @@ test.describe('4 Convert tab of the checker panel', () => {
         const to = lines.findIndex((l: string, i: number) => i > from && l.includes('</measure>'));
         cm.setSelection({ line: from, ch: 0 }, { line: to + 1, ch: 0 });
       });
-      await expect(pane.locator('.ccScope')).toHaveClass(/ccScopeSelection/);
+      await expect(pane.locator('.mtScope')).toHaveClass(/mtScopeSelection/);
     });
 
     await test.step('Test lists only the attributes of measure 1', async () => {
       const before = await getEditorValue(page);
       await convertButton(page, 0, 0).click();
       // n1-n4 converted, n5 and n6 with warnings
-      await expect(pane.locator('.ccEntry')).toHaveCount(6);
-      await expect(pane.locator('.ccRunTitle')).toContainText(',');
+      await expect(pane.locator('.mtEntry')).toHaveCount(6);
+      await expect(pane.locator('.mtRunTitle')).toContainText(',');
       expect(await getEditorValue(page)).toEqual(before);
     });
 

@@ -894,10 +894,10 @@ export function adjustCtrlMenuOverflow(ctrlMenu) {
 }
 
 export function createEncodingPanel() {
-  let codeCheckerResizer = document.getElementById('codeCheckerResizer');
-  codeCheckerResizer.classList.add('resizer');
-  codeCheckerResizer.innerHTML = icon.kebab;
-  let codeCheckerPanel = document.getElementById('codeChecker');
+  let meiToolboxResizer = document.getElementById('meiToolboxResizer');
+  meiToolboxResizer.classList.add('resizer');
+  meiToolboxResizer.innerHTML = icon.kebab;
+  let codeCheckerPanel = document.getElementById('meiToolbox');
   codeCheckerPanel.style.display = 'none';
 } // createEncodingPanel()
 

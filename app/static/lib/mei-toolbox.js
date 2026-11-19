@@ -1,8 +1,12 @@
 /**
- * Checker panel below the encoding, with three tabs:
- *   Check:    accid.ges, metcon and linked-element checks (mei-checker.js)
- *   Convert:  attributes to elements (attribute-conversion.js)
- *   Renumber: renumbering measures (utils.renumberMeasures())
+ * MEI toolbox panel beside the encoding, with six tabs:
+ *   Check:     accid.ges, metcon and linked-element checks (mei-checker.js)
+ *   Convert:   attributes to elements (attribute-conversion.js)
+ *   Renumber:  renumbering measures (utils.renumberMeasures())
+ *   Ids:       adding, changing and removing xml:ids (editor.manipulateXmlIds())
+ *   Facsimile: ingesting a facsimile, or adding an empty facsimile skeleton
+ *   Reformat:  writing the encoding anew through Verovio or the XML parser, with
+ *              the attribute order used when writing elements back
  * Each tab has an options section with the buttons running its action, and a
  * result list with a text filter. Each tab keeps its results; results are marked
  * as outdated when the encoding changes afterwards. In a narrow panel, the
@@ -15,20 +19,23 @@
  */
 
 import { conversionGroups } from './attribute-conversion.js';
+import * as dutils from './dom-utils.js';
 import * as e from './editor.js';
-import { cm, handleEditorChanges, translator, v } from './main.js';
+import { ingestFacsimile } from './facsimile.js';
+import { addModifyerKeys } from './control-menu.js';
+import { cm, handleEditorChanges, shortcutForCommand, translator, v } from './main.js';
 import * as checker from './mei-checker.js';
-import { codeCheckerHeight, setOrientation } from './resizer.js';
+import { meiToolboxVisible, setOrientation } from './resizer.js';
 import * as utils from './utils.js';
 import * as icon from '../css/icons.js';
 
-const tabs = ['check', 'convert', 'renumber'];
+const tabs = ['check', 'convert', 'renumber', 'ids', 'facsimile', 'reformat'];
 
 // check types and the language keys of their labels
 const checkTypes = {
-  accidGes: 'checkerPanelCheckAccidGes',
-  metcon: 'checkerPanelCheckMetcon',
-  linked: 'checkerPanelCheckLinked',
+  accidGes: 'meiToolboxCheckAccidGes',
+  metcon: 'meiToolboxCheckMetcon',
+  linked: 'meiToolboxCheckLinked',
 };
 
 // language keys of the labels of attribute groups (attribute-conversion.js)
@@ -48,20 +55,46 @@ const groupLabels = {
 const suffixAtMeasuresValues = ['none', '-cont'];
 const suffixAtEndingsValues = ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'];
 
+// modes of the Ids tab and the language keys of their labels
+const idModes = {
+  add: 'meiToolboxIdsAdd',
+  change: 'meiToolboxIdsChange',
+  remove: 'meiToolboxIdsRemove',
+};
+
+/**
+ * Attribute order presets of the Reformat tab. The pattern is read by
+ * dutils.parseAttributeOrder(): names separated by whitespace and/or commas, a
+ * trailing '*' as prefix wildcard ('clef.*'), a lone '*' for all attributes not
+ * named elsewhere (alphabetically), an empty pattern for 'leave as encoded'.
+ * 'custom' takes its pattern from the text field next to the select.
+ */
+const attributeOrderPresets = {
+  keep: '',
+  alphabetical: '*',
+  xmlIdFirst: 'xml:id *',
+  custom: null,
+};
+const defaultAttributeOrderPreset = 'xmlIdFirst';
+const defaultAttributeOrderPattern = 'xml:id n label dur dots *';
+
 // localStorage keys (renumber keys as formerly used by the settings panel)
 const storageKey = {
-  checkType: 'mf-checkerPanelCheckType',
+  checkType: 'mf-meiToolboxCheckType',
   groups: 'mf-convertAttributeGroups',
   startNumber: 'mf-renumberMeasuresStartNumber',
   continueAcrossIncompleteMeasures: 'mf-renumberMeasureContinueAcrossIncompleteMeasures',
   suffixAtMeasures: 'mf-renumberMeasuresUseSuffixAtMeasures',
   continueAcrossEndings: 'mf-renumberMeasuresContinueAcrossEndings',
   suffixAtEndings: 'mf-renumberMeasuresUseSuffixAtEndings',
+  idMode: 'mf-meiToolboxIdMode',
+  attributeOrderPreset: 'mf-meiToolboxAttributeOrderPreset',
+  attributeOrderPattern: 'mf-meiToolboxAttributeOrderPattern',
 };
 
 const BUDGET_MS = 30; // work per time slice before yielding to the GUI
 
-let panel = null; // #codeChecker element, once built
+let panel = null; // #meiToolbox element, once built
 let activeTab = 'check';
 let runTab = null; // tab of the current (or last) run
 let running = false;
@@ -73,36 +106,50 @@ const panes = {}; // tab -> pane object, see buildPane()
 // ############################################################################
 
 /**
- * Shows the checker panel (building it on first use) with the given tab
- * @param {string} tab 'check', 'convert' or 'renumber'
+ * Shows the MEI toolbox (building it on first use) with the given tab
+ * @param {string} tab one of `tabs`
  */
-export function openCheckerPanel(tab = activeTab) {
+export function openToolbox(tab = activeTab) {
   if (!panel) build();
-  if (panel.style.display !== 'flex') {
-    panel.style.display = 'flex';
-    panel.style.height = codeCheckerHeight + 'px';
-    setOrientation(cm, '', '', v);
-  }
+  showPanel(true);
   selectTab(tab);
-} // openCheckerPanel()
+} // openToolbox()
 
 /**
- * Hides the checker panel (results are kept)
+ * Hides the MEI toolbox (results are kept)
  */
-export function closeCheckerPanel() {
-  if (!panel) return;
-  panel.style.display = 'none';
+export function closeToolbox() {
+  showPanel(false);
+} // closeToolbox()
+
+/**
+ * Shows the MEI toolbox when it is hidden and vice versa
+ */
+export function toggleToolbox() {
+  if (meiToolboxVisible()) closeToolbox();
+  else openToolbox();
+} // toggleToolbox()
+
+/**
+ * Shows or hides the panel. Like the facsimile panel, the settings checkbox is the
+ * single source of truth for the visibility; setOrientation() reads it and lays the
+ * encoding panel out accordingly.
+ * @param {boolean} show
+ */
+function showPanel(show) {
+  if (show && !panel) build();
+  const checkbox = document.getElementById('showMeiToolbox');
+  if (checkbox) checkbox.checked = show;
   setOrientation(cm, '', '', v);
-} // closeCheckerPanel()
+} // showPanel()
 
 /**
- * Hides the checker panel and clears all results (e.g., when a new encoding is loaded)
+ * Hides the MEI toolbox and clears all results (e.g., when a new encoding is loaded)
  */
-export function resetCheckerPanel() {
-  document.getElementById('codeCheckerResizer').style.display = 'none';
-  document.getElementById('codeChecker').style.display = 'none';
+export function resetToolbox() {
+  showPanel(false);
   if (!panel) return;
-  if (v) v.codeCheckerAbort = true; // stop a check in progress
+  if (v) v.toolboxAbort = true; // stop a check in progress
   tabs.forEach((tab) => {
     const p = panes[tab];
     clearResults(p);
@@ -113,7 +160,7 @@ export function resetCheckerPanel() {
     p.options.classList.remove('collapsed');
     showPlaceholder(p);
   });
-} // resetCheckerPanel()
+} // resetToolbox()
 
 /**
  * Starts a new run in a tab: shows the panel at that tab, clears the result
@@ -122,11 +169,11 @@ export function resetCheckerPanel() {
  * @param {string} title (html)
  */
 export function startRun(tab, title) {
-  openCheckerPanel(tab);
+  openToolbox(tab);
   const p = panes[tab];
   runTab = tab;
   running = true;
-  v.codeCheckerAbort = false;
+  v.toolboxAbort = false;
   clearResults(p);
   p.hasResults = true;
   p.title.innerHTML = title;
@@ -148,7 +195,7 @@ export function addEntry(data, tab = runTab) {
   const p = panes[tab];
   if (!p) return;
   const div = document.createElement('div');
-  div.classList.add('validation-item', 'ccEntry');
+  div.classList.add('validation-item', 'mtEntry');
   if (data.className) div.classList.add(data.className);
 
   const span = document.createElement('span');
@@ -221,13 +268,13 @@ export function finishRun(emptyText = '', summary = '') {
   if (!p) return;
   running = false;
   p.pane.classList.remove('running');
-  const stopped = v.codeCheckerAbort;
+  const stopped = v.toolboxAbort;
   if (stopped) summary = (summary ? summary + ' ' : '') + t('codeCheckerStopped', 'Stopped.');
   p.summary.innerHTML = summary;
   p.title.parentElement.title = p.title.textContent + ' ' + p.summary.textContent; // full text, if truncated
   if (p.total === 0 && emptyText && !stopped) {
     const div = document.createElement('div');
-    div.classList.add('validation-item', 'ccInfo');
+    div.classList.add('validation-item', 'mtInfo');
     div.innerHTML = emptyText;
     p.list.appendChild(div);
   }
@@ -239,8 +286,8 @@ export function finishRun(emptyText = '', summary = '') {
  * @param {string} type 'accidGes', 'metcon' or 'linked'; currently selected type, if omitted
  */
 export function runCheck(type = '') {
-  openCheckerPanel('check');
-  const radios = panes.check.content.querySelectorAll('input[name="ccCheckType"]');
+  openToolbox('check');
+  const radios = panes.check.content.querySelectorAll('input[name="mtCheckType"]');
   if (type && type in checkTypes) {
     radios.forEach((r) => (r.checked = r.value === type));
     save(storageKey.checkType, type);
@@ -271,7 +318,7 @@ export function runCheck(type = '') {
  * @param {boolean} confirmed removal of xml:ids already confirmed by the user
  */
 export function runConvert(test = false, reverse = false, confirmed = false) {
-  openCheckerPanel('convert');
+  openToolbox('convert');
   const p = panes.convert;
   const groups = selectedGroups();
   if (reverse && !test && !confirmed) {
@@ -281,10 +328,10 @@ export function runConvert(test = false, reverse = false, confirmed = false) {
   p.lastAction = () => runConvert(test, reverse);
   const key = reverse ? 'convertElementsToAttributes' : 'convertAttributesToElements';
   const title = reverse
-    ? t('checkerPanelElToAttrButton', 'Elements → attributes')
-    : t('checkerPanelAttrToElButton', 'Attributes → elements');
+    ? t('meiToolboxElToAttrButton', 'Elements → attributes')
+    : t('meiToolboxAttrToElButton', 'Attributes → elements');
   const suffix = [];
-  if (test) suffix.push(t('checkerPanelTestButton', 'Test'));
+  if (test) suffix.push(t('meiToolboxTestButton', 'Test'));
   if (cm.somethingSelected()) suffix.push(t('convertSelectionSuffix', 'selection'));
   startRun('convert', title + (suffix.length > 0 ? ' (' + suffix.join(', ') + ')' : ''));
   setTimeout(() => {
@@ -311,7 +358,7 @@ export function runConvert(test = false, reverse = false, confirmed = false) {
  * @param {boolean} change
  */
 export function runRenumber(change = false) {
-  openCheckerPanel('renumber');
+  openToolbox('renumber');
   const options = renumberOptions();
   panes.renumber.lastAction = () => runRenumber(change);
   startRun('renumber', t('renumberMeasuresModalText', 'Renumber measures') + (change ? '' : testSuffix()));
@@ -323,7 +370,7 @@ export function runRenumber(change = false) {
       if (isChanged) changed++;
       return {
         xmlId: r.measure.getAttribute('xml:id') || '',
-        className: isChanged ? '' : 'ccMuted',
+        className: isChanged ? '' : 'mtMuted',
         html:
           '<b>measure</b>' +
           idHtml(r.measure) +
@@ -340,6 +387,176 @@ export function runRenumber(change = false) {
     addEntriesSliced('renumber', entries, () => finishRun(t('renumberMeasuresNoMeasures'), summary));
   }, 10);
 } // runRenumber()
+
+/**
+ * Adds, changes or removes xml:ids, restricted to the editor selection if text is
+ * selected. Lists the xml:ids that could not be removed because they are pointed to.
+ * @param {string} mode 'add', 'change' or 'remove'; empty: the mode selected in the tab
+ */
+export function runIds(mode = '') {
+  openToolbox('ids');
+  const radios = panes.ids.content.querySelectorAll('input[name="mtIdMode"]');
+  if (mode && mode in idModes) {
+    radios.forEach((r) => (r.checked = r.value === mode));
+    save(storageKey.idMode, mode);
+  } else {
+    mode = Array.from(radios).find((r) => r.checked)?.value || 'add';
+  }
+  panes.ids.lastAction = () => runIds(mode);
+  const suffix = cm.somethingSelected() ? ' (' + t('convertSelectionSuffix', 'selection') + ')' : '';
+  startRun('ids', t(idModes[mode]) + suffix);
+  setTimeout(() => {
+    // showReport false: the result is reported in the panel, not as an alert
+    e.manipulateXmlIds(v, cm, mode, [], false, (report) => {
+      if (report.cancelled) {
+        finishRun(t('meiToolboxIdsCancelled', 'Cancelled, the encoding is unchanged.'), '');
+        return;
+      }
+      const parts = [];
+      if (report.added > 0) parts.push(t('meiToolboxIdsAdded', '{n} added').replace('{n}', report.added));
+      if (report.changed > 0) parts.push(t('meiToolboxIdsChanged', '{n} changed').replace('{n}', report.changed));
+      if (report.removed > 0) parts.push(t('meiToolboxIdsRemoved', '{n} removed').replace('{n}', report.removed));
+      if (report.kept > 0) parts.push(t('meiToolboxIdsKept', '{n} kept').replace('{n}', report.kept));
+      if (report.references > 0)
+        parts.push(t('meiToolboxIdsReferences', '{n} references updated').replace('{n}', report.references));
+      // only the xml:ids kept despite a removal are worth listing: they are the ones
+      // the user may want to look at (they are pointed to from within the encoding)
+      const entries = report.keptIds.map((id) => ({
+        xmlId: id,
+        className: 'mtMuted',
+        html: '<code>#' + esc(id) + '</code> ' + t('meiToolboxIdsKeptReason', 'pointed to within the encoding'),
+      }));
+      // the placeholder is for runs that did nothing at all; a run that added or
+      // changed xml:ids has no entries to list, but is not 'nothing to do'
+      const nothing = parts.length === 0 ? t('meiToolboxIdsNothing', 'Nothing to do.') : '';
+      addEntriesSliced('ids', entries, () => finishRun(nothing, parts.join(', ')));
+    });
+  }, 10);
+} // runIds()
+
+/**
+ * Ingests a facsimile from another file, or adds an empty facsimile skeleton with
+ * one surface per page break, and lists the resulting facsimile structure.
+ * @param {string} action 'ingest' or 'empty'
+ */
+export function runFacsimile(action = 'empty') {
+  openToolbox('facsimile');
+  panes.facsimile.lastAction = () => runFacsimile(action);
+  const title = action === 'ingest' ? t('meiToolboxFacsimileIngest') : t('meiToolboxFacsimileAddEmpty');
+  if (action === 'ingest') {
+    // Ingestion runs in its own dialog (with its own progress prompt and summary)
+    // and may be cancelled without anything happening, so the run is only started
+    // once the encoding has actually changed -- nothing is left running otherwise.
+    onceEncodingChanged(() => {
+      startRun('facsimile', title);
+      listFacsimile();
+    }, () => {});
+    ingestFacsimile();
+  } else {
+    startRun('facsimile', title);
+    setTimeout(() => {
+      e.addFacsimile(v, cm);
+      listFacsimile();
+    }, 10);
+  }
+} // runFacsimile()
+
+/**
+ * Re-renders the encoding through Verovio (which rewrites it from its own
+ * representation) or through the XML parser (editor.reformatEncoding(), which keeps
+ * the content and only normalizes formatting and attribute order).
+ * @param {string} mode 'verovio' or 'xml'
+ */
+export function runReformat(mode = 'xml') {
+  openToolbox('reformat');
+  panes.reformat.lastAction = () => runReformat(mode);
+  applyAttributeOrder();
+  startRun('reformat', t(mode === 'verovio' ? 'meiToolboxReformatVerovio' : 'meiToolboxReformatXml'));
+  if (mode === 'verovio') {
+    // Verovio re-renders in its worker and writes the result back asynchronously
+    onceEncodingChanged(
+      () => finishRun('', linesSummary()),
+      () => finishRun(t('meiToolboxReformatUnchanged', 'The encoding is unchanged.'), '')
+    );
+    v.reRenderMei(cm, false);
+  } else {
+    setTimeout(() => {
+      const result = e.reformatEncoding(v, cm);
+      if (result === null) {
+        finishRun(t('reformatEncodingParseError', 'The encoding could not be parsed.'), '');
+      } else {
+        finishRun('', linesSummary());
+      }
+    }, 10);
+  }
+} // runReformat()
+
+/**
+ * Lists the facsimile of the encoding (surfaces with their graphic and zones, and
+ * the page break pointing to each surface) as the result of the Facsimile tab.
+ */
+function listFacsimile() {
+  v.loadXml(cm.getValue(), true);
+  const surfaces = Array.from(v.xmlDoc.querySelectorAll('facsimile surface'));
+  const entries = surfaces.map((surface) => {
+    const id = surface.getAttribute('xml:id') || '';
+    const graphic = surface.querySelector('graphic');
+    const zones = surface.querySelectorAll('zone').length;
+    const pb = id ? v.xmlDoc.querySelector('pb[facs="#' + id + '"], pb[facs="' + id + '"]') : null;
+    const details = [];
+    if (graphic?.getAttribute('target')) details.push(esc(graphic.getAttribute('target')));
+    details.push(t('meiToolboxFacsimileZones', '{n} zones').replace('{n}', zones));
+    if (pb) details.push('<b>pb</b>' + idHtml(pb));
+    return { xmlId: id, html: '<b>surface</b>' + idHtml(surface) + ' &middot; ' + details.join(' &middot; ') };
+  });
+  const summary = t('meiToolboxFacsimileSummary', '{surfaces} surfaces, {zones} zones')
+    .replace('{surfaces}', surfaces.length)
+    .replace('{zones}', v.xmlDoc.querySelectorAll('facsimile zone').length);
+  addEntriesSliced('facsimile', entries, () =>
+    finishRun(t('meiToolboxFacsimileNone', 'This encoding has no facsimile.'), summary)
+  );
+} // listFacsimile()
+
+// summary line of a reformat: the resulting number of lines
+function linesSummary() {
+  return t('meiToolboxReformatDone', '{lines} lines').replace('{lines}', cm.lineCount());
+} // linesSummary()
+
+/**
+ * Calls `changed` the next time the encoding changes, or `timedOut` when it has not
+ * changed within `ms` (the user cancelled a dialog, or nothing had to be done).
+ * @param {Function} changed
+ * @param {Function} timedOut
+ * @param {number} ms
+ */
+function onceEncodingChanged(changed, timedOut, ms = 120000) {
+  let timer = null;
+  const handler = () => {
+    clearTimeout(timer);
+    cm.off('changes', handler);
+    setTimeout(changed, 10); // let the editor settle before reading it
+  };
+  timer = setTimeout(() => {
+    cm.off('changes', handler);
+    timedOut();
+  }, ms);
+  cm.on('changes', handler);
+} // onceEncodingChanged()
+
+/**
+ * Hands the attribute order chosen in the Reformat tab to dom-utils, where
+ * sortNodeAttributes() uses it whenever elements are written back to the editor.
+ */
+export function applyAttributeOrder() {
+  dutils.setAttributeOrder(attributeOrderPattern());
+} // applyAttributeOrder()
+
+// the attribute order pattern currently configured (preset, or the custom field)
+function attributeOrderPattern() {
+  const preset = load(storageKey.attributeOrderPreset, defaultAttributeOrderPreset);
+  if (preset === 'custom') return load(storageKey.attributeOrderPattern, defaultAttributeOrderPattern);
+  return attributeOrderPresets[preset] ?? attributeOrderPresets[defaultAttributeOrderPreset];
+} // attributeOrderPattern()
 
 /**
  * Elements converted to attributes lose their xml:ids. References within the file
@@ -382,29 +599,35 @@ function confirmElementRemoval(groups, proceed) {
 // ############################################################################
 
 function build() {
-  panel = document.getElementById('codeChecker');
+  panel = document.getElementById('meiToolbox');
   panel.innerHTML = '';
 
-  const header = el('div', 'ccHeader');
+  const header = el('div', 'mtHeader');
   for (const tab of tabs) {
-    const button = el('button', 'ccTab');
+    const button = el('button', 'mtTab');
     button.dataset.tab = tab;
-    button.dataset.lang = 'checkerPanelTab' + tab[0].toUpperCase() + tab.slice(1);
+    button.dataset.lang = 'meiToolboxTab' + tab[0].toUpperCase() + tab.slice(1);
     button.addEventListener('click', () => selectTab(tab));
     header.appendChild(button);
   }
-  header.appendChild(el('span', 'ccSpacer'));
-  const close = el('span', 'ccClose rightButton');
+  header.appendChild(el('span', 'mtSpacer'));
+  const close = el('span', 'mtClose rightButton');
   close.innerHTML = '&times;';
-  close.addEventListener('click', closeCheckerPanel);
+  close.dataset.langTitle = 'meiToolboxClose';
+  close.addEventListener('click', closeToolbox);
   header.appendChild(close);
   panel.appendChild(header);
 
   buildPane('check', buildCheckOptions);
   buildPane('convert', buildConvertOptions);
   buildPane('renumber', buildRenumberOptions);
+  buildPane('ids', buildIdsOptions);
+  buildPane('facsimile', buildFacsimileOptions);
+  buildPane('reformat', buildReformatOptions);
+  applyAttributeOrder();
 
   applyTexts();
+  addModifyerKeys(panel); // renders the keyboard shortcuts as in the menu bar
   document.addEventListener('mf-language-changed', applyTexts);
   cm.on('changes', onEditorChanges);
 } // build()
@@ -414,46 +637,46 @@ function build() {
  * and the result list with its header (title, filter, counter, buttons)
  */
 function buildPane(tab, buildOptions) {
-  const pane = el('div', 'ccPane');
+  const pane = el('div', 'mtPane');
   pane.dataset.tab = tab;
 
   // options
-  const options = el('div', 'ccOptions');
-  const optionsSummary = el('div', 'ccOptionsSummary');
-  const summaryText = el('span', 'ccOptionsSummaryText');
-  const rerun = el('button', 'btn ccRerun');
-  rerun.dataset.lang = 'checkerPanelRunAgain';
-  optionsSummary.append(el('span', 'ccFoldIcon', '▸'), summaryText, rerun);
+  const options = el('div', 'mtOptions');
+  const optionsSummary = el('div', 'mtOptionsSummary');
+  const summaryText = el('span', 'mtOptionsSummaryText');
+  const rerun = el('button', 'btn mtRerun');
+  rerun.dataset.lang = 'meiToolboxRunAgain';
+  optionsSummary.append(el('span', 'mtFoldIcon', '▸'), summaryText, rerun);
   optionsSummary.addEventListener('click', (ev) => {
-    if (!ev.target.closest('.ccRerun')) options.classList.remove('collapsed');
+    if (!ev.target.closest('.mtRerun')) options.classList.remove('collapsed');
   });
   rerun.addEventListener('click', () => p.lastAction?.());
-  const content = el('div', 'ccOptionsContent');
-  const fold = el('span', 'ccFold', '▴');
-  fold.dataset.langTitle = 'checkerPanelHideOptions';
+  const content = el('div', 'mtOptionsContent');
+  const fold = el('span', 'mtFold', '▴');
+  fold.dataset.langTitle = 'meiToolboxHideOptions';
   fold.addEventListener('click', () => options.classList.add('collapsed'));
   content.appendChild(fold);
   options.append(optionsSummary, content);
 
   // results
-  const results = el('div', 'ccResults');
-  const resultsHeader = el('div', 'ccResultsHeader');
-  const titleWrapper = el('span', 'ccRunTitleWrapper');
-  const title = el('span', 'ccRunTitle');
-  const summary = el('span', 'ccRunSummary');
-  const stale = el('span', 'ccStale');
-  stale.dataset.lang = 'checkerPanelOutdated';
+  const results = el('div', 'mtResults');
+  const resultsHeader = el('div', 'mtResultsHeader');
+  const titleWrapper = el('span', 'mtRunTitleWrapper');
+  const title = el('span', 'mtRunTitle');
+  const summary = el('span', 'mtRunSummary');
+  const stale = el('span', 'mtStale');
+  stale.dataset.lang = 'meiToolboxOutdated';
   titleWrapper.append(title, summary, stale);
-  const filter = el('input', 'ccFilter');
+  const filter = el('input', 'mtFilter');
   filter.type = 'search';
-  filter.dataset.langPlaceholder = 'checkerPanelFilter';
-  const count = el('span', 'ccCount');
-  const fixAll = el('button', 'btn ccFixAll');
-  const ignoreAll = el('button', 'btn ccIgnoreAll');
-  const stop = el('button', 'btn ccStop');
+  filter.dataset.langPlaceholder = 'meiToolboxFilter';
+  const count = el('span', 'mtCount');
+  const fixAll = el('button', 'btn mtFixAll');
+  const ignoreAll = el('button', 'btn mtIgnoreAll');
+  const stop = el('button', 'btn mtStop');
   stop.dataset.lang = 'codeCheckerStop';
   resultsHeader.append(titleWrapper, filter, count, fixAll, ignoreAll, stop);
-  const list = el('div', 'ccList');
+  const list = el('div', 'mtList');
   results.append(resultsHeader, list);
 
   pane.append(options, results);
@@ -498,22 +721,40 @@ function buildPane(tab, buildOptions) {
     });
   });
   stop.addEventListener('click', () => {
-    v.codeCheckerAbort = true;
+    v.toolboxAbort = true;
     stop.disabled = true;
   });
 
   buildOptions(content, p);
+
+  // Touching the options invalidates what is shown beside them: the results belong
+  // to the options they were run with, so they are dropped as soon as those change
+  // (a run that is still going is left alone; it clears the list itself anyway).
+  const dropResults = () => {
+    if (!p.hasResults || (running && runTab === tab)) return;
+    clearResults(p);
+    p.hasResults = false;
+    p.title.innerHTML = '';
+    p.summary.innerHTML = '';
+    p.title.parentElement.title = '';
+    p.pane.classList.remove('stale');
+    showPlaceholder(p);
+    updateCounts(p);
+  };
+  content.addEventListener('click', dropResults);
+  content.addEventListener('input', dropResults);
+
   showPlaceholder(p);
 } // buildPane()
 
 function buildCheckOptions(content, p) {
   const stored = load(storageKey.checkType, 'accidGes');
-  const group = el('div', 'ccOptionGroup');
+  const group = el('div', 'mtOptionGroup');
   for (const [type, langKey] of Object.entries(checkTypes)) {
-    const label = el('label', 'ccOption ccChoice');
+    const label = el('label', 'mtOption mtChoice');
     const radio = el('input');
     radio.type = 'radio';
-    radio.name = 'ccCheckType';
+    radio.name = 'mtCheckType';
     radio.value = type;
     radio.checked = type === stored;
     radio.addEventListener('change', () => {
@@ -527,26 +768,26 @@ function buildCheckOptions(content, p) {
     group.appendChild(label);
   }
   content.appendChild(group);
-  content.appendChild(actions([{ lang: 'checkerPanelCheckButton', action: () => runCheck() }]));
+  content.appendChild(actions([{ lang: 'meiToolboxCheckButton', action: () => runCheck() }]));
 } // buildCheckOptions()
 
 function buildConvertOptions(content, p) {
   const stored = load(storageKey.groups, null);
   const selected = stored === null ? conversionGroups : stored.split(',');
-  const allNone = el('div', 'ccAllNone');
-  const all = el('button', 'ccLink');
-  all.dataset.lang = 'checkerPanelAll';
-  const none = el('button', 'ccLink');
-  none.dataset.lang = 'checkerPanelNone';
+  const allNone = el('div', 'mtAllNone');
+  const all = el('button', 'mtLink');
+  all.dataset.lang = 'meiToolboxAll';
+  const none = el('button', 'mtLink');
+  none.dataset.lang = 'meiToolboxNone';
   allNone.append(all, el('span', '', ' | '), none);
   content.appendChild(allNone);
 
-  const group = el('div', 'ccOptionGroup ccGrid');
+  const group = el('div', 'mtOptionGroup mtGrid');
   for (const g of conversionGroups) {
-    const label = el('label', 'ccOption ccChoice');
+    const label = el('label', 'mtOption mtChoice');
     const checkbox = el('input');
     checkbox.type = 'checkbox';
-    checkbox.name = 'ccConvertGroup';
+    checkbox.name = 'mtConvertGroup';
     checkbox.value = g;
     checkbox.checked = selected.includes(g);
     checkbox.addEventListener('change', saveGroups);
@@ -565,41 +806,27 @@ function buildConvertOptions(content, p) {
   none.addEventListener('click', () => setAll(false));
 
   // one row per direction, each with its Test button
-  const buttons = el('div', 'ccActions ccActionRows');
+  const buttons = el('div', 'mtActions mtActionRows');
   buttons.append(
     actions(
       [
-        { lang: 'checkerPanelTestButton', action: () => runConvert(true) },
-        { lang: 'checkerPanelAttrToElButton', action: () => runConvert(false) },
+        { lang: 'meiToolboxTestButton', action: () => runConvert(true) },
+        { lang: 'meiToolboxAttrToElButton', action: () => runConvert(false) },
       ],
-      'ccActionRow'
+      'mtActionRow'
     ),
     actions(
       [
-        { lang: 'checkerPanelTestButton', action: () => runConvert(true, true) },
-        { lang: 'checkerPanelElToAttrButton', action: () => runConvert(false, true) },
+        { lang: 'meiToolboxTestButton', action: () => runConvert(true, true) },
+        { lang: 'meiToolboxElToAttrButton', action: () => runConvert(false, true) },
       ],
-      'ccActionRow'
+      'mtActionRow'
     )
   );
   content.appendChild(buttons);
   // scope (entire encoding or editor selection), shown in the sticky row of buttons
   // so that it remains visible
-  const scope = el('div', 'ccScope');
-  buttons.prepend(scope);
-  p.updateScope = () => {
-    if (cm.somethingSelected()) {
-      scope.textContent = t('convertScopeSelection', 'Scope: selection, lines {from}–{to}')
-        .replace('{from}', cm.getCursor('from').line + 1)
-        .replace('{to}', cm.getCursor('to').line + 1);
-      scope.classList.add('ccScopeSelection');
-    } else {
-      scope.textContent = t('convertScopeAll', 'Scope: entire encoding');
-      scope.classList.remove('ccScopeSelection');
-    }
-  };
-  p.updateScope();
-  cm.on('cursorActivity', p.updateScope);
+  buttons.prepend(scopeInfo(p));
   // disable action buttons when no group is selected
   const updateButtons = () => {
     const anySelected = selectedGroups().length > 0;
@@ -617,15 +844,15 @@ function buildConvertOptions(content, p) {
 
 function buildRenumberOptions(content, p) {
   // one row per option (label left, control right), striped as in the settings panel
-  const group = el('div', 'ccOptionGroup ccStriped');
+  const group = el('div', 'mtOptionGroup mtStriped');
 
   // start number
-  const startLabel = el('label', 'ccOption ccRow');
+  const startLabel = el('label', 'mtOption mtRow');
   const startText = el('span');
   startText.dataset.lang = 'renumberMeasuresStartNumber';
-  const start = el('input', 'ccNumber');
+  const start = el('input', 'mtNumber');
   start.type = 'number';
-  start.id = 'ccRenumberStartNumber';
+  start.id = 'mtRenumberStartNumber';
   start.value = load(storageKey.startNumber, '1');
   start.addEventListener('change', () => {
     save(storageKey.startNumber, start.value);
@@ -639,20 +866,20 @@ function buildRenumberOptions(content, p) {
     ['continueAcrossIncompleteMeasures', 'suffixAtMeasures', suffixAtMeasuresValues],
     ['continueAcrossEndings', 'suffixAtEndings', suffixAtEndingsValues],
   ]) {
-    const checkboxLabel = el('label', 'ccOption ccRow');
+    const checkboxLabel = el('label', 'mtOption mtRow');
     const checkbox = el('input');
     checkbox.type = 'checkbox';
-    checkbox.id = 'ccRenumber-' + checkboxKey;
+    checkbox.id = 'mtRenumber-' + checkboxKey;
     checkbox.checked = load(storageKey[checkboxKey], 'false') === 'true';
     const checkboxText = el('span');
     checkboxText.dataset.lang = langKeyOf(storageKey[checkboxKey]);
     checkboxLabel.append(checkboxText, checkbox);
 
-    const selectLabel = el('label', 'ccOption ccRow');
+    const selectLabel = el('label', 'mtOption mtRow');
     const selectText = el('span');
     selectText.dataset.lang = langKeyOf(storageKey[selectKey]);
     const select = el('select');
-    select.id = 'ccRenumber-' + selectKey;
+    select.id = 'mtRenumber-' + selectKey;
     select.dataset.langLabels = langKeyOf(storageKey[selectKey]);
     values.forEach((value) => {
       const option = el('option', '', value);
@@ -679,14 +906,227 @@ function buildRenumberOptions(content, p) {
   content.appendChild(group);
   content.appendChild(
     actions([
-      { lang: 'checkerPanelTestButton', action: () => runRenumber(false) },
-      { lang: 'checkerPanelRenumberButton', action: () => runRenumber(true) },
+      { lang: 'meiToolboxTestButton', action: () => runRenumber(false) },
+      { lang: 'meiToolboxRenumberButton', action: () => runRenumber(true) },
     ])
   );
 } // buildRenumberOptions()
 
-// row of action buttons; buttons without action are disabled (not yet implemented)
-function actions(buttons, className = 'ccActions') {
+function buildIdsOptions(content, p) {
+  const stored = load(storageKey.idMode, 'add');
+  const group = el('div', 'mtOptionGroup');
+  for (const [mode, langKey] of Object.entries(idModes)) {
+    const label = el('label', 'mtOption mtChoice');
+    const radio = el('input');
+    radio.type = 'radio';
+    radio.name = 'mtIdMode';
+    radio.value = mode;
+    radio.checked = mode === stored;
+    radio.addEventListener('change', () => {
+      save(storageKey.idMode, mode);
+      updateOptionsSummary('ids');
+    });
+    const text = el('span');
+    text.dataset.lang = langKey;
+    text.dataset.split = 'block';
+    label.append(radio, text);
+    // 'add' and 'remove' have a keyboard shortcut; state it where it acts
+    const shortcut = shortcutHtml(mode === 'add' ? 'addIds' : mode === 'remove' ? 'removeIds' : '');
+    if (shortcut) label.appendChild(shortcut);
+    group.appendChild(label);
+  }
+  content.appendChild(group);
+
+  // the xml:id style is a setting of the settings panel; mirror it here, where new
+  // xml:ids are made, and keep both controls in sync
+  const styleSelect = document.getElementById('selectIdStyle');
+  if (styleSelect) {
+    const styleRow = el('label', 'mtOption mtRow');
+    const styleText = el('span');
+    styleText.dataset.lang = 'selectIdStyle';
+    const mirror = el('select');
+    mirror.id = 'mtIdStyle';
+    Array.from(styleSelect.options).forEach((o) => {
+      const option = el('option', '', o.textContent);
+      option.value = o.value;
+      option.title = o.title;
+      mirror.appendChild(option);
+    });
+    mirror.value = styleSelect.value;
+    // the settings panel listens for 'input', so that is what keeps it in sync
+    mirror.addEventListener('change', () => {
+      styleSelect.value = mirror.value;
+      styleSelect.dispatchEvent(new Event('input', { bubbles: true }));
+      updateOptionsSummary('ids');
+    });
+    styleSelect.addEventListener('input', () => {
+      mirror.value = styleSelect.value;
+      updateOptionsSummary('ids');
+    });
+    styleRow.append(styleText, mirror);
+    content.appendChild(el('div', 'mtOptionGroup mtStriped')).appendChild(styleRow);
+  }
+
+  const buttons = actions([{ lang: 'meiToolboxIdsButton', action: () => runIds() }]);
+  buttons.prepend(scopeInfo(p));
+  content.appendChild(buttons);
+} // buildIdsOptions()
+
+function buildFacsimileOptions(content, p) {
+  const info = el('div', 'mtInfo');
+  info.dataset.lang = 'meiToolboxFacsimileInfo';
+  content.appendChild(info);
+  content.appendChild(
+    actions([
+      { lang: 'meiToolboxFacsimileIngest', action: () => runFacsimile('ingest') },
+      { lang: 'meiToolboxFacsimileAddEmpty', action: () => runFacsimile('empty') },
+    ])
+  );
+} // buildFacsimileOptions()
+
+function buildReformatOptions(content, p) {
+  // One block per method, each with its own button: the attribute order below only
+  // applies to the XML parser, which writes the encoding itself. Verovio writes it
+  // from its own representation and is not influenced by anything set here.
+  const verovio = methodBlock(content, 'meiToolboxReformatVerovio');
+  verovio.body.appendChild(el('div', 'mtInfo mtMethodNote')).dataset.lang = 'meiToolboxReformatVerovioNote';
+  verovio.body.appendChild(
+    actions([{ lang: 'meiToolboxReformatVerovio', action: () => runReformat('verovio') }])
+  );
+
+  const xml = methodBlock(content, 'meiToolboxReformatXml');
+  const group = el('div', 'mtOptionGroup mtStriped');
+
+  // attribute order: preset select, plus a pattern field when 'custom' is chosen
+  const presetRow = el('label', 'mtOption mtRow');
+  const presetText = el('span');
+  presetText.dataset.lang = 'meiToolboxAttributeOrder';
+  const preset = el('select');
+  preset.id = 'mtAttributeOrderPreset';
+  preset.dataset.langLabels = 'meiToolboxAttributeOrder';
+  Object.keys(attributeOrderPresets).forEach((value) => {
+    const option = el('option', '', value);
+    option.value = value;
+    preset.appendChild(option);
+  });
+  const storedPreset = load(storageKey.attributeOrderPreset, defaultAttributeOrderPreset);
+  preset.value = storedPreset in attributeOrderPresets ? storedPreset : defaultAttributeOrderPreset;
+  presetRow.append(presetText, preset);
+
+  const patternRow = el('label', 'mtOption mtRow');
+  const patternText = el('span');
+  patternText.dataset.lang = 'meiToolboxAttributeOrderPattern';
+  const pattern = el('input', 'mtPattern');
+  pattern.type = 'text';
+  pattern.id = 'mtAttributeOrderPattern';
+  pattern.spellcheck = false;
+  pattern.value = load(storageKey.attributeOrderPattern, defaultAttributeOrderPattern);
+  patternRow.append(patternText, pattern);
+
+  // live preview of the resulting attribute order on an example element
+  const preview = el('div', 'mtPreview');
+  const updatePreview = () => {
+    patternRow.style.display = preset.value === 'custom' ? '' : 'none';
+    preview.innerHTML = attributeOrderPreview();
+  };
+  preset.addEventListener('change', () => {
+    save(storageKey.attributeOrderPreset, preset.value);
+    applyAttributeOrder();
+    updatePreview();
+    updateOptionsSummary('reformat');
+  });
+  pattern.addEventListener('input', () => {
+    save(storageKey.attributeOrderPattern, pattern.value);
+    applyAttributeOrder();
+    updatePreview();
+    updateOptionsSummary('reformat');
+  });
+  group.append(presetRow, patternRow);
+  xml.body.append(group, preview);
+  p.updatePreview = updatePreview;
+  updatePreview();
+
+  xml.body.appendChild(
+    actions([{ lang: 'meiToolboxReformatXml', action: () => runReformat('xml'), command: 'reformatEncoding' }])
+  );
+} // buildReformatOptions()
+
+/**
+ * Adds a titled block to the options of a tab, for options that apply to one
+ * method only. Returns the block and its body, to be filled by the caller.
+ * @param {Element} content options content of the tab
+ * @param {string} langKey language key of the block title
+ * @returns {{block: Element, body: Element}}
+ */
+function methodBlock(content, langKey) {
+  const block = el('div', 'mtMethod');
+  const title = el('div', 'mtMethodTitle');
+  title.dataset.lang = langKey;
+  const body = el('div', 'mtMethodBody');
+  block.append(title, body);
+  content.appendChild(block);
+  return { block, body };
+} // methodBlock()
+
+/**
+ * Shows the configured attribute order on an example element, so that the effect of
+ * a pattern can be seen before reformatting.
+ * @returns {string} html
+ */
+function attributeOrderPreview() {
+  const example = {
+    'xml:id': 'note-1',
+    dots: '1',
+    dur: '4',
+    label: 'motto',
+    n: '3',
+    oct: '4',
+    pname: 'c',
+    'stem.dir': 'up',
+    type: 'ed',
+  };
+  const order = dutils.parseAttributeOrder(attributeOrderPattern());
+  const names = Object.keys(example);
+  const doc = document.implementation.createDocument(null, 'note', null);
+  names.forEach((name) => doc.documentElement.setAttribute(name, example[name]));
+  dutils.sortNodeAttributes(doc.documentElement, order);
+  const sorted = Array.from(doc.documentElement.attributes).map((a) => a.name + '="' + esc(example[a.name]) + '"');
+  return '<code>&lt;note ' + sorted.join(' ') + '/&gt;</code>';
+} // attributeOrderPreview()
+
+/**
+ * Scope line (entire encoding or editor selection) for tabs acting on a selection;
+ * keeps itself up to date and is shown with the action buttons.
+ * @param {Object} p pane
+ * @returns {Element}
+ */
+function scopeInfo(p) {
+  const scope = el('div', 'mtScope');
+  p.updateScope = () => {
+    if (cm.somethingSelected()) {
+      scope.textContent = t('convertScopeSelection', 'Scope: selection, lines {from}-{to}')
+        .replace('{from}', cm.getCursor('from').line + 1)
+        .replace('{to}', cm.getCursor('to').line + 1);
+      scope.classList.add('mtScopeSelection');
+    } else {
+      scope.textContent = t('convertScopeAll', 'Scope: entire encoding');
+      scope.classList.remove('mtScopeSelection');
+    }
+  };
+  p.updateScope();
+  cm.on('cursorActivity', p.updateScope);
+  return scope;
+} // scopeInfo()
+
+/**
+ * Row of action buttons; buttons without action are disabled (not yet implemented).
+ * A button with `command` also shows the keyboard shortcut that command is bound to
+ * in the keymap, so the shortcut is stated where the action is offered.
+ * @param {Array<{lang: string, action?: Function, command?: string}>} buttons
+ * @param {string} className
+ * @returns {Element}
+ */
+function actions(buttons, className = 'mtActions') {
   const div = el('div', className);
   for (const b of buttons) {
     const button = el('button', 'btn');
@@ -697,10 +1137,26 @@ function actions(buttons, className = 'ccActions') {
     } else {
       button.disabled = true;
     }
+    const shortcut = b.command && shortcutHtml(b.command);
+    if (shortcut) button.appendChild(shortcut);
     div.appendChild(button);
   }
   return div;
 } // actions()
+
+/**
+ * The keyboard shortcut of a command as the menu bar writes it, so that
+ * addModifyerKeys() renders it with the same symbols. Returns null when the command
+ * has no shortcut, so that nothing has to be kept in sync with the keymap by hand.
+ * @param {string} commandName name of a method of `cmd`, e.g. 'addIds'
+ * @returns {Element|null}
+ */
+function shortcutHtml(commandName) {
+  const shortcut = shortcutForCommand(commandName);
+  if (!shortcut) return null;
+  const span = el('span', ['keyShortCut', ...shortcut.classes].join(' '), shortcut.key);
+  return span;
+} // shortcutHtml()
 
 // ############################################################################
 // internal helpers
@@ -709,7 +1165,7 @@ function actions(buttons, className = 'ccActions') {
 function selectTab(tab) {
   if (!panes[tab]) return;
   activeTab = tab;
-  panel.querySelectorAll('.ccTab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+  panel.querySelectorAll('.mtTab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
   tabs.forEach((tb) => panes[tb].pane.classList.toggle('active', tb === tab));
 } // selectTab()
 
@@ -722,9 +1178,9 @@ function clearResults(p) {
 } // clearResults()
 
 function showPlaceholder(p) {
-  const div = el('div', 'validation-item ccInfo');
-  div.dataset.lang = 'checkerPanelNoResults';
-  div.textContent = t('checkerPanelNoResults');
+  const div = el('div', 'validation-item mtInfo');
+  div.dataset.lang = 'meiToolboxNoResults';
+  div.textContent = t('meiToolboxNoResults');
   p.list.appendChild(div);
   updateCounts(p);
 } // showPlaceholder()
@@ -735,7 +1191,7 @@ function addEntriesSliced(tab, entries, onDone) {
   const addSlice = () => {
     const t0 = performance.now();
     while (i < entries.length && performance.now() - t0 < BUDGET_MS) addEntry(entries[i++], tab);
-    if (i < entries.length && !v.codeCheckerAbort) setTimeout(addSlice, 0);
+    if (i < entries.length && !v.toolboxAbort) setTimeout(addSlice, 0);
     else onDone();
   };
   addSlice();
@@ -751,7 +1207,7 @@ function conversionEntries(result, test) {
     .forEach((w) =>
       entries.push({
         xmlId: idOf(w.element),
-        className: 'ccWarning',
+        className: 'mtWarning',
         html: '&#9888; <b>' + w.element.localName + '</b>' + idHtml(w.element) + ': ' + esc(w.message),
       })
     );
@@ -784,7 +1240,7 @@ function reverseConversionEntries(result, test) {
     .forEach((w) =>
       entries.push({
         xmlId: idOf(w.element) || idOf(w.element.closest('[*|id]') || w.element),
-        className: 'ccWarning',
+        className: 'mtWarning',
         html: '&#9888; <b>&lt;' + w.element.localName + '&gt;</b>' + idHtml(w.element) + ': ' + esc(w.message),
       })
     );
@@ -806,13 +1262,13 @@ function reverseConversionEntries(result, test) {
 } // reverseConversionEntries()
 
 function shownEntries(p) {
-  return Array.from(p.list.querySelectorAll('.ccEntry')).filter((div) => div.style.display !== 'none');
+  return Array.from(p.list.querySelectorAll('.mtEntry')).filter((div) => div.style.display !== 'none');
 }
 
 function applyFilter(p) {
   p.filterText = p.filter.value.trim().toLowerCase();
   p.shown = 0;
-  p.list.querySelectorAll('.ccEntry').forEach((div) => {
+  p.list.querySelectorAll('.mtEntry').forEach((div) => {
     const match = !p.filterText || div.textContent.toLowerCase().includes(p.filterText);
     div.style.display = match ? '' : 'none';
     div.classList.toggle('odd', match && p.shown % 2 === 1);
@@ -854,7 +1310,7 @@ function fixAllShown(p) {
   running = true;
   runTab = p.tab;
   p.fixingAll = true;
-  v.codeCheckerAbort = false;
+  v.toolboxAbort = false;
   p.stop.disabled = false;
   p.pane.classList.add('running');
   updateCounts(p);
@@ -873,7 +1329,7 @@ function fixAllShown(p) {
       console.error('Fix all: error applying fix ' + i + ':', err);
       i = buttons.length;
     }
-    if (i < buttons.length && !v.codeCheckerAbort) {
+    if (i < buttons.length && !v.toolboxAbort) {
       setTimeout(applyFixes, 0);
     } else {
       cm.blockChanges = false;
@@ -903,32 +1359,52 @@ function updateOptionsSummary(tab) {
   let text = '';
   switch (tab) {
     case 'check': {
-      const type = p.content.querySelector('input[name="ccCheckType"]:checked')?.value;
+      const type = p.content.querySelector('input[name="mtCheckType"]:checked')?.value;
       text = type ? t(checkTypes[type]) : '';
       break;
     }
     case 'convert':
-      text = t('checkerPanelGroupsSelected', '{n} of {total} attribute groups')
+      text = t('meiToolboxGroupsSelected', '{n} of {total} attribute groups')
         .replace('{n}', selectedGroups().length)
         .replace('{total}', conversionGroups.length);
       break;
     case 'renumber':
       text = t('renumberMeasuresStartNumber', 'Start number') + ': ' + renumberOptions().startNumber;
       break;
+    case 'ids': {
+      const mode = p.content.querySelector('input[name="mtIdMode"]:checked')?.value;
+      text = mode ? t(idModes[mode]) : '';
+      const style = document.getElementById('mtIdStyle');
+      if (mode !== 'remove' && style) text += ' \u00b7 ' + style.value;
+      break;
+    }
+    case 'facsimile':
+      text = t('meiToolboxFacsimileInfo', '');
+      break;
+    case 'reformat': {
+      const preset = document.getElementById('mtAttributeOrderPreset');
+      const labels = translator?.lang?.meiToolboxAttributeOrder?.labels;
+      const index = preset ? Object.keys(attributeOrderPresets).indexOf(preset.value) : -1;
+      text =
+        t('meiToolboxAttributeOrder', 'Attribute order') +
+        ': ' +
+        (labels && index >= 0 ? labels[index] : attributeOrderPattern() || '\u2014');
+      break;
+    }
   }
   p.summaryText.textContent = text;
 } // updateOptionsSummary()
 
 function selectedGroups() {
-  return Array.from(panes.convert.content.querySelectorAll('input[name="ccConvertGroup"]:checked')).map(
+  return Array.from(panes.convert.content.querySelectorAll('input[name="mtConvertGroup"]:checked')).map(
     (c) => c.value
   );
 }
 
 function renumberOptions() {
-  const value = (id) => document.getElementById('ccRenumber-' + id);
+  const value = (id) => document.getElementById('mtRenumber-' + id);
   return {
-    startNumber: parseInt(document.getElementById('ccRenumberStartNumber').value, 10) || 0,
+    startNumber: parseInt(document.getElementById('mtRenumberStartNumber').value, 10) || 0,
     continueAcrossIncompleteMeasures: value('continueAcrossIncompleteMeasures').checked,
     suffixAtMeasures: value('suffixAtMeasures').value,
     continueAcrossEndings: value('continueAcrossEndings').checked,
@@ -945,14 +1421,17 @@ function applyTexts() {
     if (!item) return;
     if ('text' in item) {
       // optionally show a trailing '(...)' as detail, e.g. 'Ties (@tie)'
+      // a keyboard shortcut shown inside a translated element survives the new text
+      const shortcut = elm.querySelector(':scope > .keyShortCut');
       const m = elm.dataset.split && item.text.match(/^(.*?)\s*[(（](.*)[)）]\s*$/);
       if (m) {
         elm.textContent = m[1];
-        const detail = el('span', 'ccDetail ccDetail-' + elm.dataset.split, m[2]);
+        const detail = el('span', 'mtDetail mtDetail-' + elm.dataset.split, m[2]);
         elm.appendChild(detail);
       } else {
         elm.textContent = item.text;
       }
+      if (shortcut) elm.appendChild(shortcut);
     }
     if ('description' in item) elm.title = item.description;
   });
@@ -971,6 +1450,8 @@ function applyTexts() {
     updateCounts(panes[tab]);
   });
   panes.convert?.updateScope?.();
+  panes.ids?.updateScope?.();
+  panes.reformat?.updatePreview?.();
 } // applyTexts()
 
 function t(key, fallback = '') {
@@ -978,7 +1459,7 @@ function t(key, fallback = '') {
 }
 
 function testSuffix() {
-  return ' (' + t('checkerPanelTestButton', 'Test') + ')';
+  return ' (' + t('meiToolboxTestButton', 'Test') + ')';
 }
 
 // language key of a renumber option = its storage key without 'mf-'

@@ -349,17 +349,91 @@ export function xmlToString(xmlNode) {
 } // xmlToString()
 
 /**
- * Sorts the attributes of an element: namespace declarations first, then xml:id,
- * then all other attributes alphabetically. Attribute nodes are moved as such, so
- * that namespaced attributes (e.g., xlink:href) keep their namespace.
- * @param {Element} xmlNode
+ * The attribute order used by sortNodeAttributes(), as a list of names: an
+ * attribute name (e.g. 'xml:id'), a prefix wildcard (e.g. 'clef.*'), or '*' for
+ * all attributes not named elsewhere, sorted alphabetically. Set through
+ * setAttributeOrder(); see parseAttributeOrder() for the pattern syntax.
+ * @type {string[]}
  */
-export function sortNodeAttributes(xmlNode) {
-  const rank = (attr) => (attr.name === 'xmlns' || attr.name.startsWith('xmlns:') ? 0 : attr.name === 'xml:id' ? 1 : 2);
+let attributeOrder = ['xml:id', '*'];
+
+/**
+ * Parses an attribute order pattern, such as 'xml:id n * type', into the list of
+ * names used by sortNodeAttributes(). Names are separated by whitespace and/or
+ * commas and may be written with a leading '@'. A name ending in '*' matches all
+ * attributes with that prefix ('clef.*'); a lone '*' stands for all attributes not
+ * named elsewhere. An empty pattern means: leave the attributes as they are.
+ * @param {string} pattern
+ * @returns {string[]}
+ */
+export function parseAttributeOrder(pattern) {
+  return String(pattern || '')
+    .split(/[\s,]+/)
+    .filter(Boolean)
+    .map((name) => name.replace(/^@/, ''));
+} // parseAttributeOrder()
+
+/**
+ * Sets the attribute order used by sortNodeAttributes() when no order is passed in.
+ * @param {string|string[]} order a pattern (see parseAttributeOrder()) or a list of names
+ */
+export function setAttributeOrder(order) {
+  attributeOrder = Array.isArray(order) ? order : parseAttributeOrder(order);
+} // setAttributeOrder()
+
+/**
+ * Returns the attribute order currently used by sortNodeAttributes().
+ * @returns {string[]}
+ */
+export function getAttributeOrder() {
+  return attributeOrder;
+} // getAttributeOrder()
+
+/**
+ * Sorts the attributes of an element into `order` (by default, the order set
+ * through setAttributeOrder()). Namespace declarations always come first, as they
+ * bind the prefixes of the attributes following them. Attributes not matched by any
+ * name in `order` and attributes beyond a lone '*' are sorted alphabetically among
+ * themselves; without a '*', unmatched attributes keep their relative order at the
+ * end. An empty order leaves the element untouched. Attribute nodes are moved as
+ * such, so that namespaced attributes (e.g., xlink:href) keep their namespace.
+ * @param {Element} xmlNode
+ * @param {string[]} [order]
+ */
+export function sortNodeAttributes(xmlNode, order = attributeOrder) {
+  if (!order || order.length === 0) return; // keep as encoded
   const attrs = Array.from(xmlNode.attributes);
-  const sorted = attrs
-    .slice()
-    .sort((a, b) => rank(a) - rank(b) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  if (attrs.length < 2) return;
+
+  const restRank = order.indexOf('*'); // rank of the alphabetically sorted remainder
+  // rank of an attribute: namespace declarations first, then its position in `order`
+  const rankOf = (name) => {
+    if (name === 'xmlns' || name.startsWith('xmlns:')) return -1;
+    let best = -1;
+    let bestLength = -1;
+    order.forEach((entry, i) => {
+      if (entry === '*') return;
+      const matches = entry.endsWith('*') ? name.startsWith(entry.slice(0, -1)) : name === entry;
+      // the most specific match wins, so that 'clef.shape' beats 'clef.*'
+      if (matches && entry.length > bestLength) {
+        best = i;
+        bestLength = entry.length;
+      }
+    });
+    if (best >= 0) return best;
+    return restRank >= 0 ? restRank : order.length; // unmatched: at '*', else at the end
+  };
+
+  const ranks = new Map(attrs.map((attr) => [attr, rankOf(attr.name)]));
+  // attributes sharing a rank are sorted alphabetically, except unmatched ones
+  // without a '*' in the order, which keep their relative order
+  const keepOrder = restRank < 0;
+  const sorted = attrs.slice().sort((a, b) => {
+    const diff = ranks.get(a) - ranks.get(b);
+    if (diff !== 0) return diff;
+    if (keepOrder && ranks.get(a) === order.length) return 0;
+    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+  });
   if (sorted.every((attr, i) => attr === attrs[i])) return; // already in order
   attrs.forEach((attr) => xmlNode.removeAttributeNode(attr));
   sorted.forEach((attr) => xmlNode.setAttributeNodeNS(attr));

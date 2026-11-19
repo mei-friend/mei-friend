@@ -69,17 +69,17 @@ function hasMeterInfo(element) {
 
 /**
  * Finishes a check: resets the progress bar, writes the status bar text and
- * finalizes the code checker panel. A check stopped through the Stop button
- * (v.codeCheckerAbort) says so in status bar and panel.
+ * finalizes the result list of the MEI toolbox. A check stopped through the Stop button
+ * (v.toolboxAbort) says so in status bar and panel.
  * @param {Viewer} v
  * @param {string} statusText
  * @param {string} allGoodText shown in the panel when no entries were found
  */
 function finishCheck(v, statusText, allGoodText) {
   setProgressBar(0);
-  const stopped = v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text + ' ' : '';
+  const stopped = v.toolboxAbort ? translator.lang.codeCheckerStopped.text + ' ' : '';
   document.getElementById('statusBar').innerHTML = stopped + statusText;
-  v.finalizeCodeCheckerPanel(v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text : allGoodText);
+  v.finalizeCodeCheckerPanel(v.toolboxAbort ? translator.lang.codeCheckerStopped.text : allGoodText);
   v.allowCursorActivity = true;
 } // finishCheck()
 
@@ -235,7 +235,7 @@ export function checkAccidGes(v, cm) {
       checkElement(list[i++]);
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (i < list.length && !v.codeCheckerAbort) {
+    if (i < list.length && !v.toolboxAbort) {
       setProgressBar((100 * i) / list.length);
       statusBar.innerHTML = 'Checking accid.ges... ' + i + ' of ' + list.length + ' elements checked.';
       setTimeout(processAccidGes, 0);
@@ -604,7 +604,7 @@ export function checkMeterConformance(v, cm) {
       }
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (n < list.length && !v.codeCheckerAbort) {
+    if (n < list.length && !v.toolboxAbort) {
       setProgressBar((100 * n) / list.length);
       statusBar.innerHTML = 'Checking meter conformance... ' + n + ' of ' + list.length + ' elements checked.';
       setTimeout(processMeasures, 0);
@@ -650,7 +650,7 @@ export function checkMeterConformance(v, cm) {
       if (ignore || utils.compareNumbersWithTolerance(duration, meterCount, defaults.beatTolerance)) {
         return; // conformant
       }
-      // display non conformance message as entry in code checker panel
+      // display non conformance message as entry in the MEI toolbox
       let data = {};
       data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
       data.html =
@@ -729,7 +729,7 @@ export function checkLinkedElements(v, cm) {
           checkElement(elements[n++]);
           if (performance.now() - t0 > BUDGET_MS) break;
         }
-        if (n < elements.length && !v.codeCheckerAbort) {
+        if (n < elements.length && !v.toolboxAbort) {
           setProgressBar((100 * n) / elements.length);
           setTimeout(processNext, 0);
         } else {

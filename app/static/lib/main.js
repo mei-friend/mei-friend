@@ -52,7 +52,7 @@ export const samp = {
 };
 
 import {
-  addCodeCheckerResizerHandlers,
+  addMeiToolboxResizerHandlers,
   addFacsimilerResizerHandlers,
   addNotationResizerHandlers,
   getFacsimileOrientation,
@@ -60,6 +60,7 @@ import {
   getNotationProportion,
   getOrientation,
   setFacsimileProportion,
+  setMeiToolboxExtent,
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
@@ -91,7 +92,7 @@ import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
-import * as checkerPanel from './checker-panel.js';
+import * as meiToolbox from './mei-toolbox.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -141,6 +142,7 @@ import {
   defaultFacsimileOrientation,
   defaultFacsimileProportion,
   defaultMeiFileURL,
+  defaultMeiToolboxOrientation,
   defaultNotationOrientation,
   defaultNotationProportion,
   defaultVerovioOptions,
@@ -339,7 +341,15 @@ export function updateFileStatusDisplay() {
   }
 }
 
-export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
+/**
+ * Loads an encoding into the editor.
+ * @param {string} meiXML
+ * @param {boolean} setFreshlyLoaded
+ * @param {boolean} newDocument whether this is a different encoding (as opposed to
+ *   the current one written anew, e.g. by a Verovio rerender): only then are the
+ *   results in the MEI toolbox about to become meaningless and get cleared
+ */
+export function loadDataInEditor(meiXML, setFreshlyLoaded = true, newDocument = true) {
   if (storage && storage.supported) {
     storage.override = false;
   }
@@ -351,7 +361,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
-  v.hideCodeCheckerPanel();
+  if (newDocument) v.hideCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);
@@ -927,16 +937,29 @@ async function completeInitialLoad() {
     fp = defaultFacsimileProportion;
   }
 
+  let to = ''; // MEI toolbox orientation from storage or default
+  if (storage && storage.supported && storage.hasItem('meiToolboxOrientation')) {
+    to = storage.meiToolboxOrientation;
+  } else {
+    to = defaultMeiToolboxOrientation;
+  }
+  if (storage && storage.supported) {
+    setMeiToolboxExtent(storage.meiToolboxWidth, storage.meiToolboxHeight);
+  }
+
   setNotationProportion(np);
   setFacsimileProportion(fp);
   addAnnotationHandlers();
   addMarkupHandlers();
-  setOrientation(cm, o, fo, v, storage);
+  setOrientation(cm, o, fo, v, storage, to);
+  // the attribute order is used whenever an element is written back into the
+  // editor, also before the MEI toolbox that configures it has been opened
+  meiToolbox.applyAttributeOrder();
 
   addEventListeners(v, cm);
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
-  addCodeCheckerResizerHandlers(v, cm);
+  addMeiToolboxResizerHandlers(v, cm);
 
   let doit;
   window.onresize = () => {
@@ -1177,9 +1200,9 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'updated': // display SVG data on site
       if (ev.data.mei) {
-        // from reRenderMEI
+        // from reRenderMEI: the same encoding, written anew by Verovio
         v.allowCursorActivity = false;
-        loadDataInEditor(ev.data.mei);
+        loadDataInEditor(ev.data.mei, true, false);
         setFileChangedState(false);
         updateLocalStorage(ev.data.mei);
         v.allowCursorActivity = true;
@@ -1959,7 +1982,6 @@ export let cmd = {
     }
   },
   indentSelection: () => e.indentSelection(v, cm),
-  reformatEncoding: () => e.reformatEncoding(v, cm),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
   notesZoomOut: () => v.zoom(-1, storage),
@@ -2050,19 +2072,27 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  correctAccid: () => checkerPanel.runCheck('accidGes'),
-  checkMeterConformance: () => checkerPanel.runCheck('metcon'),
-  checkLinkedElements: () => checkerPanel.runCheck('linked'),
-  renumberMeasuresTest: () => checkerPanel.runRenumber(false),
-  renumberMeasures: () => checkerPanel.runRenumber(true),
-  reRenderMei: () => v.reRenderMei(cm, false),
+  correctAccid: () => meiToolbox.runCheck('accidGes'),
+  checkMeterConformance: () => meiToolbox.runCheck('metcon'),
+  checkLinkedElements: () => meiToolbox.runCheck('linked'),
+  renumberMeasuresTest: () => meiToolbox.runRenumber(false),
+  renumberMeasures: () => meiToolbox.runRenumber(true),
+  reRenderMei: () => meiToolbox.runReformat('verovio'),
   reRenderMeiWithout: () => v.reRenderMei(cm, true),
-  addIds: () => e.manipulateXmlIds(v, cm, 'add'),
-  removeIds: () => e.manipulateXmlIds(v, cm, 'remove'),
-  changeIds: () => e.manipulateXmlIds(v, cm, 'change'),
-  convertAttributesToElements: () => checkerPanel.openCheckerPanel('convert'),
-  ingestFacsimile: () => ingestFacsimile(),
-  addFacsimile: () => e.addFacsimile(v, cm),
+  reformatEncoding: () => meiToolbox.runReformat('xml'),
+  addIds: () => meiToolbox.runIds('add'),
+  removeIds: () => meiToolbox.runIds('remove'),
+  changeIds: () => meiToolbox.runIds('change'),
+  convertAttributesToElements: () => meiToolbox.openToolbox('convert'),
+  ingestFacsimile: () => meiToolbox.runFacsimile('ingest'),
+  addFacsimile: () => meiToolbox.runFacsimile('empty'),
+  showMeiToolbox: () => meiToolbox.openToolbox(),
+  hideMeiToolbox: () => meiToolbox.closeToolbox(),
+  toggleMeiToolbox: () => meiToolbox.toggleToolbox(),
+  meiToolboxTop: () => setOrientation(cm, '', '', v, storage, 'top'),
+  meiToolboxBottom: () => setOrientation(cm, '', '', v, storage, 'bottom'),
+  meiToolboxLeft: () => setOrientation(cm, '', '', v, storage, 'left'),
+  meiToolboxRight: () => setOrientation(cm, '', '', v, storage, 'right'),
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
@@ -2190,6 +2220,10 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileBottom').addEventListener('click', cmd.facsimileBottom);
   document.getElementById('facsimileLeft').addEventListener('click', cmd.facsimileLeft);
   document.getElementById('facsimileRight').addEventListener('click', cmd.facsimileRight);
+  document.getElementById('meiToolboxTop').addEventListener('click', cmd.meiToolboxTop);
+  document.getElementById('meiToolboxBottom').addEventListener('click', cmd.meiToolboxBottom);
+  document.getElementById('meiToolboxLeft').addEventListener('click', cmd.meiToolboxLeft);
+  document.getElementById('meiToolboxRight').addEventListener('click', cmd.meiToolboxRight);
 
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
@@ -2233,6 +2267,8 @@ function addEventListeners(v, cm) {
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   //  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
+  document.getElementById('showMeiToolboxMenu').addEventListener('click', cmd.toggleMeiToolbox);
+  document.getElementById('showMeiToolboxButton').addEventListener('click', cmd.toggleMeiToolbox);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
   document.querySelectorAll('#settingsPanel .tablink').forEach((t) => t.addEventListener('click', cmd.filterSettings));
@@ -2414,29 +2450,14 @@ function addEventListeners(v, cm) {
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
-  // Manipulate encoding methods
-  document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
-  document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
-  document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
-  document.getElementById('renumberMeasuresTest').addEventListener('click', cmd.renumberMeasuresTest);
-  document.getElementById('renumberMeasuresExec').addEventListener('click', cmd.renumberMeasures);
-  document.getElementById('convertAttributesToElements').addEventListener('click', cmd.convertAttributesToElements);
-  // rerender through Verovio
-  document.getElementById('reRenderMeiVerovio').addEventListener('click', cmd.reRenderMei);
-  // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
-  // add/remove ids
-  document.getElementById('addIds').addEventListener('click', cmd.addIds);
-  document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  document.getElementById('changeIds').addEventListener('click', cmd.changeIds);
-  // menu items with class 'altKeyOnly' (e.g., 'Change ids') are only shown while ALT key is pressed
+  // menu items with class 'altKeyOnly' are only shown while the ALT key is pressed
+  // (no menu item uses it at the moment: 'Change ids' moved into the MEI toolbox)
   const toggleAltKeyOnly = (pressed) => document.body.classList.toggle('altKeyPressed', pressed);
   window.addEventListener('keydown', (ev) => toggleAltKeyOnly(ev.altKey), true);
   window.addEventListener('keyup', (ev) => toggleAltKeyOnly(ev.altKey), true);
   window.addEventListener('mousemove', (ev) => toggleAltKeyOnly(ev.altKey), true);
   window.addEventListener('blur', () => toggleAltKeyOnly(false));
-  // ingest facsimile skeleton into currently loaded MEI file
-  document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
-  document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+
   // add note
   document.getElementById('addNote').addEventListener('click', cmd.addNote);
   document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
@@ -2967,6 +2988,47 @@ function setKeyMap() {
     });
   }
 } // setKeyMap()
+
+/**
+ * Looks up the keyboard shortcut a command is bound to in the keymap, so that the
+ * GUI can show the shortcut where the command is offered without repeating it in
+ * the markup. The modifier class names are the ones the menu bar uses, so that
+ * addModifyerKeys() renders them with the same symbols: 'cmdKey' (CMD on Mac, CTRL
+ * elsewhere), 'ctrlKey' (CTRL on all platforms), 'shiftKey', 'altKey'. Whether a
+ * modifier is cmdKey or ctrlKey is decided by the Mac binding, where the two are
+ * distinct; the key itself is taken from the binding of the current platform.
+ * @param {string} commandName name of a method of `cmd`, e.g. 'addIds'
+ * @returns {{classes: string[], key: string} | null} null if not bound
+ */
+export function shortcutForCommand(commandName) {
+  const platformToken = platform.startsWith('mac') ? 'darwin' : platform.startsWith('win') ? 'win32' : 'linux';
+  // the sections of the keymap that apply here: those without a platform, and those of this platform
+  const applies = (selectors, token) =>
+    !selectors.includes('platform-') || selectors.includes('platform-' + token + '-');
+  const findBinding = (token) => {
+    for (const [selectors, bindings] of Object.entries(keymap)) {
+      if (!applies(selectors, token)) continue;
+      for (const [keyPress, method] of Object.entries(bindings)) {
+        if (method === commandName) return keyPress;
+      }
+    }
+    return null;
+  };
+
+  const here = findBinding(platformToken);
+  if (!here) return null;
+  const onMac = findBinding('darwin') || here;
+  const parts = here.split('-');
+  const key = parts.pop();
+  const macModifiers = onMac.split('-').slice(0, -1);
+  const classes = parts.map((modifier) => {
+    if (modifier === 'shift') return 'shiftKey';
+    if (modifier === 'alt') return 'altKey';
+    // cmd/ctrl: CMD on the Mac means the cmdKey of the menu bar, CTRL there means ctrlKey
+    return macModifiers.includes('cmd') ? 'cmdKey' : 'ctrlKey';
+  });
+  return { classes, key: key.length === 1 ? key.toUpperCase() : key };
+} // shortcutForCommand()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
