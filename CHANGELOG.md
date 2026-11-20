@@ -11,6 +11,7 @@
 * A Verovio reformat no longer clears the results in the MEI toolbox (it writes the same encoding anew rather than loading a different one).
 * `Ingest facsimile` reports into the MEI toolbox instead of into modal prompts: the progress appears in the summary line of the Facsimile tab, each problem as an entry (clickable where the element is known), the Stop button of the result list ends the ingestion, and the summary states what was done. Without problems, the resulting facsimile is listed.
 * Keyboard shortcuts are stated in the MEI toolbox where the action is offered (`Cmd-M` / `Ctrl-M` at `Add xml:ids`, `Shift-Cmd-M` / `Shift-Ctrl-M` at `Remove xml:ids`, `Shift-Cmd-X` / `Shift-Ctrl-X` at `Via XML parser`). They are read from the keymap, so they cannot drift apart from the bindings.
+* Fixed undo and redo stepping back two edits at once: `Cmd-Z`/`Ctrl-Z` and `Shift-Cmd-Z`/`Shift-Ctrl-Z` were bound both by the editor (which handles them while it has the focus) and by mei-friend's always-on keymap, so one keypress ran the command twice. After adding xml:ids and then typing, a single undo reverted both; redo skipped a step in the same way. The bindings now sit in the keymap's `*-not-in-text` sections, where they only fire while the focus is outside the editor; a new e2e test keeps them there.
 * Results in the MEI toolbox are cleared as soon as the options they were produced with are touched, so that what is shown always belongs to the options beside it.
 
 ### 1.6.2 patch: Code checker optimizations and new functionality

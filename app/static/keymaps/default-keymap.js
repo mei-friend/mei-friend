@@ -130,8 +130,6 @@ export const keymap = {
     'cmd-f': 'doFind',
     'cmd-g': 'doFindNext',
     'cmd-shift-g': 'doFindPrev',
-    'cmd-z': 'undo',
-    'cmd-shift-z': 'redo',
     'cmd-0': 'notesZoom100',
     'cmd-5': 'notesZoom50',
     'cmd-+': 'notesZoomIn',
@@ -190,8 +188,6 @@ export const keymap = {
     'ctrl-f': 'doFind',
     'ctrl-g': 'doFindNext',
     'ctrl-shift-g': 'doFindPrev',
-    'ctrl-z': 'undo',
-    'ctrl-shift-z': 'redo',
     'ctrl-0': 'notesZoom100',
     'ctrl-5': 'notesZoom50',
     'ctrl-+': 'notesZoomIn',
@@ -240,10 +236,19 @@ export const keymap = {
   // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Mac OSX
   '.platform-darwin-not-in-text': {
     'cmd-a': 'toggleAnnotationPanel',
+    // The editor binds undo/redo itself and handles them while it has the focus.
+    // Binding them in an always-on section as well made one keypress run the
+    // command twice, stepping back two edits at once; here they only fire when
+    // the focus is outside the editor (e.g. on the notation).
+    'cmd-z': 'undo',
+    'cmd-shift-z': 'redo',
   },
 
   // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Win/Linux
   '.platform-win32-not-in-text, .platform-linux-not-in-text': {
     'ctrl-a': 'toggleAnnotationPanel',
+    // see the Mac section above: the editor brings its own undo/redo
+    'ctrl-z': 'undo',
+    'ctrl-shift-z': 'redo',
   },
 };
