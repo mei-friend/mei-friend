@@ -221,7 +221,7 @@ export const lang = {
   meiToolboxClose: { text: 'Luk MEI-værktøjskassen' },
   meiToolboxTabIds: { text: 'Id’er' },
   meiToolboxTabFacsimile: { text: 'Faksimile' },
-  meiToolboxTabReformat: { text: 'Gengiv igen' },
+  meiToolboxTabReformat: { text: 'Reformatér' },
   meiToolboxIdsAdd: { text: 'Tilføj xml:id (til elementer uden)' },
   meiToolboxIdsChange: {
     text: 'Skift xml:id (et nyt til hvert element)',
@@ -238,10 +238,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Intet at gøre: ingen xml:id blev tilføjet, ændret eller fjernet.' },
   meiToolboxIdsCancelled: { text: 'Annulleret, kodningen er uændret.' },
   meiToolboxFacsimileInfo: {
-    text: 'Forbind kodningen med sidebillederne: indlæs en faksimile fra en anden fil, eller tilføj en tom faksimile med én surface pr. sideskift.',
+    text: 'Forbind kodningen med sidebillederne: indlæs en faksimile fra en anden fil, eller tilføj de surfaces, der stadig mangler, én pr. sideskift.',
   },
   meiToolboxFacsimileIngest: { text: 'Indlæs faksimile…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Tilføj tom faksimile' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Tilføj manglende surfaces',
+    description: 'Tilføjer det, der mangler: en faksimile, hvis der ingen er, en surface med en pladsholder-graphic til hver side, der ikke har en endnu, og pb@facs, der peger på den. Sider knyttes til de surfaces, der allerede er der, og som ikke ændres.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Tilføjede surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Sider forbundet med en surface, der allerede var der: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimile tilføjet.' },
+  meiToolboxFacsimileUpToDate: { text: 'Hver side har allerede sin surface; intet blev tilføjet.' },
   meiToolboxFacsimileZones: { text: '{n} zoner' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zoner' },
   meiToolboxFacsimileNone: { text: 'Denne kodning har ingen faksimile.' },
@@ -249,9 +256,12 @@ export const lang = {
     text: 'Via Verovio',
     description: 'Lader Verovio skrive kodningen på ny ud fra sin egen repræsentation.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio skriver kodningen ud fra sin egen repræsentation, i sin egen formatering og attributrækkefølge.',
+  },
   meiToolboxReformatXml: {
-    text: 'Med XML-parseren',
-    description: 'Reformaterer kodningen via XML-parseren: indholdet bevares, kun formateringen og attributrækkefølgen ændres.',
+    text: 'Via XML-parseren',
+    description: 'Reformaterer kodningen via XML-parseren: indholdet bevares, kun formateringen og attributrækkefølgen ændres. Samme som Kode → Reformatér via XML-parseren.',
   },
   meiToolboxReformatUnchanged: { text: 'Kodningen er uændret.' },
   meiToolboxReformatDone: { text: '{lines} linjer' },

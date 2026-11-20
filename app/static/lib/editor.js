@@ -2212,78 +2212,156 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
 } // removeZone()
 
 /**
- * Adds a facsimile element to DOM and editor,
- * with a surface element for each page beginning <pb> to which
- * a @facs attribute is added referencing the surface element.
- * Additionally, each surface elements will be added a <graphic>
- * element.
- * If the facsimile element exists, it will check all
- * surface elements and the pb@facs references and add them if
- * necessary.
+ * Links every page beginning `<pb>` of the encoding to a `<surface>` of the
+ * facsimile, adding only what is missing: a `<facsimile>` when there is none,
+ * a `<surface>` (with a placeholder `<graphic>`) for every page that has none
+ * yet, and `pb@facs` pointing to it. A page is matched to an existing surface
+ * through `pb@facs`, else through `surface@n`, else by position (the n-th page
+ * belongs to the n-th surface), so an encoding whose facsimile is already there
+ * is linked up rather than given a second set of surfaces. Surfaces of pages
+ * that no longer exist are left alone. When nothing is missing, the encoding is
+ * not touched at all.
  * @param {Object} v
  * @param {Object} cm
+ * @returns {Object} what was done: {pages, surfaces, surfacesAdded, pagesLinked,
+ *   graphicsAdded, facsimileAdded}
  */
 export function addFacsimile(v, cm) {
+  const report = { pages: 0, surfaces: 0, surfacesAdded: 0, pagesLinked: 0, graphicsAdded: 0, facsimileAdded: false };
+  const facsimile = v.xmlDoc.querySelector('facsimile');
+  const pbs = Array.from(v.xmlDoc.querySelectorAll('pb'));
+  report.pages = pbs.length;
+
+  // the surfaces already there, and the ones a page can still be matched to
+  const existingSurfaces = facsimile ? Array.from(facsimile.querySelectorAll('surface')) : [];
+  report.surfaces = existingSurfaces.length;
+  const unclaimed = new Set(existingSurfaces);
+  const byN = new Map();
+  existingSurfaces.forEach((s) => {
+    const n = s.getAttribute('n');
+    if (n !== null && !byN.has(n)) byN.set(n, s);
+  });
+  // pages already pointing at a surface claim it before the others are handed out
+  const surfaceOf = new Map(); // pb -> surface
+  pbs.forEach((pb) => {
+    const target = utils.rmHash(pb.getAttribute('facs'));
+    const surface = target && facsimile ? facsimile.querySelector('surface[*|id="' + target + '"]') : null;
+    if (surface) {
+      surfaceOf.set(pb, surface);
+      unclaimed.delete(surface);
+    }
+  });
+
+  // what has to be created, collected before anything is changed
+  const toLink = []; // {pb, surface} pages that get a @facs to an existing surface
+  const toAdd = []; // {pb, p} pages that get a new surface
+  pbs.forEach((pb, p) => {
+    if (surfaceOf.has(pb)) return;
+    const byNumber = byN.get(String(p + 1));
+    const surface = byNumber && unclaimed.has(byNumber) ? byNumber : unclaimed.values().next().value;
+    if (surface) {
+      unclaimed.delete(surface);
+      surfaceOf.set(pb, surface);
+      toLink.push({ pb, surface });
+    } else {
+      toAdd.push({ pb, p });
+    }
+  });
+  // surfaces without a graphic, so that the facsimile can be filled in by hand
+  const needGraphic = pbs
+    .map((pb) => surfaceOf.get(pb))
+    .filter((surface) => surface && !surface.querySelector('graphic'));
+
+  report.pagesLinked = toLink.length;
+  report.surfacesAdded = toAdd.length;
+  report.graphicsAdded = needGraphic.length + toAdd.length;
+  report.facsimileAdded = !facsimile;
+  if (facsimile && toLink.length === 0 && toAdd.length === 0 && needGraphic.length === 0) {
+    return report; // every page already has its surface: leave the encoding alone
+  }
+
   withSingleUndoStep(cm, () => {
     v.allowCursorActivity = false;
     cm.blockChanges = true;
-    let facsimile = v.xmlDoc.querySelector('facsimile');
-    let facsimileId;
-    if (facsimile) {
-      facsimileId = facsimile.getAttribute('xml:id');
-      this.removeInEditor(cm, facsimile);
+
+    let target = facsimile;
+    if (!target) {
+      target = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
+      target.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('facsimile', v.xmlIdStyle));
+      v.xmlDoc.querySelector('body').before(target);
     }
+
+    const newSurfaces = toAdd.map(({ pb, p }) => {
+      const surface = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'surface');
+      surface.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('surface', v.xmlIdStyle));
+      target.appendChild(surface);
+      surfaceOf.set(pb, surface);
+      addGraphic(surface, p);
+      return surface;
+    });
+    needGraphic.forEach((surface) => addGraphic(surface, pbs.findIndex((pb) => surfaceOf.get(pb) === surface)));
+
     if (!facsimile) {
-      facsimile = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
-      facsimileId = utils.generateXmlId('facsimile', v.xmlIdStyle);
-      facsimile.setAttributeNS(dutils.xmlNameSpace, 'xml:id', facsimileId);
-      v.xmlDoc.querySelector('body').before(facsimile);
-    }
-    v.xmlDoc.querySelectorAll('pb').forEach((pb, p) => {
-      let pbFacs = utils.rmHash(pb.getAttribute('facs'));
-      let surface = v.xmlDoc.querySelector('surface[*|id="' + pbFacs + '"]');
-      let surfaceId;
-      if (surface) {
-        surfaceId = surface.getAttribute('xml:id');
+      // no facsimile yet: write the whole element before <body>
+      insertFacsimileInEditor(target);
+    } else {
+      // keep the facsimile that is there and only add the new surfaces to it
+      if (newSurfaces.length > 0 && !appendSurfacesInEditor(newSurfaces)) {
+        // the facsimile could not be found in the editor (e.g. written as <facsimile/>):
+        // fall back to writing the whole element anew
+        removeInEditor(cm, facsimile);
+        insertFacsimileInEditor(target);
       } else {
-        surface = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'surface');
-        surfaceId = utils.generateXmlId('surface', v.xmlIdStyle);
-        surface.setAttributeNS(dutils.xmlNameSpace, 'xml:id', surfaceId);
-        facsimile.appendChild(surface);
-        // update pb elements in DOM and in editor
-        pb.setAttribute('facs', '#' + surfaceId);
-        this.replaceInEditor(cm, pb);
+        needGraphic.forEach((surface) => replaceInEditor(cm, surface));
       }
-      let graphic = surface.querySelector('graphic');
-      if (!graphic) {
-        graphic = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'graphic');
-        let graphicId = utils.generateXmlId('graphic', v.xmlIdStyle);
-        graphic.setAttributeNS(dutils.xmlNameSpace, 'xml:id', graphicId);
-        graphic.setAttribute('target', 'Page-' + (p + 1)); // dummy values
-        graphic.setAttribute('width', '0');
-        graphic.setAttribute('height', '0');
-        surface.appendChild(graphic);
-      }
+    }
+
+    // point the pages at their surface
+    [...toLink.map((l) => l.pb), ...toAdd.map((a) => a.pb)].forEach((pb) => {
+      pb.setAttribute('facs', '#' + surfaceOf.get(pb).getAttribute('xml:id'));
+      replaceInEditor(cm, pb);
     });
 
-    // add to editor
-    let c = cm.getSearchCursor('<body');
-    let p1;
-    if (c.findNext()) {
-      p1 = c.from();
-      cm.setCursor(p1);
-    }
-    cm.replaceRange(dutils.xmlToString(facsimile) + '\n', cm.getCursor());
-    for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
-    utils.setCursorToId(cm, facsimileId);
-
-    // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
     v.allowCursorActivity = true;
     cm.blockChanges = false;
-    console.log('Editor: new facsimile added', facsimile);
+    console.log('Editor: facsimile updated', report);
     handleEditorChanges();
   });
+  return report;
+
+  // placeholder graphic, to be filled in with the real image
+  function addGraphic(surface, p) {
+    const graphic = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'graphic');
+    graphic.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('graphic', v.xmlIdStyle));
+    graphic.setAttribute('target', 'Page-' + (p + 1)); // dummy values
+    graphic.setAttribute('width', '0');
+    graphic.setAttribute('height', '0');
+    surface.appendChild(graphic);
+  } // addGraphic()
+
+  // writes the complete facsimile element before <body>
+  function insertFacsimileInEditor(element) {
+    const sc = cm.getSearchCursor('<body');
+    if (!sc.findNext()) return;
+    const from = sc.from();
+    cm.setCursor(from);
+    cm.replaceRange(dutils.xmlToString(element) + '\n', cm.getCursor());
+    for (let l = from.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
+    utils.setCursorToId(cm, element.getAttribute('xml:id'));
+  } // insertFacsimileInEditor()
+
+  // appends surfaces to the facsimile already in the editor, before its end tag
+  function appendSurfacesInEditor(surfaces) {
+    const sc = cm.getSearchCursor('</facsimile>');
+    if (!sc.findNext()) return false;
+    const from = sc.from();
+    const text = surfaces.map((surface) => dutils.xmlToString(surface)).join('\n') + '\n';
+    cm.replaceRange(text, from);
+    for (let l = from.line; l <= from.line + text.split('\n').length; l++) cm.indentLine(l, 'smart');
+    utils.setCursorToId(cm, surfaces[0].getAttribute('xml:id'));
+    return true;
+  } // appendSurfacesInEditor()
 } // addFacsimile()
 
 /**

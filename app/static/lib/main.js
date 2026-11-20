@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.6.2';
-export const versionDate = '18 Nov 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '20 Nov 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
 // Date of the Let's Encode paragraph, which only campaign volunteers ever see.
 // Bump this instead of splashDate when only that paragraph changes: volunteers
@@ -132,7 +132,6 @@ import {
   addZoneDrawer,
   clearFacsimile,
   drawFacsimile,
-  ingestFacsimile,
   loadFacsimile,
   zoomFacsimile,
 } from './facsimile.js';

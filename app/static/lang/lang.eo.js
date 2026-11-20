@@ -219,7 +219,7 @@ export const lang = {
   meiToolboxClose: { text: 'Fermi la MEI-ilarkeston' },
   meiToolboxTabIds: { text: 'Id-oj' },
   meiToolboxTabFacsimile: { text: 'Faksimilo' },
-  meiToolboxTabReformat: { text: 'Reskribi' },
+  meiToolboxTabReformat: { text: 'Reformati' },
   meiToolboxIdsAdd: { text: 'Aldoni xml:id-ojn (al elementoj sen tia)' },
   meiToolboxIdsChange: {
     text: 'Ŝanĝi xml:id-ojn (novan por ĉiu elemento)',
@@ -236,10 +236,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Nenio farenda: neniu xml:id estis aldonita, ŝanĝita aŭ forigita.' },
   meiToolboxIdsCancelled: { text: 'Nuligita, la kodigo restas senŝanĝa.' },
   meiToolboxFacsimileInfo: {
-    text: 'Ligi la kodigon al paĝbildoj: enigi faksimilon el alia dosiero aŭ aldoni malplenan faksimilon kun unu surfaco por ĉiu paĝosalto.',
+    text: 'Ligi la kodigon al paĝbildoj: enigi faksimilon el alia dosiero aŭ aldoni la ankoraŭ mankantajn surfacojn, po unu por ĉiu paĝosalto.',
   },
   meiToolboxFacsimileIngest: { text: 'Enigi faksimilon…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Aldoni malplenan faksimilon' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Aldoni mankantajn surfacojn',
+    description: 'Aldonas tion, kio mankas: faksimilon, se ne ekzistas, surfacon kun lokokupa graphic por ĉiu paĝo ankoraŭ sen tia, kaj pb@facs montrantan al ĝi. Paĝoj estas kongruigataj kun la jam ekzistantaj surfacoj, kiuj restas senŝanĝaj.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Aldonitaj surfacoj: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Paĝoj ligitaj al jam ekzistanta surfaco: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimilo aldonita.' },
+  meiToolboxFacsimileUpToDate: { text: 'Ĉiu paĝo jam havas sian surfacon; nenio aldonita.' },
   meiToolboxFacsimileZones: { text: '{n} zonoj' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfacoj, {zones} zonoj' },
   meiToolboxFacsimileNone: { text: 'Ĉi tiu kodigo ne havas faksimilon.' },
@@ -247,9 +254,12 @@ export const lang = {
     text: 'Per Verovio',
     description: 'Lasas Verovion reskribi la kodigon el sia propra reprezento.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio skribas la kodigon el sia propra reprezento, en sia propra formato kaj atributordo.',
+  },
   meiToolboxReformatXml: {
     text: 'Per la XML-analizilo',
-    description: 'Reformatas la kodigon per la XML-analizilo: la enhavo restas, nur la formato kaj la atributordo ŝanĝiĝas.',
+    description: 'Reformatas la kodigon per la XML-analizilo: la enhavo restas, nur la formato kaj la atributordo ŝanĝiĝas. Same kiel Kodo → Reformati per la XML-analizilo.',
   },
   meiToolboxReformatUnchanged: { text: 'La kodigo restas senŝanĝa.' },
   meiToolboxReformatDone: { text: '{lines} linioj' },

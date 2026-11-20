@@ -223,7 +223,7 @@ export const lang = {
   meiToolboxClose: { text: 'Fermer la boîte à outils MEI' },
   meiToolboxTabIds: { text: 'Ids' },
   meiToolboxTabFacsimile: { text: 'Fac-similé' },
-  meiToolboxTabReformat: { text: 'Régénérer' },
+  meiToolboxTabReformat: { text: 'Reformater' },
   meiToolboxIdsAdd: { text: 'Ajouter des xml:id (aux éléments qui n’en ont pas)' },
   meiToolboxIdsChange: {
     text: 'Changer les xml:id (un nouveau pour chaque élément)',
@@ -240,10 +240,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Rien à faire : aucun xml:id n’a été ajouté, modifié ou supprimé.' },
   meiToolboxIdsCancelled: { text: 'Annulé, l’encodage est inchangé.' },
   meiToolboxFacsimileInfo: {
-    text: 'Relier l’encodage aux images de pages : importer un fac-similé depuis un autre fichier, ou ajouter un fac-similé vide avec une surface par saut de page.',
+    text: 'Relier l’encodage aux images de pages : importer un fac-similé depuis un autre fichier, ou ajouter les surfaces qui manquent encore, une par saut de page.',
   },
   meiToolboxFacsimileIngest: { text: 'Importer un fac-similé…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Ajouter un fac-similé vide' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Ajouter les surfaces manquantes',
+    description: 'Ajoute ce qui manque : un fac-similé s’il n’y en a pas, une surface avec un graphic provisoire pour chaque page qui n’en a pas encore, et pb@facs qui y renvoie. Les pages sont associées aux surfaces déjà présentes, qui restent inchangées.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Surfaces ajoutées : {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pages reliées à une surface déjà présente : {n}' },
+  meiToolboxFacsimileCreated: { text: 'Fac-similé ajouté.' },
+  meiToolboxFacsimileUpToDate: { text: 'Chaque page a déjà sa surface ; rien n’a été ajouté.' },
   meiToolboxFacsimileZones: { text: '{n} zones' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
   meiToolboxFacsimileNone: { text: 'Cet encodage ne comporte pas de fac-similé.' },
@@ -251,9 +258,12 @@ export const lang = {
     text: 'Via Verovio',
     description: 'Laisse Verovio réécrire l’encodage à partir de sa propre représentation.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio écrit l’encodage à partir de sa propre représentation, avec sa propre mise en forme et son propre ordre d’attributs.',
+  },
   meiToolboxReformatXml: {
-    text: 'Avec l’analyseur XML',
-    description: 'Reformate l’encodage avec l’analyseur XML : le contenu est conservé, seuls la mise en forme et l’ordre des attributs changent.',
+    text: 'Via l’analyseur XML',
+    description: 'Reformate l’encodage avec l’analyseur XML : le contenu est conservé, seuls la mise en forme et l’ordre des attributs changent. Identique à Code → Reformater via l’analyseur XML.',
   },
   meiToolboxReformatUnchanged: { text: 'L’encodage est inchangé.' },
   meiToolboxReformatDone: { text: '{lines} lignes' },

@@ -215,7 +215,7 @@ export const lang = {
   meiToolboxClose: { text: 'Закрити набір інструментів MEI' },
   meiToolboxTabIds: { text: 'Ід' },
   meiToolboxTabFacsimile: { text: 'Факсиміле' },
-  meiToolboxTabReformat: { text: 'Перебудувати' },
+  meiToolboxTabReformat: { text: 'Переформатувати' },
   meiToolboxIdsAdd: { text: 'Додати xml:id (до елементів без нього)' },
   meiToolboxIdsChange: {
     text: 'Змінити xml:id (новий для кожного елемента)',
@@ -232,10 +232,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Немає що робити: жодного xml:id не додано, не змінено й не вилучено.' },
   meiToolboxIdsCancelled: { text: 'Скасовано, кодування не змінено.' },
   meiToolboxFacsimileInfo: {
-    text: 'Пов’яжіть кодування із зображеннями сторінок: імпортуйте факсиміле з іншого файлу або додайте порожнє факсиміле з однією surface на кожен розрив сторінки.',
+    text: 'Пов’яжіть кодування із зображеннями сторінок: імпортуйте факсиміле з іншого файлу або додайте surfaces, яких ще бракує, по одній на кожен розрив сторінки.',
   },
   meiToolboxFacsimileIngest: { text: 'Імпортувати факсиміле…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Додати порожнє факсиміле' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Додати відсутні surfaces',
+    description: 'Додає те, чого бракує: факсиміле, якщо його немає, surface із тимчасовим graphic для кожної сторінки, яка ще її не має, і pb@facs, що на неї вказує. Сторінки зіставляються з наявними surfaces, які залишаються без змін.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Додано surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Сторінок пов’язано з наявною surface: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Факсиміле додано.' },
+  meiToolboxFacsimileUpToDate: { text: 'Кожна сторінка вже має свою surface; нічого не додано.' },
   meiToolboxFacsimileZones: { text: '{n} зон' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} зон' },
   meiToolboxFacsimileNone: { text: 'Це кодування не має факсиміле.' },
@@ -243,9 +250,12 @@ export const lang = {
     text: 'Через Verovio',
     description: 'Дозволяє Verovio переписати кодування з власного подання.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio записує кодування з власного подання, у власному форматуванні та порядку атрибутів.',
+  },
   meiToolboxReformatXml: {
     text: 'Через XML-парсер',
-    description: 'Переформатовує кодування через XML-парсер: вміст зберігається, змінюються лише форматування та порядок атрибутів.',
+    description: 'Переформатовує кодування через XML-парсер: вміст зберігається, змінюються лише форматування та порядок атрибутів. Те саме, що Код → Переформатувати через XML-парсер.',
   },
   meiToolboxReformatUnchanged: { text: 'Кодування не змінено.' },
   meiToolboxReformatDone: { text: '{lines} рядків' },

@@ -442,21 +442,42 @@ export function runIds(mode = '') {
 export function runFacsimile(action = 'empty') {
   openToolbox('facsimile');
   panes.facsimile.lastAction = () => runFacsimile(action);
-  const title = action === 'ingest' ? t('meiToolboxFacsimileIngest') : t('meiToolboxFacsimileAddEmpty');
+  const title = action === 'ingest' ? t('meiToolboxFacsimileIngest') : t('meiToolboxFacsimileAddMissing');
   if (action === 'ingest') {
-    // Ingestion runs in its own dialog (with its own progress prompt and summary)
-    // and may be cancelled without anything happening, so the run is only started
-    // once the encoding has actually changed -- nothing is left running otherwise.
-    onceEncodingChanged(() => {
-      startRun('facsimile', title);
-      listFacsimile();
-    }, () => {});
-    ingestFacsimile();
+    // The ingestion reports here instead of into modal prompts: progress in the
+    // summary line, each problem as an entry, the result through finishRun(). It
+    // only starts once a file has been chosen, so cancelling the file dialog
+    // leaves the tab as it was.
+    ingestFacsimile({
+      started: (runTitle, fileName) =>
+        startRun('facsimile', esc(runTitle) + ' &middot; <code>' + esc(fileName) + '</code>'),
+      progress: (text) => (panes.facsimile.summary.textContent = text),
+      warn: (entry) => addEntry({ ...entry, className: 'mtWarning' }, 'facsimile'),
+      aborted: () => v.toolboxAbort,
+      failed: (message) => {
+        startRun('facsimile', title);
+        finishRun(esc(message), '');
+      },
+      finished: (runTitle, summary, warningCount) => {
+        panes.facsimile.title.textContent = runTitle;
+        // without problems to look at, show what the encoding now has instead
+        if (warningCount === 0) listFacsimile(summary);
+        else finishRun('', summary);
+      },
+    });
   } else {
     startRun('facsimile', title);
     setTimeout(() => {
-      e.addFacsimile(v, cm);
-      listFacsimile();
+      const report = e.addFacsimile(v, cm);
+      const parts = [];
+      if (report.surfacesAdded > 0)
+        parts.push(t('meiToolboxFacsimileAdded', '{n} surfaces added').replace('{n}', report.surfacesAdded));
+      if (report.pagesLinked > 0)
+        parts.push(t('meiToolboxFacsimileLinked', '{n} pages linked').replace('{n}', report.pagesLinked));
+      // an encoding without page breaks only gets the empty facsimile element itself
+      if (parts.length === 0 && report.facsimileAdded) parts.push(t('meiToolboxFacsimileCreated', 'Facsimile added.'));
+      if (parts.length === 0) parts.push(t('meiToolboxFacsimileUpToDate', 'Every page already has its surface.'));
+      listFacsimile(parts.join(', '));
     }, 10);
   }
 } // runFacsimile()
@@ -494,8 +515,9 @@ export function runReformat(mode = 'xml') {
 /**
  * Lists the facsimile of the encoding (surfaces with their graphic and zones, and
  * the page break pointing to each surface) as the result of the Facsimile tab.
+ * @param {string} summaryPrefix put before the summary, e.g. what an ingestion did
  */
-function listFacsimile() {
+function listFacsimile(summaryPrefix = '') {
   v.loadXml(cm.getValue(), true);
   const surfaces = Array.from(v.xmlDoc.querySelectorAll('facsimile surface'));
   const entries = surfaces.map((surface) => {
@@ -509,9 +531,14 @@ function listFacsimile() {
     if (pb) details.push('<b>pb</b>' + idHtml(pb));
     return { xmlId: id, html: '<b>surface</b>' + idHtml(surface) + ' &middot; ' + details.join(' &middot; ') };
   });
-  const summary = t('meiToolboxFacsimileSummary', '{surfaces} surfaces, {zones} zones')
-    .replace('{surfaces}', surfaces.length)
-    .replace('{zones}', v.xmlDoc.querySelectorAll('facsimile zone').length);
+  const summary = [
+    summaryPrefix,
+    t('meiToolboxFacsimileSummary', '{surfaces} surfaces, {zones} zones')
+      .replace('{surfaces}', surfaces.length)
+      .replace('{zones}', v.xmlDoc.querySelectorAll('facsimile zone').length),
+  ]
+    .filter(Boolean)
+    .join(' &middot; ');
   addEntriesSliced('facsimile', entries, () =>
     finishRun(t('meiToolboxFacsimileNone', 'This encoding has no facsimile.'), summary)
   );
@@ -730,7 +757,10 @@ function buildPane(tab, buildOptions) {
   // Touching the options invalidates what is shown beside them: the results belong
   // to the options they were run with, so they are dropped as soon as those change
   // (a run that is still going is left alone; it clears the list itself anyway).
-  const dropResults = () => {
+  const dropResults = (ev) => {
+    // not for the action buttons: they start a run, which clears the list itself
+    // (and a run that finishes synchronously would otherwise be wiped right away)
+    if (ev?.target?.closest('.mtActions')) return;
     if (!p.hasResults || (running && runTab === tab)) return;
     clearResults(p);
     p.hasResults = false;
@@ -973,13 +1003,13 @@ function buildIdsOptions(content, p) {
 } // buildIdsOptions()
 
 function buildFacsimileOptions(content, p) {
-  const info = el('div', 'mtInfo');
+  const info = el('div', 'mtMethodNote');
   info.dataset.lang = 'meiToolboxFacsimileInfo';
   content.appendChild(info);
   content.appendChild(
     actions([
       { lang: 'meiToolboxFacsimileIngest', action: () => runFacsimile('ingest') },
-      { lang: 'meiToolboxFacsimileAddEmpty', action: () => runFacsimile('empty') },
+      { lang: 'meiToolboxFacsimileAddMissing', action: () => runFacsimile('empty') },
     ])
   );
 } // buildFacsimileOptions()
@@ -989,7 +1019,7 @@ function buildReformatOptions(content, p) {
   // applies to the XML parser, which writes the encoding itself. Verovio writes it
   // from its own representation and is not influenced by anything set here.
   const verovio = methodBlock(content, 'meiToolboxReformatVerovio');
-  verovio.body.appendChild(el('div', 'mtInfo mtMethodNote')).dataset.lang = 'meiToolboxReformatVerovioNote';
+  verovio.body.appendChild(el('div', 'mtMethodNote')).dataset.lang = 'meiToolboxReformatVerovioNote';
   verovio.body.appendChild(
     actions([{ lang: 'meiToolboxReformatVerovio', action: () => runReformat('verovio') }])
   );

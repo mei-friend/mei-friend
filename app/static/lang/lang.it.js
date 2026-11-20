@@ -224,7 +224,7 @@ export const lang = {
   meiToolboxClose: { text: 'Chiudi la cassetta degli attrezzi MEI' },
   meiToolboxTabIds: { text: 'Id' },
   meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Rigenera' },
+  meiToolboxTabReformat: { text: 'Riformatta' },
   meiToolboxIdsAdd: { text: 'Aggiungi xml:id (agli elementi che non ne hanno)' },
   meiToolboxIdsChange: {
     text: 'Cambia gli xml:id (uno nuovo per ogni elemento)',
@@ -241,10 +241,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Niente da fare: nessun xml:id è stato aggiunto, modificato o rimosso.' },
   meiToolboxIdsCancelled: { text: 'Annullato, la codifica è invariata.' },
   meiToolboxFacsimileInfo: {
-    text: 'Collega la codifica alle immagini delle pagine: importa un facsimile da un altro file o aggiungi un facsimile vuoto con una surface per ogni interruzione di pagina.',
+    text: 'Collega la codifica alle immagini delle pagine: importa un facsimile da un altro file o aggiungi le surface che ancora mancano, una per ogni interruzione di pagina.',
   },
   meiToolboxFacsimileIngest: { text: 'Importa facsimile…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Aggiungi facsimile vuoto' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Aggiungi le surface mancanti',
+    description: 'Aggiunge ciò che manca: un facsimile se non c’è, una surface con un graphic segnaposto per ogni pagina che non ne ha ancora una, e pb@facs che vi punta. Le pagine vengono associate alle surface già presenti, che restano invariate.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Surface aggiunte: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pagine collegate a una surface già presente: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsimile aggiunto.' },
+  meiToolboxFacsimileUpToDate: { text: 'Ogni pagina ha già la sua surface; non è stato aggiunto nulla.' },
   meiToolboxFacsimileZones: { text: '{n} zone' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surface, {zones} zone' },
   meiToolboxFacsimileNone: { text: 'Questa codifica non ha un facsimile.' },
@@ -252,9 +259,12 @@ export const lang = {
     text: 'Tramite Verovio',
     description: 'Lascia che Verovio riscriva la codifica dalla propria rappresentazione.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio scrive la codifica dalla propria rappresentazione, con la propria formattazione e il proprio ordine degli attributi.',
+  },
   meiToolboxReformatXml: {
-    text: 'Con il parser XML',
-    description: 'Riformatta la codifica tramite il parser XML: il contenuto resta invariato, cambiano solo la formattazione e l’ordine degli attributi.',
+    text: 'Tramite il parser XML',
+    description: 'Riformatta la codifica tramite il parser XML: il contenuto resta invariato, cambiano solo la formattazione e l’ordine degli attributi. Come Codice → Riformatta tramite il parser XML.',
   },
   meiToolboxReformatUnchanged: { text: 'La codifica è invariata.' },
   meiToolboxReformatDone: { text: '{lines} righe' },

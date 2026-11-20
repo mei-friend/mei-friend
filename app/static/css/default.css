@@ -1480,13 +1480,20 @@ input.urlResolves {
   padding: 2px 0;
 }
 
+/* explanatory text in the options of a tab (not to be confused with .mtInfo,
+   the placeholder shown in the result list) */
 .mtMethodNote {
   padding: 4px 6px;
   font-size: 0.9em;
+  opacity: 0.85;
 }
 
+/* inside a method block the buttons belong to that block, so they scroll with it
+   rather than sticking to the bottom of the whole options area */
 .mtMethod .mtActions {
+  position: static;
   justify-content: flex-end;
+  padding: 3px 6px;
 }
 
 /* keyboard shortcut on a toolbox button or option, as in the menu bar */
@@ -1494,6 +1501,13 @@ input.urlResolves {
   margin-left: 6px;
   font-weight: normal;
   opacity: 0.8;
+}
+
+/* on an option row, the shortcut goes to the right edge, as in the menu bar */
+#meiToolbox .mtChoice .keyShortCut {
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
 }
 
 /* Reformat tab: the custom attribute order pattern and its live preview */

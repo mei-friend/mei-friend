@@ -224,7 +224,7 @@ export const lang = {
   meiToolboxClose: { text: 'Zamknij przybornik MEI' },
   meiToolboxTabIds: { text: 'Id' },
   meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Przebuduj' },
+  meiToolboxTabReformat: { text: 'Formatuj' },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (do elementów bez niego)' },
   meiToolboxIdsChange: {
     text: 'Zmień xml:id (nowy dla każdego elementu)',
@@ -241,10 +241,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Nie ma nic do zrobienia: nie dodano, nie zmieniono ani nie usunięto żadnego xml:id.' },
   meiToolboxIdsCancelled: { text: 'Anulowano, kodowanie pozostało bez zmian.' },
   meiToolboxFacsimileInfo: {
-    text: 'Powiąż kodowanie z obrazami stron: zaimportuj facsimile z innego pliku albo dodaj puste facsimile z jedną powierzchnią na każdy podział strony.',
+    text: 'Powiąż kodowanie z obrazami stron: zaimportuj facsimile z innego pliku albo dodaj brakujące jeszcze powierzchnie, po jednej na każdy podział strony.',
   },
   meiToolboxFacsimileIngest: { text: 'Zaimportuj facsimile…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Dodaj puste facsimile' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Dodaj brakujące powierzchnie',
+    description: 'Dodaje to, czego brakuje: facsimile, jeśli go nie ma, powierzchnię z zastępczym elementem graphic dla każdej strony, która jeszcze jej nie ma, oraz pb@facs wskazujący na nią. Strony są dopasowywane do już istniejących powierzchni, które pozostają bez zmian.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Dodane powierzchnie: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Strony powiązane z istniejącą już powierzchnią: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Dodano facsimile.' },
+  meiToolboxFacsimileUpToDate: { text: 'Każda strona ma już swoją powierzchnię; nic nie dodano.' },
   meiToolboxFacsimileZones: { text: 'stref: {n}' },
   meiToolboxFacsimileSummary: { text: 'powierzchni: {surfaces}, stref: {zones}' },
   meiToolboxFacsimileNone: { text: 'To kodowanie nie zawiera facsimile.' },
@@ -252,9 +259,12 @@ export const lang = {
     text: 'Przez Verovio',
     description: 'Pozwala programowi Verovio zapisać kodowanie na nowo z własnej reprezentacji.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio zapisuje kodowanie z własnej reprezentacji, we własnym formatowaniu i kolejności atrybutów.',
+  },
   meiToolboxReformatXml: {
     text: 'Przez parser XML',
-    description: 'Formatuje kodowanie na nowo przez parser XML: treść pozostaje bez zmian, zmieniają się tylko formatowanie i kolejność atrybutów.',
+    description: 'Formatuje kodowanie na nowo przez parser XML: treść pozostaje bez zmian, zmieniają się tylko formatowanie i kolejność atrybutów. To samo co Kod → Formatuj przez parser XML.',
   },
   meiToolboxReformatUnchanged: { text: 'Kodowanie pozostało bez zmian.' },
   meiToolboxReformatDone: { text: 'wierszy: {lines}' },

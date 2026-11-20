@@ -1001,8 +1001,14 @@ function adjustCoordinates(x, y, width, height) {
  * Creates input dialog to load facsimile skeleton file
  * to be ingested into the existing MEI file, and
  * adds ingestionInputHander to input element.
+ * @param {Object} reporter where the ingestion reports to, so that it does not
+ *   have to know about the GUI: started(title, fileName), progress(text),
+ *   warn({html, xmlId}) per problem, aborted() polled for a Stop request,
+ *   failed(message) when there is nothing to ingest, and
+ *   finished(title, summary, warningCount). The MEI toolbox passes a reporter
+ *   that writes into its Facsimile tab.
  */
-export function ingestFacsimile(reporter = promptReporter()) {
+export function ingestFacsimile(reporter) {
   let input = document.createElement('input');
   input.type = 'file';
   let accept = '.mei,.xml,.musicxml,.txt';
@@ -1010,42 +1016,6 @@ export function ingestFacsimile(reporter = promptReporter()) {
   input.addEventListener('change', (ev) => ingestionInputHandler(ev, reporter));
   input.click();
 } // ingestFacsimile()
-
-/**
- * Where the ingestion reports to. The MEI toolbox passes its own reporter, so that
- * progress, problems and the summary appear in its result list instead of in modal
- * prompts; this one keeps the prompts for any other caller.
- * @returns {Object} reporter
- */
-function promptReporter() {
-  let aborted = false;
-  const okButton = {
-    label: translator.lang.selectTagNameForEnclosureOkButton.value,
-    event: () => v.hideUserPrompt(),
-    cancel: true,
-  };
-  const warnings = [];
-  return {
-    started: (title) =>
-      v.showUserPrompt(
-        '<b>' + title + '</b><br><br><span id="ingestFacsimileProgress"></span>',
-        [{ label: translator.lang.codeCheckerStop.text, event: () => (aborted = true), cancel: true }],
-        'info'
-      ),
-    progress: (text) => {
-      const span = document.getElementById('ingestFacsimileProgress');
-      if (span) span.innerHTML = text;
-    },
-    warn: (entry) => warnings.push(entry.html),
-    aborted: () => aborted,
-    failed: (message) => v.showUserPrompt(message, [okButton]),
-    finished: (title, summary) => {
-      let msg = '<b>' + title + '</b><br><br>' + summary;
-      if (warnings.length > 0) msg += '<div class="promptScrollList">' + warnings.join('<br>') + '</div>';
-      v.showUserPrompt(msg, [okButton], warnings.length > 0 || aborted ? 'warning' : 'info');
-    },
-  };
-} // promptReporter()
 
 /**
  * Handles loading of ingestion file and calls
@@ -1071,7 +1041,7 @@ function ingestionInputHandler(ev, reporter) {
   });
   readingPromise.then(
     function (reply) {
-      handleFacsimileIngestion(reply);
+      handleFacsimileIngestion(reply, reporter);
     },
     function () {
       log('Loading of ingestion file ' + reply.fileName + ' failed.');
@@ -1086,64 +1056,60 @@ function ingestionInputHandler(ev, reporter) {
  * name from zone@type and by @n). Only the start tags of the pointed-to
  * elements are touched in the editor; their content and formatting stay as
  * they are. The zones are processed in time slices of BUDGET_MS with a
- * blocking progress prompt (with Stop button) in between, and a final prompt
- * reports what was done. The editor's change listener is blocked for the
- * duration and called once at the end, so storage and git are written once
- * rather than once per element. All edits form a single undo step.
+ * `reporter` in between, which also collects the problems and the final summary
+ * and offers the Stop (see ingestFacsimile()). The editor's change listener is
+ * blocked for the duration and called once at the end, so storage and git are
+ * written once rather than once per element. All edits form a single undo step.
  * @param {Object} reply
+ * @param {Object} reporter see ingestFacsimile()
  */
-function handleFacsimileIngestion(reply) {
+function handleFacsimileIngestion(reply, reporter) {
   const startTime = Date.now();
   console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
   const fill = (key, values = {}) =>
     Object.entries(values).reduce((t, [k, val]) => t.replaceAll('{' + k + '}', val), translator.lang[key].text);
-  const okButton = {
-    label: translator.lang.selectTagNameForEnclosureOkButton.value,
-    event: () => v.hideUserPrompt(),
-    cancel: true,
-  };
 
   const skelXml = new DOMParser().parseFromString(reply.mei, 'text/xml');
   const facsimile = skelXml.querySelector('facsimile');
   if (!facsimile) {
-    v.showUserPrompt(fill('ingestFacsimileNoFacsimile', { file: reply.fileName }), [okButton]);
+    reporter.failed(fill('ingestFacsimileNoFacsimile', { file: reply.fileName }));
     return;
   }
   v.loadXml(cm.getValue()); // make sure xmlDoc matches the editor
   const music = v.xmlDoc.querySelector('music');
   const body = music?.querySelector('body');
   if (!body) {
-    v.showUserPrompt(fill('ingestFacsimileNoBody'), [okButton]);
+    reporter.failed(fill('ingestFacsimileNoBody'));
     return;
   }
 
   const zones = Array.from(facsimile.querySelectorAll('zone'));
   const surfaceCount = facsimile.querySelectorAll('surface').length;
   const fileValues = { file: reply.fileName, surfaces: surfaceCount, zones: zones.length };
-  let warnings = []; // HTML strings
+  let warningCount = 0;
   let added = 0;
   let i = 0; // zones processed
-  let abort = false;
   let lastPos = null; // editor position of the last edit, search hint for the next one
+  // a problem with one element, reported right away so it can be looked at while
+  // the ingestion is still running; xmlId (when known) makes the entry clickable
+  const warn = (key, values, xmlId = '') => {
+    warningCount++;
+    reporter.warn({ html: fill(key, values), xmlId: xmlId });
+  };
 
   busy();
   v.allowCursorActivity = false;
   cm.blockChanges = true; // single handleEditorChanges() call in finish()
   const undoState = beginSingleUndoStep(cm);
 
-  // progress prompt; Stop finishes with what has been done so far (undoable in one step)
-  v.showUserPrompt(
-    '<b>' + fill('ingestFacsimileTitle') + '</b><br><br><span id="ingestFacsimileProgress"></span>',
-    [{ label: translator.lang.codeCheckerStop.text, event: () => (abort = true), cancel: true }],
-    'info'
-  );
+  // Stop finishes with what has been done so far (undoable in one step)
+  reporter.started(fill('ingestFacsimileTitle'), reply.fileName);
   setProgressBar(0);
   showProgress();
   setTimeout(insertFacsimile, 0); // let the prompt paint first
 
   function showProgress() {
-    const span = document.getElementById('ingestFacsimileProgress');
-    if (span) span.innerHTML = fill('ingestFacsimileProgress', { ...fileValues, done: i, total: zones.length });
+    reporter.progress(fill('ingestFacsimileProgress', { ...fileValues, done: i, total: zones.length }));
     setProgressBar(zones.length ? (100 * i) / zones.length : 0);
   } // showProgress()
 
@@ -1162,7 +1128,7 @@ function handleFacsimileIngestion(reply) {
         bodyPos = sc.findNext() ? sc.from() : null;
       }
       if (!bodyPos) {
-        warnings.push(fill('ingestFacsimileNoBodyInEditor'));
+        warn('ingestFacsimileNoBodyInEditor', {});
       } else {
         const indentUnit = ' '.repeat(cm.getOption('indentUnit'));
         const baseIndent = cm.getLine(bodyPos.line).match(/^\s*/)[0];
@@ -1215,18 +1181,18 @@ function handleFacsimileIngestion(reply) {
       const values = { type: type, n: n };
       const targets = getTargets(type, n);
       if (targets.length < 1) {
-        warnings.push(fill('ingestFacsimileNotFound', values));
+        warn('ingestFacsimileNotFound', values);
       } else if (targets.length > 1) {
-        warnings.push(fill('ingestFacsimileNotUnique', values));
+        warn('ingestFacsimileNotUnique', values);
       } else if (!targets[0].hasAttribute('xml:id')) {
-        warnings.push(fill('ingestFacsimileNoId', values));
+        warn('ingestFacsimileNoId', values);
       } else {
         const range = setAttributeInEditor(cm, targets[0], 'facs', '#' + zoneId, lastPos);
         if (range.start && range.start !== -1) {
           lastPos = range.end;
           added++;
         } else {
-          warnings.push(fill('ingestFacsimileNotInEditor', values));
+          warn('ingestFacsimileNotInEditor', values, targets[0].getAttribute('xml:id'));
         }
       }
     });
@@ -1236,12 +1202,12 @@ function handleFacsimileIngestion(reply) {
   function processZones() {
     const t0 = performance.now();
     cm.operation(() => {
-      while (i < zones.length && !abort) {
+      while (i < zones.length && !reporter.aborted()) {
         processZone(zones[i++]);
         if (performance.now() - t0 > BUDGET_MS) break;
       }
     });
-    if (i < zones.length && !abort) {
+    if (i < zones.length && !reporter.aborted()) {
       showProgress();
       setTimeout(processZones, 0);
     } else {
@@ -1256,14 +1222,11 @@ function handleFacsimileIngestion(reply) {
     handleEditorChanges();
     setProgressBar(0);
 
+    const abort = reporter.aborted();
     const values = { ...fileValues, added: added, done: i };
-    let msg = '<b>' + fill(abort ? 'ingestFacsimileStoppedTitle' : 'ingestFacsimileDoneTitle') + '</b><br><br>';
-    msg += fill('ingestFacsimileSummary', values);
-    if (abort) msg += '<br>' + fill('ingestFacsimileStopped', values);
-    if (warnings.length > 0) {
-      msg += '<br><br>' + fill('ingestFacsimileProblems', { count: warnings.length });
-      msg += '<div class="promptScrollList">' + warnings.join('<br>') + '</div>';
-    }
+    let summary = fill('ingestFacsimileSummary', values);
+    if (abort) summary += ' ' + fill('ingestFacsimileStopped', values);
+    if (warningCount > 0) summary += ' ' + fill('ingestFacsimileProblems', { count: warningCount });
     console.log(
       added +
         ' @facs attributes added from ' +
@@ -1273,11 +1236,11 @@ function handleFacsimileIngestion(reply) {
         (Date.now() - startTime) / 1000 +
         ' s)'
     );
-    v.showUserPrompt(msg, [okButton], warnings.length > 0 || abort ? 'warning' : 'info');
+    reporter.finished(fill(abort ? 'ingestFacsimileStoppedTitle' : 'ingestFacsimileDoneTitle'), summary, warningCount);
 
     // uncheck edit zones after ingest
     document.getElementById('editFacsimileZones').checked = false;
-    v.updateData(cm, false, false); // keep focus on the prompt
+    v.updateData(cm, false, false); // keep the focus where the result is shown
     v.allowCursorActivity = true;
     busy(false);
   } // finish()

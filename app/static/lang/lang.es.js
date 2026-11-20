@@ -220,7 +220,7 @@ export const lang = {
   meiToolboxClose: { text: 'Cerrar la caja de herramientas MEI' },
   meiToolboxTabIds: { text: 'Ids' },
   meiToolboxTabFacsimile: { text: 'Facsímil' },
-  meiToolboxTabReformat: { text: 'Regenerar' },
+  meiToolboxTabReformat: { text: 'Reformatear' },
   meiToolboxIdsAdd: { text: 'Añadir xml:id (a los elementos que no lo tienen)' },
   meiToolboxIdsChange: {
     text: 'Cambiar los xml:id (uno nuevo para cada elemento)',
@@ -237,10 +237,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Nada que hacer: no se ha añadido, cambiado ni eliminado ningún xml:id.' },
   meiToolboxIdsCancelled: { text: 'Cancelado, la codificación no ha cambiado.' },
   meiToolboxFacsimileInfo: {
-    text: 'Enlaza la codificación con las imágenes de página: incorpora un facsímil de otro archivo o añade un facsímil vacío con una superficie por salto de página.',
+    text: 'Enlaza la codificación con las imágenes de página: incorpora un facsímil de otro archivo o añade las superficies que aún faltan, una por salto de página.',
   },
   meiToolboxFacsimileIngest: { text: 'Incorporar facsímil…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Añadir facsímil vacío' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Añadir las superficies que faltan',
+    description: 'Añade lo que falta: un facsímil si no hay ninguno, una superficie con un gráfico provisional para cada página que aún no la tiene, y pb@facs que apunta a ella. Las páginas se asocian a las superficies ya existentes, que se dejan como están.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Superficies añadidas: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Páginas enlazadas a una superficie ya existente: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsímil añadido.' },
+  meiToolboxFacsimileUpToDate: { text: 'Cada página ya tiene su superficie; no se ha añadido nada.' },
   meiToolboxFacsimileZones: { text: '{n} zonas' },
   meiToolboxFacsimileSummary: { text: '{surfaces} superficies, {zones} zonas' },
   meiToolboxFacsimileNone: { text: 'Esta codificación no tiene facsímil.' },
@@ -248,9 +255,12 @@ export const lang = {
     text: 'Con Verovio',
     description: 'Deja que Verovio reescriba la codificación a partir de su propia representación.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio escribe la codificación a partir de su propia representación, con su propio formato y orden de atributos.',
+  },
   meiToolboxReformatXml: {
     text: 'Con el analizador XML',
-    description: 'Reformatea la codificación con el analizador XML: el contenido se mantiene, solo cambian el formato y el orden de los atributos.',
+    description: 'Reformatea la codificación con el analizador XML: el contenido se mantiene, solo cambian el formato y el orden de los atributos. Igual que Código → Reformatear con el analizador XML.',
   },
   meiToolboxReformatUnchanged: { text: 'La codificación no ha cambiado.' },
   meiToolboxReformatDone: { text: '{lines} líneas' },

@@ -215,7 +215,7 @@ export const lang = {
   meiToolboxClose: { text: 'Затвори MEI алатницу' },
   meiToolboxTabIds: { text: 'Ид-ови' },
   meiToolboxTabFacsimile: { text: 'Факсимил' },
-  meiToolboxTabReformat: { text: 'Поново исцртај' },
+  meiToolboxTabReformat: { text: 'Преобликуј' },
   meiToolboxIdsAdd: { text: 'Додај xml:id (елементима без њега)' },
   meiToolboxIdsChange: {
     text: 'Промени xml:id (нови за сваки елемент)',
@@ -232,10 +232,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Нема шта да се уради: ниједан xml:id није додат, промењен ни уклоњен.' },
   meiToolboxIdsCancelled: { text: 'Отказано, кодирање је непромењено.' },
   meiToolboxFacsimileInfo: {
-    text: 'Повежите кодирање са сликама страница: увезите факсимил из друге датотеке или додајте празан факсимил са једном површином по прелому странице.',
+    text: 'Повежите кодирање са сликама страница: увезите факсимил из друге датотеке или додајте површине које још недостају, по једну за сваки прелом странице.',
   },
   meiToolboxFacsimileIngest: { text: 'Увези факсимил…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Додај празан факсимил' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Додај површине које недостају',
+    description: 'Додаје оно што недостаје: факсимил ако га нема, површину са резервисаним graphic елементом за сваку страницу која је још нема, и pb@facs који на њу упућује. Странице се повезују са већ постојећим површинама, које остају непромењене.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Додато површина: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Страница повезаних са већ постојећом површином: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Факсимил додат.' },
+  meiToolboxFacsimileUpToDate: { text: 'Свака страница већ има своју површину; ништа није додато.' },
   meiToolboxFacsimileZones: { text: '{n} зона' },
   meiToolboxFacsimileSummary: { text: '{surfaces} површина, {zones} зона' },
   meiToolboxFacsimileNone: { text: 'Ово кодирање нема факсимил.' },
@@ -243,9 +250,12 @@ export const lang = {
     text: 'Преко Verovija',
     description: 'Пушта Verovio да изнова испише кодирање из сопственог приказа.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio исписује кодирање из сопственог приказа, у сопственом обликовању и редоследу атрибута.',
+  },
   meiToolboxReformatXml: {
     text: 'Преко XML парсера',
-    description: 'Преобликује кодирање кроз XML парсер: садржај остаје исти, мењају се само обликовање и редослед атрибута.',
+    description: 'Преобликује кодирање кроз XML парсер: садржај остаје исти, мењају се само обликовање и редослед атрибута. Исто као Кôд → Преобликуј преко XML парсера.',
   },
   meiToolboxReformatUnchanged: { text: 'Кодирање је непромењено.' },
   meiToolboxReformatDone: { text: '{lines} редова' },

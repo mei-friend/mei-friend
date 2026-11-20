@@ -217,7 +217,7 @@ export const lang = {
   meiToolboxClose: { text: 'MEI-gereedschapskist sluiten' },
   meiToolboxTabIds: { text: 'Id\'s' },
   meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Opnieuw opbouwen' },
+  meiToolboxTabReformat: { text: 'Herformatteren' },
   meiToolboxIdsAdd: { text: 'xml:id\'s toevoegen (aan elementen zonder)' },
   meiToolboxIdsChange: {
     text: 'xml:id\'s wijzigen (een nieuwe voor elk element)',
@@ -234,10 +234,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Niets te doen: er zijn geen xml:id\'s toegevoegd, gewijzigd of verwijderd.' },
   meiToolboxIdsCancelled: { text: 'Geannuleerd, de codering is ongewijzigd.' },
   meiToolboxFacsimileInfo: {
-    text: 'Verbind de codering met paginabeelden: neem een facsimile uit een ander bestand over, of voeg een leeg facsimile toe met één surface per pagina-einde.',
+    text: 'Verbind de codering met paginabeelden: neem een facsimile uit een ander bestand over, of voeg de surfaces toe die nog ontbreken, één per pagina-einde.',
   },
   meiToolboxFacsimileIngest: { text: 'Facsimile overnemen…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Leeg facsimile toevoegen' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Ontbrekende surfaces toevoegen',
+    description: 'Voegt toe wat ontbreekt: een facsimile als er geen is, een surface met een tijdelijke graphic voor elke pagina die er nog geen heeft, en pb@facs dat ernaar verwijst. Pagina’s worden gekoppeld aan de al aanwezige surfaces, die onveranderd blijven.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Toegevoegde surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pagina\'s gekoppeld aan een al aanwezige surface: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsimile toegevoegd.' },
+  meiToolboxFacsimileUpToDate: { text: 'Elke pagina heeft al zijn surface; er is niets toegevoegd.' },
   meiToolboxFacsimileZones: { text: '{n} zones' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
   meiToolboxFacsimileNone: { text: 'Deze codering heeft geen facsimile.' },
@@ -245,9 +252,12 @@ export const lang = {
     text: 'Via Verovio',
     description: 'Laat Verovio de codering opnieuw schrijven vanuit zijn eigen representatie.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio schrijft de codering vanuit zijn eigen representatie, met zijn eigen opmaak en attribuutvolgorde.',
+  },
   meiToolboxReformatXml: {
-    text: 'Met de XML-parser',
-    description: 'Formatteert de codering opnieuw via de XML-parser: de inhoud blijft behouden, alleen opmaak en attribuutvolgorde veranderen.',
+    text: 'Via de XML-parser',
+    description: 'Formatteert de codering opnieuw via de XML-parser: de inhoud blijft behouden, alleen opmaak en attribuutvolgorde veranderen. Hetzelfde als Code → Herformatteren via de XML-parser.',
   },
   meiToolboxReformatUnchanged: { text: 'De codering is ongewijzigd.' },
   meiToolboxReformatDone: { text: '{lines} regels' },

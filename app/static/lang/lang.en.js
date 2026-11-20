@@ -260,10 +260,18 @@ export const lang = {
 
   // MEI TOOLBOX: Facsimile tab
   meiToolboxFacsimileInfo: {
-    text: 'Link the encoding to page images: ingest a facsimile from another file, or add an empty facsimile with one surface per page break.',
+    text: 'Link the encoding to page images: ingest a facsimile from another file, or add the surfaces that are still missing, one per page break.',
   },
   meiToolboxFacsimileIngest: { text: 'Ingest facsimile…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Add empty facsimile' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Add missing surfaces',
+    description:
+      'Adds what is missing: a facsimile when there is none, a surface with a placeholder graphic for every page that has none yet, and pb@facs pointing to it. Pages are matched to the surfaces already there, which are left as they are.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Surfaces added: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pages linked to a surface that was already there: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsimile added.' },
+  meiToolboxFacsimileUpToDate: { text: 'Every page already has its surface; nothing added.' },
   meiToolboxFacsimileZones: { text: '{n} zones' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
   meiToolboxFacsimileNone: { text: 'This encoding has no facsimile.' },

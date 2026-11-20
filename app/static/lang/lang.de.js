@@ -222,7 +222,7 @@ export const lang = {
   meiToolboxClose: { text: 'MEI-Werkzeugkasten schließen' },
   meiToolboxTabIds: { text: 'Ids' },
   meiToolboxTabFacsimile: { text: 'Faksimile' },
-  meiToolboxTabReformat: { text: 'Neu schreiben' },
+  meiToolboxTabReformat: { text: 'Neu formatieren' },
   meiToolboxIdsAdd: { text: 'xml:ids hinzufügen (zu Elementen ohne)' },
   meiToolboxIdsChange: {
     text: 'xml:ids ändern (neue für jedes Element)',
@@ -239,10 +239,17 @@ export const lang = {
   meiToolboxIdsNothing: { text: 'Nichts zu tun: Es wurden keine xml:ids hinzugefügt, geändert oder entfernt.' },
   meiToolboxIdsCancelled: { text: 'Abgebrochen, die Kodierung ist unverändert.' },
   meiToolboxFacsimileInfo: {
-    text: 'Die Kodierung mit Seitenbildern verbinden: ein Faksimile aus einer anderen Datei übernehmen oder ein leeres Faksimile mit einer surface je Seitenumbruch anlegen.',
+    text: 'Die Kodierung mit Seitenbildern verbinden: ein Faksimile aus einer anderen Datei übernehmen oder die noch fehlenden surfaces anlegen, eine je Seitenumbruch.',
   },
   meiToolboxFacsimileIngest: { text: 'Faksimile übernehmen…' },
-  meiToolboxFacsimileAddEmpty: { text: 'Leeres Faksimile anlegen' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Fehlende surfaces anlegen',
+    description: 'Fügt hinzu, was fehlt: ein Faksimile, wenn es keines gibt, eine surface mit Platzhalter-graphic für jede Seite, die noch keine hat, und pb@facs, das darauf zeigt. Seiten werden den schon vorhandenen surfaces zugeordnet, die unverändert bleiben.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Hinzugefügte surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Mit einer schon vorhandenen surface verknüpfte Seiten: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimile angelegt.' },
+  meiToolboxFacsimileUpToDate: { text: 'Jede Seite hat bereits ihre surface; nichts hinzugefügt.' },
   meiToolboxFacsimileZones: { text: '{n} Zonen' },
   meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} Zonen' },
   meiToolboxFacsimileNone: { text: 'Diese Kodierung hat kein Faksimile.' },
@@ -250,9 +257,12 @@ export const lang = {
     text: 'Über Verovio',
     description: 'Lässt Verovio die Kodierung aus seiner eigenen Repräsentation neu schreiben.',
   },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio schreibt die Kodierung aus seiner eigenen Repräsentation, in eigener Formatierung und Attributreihenfolge.',
+  },
   meiToolboxReformatXml: {
     text: 'Über XML-Parser',
-    description: 'Formatiert die Kodierung über den XML-Parser neu: Der Inhalt bleibt erhalten, nur Formatierung und Attributreihenfolge ändern sich.',
+    description: 'Formatiert die Kodierung über den XML-Parser neu: Der Inhalt bleibt erhalten, nur Formatierung und Attributreihenfolge ändern sich. Dasselbe wie Code → Über XML-Parser neu formatieren.',
   },
   meiToolboxReformatUnchanged: { text: 'Die Kodierung ist unverändert.' },
   meiToolboxReformatDone: { text: '{lines} Zeilen' },
