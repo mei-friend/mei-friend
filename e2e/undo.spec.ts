@@ -68,6 +68,34 @@ test.describe('1 A single Ctrl-Z reverts a whole mei-friend edit operation.', ()
   });
 });
 
+test.describe('3 The editor keeps its own undo and redo.', () => {
+  test('3.1 Undo and redo are not bound a second time while the editor has focus', async ({ page }) => {
+    // CodeMirror binds Cmd/Ctrl-Z and Shift-Cmd/Ctrl-Z itself and handles them
+    // while the editor has the focus. mei-friend binding them in one of its
+    // always-on sections as well made one keypress run the command twice, so a
+    // single undo stepped back two edits (and redo skipped one). They therefore
+    // belong in the '*-not-in-text' sections, which the key handler skips while
+    // the focus is in the editor or in a text field.
+    const sections = await page.evaluate(async () => {
+      const { keymap } = await import('/static/keymaps/default-keymap.js');
+      const found = {};
+      for (const [selectors, bindings] of Object.entries(keymap))
+        for (const [key, command] of Object.entries(bindings))
+          if (command === 'undo' || command === 'redo') (found[command] ||= []).push({ selectors, key });
+      return found;
+    });
+
+    for (const command of ['undo', 'redo']) {
+      const places = sections[command] || [];
+      expect(places.length, `${command} should be bound for Mac and for Windows/Linux`).toBeGreaterThan(0);
+      for (const place of places)
+        expect(place.selectors, `'${place.key}' -> ${command} must not fire while the editor has focus`).toContain(
+          'not-in-text'
+        );
+    }
+  });
+});
+
 test.describe('2 Undo keeps the annotation list and notation highlights in sync.', () => {
   test('2.1 Undoing an annotation removes its list entry and notation highlight', async ({ page }) => {
     const noteId = 'note-0000001117852400';

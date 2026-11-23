@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.1">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Attribute conversion test: MEI 4</title>
+      </titleStmt>
+      <pubStmt/>
+      <notesStmt>
+        <annot>Test encoding for MEI 4 attribute names in the attribute conversion (e2e/attributeConversion.spec.ts): key.sig/key.mode/key.pname/keysig.showchange, and @label as display label (converted to label elements up to MEI 4).</annot>
+      </notesStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef xml:id="sd" key.sig="2s" key.mode="major" key.pname="d" keysig.showchange="true" meter.count="3" meter.unit="4">
+            <staffGrp xml:id="sg" symbol="bracket" label="Strings">
+              <staffDef xml:id="s1" n="1" lines="5" clef.shape="G" clef.line="2" label="Violin"/>
+              <!-- label with line break (pattern from Signature-Sound-Vienna): stays an element -->
+              <staffDef xml:id="s2" n="2" lines="5" clef.shape="C" clef.line="3">
+                <label xml:id="lb2">Viola<lb/>I</label>
+              </staffDef>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure xml:id="m1" n="1" right="end">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n1" pname="d" oct="5" dur="2" dots="1" accid.ges="n" artic="acc"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n2" pname="d" oct="4" dur="2" dots="1"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

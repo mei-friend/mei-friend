@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Attribute conversion test: attributes</title>
+      </titleStmt>
+      <pubStmt/>
+      <notesStmt>
+        <annot>Test encoding for "Convert attributes to elements" (e2e/attributeConversion.spec.ts). Encoded with attributes wherever MEI allows them; each measure covers one topic. Cases marked "warning" cannot be converted and must remain unchanged. Score and staff definitions: keysig, meter, clef, mensur, symbol; @label stays (MEI 5).</annot>
+      </notesStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef xml:id="sd" keysig="1f" meter.count="4" meter.unit="4" meter.sym="common">
+            <staffGrp xml:id="sg" symbol="brace" label="Piano">
+              <staffDef xml:id="s1" n="1" lines="5" clef.shape="G" clef.line="2" label="RH"/>
+              <staffDef xml:id="s2" n="2" lines="5" clef.shape="F" clef.line="4" clef.dis="8" clef.dis.place="below" keysig="2f" keysig.visible="true" meter.form="norm" mensur.sign="C" mensur.slash="1"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sec">
+            <!-- m1: accidentals -->
+            <measure xml:id="m1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n1" pname="c" oct="5" dur="4" accid="s"/>
+                  <note xml:id="n2" pname="d" oct="5" dur="4" accid.ges="f"/>
+                  <note xml:id="n3" pname="e" oct="5" dur="4" accid="n" accid.ges="n"/>
+                  <!-- merge into existing accid element (frequent in real encodings) -->
+                  <note xml:id="n4" pname="f" oct="5" dur="4" accid.ges="s">
+                    <accid xml:id="n4a" accid="s"/>
+                  </note>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- warning: @accid.ges contradicts existing accid element -->
+                  <note xml:id="n5" pname="c" oct="3" dur="2" accid.ges="f">
+                    <accid xml:id="n5a" accid.ges="s"/>
+                  </note>
+                  <!-- warning: accid within editorial markup exists (pattern from Signature-Sound-Vienna) -->
+                  <note xml:id="n6" pname="d" oct="3" dur="2" accid.ges="s">
+                    <supplied xml:id="n6sup">
+                      <accid xml:id="n6a" accid="s"/>
+                    </supplied>
+                  </note>
+                </layer>
+              </staff>
+            </measure>
+            <!-- m2: articulations -->
+            <measure xml:id="m2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n7" pname="c" oct="5" dur="4" artic="stacc"/>
+                  <note xml:id="n8" pname="d" oct="5" dur="4" artic="stacc acc"/>
+                  <!-- equal number of values: paired -->
+                  <note xml:id="n9" pname="e" oct="5" dur="4" artic="stacc acc" artic.ges="ten marc"/>
+                  <!-- different number of values: separate artic elements -->
+                  <chord xml:id="c1" dur="4" artic="ten" artic.ges="stacc ten">
+                    <note xml:id="c1a" pname="e" oct="4"/>
+                    <note xml:id="c1b" pname="g" oct="4"/>
+                  </chord>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- existing artic element with the same value: no duplicate -->
+                  <note xml:id="n10" pname="c" oct="3" dur="2" artic="acc">
+                    <artic xml:id="n10a" artic="acc"/>
+                  </note>
+                  <!-- warning: artic within editorial markup exists -->
+                  <note xml:id="n11" pname="d" oct="3" dur="2" artic="stacc">
+                    <supplied xml:id="n11sup">
+                      <artic xml:id="n11a" artic="acc"/>
+                    </supplied>
+                  </note>
+                </layer>
+              </staff>
+            </measure>
+            <!-- m3: lyrics -->
+            <measure xml:id="m3" n="3">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n12" pname="c" oct="5" dur="4" syl="Ky"/>
+                  <!-- warning: verse element exists -->
+                  <note xml:id="n13" pname="d" oct="5" dur="4" syl="ri">
+                    <verse xml:id="n13v" n="1">
+                      <syl xml:id="n13s">e</syl>
+                    </verse>
+                  </note>
+                  <chord xml:id="c2" dur="2" syl="e">
+                    <note xml:id="c2a" pname="e" oct="4"/>
+                    <note xml:id="c2b" pname="g" oct="4"/>
+                  </chord>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <mRest xml:id="mr1"/>
+                </layer>
+              </staff>
+            </measure>
+            <!-- m4: fermatas -->
+            <measure xml:id="m4" n="4">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n14" pname="c" oct="5" dur="4" fermata="above"/>
+                  <chord xml:id="c3" dur="4" fermata="below">
+                    <note xml:id="c3a" pname="e" oct="4"/>
+                    <note xml:id="c3b" pname="g" oct="4"/>
+                  </chord>
+                  <rest xml:id="r1" dur="4" fermata="above"/>
+                  <!-- existing fermata element: attribute removed, no duplicate -->
+                  <note xml:id="n15" pname="d" oct="5" dur="4" fermata="above"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <mRest xml:id="mr2" fermata="above"/>
+                </layer>
+              </staff>
+              <fermata xml:id="f0" staff="1" startid="#n15" place="above"/>
+            </measure>
+            <!-- m5-m7: ties; staff 1 has two layers with ties on the same pitch -->
+            <measure xml:id="m5" n="5">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n16" pname="c" oct="5" dur="2" tie="i"/>
+                  <note xml:id="n17" pname="e" oct="5" dur="2" tie="i"/>
+                </layer>
+                <layer n="2">
+                  <note xml:id="n18" pname="c" oct="5" dur="2" tie="i"/>
+                  <note xml:id="n19" pname="a" oct="4" dur="2"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- chord tie: one tie per chord note -->
+                  <chord xml:id="c4" dur="1" tie="i">
+                    <note xml:id="c4a" pname="c" oct="3"/>
+                    <note xml:id="c4b" pname="g" oct="3"/>
+                  </chord>
+                </layer>
+              </staff>
+            </measure>
+            <measure xml:id="m6" n="6">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n20" pname="c" oct="5" dur="2" tie="t"/>
+                  <!-- medial: ends tie from n17, starts tie to n24 -->
+                  <note xml:id="n22" pname="e" oct="5" dur="2" tie="m"/>
+                </layer>
+                <layer n="2">
+                  <note xml:id="n21" pname="c" oct="5" dur="2" tie="t"/>
+                  <note xml:id="n23" pname="a" oct="4" dur="2"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <chord xml:id="c5" dur="1" tie="t">
+                    <note xml:id="c5a" pname="c" oct="3"/>
+                    <note xml:id="c5b" pname="g" oct="3"/>
+                  </chord>
+                </layer>
+              </staff>
+            </measure>
+            <measure xml:id="m7" n="7">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n24" pname="e" oct="5" dur="2" tie="t"/>
+                  <!-- warning: no matching end -->
+                  <note xml:id="n25" pname="g" oct="5" dur="4" tie="i"/>
+                  <!-- tie to n29 already encoded as tie element: no duplicate -->
+                  <note xml:id="n26" pname="a" oct="5" dur="4" tie="i"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- warning: no matching start -->
+                  <note xml:id="n27" pname="e" oct="3" dur="2" tie="t"/>
+                  <note xml:id="n28" pname="c" oct="3" dur="2"/>
+                </layer>
+              </staff>
+              <tie xml:id="t0" staff="1" startid="#n26" endid="#n29"/>
+            </measure>
+            <!-- m8-m10: slurs (nested, medial, across staves, unterminated) and glissando -->
+            <measure xml:id="m8" n="8">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n29" pname="a" oct="5" dur="4" tie="t" slur="i1"/>
+                  <note xml:id="n30" pname="g" oct="5" dur="4" slur="i2"/>
+                  <note xml:id="n31" pname="f" oct="5" dur="4" slur="t2"/>
+                  <note xml:id="n32" pname="e" oct="5" dur="4" slur="t1"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n33" pname="c" oct="3" dur="2" slur="i1"/>
+                  <note xml:id="n34" pname="d" oct="3" dur="2" slur="m1"/>
+                </layer>
+              </staff>
+            </measure>
+            <measure xml:id="m9" n="9">
+              <staff n="1">
+                <layer n="1">
+                  <!-- warning: unterminated slur -->
+                  <note xml:id="n35" pname="c" oct="5" dur="4" slur="i3"/>
+                  <note xml:id="n36" pname="d" oct="5" dur="4" gliss="i"/>
+                  <note xml:id="n37" pname="a" oct="5" dur="2" gliss="t"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n38" pname="e" oct="3" dur="1" slur="t1"/>
+                </layer>
+              </staff>
+            </measure>
+            <measure xml:id="m10" n="10" right="end">
+              <staff n="1">
+                <layer n="1">
+                  <!-- slur across staves -->
+                  <note xml:id="n39" pname="c" oct="5" dur="1" slur="i4"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n40" pname="c" oct="3" dur="1" slur="t4"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

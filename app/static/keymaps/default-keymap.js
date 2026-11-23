@@ -125,12 +125,11 @@ export const keymap = {
     'cmd-m': 'addIds',
     'cmd-shift-m': 'removeIds',
     'cmd-shift-v': 'validate',
+    'cmd-shift-x': 'reformatEncoding',
     'shift-alt-f': 'indentSelection',
     'cmd-f': 'doFind',
     'cmd-g': 'doFindNext',
     'cmd-shift-g': 'doFindPrev',
-    'cmd-z': 'undo',
-    'cmd-shift-z': 'redo',
     'cmd-0': 'notesZoom100',
     'cmd-5': 'notesZoom50',
     'cmd-+': 'notesZoomIn',
@@ -184,12 +183,11 @@ export const keymap = {
     'ctrl-m': 'addIds',
     'ctrl-shift-m': 'removeIds',
     'ctrl-shift-v': 'validate',
+    'ctrl-shift-x': 'reformatEncoding',
     'shift-alt-f': 'indentSelection',
     'ctrl-f': 'doFind',
     'ctrl-g': 'doFindNext',
     'ctrl-shift-g': 'doFindPrev',
-    'ctrl-z': 'undo',
-    'ctrl-shift-z': 'redo',
     'ctrl-0': 'notesZoom100',
     'ctrl-5': 'notesZoom50',
     'ctrl-+': 'notesZoomIn',
@@ -215,19 +213,19 @@ export const keymap = {
     'alt-s': 'addSlur',
     'alt-t': 'addTie',
     'alt-h': 'addCresHairpin',
-    'alt-shift-h': 'addDimHairpin',
+    'shift-alt-h': 'addDimHairpin',
     'alt-f': 'addFermata',
     'alt-i': 'addDirective',
     'alt-d': 'addDynamics',
-    'alt-shift-t': 'addTempo',
+    'shift-alt-t': 'addTempo',
     'alt-g': 'addGlissando',
     'alt-p': 'addPedalDown',
-    'alt-shift-p': 'addPedalUp',
+    'shift-alt-p': 'addPedalUp',
     'alt-m': 'addMordent',
-    'alt-shift-m': 'addMordentUpper',
+    'shift-alt-m': 'addMordentUpper',
     'alt-l': 'addTrill',
     'alt-r': 'addTurn',
-    'alt-shift-r': 'addTurnLower',
+    'shift-alt-r': 'addTurnLower',
   }, // Win/Linux-all
 
   // not in text (fields, editor), that is, .preventKeyBinding and #encoding all operating systems
@@ -238,10 +236,19 @@ export const keymap = {
   // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Mac OSX
   '.platform-darwin-not-in-text': {
     'cmd-a': 'toggleAnnotationPanel',
+    // The editor binds undo/redo itself and handles them while it has the focus.
+    // Binding them in an always-on section as well made one keypress run the
+    // command twice, stepping back two edits at once; here they only fire when
+    // the focus is outside the editor (e.g. on the notation).
+    'cmd-z': 'undo',
+    'cmd-shift-z': 'redo',
   },
 
   // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Win/Linux
   '.platform-win32-not-in-text, .platform-linux-not-in-text': {
     'ctrl-a': 'toggleAnnotationPanel',
+    // see the Mac section above: the editor brings its own undo/redo
+    'ctrl-z': 'undo',
+    'ctrl-shift-z': 'redo',
   },
 };

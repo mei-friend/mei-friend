@@ -89,6 +89,9 @@ export default class Storage {
       this._orientation = this.storage.getItem('orientation');
       this._notationOrientation = this.storage.getItem('notationOrientation');
       this._facsimileOrientation = this.storage.getItem('facsimileOrientation');
+      this._meiToolboxOrientation = this.storage.getItem('meiToolboxOrientation');
+      this._meiToolboxWidth = this.storage.getItem('meiToolboxWidth');
+      this._meiToolboxHeight = this.storage.getItem('meiToolboxHeight');
       this._notationProportion = this.storage.getItem('notationProportion');
       this._facsimileProportion = this.storage.getItem('facsimileProportion');
       this._page = this.storage.getItem('page');
@@ -285,6 +288,33 @@ export default class Storage {
   set facsimileOrientation(orientation) {
     this.safelySetStorageItem('facsimileOrientation', orientation);
     this._facsimileOrientation = orientation;
+  }
+
+  get meiToolboxOrientation() {
+    return this._meiToolboxOrientation;
+  }
+
+  set meiToolboxOrientation(orientation) {
+    this.safelySetStorageItem('meiToolboxOrientation', orientation);
+    this._meiToolboxOrientation = orientation;
+  }
+
+  get meiToolboxWidth() {
+    return parseFloat(this._meiToolboxWidth);
+  }
+
+  set meiToolboxWidth(width) {
+    this.safelySetStorageItem('meiToolboxWidth', width);
+    this._meiToolboxWidth = width;
+  }
+
+  get meiToolboxHeight() {
+    return parseFloat(this._meiToolboxHeight);
+  }
+
+  set meiToolboxHeight(height) {
+    this.safelySetStorageItem('meiToolboxHeight', height);
+    this._meiToolboxHeight = height;
   }
 
   get notationProportion() {

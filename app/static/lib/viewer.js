@@ -15,7 +15,7 @@ import {
 } from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
-import { codeCheckerHeight } from './resizer.js';
+import * as meiToolbox from './mei-toolbox.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
@@ -2031,18 +2031,6 @@ export default class Viewer {
         }
       }
       switch (opt) {
-        case 'renumberMeasuresUseSuffixAtEndings':
-          this.disableElementThroughCheckbox(
-            'renumberMeasuresContinueAcrossEndings',
-            'renumberMeasuresUseSuffixAtEndings'
-          );
-          break;
-        case 'renumberMeasuresUseSuffixAtMeasures':
-          this.disableElementThroughCheckbox(
-            'renumberMeasureContinueAcrossIncompleteMeasures',
-            'renumberMeasuresUseSuffixAtMeasures'
-          );
-          break;
         case 'transposeKey':
           if (o.radioChecked && document.getElementById('enableTransposition').checked) {
             this.setDisablednessInOptionsItem(['transposeKey'], ['']);
@@ -2171,6 +2159,12 @@ export default class Viewer {
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
+          case 'showMeiToolbox':
+            value ? cmd.showMeiToolbox() : cmd.hideMeiToolbox();
+            break;
+          case 'selectMeiToolboxOrientation':
+            setOrientation(cm, '', '', this);
+            break;
           case 'selectFacsimilePanelOrientation':
             facs.drawFacsimile();
             break;
@@ -2274,18 +2268,6 @@ export default class Viewer {
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
             document.getElementById('updateControls').style.display = u ? 'flex' : 'none';
-            break;
-          case 'renumberMeasuresContinueAcrossEndings':
-            this.disableElementThroughCheckbox(
-              'renumberMeasuresContinueAcrossEndings',
-              'renumberMeasuresUseSuffixAtEndings'
-            );
-            break;
-          case 'renumberMeasureContinueAcrossIncompleteMeasures':
-            this.disableElementThroughCheckbox(
-              'renumberMeasureContinueAcrossIncompleteMeasures',
-              'renumberMeasuresUseSuffixAtMeasures'
-            );
             break;
           case 'supplyWorkpackageGithubActionsConfiguration':
             console.log('Update to GitHub Actions configuration URL');
@@ -3166,15 +3148,6 @@ export default class Viewer {
     }
   }
 
-  // toggle disabled at one specific checkbox
-  disableElementThroughCheckbox(checkbox, affectedElement) {
-    let cont = document.getElementById(checkbox).checked;
-    let el = document.getElementById(affectedElement);
-    el.disabled = cont;
-    if (cont) el.parentNode.classList.add('disabled');
-    else el.parentNode.classList.remove('disabled');
-  } // disableElementThroughCheckbox()
-
   /**
    * Sets disabled to offItems (and removes it to onItems) of
    * current element and its previous sibling (label)
@@ -3736,266 +3709,31 @@ export default class Viewer {
   } // toggleValidationReportVisibility()
 
   /**
-   * Initializes and shows code checker panel below the CodeMirror encoding.
-   * codeCheckerEntries to be added through addCodeCheckerEntry(data).
+   * Starts a new run of a check in the Check tab of the MEI toolbox (see
+   * mei-toolbox.js), which lists entries added through addCodeCheckerEntry(data).
    * @param {string} title
-   * @returns
    */
   initCodeCheckerPanel(title = 'Code Checker') {
-    let codeChecker = document.getElementById('codeChecker');
-    if (!codeChecker) return;
-    codeChecker.innerHTML = '';
-    codeChecker.style.height = codeCheckerHeight + 'px';
-    codeChecker.style.display = 'flex';
-    setOrientation(cm, '', '', this);
-
-    let headerDiv = document.createElement('div');
-    headerDiv.classList.add('validation-title');
-    headerDiv.id = 'codeCheckerTitle';
-    codeChecker.appendChild(headerDiv);
-
-    let titleSpan = document.createElement('span');
-    titleSpan.innerHTML = title;
-    titleSpan.title = title;
-    titleSpan.classList.add('codeCheckerMessage');
-    headerDiv.appendChild(titleSpan);
-
-    // Correct/Fix all
-    let correctAllButton = document.createElement('button');
-    correctAllButton.id = 'codeCheckerFixAllButton';
-    correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
-    correctAllButton.classList.add('btn');
-    correctAllButton.addEventListener('click', () => {
-      const fixButtonList = Array.from(codeChecker.querySelectorAll('button.fix:not(.disabled)'));
-      infoSpanCurrent.innerHTML = '0';
-      infoSpanOf.innerHTML = '/';
-      infoSpanTotal.innerHTML = fixButtonList.length;
-      correctAllButton.classList.add('disabled');
-      correctAllButton.disabled = true;
-      ignoreAllButton.classList.add('disabled');
-      ignoreAllButton.disabled = true;
-      if (fixButtonList.length === 0) return;
-
-      // Apply the fixes in time slices, each as one CodeMirror operation.
-      // Editor change handling (DOM reparse, local storage, notation update)
-      // is blocked while fixing and run once at the end; cursor activity is
-      // suppressed so that no page flipping happens per fix.
-      const BUDGET_MS = 50; // per slice, before yielding to the GUI
-      let i = 0;
-      this.showCodeCheckerStopButton(true);
-      cm.blockChanges = true;
-      const applyFixes = () => {
-        try {
-          cm.operation(() => {
-            const t0 = performance.now();
-            while (i < fixButtonList.length) {
-              fixButtonList[i++].applyFix();
-              if (performance.now() - t0 > BUDGET_MS) break;
-            }
-            this.allowCursorActivity = false; // fix callbacks re-enable it; keep it off until done
-          });
-        } catch (err) {
-          console.error('Fix all: error applying fix ' + i + ':', err);
-          i = fixButtonList.length;
-        }
-        if (i < fixButtonList.length && !this.codeCheckerAbort) {
-          setTimeout(applyFixes, 0);
-        } else {
-          cm.blockChanges = false;
-          this.allowCursorActivity = true;
-          this.showCodeCheckerStopButton(false);
-          if (this.codeCheckerAbort) {
-            // stopped: let the user continue with the remaining entries
-            correctAllButton.classList.remove('disabled');
-            correctAllButton.disabled = false;
-            ignoreAllButton.classList.remove('disabled');
-            ignoreAllButton.disabled = false;
-          }
-          handleEditorChanges();
-        }
-      };
-      setTimeout(applyFixes, 0);
-    });
-    headerDiv.appendChild(correctAllButton);
-
-    let ignoreAllButton = document.createElement('button');
-    ignoreAllButton.id = 'codeCheckerIgnoreAllButton';
-    ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
-    ignoreAllButton.classList.add('btn');
-    ignoreAllButton.addEventListener('click', () => {
-      codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
-        let button = ch.querySelector('button.ignore');
-        let span = ch.querySelector('.codeCheckerMessage');
-        if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
-          button.click();
-        }
-      });
-    });
-    headerDiv.appendChild(ignoreAllButton);
-
-    // Stop button: interrupts a running check or "Fix all" at the next time slice
-    this.codeCheckerAbort = false;
-    let stopButton = document.createElement('button');
-    stopButton.id = 'codeCheckerStopButton';
-    stopButton.innerHTML = translator.lang.codeCheckerStop.text;
-    stopButton.classList.add('btn');
-    stopButton.addEventListener('click', () => {
-      this.codeCheckerAbort = true;
-      stopButton.disabled = true;
-      stopButton.classList.add('disabled');
-    });
-    headerDiv.appendChild(stopButton);
-
-    let infoSpanCurrent = document.createElement('span');
-    infoSpanCurrent.id = 'codeCheckerInfoCurrent';
-    headerDiv.appendChild(infoSpanCurrent);
-    let infoSpanOf = document.createElement('span');
-    infoSpanOf.id = 'codeCheckerInfoOf';
-    headerDiv.appendChild(infoSpanOf);
-    let infoSpanTotal = document.createElement('span');
-    infoSpanTotal.id = 'codeCheckerInfoTotal';
-    headerDiv.appendChild(infoSpanTotal);
-
-    let closeButton = document.createElement('span');
-    closeButton.classList.add('rightButton');
-    closeButton.id = 'codeCheckerCloseButton';
-    closeButton.innerHTML = '&times';
-    closeButton.addEventListener('click', () => {
-      codeChecker.style.display = 'none';
-      setOrientation(cm, '', '', this);
-    });
-    headerDiv.appendChild(closeButton);
-
-    // add empty validation-item to show that the panel is open
-    let emptyDiv = document.createElement('div');
-    emptyDiv.classList.add('validation-item');
-    emptyDiv.classList.add('codeCheckerInfoEmpty');
-    codeChecker.appendChild(emptyDiv);
-
-    let noMessages = document.createElement('div');
-    noMessages.classList.add('validation-item');
-    noMessages.id = 'codeCheckerCheckingCode';
-    noMessages.classList.add('noAccidMessagesFound');
-    noMessages.innerHTML = translator.lang.codeCheckerCheckingCode.text;
-    codeChecker.appendChild(noMessages);
+    meiToolbox.startRun('check', title);
   } // initCodeCheckerPanel()
 
   /**
-   * Adds an entry to the code checker panel with a data structure,
-   * containing also the fix callback
-   * @param {Object} data
-   * @returns
+   * Adds an entry to the result list of the current MEI toolbox run
+   * @param {Object} data {xmlId, html, correct}, with optional fix callback correct()
    */
   addCodeCheckerEntry(data) {
-    let codeChecker = document.getElementById('codeChecker');
-    if (!codeChecker) return;
-    let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
-    if (noMessages) noMessages.remove();
-    let codeCheckerInfoCurrent = document.getElementById('codeCheckerInfoCurrent');
-    let codeCheckerInfoTotal = document.getElementById('codeCheckerInfoTotal');
-    let div = document.createElement('div');
-    div.classList.add('validation-item');
-
-    // span for message
-    let span = document.createElement('span');
-    span.classList.add('codeCheckerMessage');
-    span.innerHTML = data.html;
-    span.title = data.html;
-    span.addEventListener('click', () => {
-      utils.setCursorToId(cm, data.xmlId);
-      cm.focus();
-    });
-    div.appendChild(span);
-
-    // function to correct error
-    if (data.correct) {
-      // Correct/Fix Button
-      let correctButton = document.createElement('button');
-      correctButton.innerHTML = translator.lang.codeCheckerFix.text;
-      correctButton.classList.add('btn');
-      correctButton.classList.add('fix');
-      // applyFix() is also called directly by "Fix all", so that no click event
-      // has to be dispatched (and handled by document-wide listeners) per entry
-      correctButton.applyFix = () => {
-        data.correct();
-        let checked = document.createElement('span');
-        checked.innerHTML = icon.check;
-        div.appendChild(checked);
-        correctButton.disabled = true;
-        correctButton.classList.add('disabled');
-        ignoreButton.disabled = true;
-        ignoreButton.classList.add('disabled');
-        let count = parseInt(codeCheckerInfoCurrent.innerHTML) || 0;
-        let total = parseInt(codeCheckerInfoTotal.innerHTML) || 0;
-        codeCheckerInfoCurrent.innerHTML = ++count;
-        if (count === total) {
-          let checked = document.createElement('span');
-          checked.innerHTML += icon.check;
-          codeCheckerInfoCurrent.parentElement.appendChild(checked);
-        }
-      };
-      correctButton.addEventListener('click', correctButton.applyFix);
-      div.appendChild(correctButton);
-
-      // Ignore Button
-      let ignoreButton = document.createElement('button');
-      ignoreButton.innerHTML = translator.lang.codeCheckerIgnore.text;
-      ignoreButton.classList.add('btn');
-      ignoreButton.classList.add('ignore');
-      ignoreButton.addEventListener('click', () => {
-        let total = parseInt(codeCheckerInfoTotal.innerHTML);
-        // correctButton.removeEventListener('click', data.correct);
-        if (!span.classList.contains('strikethrough')) {
-          // active, not stroke through
-          correctButton.disabled = true;
-          correctButton.classList.add('disabled');
-          span.disabled = true;
-          span.classList.add('strikethrough');
-          total--;
-        } else {
-          correctButton.disabled = false;
-          correctButton.classList.remove('disabled');
-          span.disabled = false;
-          span.classList.remove('strikethrough');
-          total++;
-        }
-        codeCheckerInfoTotal.innerHTML = total;
-      });
-      div.appendChild(ignoreButton);
-    }
-    codeChecker.appendChild(div);
+    meiToolbox.addEntry(data);
   } // addCodeCheckerEntry()
 
   /**
-   * Shows or hides the Stop button of the code checker panel; showing it
-   * (a check or "Fix all" starts) resets the abort flag
-   * @param {boolean} visible
+   * Finishes the current MEI toolbox run
+   * @param {string} allGoodString shown when no entries were found
    */
-  showCodeCheckerStopButton(visible) {
-    if (visible) this.codeCheckerAbort = false;
-    const stopButton = document.getElementById('codeCheckerStopButton');
-    if (!stopButton) return;
-    stopButton.style.display = visible ? '' : 'none';
-    stopButton.disabled = false;
-    stopButton.classList.remove('disabled');
-  } // showCodeCheckerStopButton()
-
   finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
-    this.showCodeCheckerStopButton(false);
-    let nothingFound = document.getElementById('codeCheckerCheckingCode');
-    if (nothingFound) {
-      nothingFound.innerHTML = allGoodString;
-    } else {
-      document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
-      document.getElementById('codeCheckerInfoOf').innerHTML = '/';
-      // decrement the first empty validation-item
-      document.getElementById('codeCheckerInfoTotal').innerHTML =
-        document.querySelectorAll('.validation-item')?.length - 1;
-    }
+    meiToolbox.finishRun(allGoodString);
   } // finalizeCodeCheckerPanel()
 
   hideCodeCheckerPanel() {
-    document.getElementById('codeCheckerResizer').style.display = 'none';
-    document.getElementById('codeChecker').style.display = 'none';
+    meiToolbox.resetToolbox();
   }
 } // class Viewer

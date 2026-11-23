@@ -85,12 +85,18 @@ test.describe('2 Test mei-friend settings panel tab', () => {
     await expect(page.locator('#selectIdStyle')).toHaveValue('Base36');
     // choose a different xml:id style from selector
     await page.locator('#selectIdStyle').selectOption('Original');
-    // remove xml:id's from the MEI by clicking #manipulateMenuTitle => #removeIdsText
-    await page.click('#manipulateMenuTitle');
-    await page.click('#removeIdsText');
-    /// add xml:id's back to the MEI by clicking #manipulateMenuTitle => #addIdsText
-    await page.click('#manipulateMenuTitle');
-    await page.click('#addIdsText');
+    // remove and re-add xml:ids in the Ids tab of the MEI toolbox
+    await page.click('#closeSettingsButton'); // the settings panel covers the toolbox button
+    await page.click('#showMeiToolboxButton');
+    await page.click('.mtTab[data-tab="ids"]');
+    const idsPane = page.locator('.mtPane[data-tab="ids"]');
+    await idsPane.locator('input[value="remove"]').check();
+    await idsPane.locator('.mtActions button').click();
+    await expect(idsPane.locator('.mtRunSummary')).toContainText('removed', { timeout: 30000 });
+    await page.evaluate(() => document.querySelector('.mtPane[data-tab="ids"] .mtOptions')!.classList.remove('collapsed'));
+    await idsPane.locator('input[value="add"]').check();
+    await idsPane.locator('.mtActions button').click();
+    await expect(idsPane.locator('.mtRunSummary')).toContainText('added', { timeout: 30000 });
     // ensure that the xml:id style of the first g.staff element fits the selected style
     await expect(page.locator('g.staff').first()).toHaveAttribute('id', /^staff-\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d$/);
   });
