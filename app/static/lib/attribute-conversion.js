@@ -105,12 +105,13 @@ const lyricsElements = ['verse', 'syl', 'refrain'];
 
 /**
  * Groups of attributes that can be converted selectively (options.groups):
- *   accid: note@accid, @accid.ges; artic: note|chord@artic, @artic.ges; syl: note|chord@syl;
+ *   accid: note@accid; accidGes: note@accid.ges (both as attributes of an accid element);
+ *   artic: note|chord@artic, @artic.ges; syl: note|chord@syl;
  *   fermata: @fermata; tie: @tie; slur: @slur; gliss: note@gliss;
  *   definitions: clef, key, meter and mensuration attributes on staffDef/scoreDef;
  *   labels: staffGrp@symbol and (MEI < 5) staffDef|staffGrp@label, @label.abbr
  */
-export const conversionGroups = ['accid', 'artic', 'syl', 'fermata', 'tie', 'slur', 'gliss', 'definitions', 'labels'];
+export const conversionGroups = ['accid', 'accidGes', 'artic', 'syl', 'fermata', 'tie', 'slur', 'gliss', 'definitions', 'labels'];
 
 /**
  * Converts all attributes in xmlDoc that have an element equivalent into
@@ -163,7 +164,7 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
 
   if (groups.has('definitions')) convertDefinitions();
   if (groups.has('labels')) convertLabels();
-  if (groups.has('accid')) convertAccid();
+  if (groups.has('accid') || groups.has('accidGes')) convertAccid();
   if (groups.has('artic')) convertArtic();
   if (groups.has('syl')) convertSyl();
   if (groups.has('fermata')) convertFermata();
@@ -265,10 +266,13 @@ export function convertAttributesToElements(xmlDoc, options = {}) {
   // accid, artic, syl
   // ##########################################################################
 
+  // note@accid (group accid) and note@accid.ges (group accidGes) as attributes of an accid element
   function convertAccid() {
+    const names = accidAttributes(groups);
     for (const note of music.querySelectorAll('note[accid], note[accid\\.ges]')) {
       if (!inScope(note)) continue;
-      const attrs = ['accid', 'accid.ges'].filter((a) => note.hasAttribute(a));
+      const attrs = names.filter((a) => note.hasAttribute(a));
+      if (attrs.length === 0) continue;
       const accids = directChildren(note, 'accid');
       if (inEditorialMarkup(note, 'accid')) {
         warn(note, attrs.map((a) => '@' + a).join(', ') + ' not converted, accid element within editorial markup exists');
@@ -777,7 +781,8 @@ const controlEventAttributes = ['startid', 'endid', 'staff', 'layer', 'tstamp', 
  *   An element is converted if it, or an element receiving its attribute, is within the scope.
  * @returns {{counts: Object<string, number>, changes: Array<Object>, warnings: Array<Object>, changedElements: Array<Element>}}
  *   counts: number of removed elements per element name;
- *   changes: one entry per conversion, {name, removed: [{element, text}], targets: [{element, attributes}]},
+ *   changes: one entry per conversion, {name, removed: [{element, text, partial}], targets: [{element, attributes}]},
+ *     (partial: only some attributes moved, the element remains)
  *     with the removed elements and the elements that received attributes;
  *   warnings: elements that could not be converted, [{element, message}];
  *   changedElements: always empty (no new xml:ids)
@@ -810,7 +815,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
 
   if (groups.has('definitions')) definitionsToAttributes();
   if (groups.has('labels')) labelsToAttributes();
-  if (groups.has('accid')) accidToAttributes();
+  if (groups.has('accid') || groups.has('accidGes')) accidToAttributes();
   if (groups.has('artic')) articToAttributes();
   if (groups.has('syl')) sylToAttributes();
   if (groups.has('fermata')) fermataToAttributes();
@@ -887,11 +892,15 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
         continue;
       }
       const el = accids[0];
-      if (!convertible(el, ['accid', 'accid.ges'])) continue;
+      // attributes of the selected groups (accid: @accid, accidGes: @accid.ges); if the
+      // accid element keeps another attribute, only these move and the element remains
+      const names = accidAttributes(groups).filter((a) => el.hasAttribute(a));
+      if (names.length === 0) continue;
+      const partial = ['accid', 'accid.ges'].some((a) => el.hasAttribute(a) && !names.includes(a));
+      if (!convertible(el, ['accid', 'accid.ges'], false, false, partial)) continue;
       const attrs = {};
-      for (const a of ['accid', 'accid.ges']) if (el.hasAttribute(a)) attrs[a] = el.getAttribute(a);
-      if (Object.keys(attrs).length === 0) continue; // empty accid
-      if (noConflicts(note, attrs, el)) apply('accid', el, [[note, attrs]]);
+      for (const a of names) attrs[a] = el.getAttribute(a);
+      if (noConflicts(note, attrs, el)) apply('accid', el, [[note, attrs]], partial ? names : null);
     }
   } // accidToAttributes()
 
@@ -1065,7 +1074,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
    * (and xml:id), no content (or only text, if textAllowed; only child elements,
    * if childrenAllowed), not referenced by xml:id, and not inside editorial markup.
    */
-  function convertible(el, allowed, textAllowed = false, childrenAllowed = false) {
+  function convertible(el, allowed, textAllowed = false, childrenAllowed = false, elementRemains = false) {
     const extra = Array.from(el.attributes)
       .map((a) => a.name)
       .filter((a) => a !== 'xml:id' && !allowed.includes(a));
@@ -1079,7 +1088,7 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
       return false;
     }
     const id = el.getAttribute('xml:id');
-    if (id && referenced.has(id)) {
+    if (id && referenced.has(id) && !elementRemains) {
       warn(el, 'xml:id is referenced from elsewhere, not converted');
       return false;
     }
@@ -1174,14 +1183,18 @@ export function convertElementsToAttributes(xmlDoc, options = {}) {
    * @param {string} name
    * @param {Element|Array<Element>} elements to be removed
    * @param {Array<[Element, Object]>} targets elements and attributes to be set
+   * @param {Array<string>|null} removeAttributes if given, only these attributes are
+   *   removed from the elements, which remain (recorded with partial: true)
    */
-  function apply(name, elements, targets) {
+  function apply(name, elements, targets, removeAttributes = null) {
     elements = Array.isArray(elements) ? elements : [elements];
     for (const [target, attrs] of targets) {
       for (const [a, value] of Object.entries(attrs)) target.setAttribute(a, value);
     }
-    const removed = elements.map((el) => ({ element: el, text: '<' + el.localName + '>' }));
-    elements.forEach((el) => removeIndented(el));
+    const partial = !!removeAttributes;
+    const removed = elements.map((el) => ({ element: el, text: '<' + el.localName + '>', partial }));
+    if (partial) elements.forEach((el) => removeAttributes.forEach((a) => el.removeAttribute(a)));
+    else elements.forEach((el) => removeIndented(el));
     counts[name] = (counts[name] || 0) + elements.length;
     changes.push({
       name,
@@ -1217,6 +1230,11 @@ function pitchesOf(el) {
   if (pitches.length === 0 || pitches.includes(null)) return null;
   return [...new Set(pitches)].sort().join(' ');
 } // pitchesOf()
+
+// attribute names of the accid groups selected: accid -> @accid, accidGes -> @accid.ges
+function accidAttributes(groups) {
+  return [groups.has('accid') ? 'accid' : '', groups.has('accidGes') ? 'accid.ges' : ''].filter((a) => a);
+}
 
 function tokens(str) {
   return (str || '').trim().split(/\s+/).filter((t) => t);

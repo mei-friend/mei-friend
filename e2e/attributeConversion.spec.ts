@@ -290,6 +290,29 @@ test.describe('1 Attributes to elements', () => {
     expect(m5.elements['c4'].attrs.tie).toBeUndefined();
     expect(m5.elements['c5'].attrs.tie).toBeUndefined();
   });
+
+  test('1.14 @accid and @accid.ges are separate groups', async ({ page }) => {
+    // written accidentals only: @accid.ges stays an attribute of the note
+    const written = await convert(page, attributesMei, 'toElements', { groups: ['accid'] });
+    expect(written.counts).toEqual({ accid: 2 });
+    expect(childrenOf(written, 'n1', 'accid')[0].attrs).toEqual({ accid: 's' });
+    expect(written.elements['n2'].attrs['accid.ges']).toBe('f');
+    expect(childrenOf(written, 'n2', 'accid')).toEqual([]);
+    expect(childrenOf(written, 'n3', 'accid')[0].attrs).toEqual({ accid: 'n' });
+    expect(written.elements['n3'].attrs['accid.ges']).toBe('n');
+    expect(written.elements['n4'].attrs['accid.ges']).toBe('s'); // no @accid: unchanged
+    expect(written.elements['n4a'].attrs).toEqual({ accid: 's' });
+    expect(written.warnings).toEqual([]); // n5, n6 have no @accid
+    // gestural accidentals only: @accid stays an attribute of the note
+    const gestural = await convert(page, attributesMei, 'toElements', { groups: ['accidGes'] });
+    expect(gestural.counts).toEqual({ accid: 3 });
+    expect(gestural.elements['n1'].attrs.accid).toBe('s');
+    expect(childrenOf(gestural, 'n2', 'accid')[0].attrs).toEqual({ 'accid.ges': 'f' });
+    expect(childrenOf(gestural, 'n3', 'accid')[0].attrs).toEqual({ 'accid.ges': 'n' });
+    expect(gestural.elements['n3'].attrs.accid).toBe('n');
+    expect(gestural.elements['n4a'].attrs).toEqual({ accid: 's', 'accid.ges': 's' }); // merged
+    expect(gestural.warnings.map((w) => w.split(':')[0]).sort()).toEqual(['note#n5', 'note#n6']);
+  });
 });
 
 test.describe('2 Elements to attributes', () => {
@@ -445,6 +468,27 @@ test.describe('2 Elements to attributes', () => {
     const notes = await convert(page, elementsMei, 'toAttributes', { scopeMeasures: ['m5'], groups: ['tie'] });
     expect(notes.counts).toEqual({ tie: 1 }); // t1 in m4, ending on n19 in m5
     expect(notes.elements['n19'].attrs.tie).toBe('t');
+  });
+
+  test('2.12 @accid and @accid.ges are separate groups; accid elements keeping an attribute remain', async ({ page }) => {
+    const elements = await convert(page, attributesMei, 'toElements');
+    const n3accid = childrenOf(elements, 'n3', 'accid')[0]; // accid="n" accid.ges="n"
+    const gestural = await convert(page, elements.xml, 'toAttributes', { groups: ['accidGes'] });
+    expect(gestural.counts).toEqual({ accid: 3 }); // n2 (removed), n3 and n4 (accid elements remain)
+    // n5a contradicts n5@accid.ges (kept as in 1.3)
+    expect(gestural.warnings.map((w) => w.split(':')[0])).toEqual(['accid#n5a']);
+    expect(gestural.elements['n3'].attrs['accid.ges']).toBe('n');
+    expect(gestural.elements[n3accid.id!].attrs).toEqual({ accid: 'n' }); // same element, same xml:id
+    expect(gestural.elements['n2'].attrs['accid.ges']).toBe('f');
+    expect(childrenOf(gestural, 'n2', 'accid')).toEqual([]); // nothing left: removed
+    expect(childrenOf(gestural, 'n1', 'accid')[0].attrs).toEqual({ accid: 's' }); // @accid: not selected
+    expect(gestural.elements['n4a'].attrs).toEqual({ accid: 's' });
+    expect(gestural.elements['n4'].attrs['accid.ges']).toBe('s');
+    // a referenced accid element may give up an attribute, as it remains (elements fixture: a4)
+    const referenced = elementsMei.replace('<accid xml:id="a4" accid="f"/>', '<accid xml:id="a4" accid="f" accid.ges="f"/>');
+    const partial = await convert(page, referenced, 'toAttributes', { groups: ['accidGes'] });
+    expect(partial.elements['a4'].attrs).toEqual({ accid: 'f' });
+    expect(partial.elements['n4'].attrs['accid.ges']).toBe('f');
   });
 });
 

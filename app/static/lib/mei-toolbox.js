@@ -41,6 +41,7 @@ const checkTypes = {
 // language keys of the labels of attribute groups (attribute-conversion.js)
 const groupLabels = {
   accid: 'convertGroupAccid',
+  accidGes: 'convertGroupAccidGes',
   artic: 'convertGroupArtic',
   syl: 'convertGroupSyl',
   fermata: 'convertGroupFermata',
@@ -81,7 +82,8 @@ const defaultAttributeOrderPattern = 'xml:id n label dur dots *';
 // localStorage keys (renumber keys as formerly used by the settings panel)
 const storageKey = {
   checkType: 'mf-meiToolboxCheckType',
-  groups: 'mf-convertAttributeGroups',
+  groups: 'mf-meiToolboxConvertGroups',
+  groupsBeforeAccidGes: 'mf-convertAttributeGroups', // until accid and accid.ges were separate groups
   startNumber: 'mf-renumberMeasuresStartNumber',
   continueAcrossIncompleteMeasures: 'mf-renumberMeasureContinueAcrossIncompleteMeasures',
   suffixAtMeasures: 'mf-renumberMeasuresUseSuffixAtMeasures',
@@ -595,7 +597,10 @@ function attributeOrderPattern() {
  */
 function confirmElementRemoval(groups, proceed) {
   const test = e.convertAttributesToElements(v, cm, { groups, test: true, reverse: true, selection: true });
-  const count = test.changes.flatMap((c) => c.removed).filter((r) => r.element.hasAttribute('xml:id')).length;
+  // elements that remain (only some attributes converted) keep their xml:id
+  const count = test.changes
+    .flatMap((c) => c.removed)
+    .filter((r) => !r.partial && r.element.hasAttribute('xml:id')).length;
   if (count === 0) {
     proceed();
     return;
@@ -803,7 +808,15 @@ function buildCheckOptions(content, p) {
 
 function buildConvertOptions(content, p) {
   const stored = load(storageKey.groups, null);
-  const selected = stored === null ? conversionGroups : stored.split(',');
+  let selected = stored === null ? conversionGroups : stored.split(',');
+  if (stored === null) {
+    // groups saved before @accid and @accid.ges became separate groups: 'accid' meant both
+    const before = load(storageKey.groupsBeforeAccidGes, null);
+    if (before !== null) {
+      selected = before.split(',');
+      if (selected.includes('accid')) selected.push('accidGes');
+    }
+  }
   const allNone = el('div', 'mtAllNone');
   const all = el('button', 'mtLink');
   all.dataset.lang = 'meiToolboxAll';
