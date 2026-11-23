@@ -122,6 +122,16 @@ function sizeEncodingPanel(cm, encodingWidth, encodingHeight) {
     else mtHeight = meiToolboxHeight + meiToolboxResizerWidth;
   }
   cm.setSize(encodingWidth - mtWidth, encodingHeight - mtHeight);
+  // offsets of the editor from each edge of #encoding, so that overlays anchored to
+  // the editor (#validation-status, #validation-report, #linkedNavUp/Down, cf.
+  // default.css) stay on it instead of the toolbox
+  const encoding = document.getElementById('encoding');
+  if (encoding) {
+    const offset = (side) => (meiToolboxOrientation === side ? (meiToolboxBeside() ? mtWidth : mtHeight) : 0) + 'px';
+    for (const side of ['Left', 'Top', 'Right', 'Bottom']) {
+      encoding.style.setProperty('--editorOffset' + side, offset(side.toLowerCase()));
+    }
+  }
 } // sizeEncodingPanel()
 
 // general settings

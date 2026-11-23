@@ -1212,8 +1212,9 @@ export default class Viewer {
     const hScrollbar = wrapper.querySelector('.CodeMirror-hscrollbar');
     const vWidth = vScrollbar && vScrollbar.offsetWidth > 0 ? vScrollbar.offsetWidth : 0;
     const hHeight = hScrollbar && hScrollbar.offsetHeight > 0 ? hScrollbar.offsetHeight : 0;
-    up.style.right = down.style.right = `${6 + vWidth}px`;
-    down.style.bottom = `${6 + hHeight}px`;
+    // the --editorOffset* variables skip the MEI toolbox (cf. resizer.sizeEncodingPanel())
+    up.style.right = down.style.right = `calc(${6 + vWidth}px + var(--editorOffsetRight, 0px))`;
+    down.style.bottom = `calc(${6 + hHeight}px + var(--editorOffsetBottom, 0px))`;
 
     if (!this._linkedNavKeyMap) {
       this._linkedNavKeyMap = {
