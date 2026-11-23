@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Measure durations for the meter conformance code checker.
+     Measure 1 conforms, measure 2 is a beat short on staff 2, measure 3 holds
+     an mRest and must be accepted, measure 4 is short on staff 2 as well. -->
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>meter conformance</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp>
+        <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+        <staffDef n="2" lines="5" clef.shape="F" clef.line="4"/>
+      </staffGrp>
+    </scoreDef>
+    <section>
+      <measure n="1" xml:id="p1">
+        <staff n="1" xml:id="p1s1"><layer n="1"><note xml:id="p1n1" pname="c" oct="5" dur="1"/></layer></staff>
+        <staff n="2" xml:id="p1s2"><layer n="1"><note xml:id="p1n2" pname="c" oct="3" dur="1"/></layer></staff>
+      </measure>
+      <measure n="2" xml:id="p2">
+        <staff n="1" xml:id="p2s1"><layer n="1"><note xml:id="p2n1" pname="d" oct="5" dur="1"/></layer></staff>
+        <staff n="2" xml:id="p2s2"><layer n="1"><note xml:id="p2n2" pname="d" oct="3" dur="2" dots="1"/></layer></staff>
+      </measure>
+      <measure n="3" xml:id="p3">
+        <staff n="1" xml:id="p3s1"><layer n="1"><note xml:id="p3n1" pname="e" oct="5" dur="1"/></layer></staff>
+        <staff n="2" xml:id="p3s2"><layer n="1"><mRest xml:id="p3r"/></layer></staff>
+      </measure>
+      <measure n="4" xml:id="p4">
+        <staff n="1" xml:id="p4s1"><layer n="1"><note xml:id="p4n1" pname="f" oct="5" dur="1"/></layer></staff>
+        <staff n="2" xml:id="p4s2"><layer n="1"><note xml:id="p4n2" pname="f" oct="3" dur="2"/></layer></staff>
+      </measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

@@ -1365,51 +1365,501 @@ input.urlResolves {
   text-decoration: line-through;
 }
 
-#codeChecker {
+/* MEI toolbox beside the encoding (mei-toolbox.js): tabs Check, Convert, Renumber,
+   Ids, Facsimile, Rerender.
+   Narrow panel: options above the results, folded away after a run;
+   wide panel (container query below): options beside the results. */
+#meiToolbox {
   display: none;
+  flex: 0 0 auto;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
+  container-type: inline-size;
   color: var(--textColor);
   background-color: var(--settingsBackgroundAlternativeColor);
-  font-family: monospace;
 }
 
-#codeChecker div:nth-child(even) {
-  background: var(--settingsBackgroundColor);
-}
-
-#codeChecker button {
+#meiToolbox button.btn {
   background-color: var(--backgroundColor) !important;
   border-color: var(--dropdownBorderColor) !important;
-  padding-left: 2px;
-  padding-right: 2px;
+  color: var(--textColor);
+  padding-left: 4px;
+  padding-right: 4px;
   min-width: fit-content;
-  margin-left: 2px; /* Add spacing between buttons */
+  margin-left: 2px;
 }
 
-#codeChecker svg {
+#meiToolbox button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#meiToolbox svg {
   width: 16px;
   height: 16px;
   stroke: darkgreen;
 }
 
-#codeCheckerResizer {
-  cursor: row-resize;
-  height: 6px;
+/* width/height and cursor of the resizer come from toolbox-[top/bottom/left/right].css */
+#meiToolboxResizer {
+  flex: 0 0 auto;
+  background-color: var(--dropdownBorderColor);
 }
 
-#codeCheckerResizer svg {
-  min-height: 16px;
-  max-height: 16px;
+/* The tab row wraps into further rows when the toolbox is narrow (docked left or
+   right), so that all six tab labels stay readable instead of being cut off. */
+.mtHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  flex: 0 0 auto;
+  background-color: var(--navbarBackgroundColor);
 }
 
-#codeCheckerCloseButton {
-  margin-right: 10px;
-  margin-top: 0.5px;
+.mtTab {
+  color: var(--textColor);
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 3px 12px;
+  cursor: pointer;
+  font-size: 0.9em;
+  white-space: nowrap;
+  flex: 0 1 auto;
 }
 
-#codeCheckerInfoTotal {
-  margin-right: 35px;
+.mtTab:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.mtTab.active {
+  background-color: var(--settingsBackgroundColor);
+  border-bottom-color: var(--highlightColor);
+  font-weight: bold;
+}
+
+.mtSpacer {
+  flex: 1 0 0;
+}
+
+.mtClose {
+  cursor: pointer;
+  padding: 2px 10px;
+  font-size: 1.2em;
+}
+
+.mtPane {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.mtPane.active {
+  display: flex;
+}
+
+/* Reformat tab: one block per method, so that it is visible at a glance which
+   options belong to which button (the attribute order applies to the XML parser
+   only; Verovio writes the encoding from its own representation). */
+.mtMethod {
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  margin: 4px 2px 8px;
+}
+
+.mtMethodTitle {
+  padding: 2px 6px;
+  font-weight: bold;
+  background-color: var(--navbarBackgroundColor);
+  border-bottom: 1px solid var(--dropdownBorderColor);
+  border-radius: 3px 3px 0 0;
+}
+
+.mtMethodBody {
+  padding: 2px 0;
+}
+
+/* explanatory text in the options of a tab (not to be confused with .mtInfo,
+   the placeholder shown in the result list) */
+.mtMethodNote {
+  padding: 4px 6px;
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+/* inside a method block the buttons belong to that block, so they scroll with it
+   rather than sticking to the bottom of the whole options area */
+.mtMethod .mtActions {
+  position: static;
+  justify-content: flex-end;
+  padding: 3px 6px;
+}
+
+/* keyboard shortcut on a toolbox button or option, as in the menu bar */
+#meiToolbox .keyShortCut {
+  margin-left: 6px;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+/* on an option row, the shortcut goes to the right edge, as in the menu bar */
+#meiToolbox .mtChoice .keyShortCut {
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Reformat tab: the custom attribute order pattern and its live preview */
+.mtPattern {
+  font-family: monospace;
+  min-width: 12em;
+  flex: 1 1 auto;
+}
+
+.mtPreview {
+  padding: 4px 6px;
+  font-size: 0.85em;
+  overflow-x: auto;
+  color: var(--textColorLighter, var(--textColor));
+}
+
+.mtPreview code {
+  white-space: nowrap;
+}
+
+/* options */
+.mtOptions {
+  flex: 0 0 auto;
+  max-height: 70%;
+  overflow-y: auto;
+  font-size: 0.9em;
+  border-bottom: 1px solid var(--dropdownBorderColor);
+  background-color: var(--settingsBackgroundColor);
+}
+
+.mtOptionsContent {
+  position: relative;
+  padding: 4px 8px;
+}
+
+.mtOptionsSummary {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.mtOptionsSummaryText {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mtOptions.collapsed .mtOptionsContent {
+  display: none;
+}
+
+.mtOptions.collapsed .mtOptionsSummary {
+  display: flex;
+}
+
+.mtFold {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  cursor: pointer;
+}
+
+.mtOptionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 30em; /* keep labels and controls together in a wide narrow-mode panel */
+  padding-right: 1em; /* room for the fold icon */
+}
+
+.mtOptionGroup.mtGrid {
+  max-width: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16em, 1fr));
+  column-gap: 0.5em;
+  row-gap: 1px;
+}
+
+.mtOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 1.8em;
+}
+
+#meiToolbox input[type='radio'],
+#meiToolbox input[type='checkbox'] {
+  accent-color: var(--highlightColor);
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* selectable rows (check types, attribute groups); colors theme-neutral */
+.mtChoice {
+  align-items: flex-start;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.mtChoice input {
+  margin-top: 0.2em !important;
+}
+
+.mtChoice:hover {
+  background-color: rgba(127, 127, 127, 0.12);
+}
+
+.mtChoice:has(input[type='radio']:checked) {
+  background-color: rgba(127, 127, 127, 0.2);
+  border-left-color: var(--highlightColor);
+}
+
+.mtDetail {
+  font-family: monospace;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.mtDetail-block {
+  display: block;
+  margin-top: 1px;
+}
+
+.mtDetail-inline {
+  margin-left: 0.4em;
+}
+
+/* label left, control right (renumber options) */
+.mtOption.mtRow {
+  justify-content: space-between;
+  padding: 1px 8px;
+}
+
+/* rows with every second one brighter, as in the settings panel */
+.mtOptionGroup.mtStriped {
+  gap: 0;
+}
+
+.mtStriped > .mtOption:nth-child(odd) {
+  background-color: var(--settingsBackgroundAlternativeColor);
+}
+
+.mtStriped input[type='checkbox'] {
+  margin-right: 2px !important;
+}
+
+.mtOption.disabled {
+  opacity: 0.45;
+}
+
+#meiToolbox select,
+#meiToolbox input[type='number'] {
+  height: 1.7em;
+  padding: 0 4px;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--backgroundColor);
+  color: var(--textColor);
+  font-size: 0.95em;
+}
+
+#meiToolbox select {
+  min-width: 7em;
+  text-align: left;
+}
+
+.mtNumber {
+  width: 5em;
+  text-align: right;
+}
+
+.mtAllNone {
+  margin-bottom: 2px;
+}
+
+.mtLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--textColor);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.mtActions {
+  position: sticky; /* keep the buttons visible when the options scroll */
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 3px 0;
+  background-color: var(--settingsBackgroundColor);
+}
+
+.mtActions button.btn {
+  margin-left: 0;
+}
+
+.mtScope {
+  flex-basis: 100%;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.mtScope.mtScopeSelection {
+  opacity: 1;
+  font-weight: bold;
+  color: var(--highlightColor);
+}
+
+.mtActions.mtActionRows {
+  /* one pair of buttons per direction: side by side if there is room, else stacked */
+  column-gap: 1.5em;
+  row-gap: 4px;
+}
+
+.mtActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* results */
+.mtResults {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mtResultsHeader {
+  font-size: 0.9em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background-color: var(--settingsBackgroundColor);
+  border-bottom: 1px solid var(--dropdownBorderColor);
+}
+
+.mtRunTitleWrapper {
+  flex: 1 1 12em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mtRunTitle {
+  font-weight: bold;
+}
+
+.mtRunSummary {
+  margin-left: 0.5em;
+}
+
+.mtStale {
+  display: none;
+  margin-left: 0.5em;
+  color: var(--fileStatusWarnColor);
+}
+
+.mtPane.stale .mtStale {
+  display: inline;
+}
+
+.mtFilter {
+  width: 12em;
+  height: 1.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  outline: 0;
+}
+
+.mtCount {
+  white-space: nowrap;
+}
+
+.mtPane:not(.running) .mtStop {
+  display: none;
+}
+
+.mtList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mtList .mtEntry {
+  font-family: monospace;
+}
+
+.mtList .validation-item {
+  padding: 0 4px;
+}
+
+.mtList .validation-item.odd {
+  background-color: var(--settingsBackgroundColor);
+}
+
+.mtList .mtEntry .codeCheckerMessage {
+  cursor: pointer;
+}
+
+.mtList .mtMuted {
+  opacity: 0.6;
+}
+
+.mtList .mtWarning .codeCheckerMessage {
+  color: var(--fileStatusWarnColor);
+}
+
+.mtList .mtInfo {
+  padding: 4px 8px;
+  opacity: 0.75;
+  cursor: default;
+}
+
+/* wide panel: options beside the results, always unfolded */
+@container (min-width: 720px) {
+  .mtPane.active {
+    flex-direction: row;
+  }
+
+  .mtOptions {
+    flex: 0 0 22em;
+    max-height: none;
+    border-bottom: none;
+    border-right: 1px solid var(--dropdownBorderColor);
+  }
+
+  .mtOptions.collapsed .mtOptionsContent {
+    display: block;
+  }
+
+  .mtOptions.collapsed .mtOptionsSummary,
+  .mtFold {
+    display: none;
+  }
+
+  .mtOptionGroup.mtGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .codeCheckerMessage {
@@ -1421,17 +1871,6 @@ input.urlResolves {
   cursor: default;
   position: relative;
   padding-left: 2px;
-}
-
-#codeCheckerTitle {
-  position: absolute;
-  width: 100%;
-  background-color: var(--navbarBackgroundColor);
-  z-index: 1;
-}
-
-.codeCheckerInfoEmpty {
-  min-height: 2em;
 }
 
 #validation-status {
@@ -2832,6 +3271,17 @@ select > option {
 #promptContent {
   margin: auto;
   text-align: center;
+}
+
+/* scrollable list inside a user prompt (e.g., problems during facsimile ingestion) */
+#promptMessage .promptScrollList {
+  max-height: 30vh;
+  overflow-y: auto;
+  text-align: left;
+  margin-top: 0.5em;
+  padding: 0.3em 0.6em;
+  border: 1px solid var(--overlayBorderColor);
+  border-radius: 4px;
 }
 
 #promptButtons {

@@ -139,6 +139,13 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
+  reformatEncodingText: {
+    text: 'Riformatta tramite parser XML',
+    description:
+      'Riformatta l\'intera codifica tramite il parser XML: attributi ordinati (prima xml:id, poi in ordine alfabetico), serializzazione XML normalizzata (ad es. virgolette doppie, elementi vuoti come tag autochiudenti, riferimenti di carattere come caratteri), tutte le righe indentate.',
+  },
+  reformatEncodingDone: { text: 'Codifica riformattata tramite il parser XML ({lines} righe).' },
+  reformatEncodingParseError: { text: 'Impossibile riformattare: la codifica non è XML ben formato.' },
   surroundWithTagsText: { text: 'Circonda con tags' },
   surroundWithLastTagText: { text: 'Circonda con' },
   jumpToLineText: { text: 'Vai alla riga' },
@@ -155,10 +162,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Finestra di annotazioni' },
   showFacsimileMenuText: { text: 'Finestra di facsimili' },
   showPlaybackControlsText: { text: 'Controlli di riproduzione' },
+  showMeiToolboxMenuText: { text: 'Cassetta degli attrezzi MEI' },
   facsimileTop: { text: 'Facsimile in alto' },
   facsimileBottom: { text: 'Facsimile in basso' },
   facsimileLeft: { text: 'Facsimile a sinistra' },
   facsimileRight: { text: 'Facsimile a destra' },
+  meiToolboxTop: { text: 'Cassetta MEI in alto' },
+  meiToolboxBottom: { text: 'Cassetta MEI in basso' },
+  meiToolboxLeft: { text: 'Cassetta MEI a sinistra' },
+  meiToolboxRight: { text: 'Cassetta MEI a destra' },
 
   // MANIPULATE MENU ITEM/ MENU MODIFICA
   manipulateMenuTitle: { text: 'Modifica' },
@@ -181,6 +193,118 @@ export const lang = {
   meterConformanceText: { text: 'Verificare @metcon' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },
+  convertAttributesToElementsText: {
+    text: 'Converti attributi in elementi',
+    description:
+      'Converte gli attributi che possono essere espressi anche come elementi in tali elementi, ad es. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss su note e accordi, o gli attributi di chiave, armatura e tempo su staffDef e scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributi convertiti in {list}.' },
+  convertAttributesToElementsNone: { text: 'Nessun attributo trovato che possa essere convertito in elementi.' },
+  convertAttributesToElementsProblems: { text: 'Non è stato possibile convertire {count} attributi.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Verifica' },
+  meiToolboxTabConvert: { text: 'Converti' },
+  meiToolboxTabRenumber: { text: 'Rinumera' },
+  meiToolboxCheckButton: { text: 'Verifica' },
+  meiToolboxTestButton: { text: 'Prova', description: 'Elenca ciò che verrebbe modificato, senza modificare la codifica' },
+  meiToolboxRenumberButton: { text: 'Rinumera' },
+  meiToolboxAttrToElButton: { text: 'Attributi → elementi' },
+  meiToolboxElToAttrButton: { text: 'Elementi → attributi', description: 'Converte gli elementi in attributi quando non si perde alcuna informazione; gli altri elementi vengono mantenuti ed elencati.' },
+  meiToolboxAll: { text: 'tutti' },
+  meiToolboxNone: { text: 'nessuno' },
+  meiToolboxFilter: { text: 'Filtra i risultati' },
+  meiToolboxRunAgain: { text: 'Esegui di nuovo' },
+  meiToolboxHideOptions: { text: 'Nascondi opzioni' },
+  meiToolboxOutdated: { text: '(la codifica è cambiata nel frattempo, i risultati potrebbero non essere aggiornati)' },
+  meiToolboxNoResults: { text: 'Ancora nessun risultato. Scegli le opzioni ed esegui.' },
+  meiToolboxGroupsSelected: { text: '{n} di {total} gruppi di attributi' },
+  meiToolboxCheckAccidGes: { text: 'Alterazioni (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Durate delle misure (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Elementi collegati (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Chiudi la cassetta degli attrezzi MEI' },
+  meiToolboxTabIds: { text: 'Id' },
+  meiToolboxTabFacsimile: { text: 'Facsimile' },
+  meiToolboxTabReformat: { text: 'Riformatta' },
+  meiToolboxIdsAdd: { text: 'Aggiungi xml:id (agli elementi che non ne hanno)' },
+  meiToolboxIdsChange: {
+    text: 'Cambia gli xml:id (uno nuovo per ogni elemento)',
+    description: 'Assegna un nuovo xml:id a ogni elemento. I riferimenti all’interno di questa codifica vengono aggiornati, ma i collegamenti da altri file, annotazioni, strumenti di facsimile o URL che puntano ai vecchi xml:id non funzioneranno più.',
+  },
+  meiToolboxIdsRemove: { text: 'Rimuovi gli xml:id (tranne quelli referenziati)' },
+  meiToolboxIdsButton: { text: 'Applica' },
+  meiToolboxIdsAdded: { text: '{n} aggiunti' },
+  meiToolboxIdsChanged: { text: '{n} modificati' },
+  meiToolboxIdsRemoved: { text: '{n} rimossi' },
+  meiToolboxIdsKept: { text: '{n} mantenuti' },
+  meiToolboxIdsReferences: { text: '{n} riferimenti aggiornati' },
+  meiToolboxIdsKeptReason: { text: 'referenziato all’interno della codifica' },
+  meiToolboxIdsNothing: { text: 'Niente da fare: nessun xml:id è stato aggiunto, modificato o rimosso.' },
+  meiToolboxIdsCancelled: { text: 'Annullato, la codifica è invariata.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Collega la codifica alle immagini delle pagine: importa un facsimile da un altro file o aggiungi le surface che ancora mancano, una per ogni interruzione di pagina.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Importa facsimile…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Aggiungi le surface mancanti',
+    description: 'Aggiunge ciò che manca: un facsimile se non c’è, una surface con un graphic segnaposto per ogni pagina che non ne ha ancora una, e pb@facs che vi punta. Le pagine vengono associate alle surface già presenti, che restano invariate.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Surface aggiunte: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pagine collegate a una surface già presente: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsimile aggiunto.' },
+  meiToolboxFacsimileUpToDate: { text: 'Ogni pagina ha già la sua surface; non è stato aggiunto nulla.' },
+  meiToolboxFacsimileZones: { text: '{n} zone' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surface, {zones} zone' },
+  meiToolboxFacsimileNone: { text: 'Questa codifica non ha un facsimile.' },
+  meiToolboxReformatVerovio: {
+    text: 'Tramite Verovio',
+    description: 'Lascia che Verovio riscriva la codifica dalla propria rappresentazione.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio scrive la codifica dalla propria rappresentazione, con la propria formattazione e il proprio ordine degli attributi.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Tramite il parser XML',
+    description: 'Riformatta la codifica tramite il parser XML: il contenuto resta invariato, cambiano solo la formattazione e l’ordine degli attributi. Come Codice → Riformatta tramite il parser XML.',
+  },
+  meiToolboxReformatUnchanged: { text: 'La codifica è invariata.' },
+  meiToolboxReformatDone: { text: '{lines} righe' },
+  meiToolboxAttributeOrder: {
+    text: 'Ordine degli attributi',
+    description: 'L’ordine in cui gli attributi vengono scritti ogni volta che mei-friend riscrive un elemento.',
+    labels: ['come codificato', 'alfabeticamente', 'xml:id per primo, poi alfabeticamente', 'personalizzato…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Schema dell’ordine',
+    description: 'Nomi di attributo separati da spazi o virgole, nell’ordine desiderato, ad es. «xml:id n label *». Un nome che termina con * corrisponde a tutti gli attributi con quel prefisso (clef.*). Un singolo * rappresenta tutti gli attributi non nominati, in ordine alfabetico; senza di esso mantengono il loro ordine alla fine. Le dichiarazioni di namespace vengono sempre per prime.',
+  },
+  codeCheckerFixShown: { text: 'Correggi {n} mostrati' },
+  codeCheckerIgnoreShown: { text: 'Ignora {n} mostrati' },
+  convertGroupAccid: { text: 'Alterazioni scritte (@accid)' },
+  convertGroupAccidGes: { text: 'Alterazioni sonore (@accid.ges)' },
+  convertGroupArtic: { text: 'Articolazioni (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Testo (@syl)' },
+  convertGroupFermata: { text: 'Corone (@fermata)' },
+  convertGroupTie: { text: 'Legature di valore (@tie)' },
+  convertGroupSlur: { text: 'Legature di portamento (@slur)' },
+  convertGroupGliss: { text: 'Glissandi (@gliss)' },
+  convertGroupDefinitions: { text: 'Chiave, armatura, tempo, mensura (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Simboli di gruppo ed etichette (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Gli attributi verrebbero convertiti in {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elementi convertiti in attributi: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Gli elementi verrebbero convertiti in attributi: {list}.' },
+  convertElementsToAttributesProblems: { text: 'Non è stato possibile convertire {count} elementi.' },
+  convertElementsToAttributesNone: { text: 'Nessun elemento trovato che possa essere convertito in attributi.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementi → attributi</b>\n\nAttenzione: questa operazione può interrompere i link esterni.\n\n{count} degli elementi da convertire hanno un xml:id, che viene rimosso insieme all\'elemento. Gli elementi referenziati all\'interno di questo file non vengono convertiti.\n\nI link da altri file, le annotazioni salvate al di fuori di questo file, gli strumenti per facsimili o gli URL che puntano a questi xml:id non funzioneranno più.' },
+  elementsToAttributesProceed: { text: 'Converti' },
+  elementsToAttributesCancel: { text: 'Annulla' },
+  convertScopeAll: { text: 'Ambito: intera codifica (seleziona del testo nell\'editor per limitare la conversione)' },
+  convertScopeSelection: { text: 'Ambito: selezione, righe {from}–{to}' },
+  convertSelectionSuffix: { text: 'selezione' },
+  renumberMeasuresStartNumber: { text: 'Numero iniziale' },
+  renumberMeasuresUnchanged: { text: 'invariato' },
+  renumberMeasuresSummary: { text: '{total} misure, {changed} rinumerate.' },
+  renumberMeasuresSummaryTest: { text: '{total} misure, {changed} verrebbero rinumerate.' },
+  renumberMeasuresNoMeasures: { text: 'Nessuna misura trovata.' },
   addIdsText: { text: 'Aggiungi ids a MEI' },
   removeIdsText: { text: 'Rimuovi ids da MEI' },
   changeIdsText: {
@@ -196,6 +320,26 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Ridisegna tramite Verovio' },
   addFacsimile: { text: 'Aggiungi elemento facsimile' },
   ingestFacsimileText: { text: 'Incorpora facsimile' },
+  ingestFacsimileTitle: { text: 'Incorporazione del facsimile' },
+  ingestFacsimileProgress: { text: '{file}: {done} di {total} zone elaborate.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile incorporato' },
+  ingestFacsimileStoppedTitle: { text: 'Incorporazione del facsimile interrotta' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile da {file} con {surfaces} superfici (surface) e {zones} zone inserito prima di body; attributi @facs aggiunti a {added} elementi.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Interrotto dopo {done} di {total} zone. Le modifiche fatte finora possono essere annullate in un solo passaggio.',
+  },
+  ingestFacsimileProblems: { text: 'Sono stati riscontrati {count} problemi:' },
+  ingestFacsimileNotFound: { text: '{type} con n="{n}" non trovato.' },
+  ingestFacsimileNotUnique: { text: '{type} con n="{n}" non univoco.' },
+  ingestFacsimileNoId: { text: '{type} con n="{n}" senza xml:id, @facs non aggiunto.' },
+  ingestFacsimileNotInEditor: { text: '{type} con n="{n}" non trovato nell\'editor, @facs non aggiunto.' },
+  ingestFacsimileNoFacsimile: {
+    text: 'Incorporazione del facsimile fallita: nessun elemento facsimile trovato in {file}.',
+  },
+  ingestFacsimileNoBody: { text: 'Incorporazione del facsimile fallita: nessun elemento body trovato nella codifica.' },
+  ingestFacsimileNoBodyInEditor: { text: "Nessun elemento body trovato nell'editor, elemento facsimile non inserito." },
 
   // INSERT MENU ITEM / INSERISCI VOCE DI MENU
   insertMenuTitle: { text: 'Inserisci' },
@@ -880,10 +1024,6 @@ export const lang = {
   },
 
   // Renumber measures / Rinumerazione misure
-  renumberMeasuresHeading: {
-    text: 'Rinumera misure',
-    description: 'Impostazioni per la rinumerazione delle misure',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continua tra le misure incomplete',
     description: 'Continua i numeri delle misure tra le misure incomplete (@metcon="false")',
@@ -953,6 +1093,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Mostra i titoli dei facsimili',
     description: 'Mostra i titoli dei facsimili sopra le immagini di origine',
+  },
+  titleMeiToolbox: {
+    text: 'Cassetta degli attrezzi MEI',
+    description: 'Controlli e manipolazioni della codifica, in un pannello accanto all’editor',
+  },
+  showMeiToolbox: {
+    text: 'Mostra la cassetta degli attrezzi MEI',
+    description: 'Mostra la cassetta degli attrezzi MEI con le schede Controlla, Converti, Rinumera, Id, Facsimile e Rigenera',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Posizione della cassetta degli attrezzi MEI',
+    description: 'Seleziona la posizione della cassetta degli attrezzi MEI rispetto all’editor',
+    labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
 
   // Supplied element // Elemento fornito
@@ -1242,11 +1395,6 @@ export const lang = {
 
   // utils renumber measures
   renumberMeasuresModalText: { text: 'Rinumera misure' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'sarebbe' },
-  renumberMeasuresChangedTo: { text: 'cambiato in' },
-  renumberMeasureMeasuresRenumbered: { text: 'misure rinumerate' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

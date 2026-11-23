@@ -130,6 +130,13 @@ export const lang = {
   replaceMenuText: { text: 'Замени' },
   replaceAllMenuText: { text: 'Замени све' },
   indentSelectionText: { text: 'Увуци избор' },
+  reformatEncodingText: {
+    text: 'Преформатирај путем XML парсера',
+    description:
+      'Преформатира цело кодирање путем XML парсера: атрибути сортирани (прво xml:id, затим абецедно), нормализована XML серијализација (нпр. двоструки наводници, празни елементи као самозатварајуће ознаке, референце знакова као знакови), сви редови увучени.',
+  },
+  reformatEncodingDone: { text: 'Кодирање преформатирано путем XML парсера ({lines} редова).' },
+  reformatEncodingParseError: { text: 'Преформатирање није могуће: кодирање није добро формиран XML.' },
   surroundWithTagsText: { text: 'Ограничи ознакама' },
   surroundWithLastTagText: { text: 'Ограничи са ' },
   jumpToLineText: { text: 'Иди на линију' },
@@ -146,10 +153,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Панел са напоменама' },
   showFacsimileMenuText: { text: 'Панел са факсимилом' },
   showPlaybackControlsText: { text: 'Контроле репродукције' },
+  showMeiToolboxMenuText: { text: 'MEI алатница' },
   facsimileTop: { text: 'Факсимил горе' },
   facsimileBottom: { text: 'Факсимил доле' },
   facsimileLeft: { text: 'Факсимил лево' },
   facsimileRight: { text: 'Факсимил десно' },
+  meiToolboxTop: { text: 'MEI алатница горе' },
+  meiToolboxBottom: { text: 'MEI алатница доле' },
+  meiToolboxLeft: { text: 'MEI алатница лево' },
+  meiToolboxRight: { text: 'MEI алатница десно' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Манипулација' },
@@ -172,6 +184,118 @@ export const lang = {
   meterConformanceText: { text: 'Провери @metcon' },
   renumberMeasuresTestText: { text: ' Ренумерирај мере (тест)' },
   renumberMeasuresExecText: { text: ' Ренумерирај мере (изврши)' },
+  convertAttributesToElementsText: {
+    text: 'Претвори атрибуте у елементе',
+    description:
+      'Претвара атрибуте који се могу изразити и као елементи у те елементе, нпр. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss на нотама и акордима, или атрибуте кључа, предзнака и такта на staffDef и scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Атрибути претворени у {list}.' },
+  convertAttributesToElementsNone: { text: 'Нису пронађени атрибути који се могу претворити у елементе.' },
+  convertAttributesToElementsProblems: { text: '{count} атрибута није могуће претворити.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Провера' },
+  meiToolboxTabConvert: { text: 'Претварање' },
+  meiToolboxTabRenumber: { text: 'Ренумерисање' },
+  meiToolboxCheckButton: { text: 'Провери' },
+  meiToolboxTestButton: { text: 'Тестирај', description: 'Прикажи шта би било промењено, без мењања кодирања' },
+  meiToolboxRenumberButton: { text: 'Ренумериши' },
+  meiToolboxAttrToElButton: { text: 'Атрибути → елементи' },
+  meiToolboxElToAttrButton: { text: 'Елементи → атрибути', description: 'Претвара елементе у атрибуте када се не губи никаква информација; остали елементи се задржавају и наводе.' },
+  meiToolboxAll: { text: 'све' },
+  meiToolboxNone: { text: 'ништа' },
+  meiToolboxFilter: { text: 'Филтрирај резултате' },
+  meiToolboxRunAgain: { text: 'Покрени поново' },
+  meiToolboxHideOptions: { text: 'Сакриј опције' },
+  meiToolboxOutdated: { text: '(кодирање је у међувремену промењено, резултати су можда застарели)' },
+  meiToolboxNoResults: { text: 'Још нема резултата. Изаберите опције и покрените.' },
+  meiToolboxGroupsSelected: { text: '{n} од {total} група атрибута' },
+  meiToolboxCheckAccidGes: { text: 'Предзнаци (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Трајања тактова (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Повезани елементи (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Затвори MEI алатницу' },
+  meiToolboxTabIds: { text: 'Ид-ови' },
+  meiToolboxTabFacsimile: { text: 'Факсимил' },
+  meiToolboxTabReformat: { text: 'Преобликуј' },
+  meiToolboxIdsAdd: { text: 'Додај xml:id (елементима без њега)' },
+  meiToolboxIdsChange: {
+    text: 'Промени xml:id (нови за сваки елемент)',
+    description: 'Додељује нови xml:id сваком елементу. Референце унутар овог кодирања се ажурирају, али везе из других датотека, анотација, алата за факсимил или URL-ова које показују на старе xml:id-ове више неће радити.',
+  },
+  meiToolboxIdsRemove: { text: 'Уклони xml:id (осим оних на које се упућује)' },
+  meiToolboxIdsButton: { text: 'Примени' },
+  meiToolboxIdsAdded: { text: '{n} додато' },
+  meiToolboxIdsChanged: { text: '{n} промењено' },
+  meiToolboxIdsRemoved: { text: '{n} уклоњено' },
+  meiToolboxIdsKept: { text: '{n} задржано' },
+  meiToolboxIdsReferences: { text: '{n} референци ажурирано' },
+  meiToolboxIdsKeptReason: { text: 'на њега се упућује унутар кодирања' },
+  meiToolboxIdsNothing: { text: 'Нема шта да се уради: ниједан xml:id није додат, промењен ни уклоњен.' },
+  meiToolboxIdsCancelled: { text: 'Отказано, кодирање је непромењено.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Повежите кодирање са сликама страница: увезите факсимил из друге датотеке или додајте површине које још недостају, по једну за сваки прелом странице.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Увези факсимил…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Додај површине које недостају',
+    description: 'Додаје оно што недостаје: факсимил ако га нема, површину са резервисаним graphic елементом за сваку страницу која је још нема, и pb@facs који на њу упућује. Странице се повезују са већ постојећим површинама, које остају непромењене.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Додато површина: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Страница повезаних са већ постојећом површином: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Факсимил додат.' },
+  meiToolboxFacsimileUpToDate: { text: 'Свака страница већ има своју површину; ништа није додато.' },
+  meiToolboxFacsimileZones: { text: '{n} зона' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} површина, {zones} зона' },
+  meiToolboxFacsimileNone: { text: 'Ово кодирање нема факсимил.' },
+  meiToolboxReformatVerovio: {
+    text: 'Преко Verovija',
+    description: 'Пушта Verovio да изнова испише кодирање из сопственог приказа.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio исписује кодирање из сопственог приказа, у сопственом обликовању и редоследу атрибута.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Преко XML парсера',
+    description: 'Преобликује кодирање кроз XML парсер: садржај остаје исти, мењају се само обликовање и редослед атрибута. Исто као Кôд → Преобликуј преко XML парсера.',
+  },
+  meiToolboxReformatUnchanged: { text: 'Кодирање је непромењено.' },
+  meiToolboxReformatDone: { text: '{lines} редова' },
+  meiToolboxAttributeOrder: {
+    text: 'Редослед атрибута',
+    description: 'Редослед којим се атрибути исписују кад год mei-friend упише елемент назад.',
+    labels: ['како је кодирано', 'абецедно', 'прво xml:id, затим абецедно', 'прилагођено…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Образац редоследа',
+    description: 'Имена атрибута раздвојена размацима или зарезима, редоследом који желите, нпр. „xml:id n label *”. Име које се завршава са * одговара свим атрибутима с тим префиксом (clef.*). Једна * означава све неименоване атрибуте, абецедно; без ње задржавају свој редослед на крају. Декларације именских простора увек долазе прве.',
+  },
+  codeCheckerFixShown: { text: 'Поправи {n} приказаних' },
+  codeCheckerIgnoreShown: { text: 'Занемари {n} приказаних' },
+  convertGroupAccid: { text: 'Писани предзнаци (@accid)' },
+  convertGroupAccidGes: { text: 'Звучни предзнаци (@accid.ges)' },
+  convertGroupArtic: { text: 'Артикулације (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Текст (@syl)' },
+  convertGroupFermata: { text: 'Фермате (@fermata)' },
+  convertGroupTie: { text: 'Лигатуре (@tie)' },
+  convertGroupSlur: { text: 'Лукови (@slur)' },
+  convertGroupGliss: { text: 'Глисанда (@gliss)' },
+  convertGroupDefinitions: { text: 'Кључ, предзнаци, такт, мензура (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Симболи група и ознаке (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Атрибути би били претворени у {list}.' },
+  convertElementsToAttributesSummary: { text: 'Елементи претворени у атрибуте: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Елементи би били претворени у атрибуте: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} елемената није могуће претворити.' },
+  convertElementsToAttributesNone: { text: 'Нису пронађени елементи који се могу претворити у атрибуте.' },
+  elementsToAttributesConfirmation: { text: '<b>Елементи → атрибути</b>\n\nПажња: ова операција може прекинути спољне везе.\n\n{count} елемената који се претварају има xml:id, који се уклања заједно са елементом. Елементи на које се упућује унутар ове датотеке се не претварају.\n\nВезе из других датотека, анотације сачуване изван ове датотеке, алати за факсимиле или URL-ови који упућују на ове xml:id-ове више неће радити.' },
+  elementsToAttributesProceed: { text: 'Претвори' },
+  elementsToAttributesCancel: { text: 'Откажи' },
+  convertScopeAll: { text: 'Опсег: цело кодирање (означите текст у едитору да ограничите претварање)' },
+  convertScopeSelection: { text: 'Опсег: избор, редови {from}–{to}' },
+  convertSelectionSuffix: { text: 'избор' },
+  renumberMeasuresStartNumber: { text: 'Почетни број' },
+  renumberMeasuresUnchanged: { text: 'непромењено' },
+  renumberMeasuresSummary: { text: '{total} тактова, {changed} ренумерисано.' },
+  renumberMeasuresSummaryTest: { text: '{total} тактова, {changed} би било ренумерисано.' },
+  renumberMeasuresNoMeasures: { text: 'Нису пронађени тактови.' },
   addIdsText: { text: 'Додај ИД-ове МЕИ' },
   removeIdsText: { text: 'Уклони ИД-ове из МЕИ' },
   changeIdsText: {
@@ -187,6 +311,24 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Поново рендеруј путем Веровио' },
   addFacsimile: { text: 'Додај елемент факсимила' },
   ingestFacsimileText: { text: 'Унеси факсимил' },
+  ingestFacsimileTitle: { text: 'Унос факсимила' },
+  ingestFacsimileProgress: { text: '{file}: обрађено {done} од {total} зона.' },
+  ingestFacsimileDoneTitle: { text: 'Факсимил унесен' },
+  ingestFacsimileStoppedTitle: { text: 'Унос факсимила прекинут' },
+  ingestFacsimileSummary: {
+    text: 'Факсимил из {file} са {surfaces} површина (surface) и {zones} зона уметнут пре body; атрибути @facs додати у {added} елемената.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Прекинуто након {done} од {total} зона. Досадашње измене могу се поништити у једном кораку.',
+  },
+  ingestFacsimileProblems: { text: 'Појавило се {count} проблема:' },
+  ingestFacsimileNotFound: { text: '{type} са n="{n}" није пронађен.' },
+  ingestFacsimileNotUnique: { text: '{type} са n="{n}" није јединствен.' },
+  ingestFacsimileNoId: { text: '{type} са n="{n}" нема xml:id, @facs није додат.' },
+  ingestFacsimileNotInEditor: { text: '{type} са n="{n}" није пронађен у едитору, @facs није додат.' },
+  ingestFacsimileNoFacsimile: { text: 'Унос факсимила није успео: у {file} није пронађен елемент facsimile.' },
+  ingestFacsimileNoBody: { text: 'Унос факсимила није успео: у кодирању није пронађен елемент body.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Елемент body није пронађен у едитору, елемент facsimile није уметнут.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Уметни' },
@@ -756,10 +898,6 @@ export const lang = {
   },
 
   // Ренумерација такта
-  renumberMeasuresHeading: {
-    text: 'Ренумерација такта',
-    description: 'Поставке за ренумерацију тактова',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Настави преко непотпуних тактова',
     description: 'Настави бројање тактова преко непотпуних тактова (@metcon="false")',
@@ -829,6 +967,16 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Show facsimile titles', // TODO: translate
     description: 'Show facsimile titles above source images', // TODO: translate
+  },
+  titleMeiToolbox: { text: 'MEI алатница', description: 'Провере и измене кодирања, у панелу поред уређивача' },
+  showMeiToolbox: {
+    text: 'Прикажи MEI алатницу',
+    description: 'Прикажи MEI алатницу са картицама Провери, Претвори, Пренумериши, Ид-ови, Факсимил и Поново исцртај',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Положај MEI алатнице',
+    description: 'Одаберите положај MEI алатнице у односу на уређивач',
+    labels: ['лево', 'десно', 'горе', 'доле'],
   },
 
   // Елементи допуне
@@ -1077,11 +1225,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Пребројавање тактова' },
-  renumberMeasuresModalTest: { text: 'Тест' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'било би' },
-  renumberMeasuresChangedTo: { text: 'промењено у' },
-  renumberMeasureMeasuresRenumbered: { text: 'тактова је пребројано' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

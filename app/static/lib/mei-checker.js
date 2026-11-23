@@ -69,17 +69,17 @@ function hasMeterInfo(element) {
 
 /**
  * Finishes a check: resets the progress bar, writes the status bar text and
- * finalizes the code checker panel. A check stopped through the Stop button
- * (v.codeCheckerAbort) says so in status bar and panel.
+ * finalizes the result list of the MEI toolbox. A check stopped through the Stop button
+ * (v.toolboxAbort) says so in status bar and panel.
  * @param {Viewer} v
  * @param {string} statusText
  * @param {string} allGoodText shown in the panel when no entries were found
  */
 function finishCheck(v, statusText, allGoodText) {
   setProgressBar(0);
-  const stopped = v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text + ' ' : '';
+  const stopped = v.toolboxAbort ? translator.lang.codeCheckerStopped.text + ' ' : '';
   document.getElementById('statusBar').innerHTML = stopped + statusText;
-  v.finalizeCodeCheckerPanel(v.codeCheckerAbort ? translator.lang.codeCheckerStopped.text : allGoodText);
+  v.finalizeCodeCheckerPanel(v.toolboxAbort ? translator.lang.codeCheckerStopped.text : allGoodText);
   v.allowCursorActivity = true;
 } // finishCheck()
 
@@ -162,6 +162,31 @@ function getAccidsInMeasure(measure, tstamps) {
 } // getAccidsInMeasure()
 
 /**
+ * Removes the gestural accidental of a note, wherever it is encoded: at the note
+ * itself and/or at a child accid element. A child accid element that carries no
+ * notated accidental of its own is removed together with it.
+ * @param {Element} note
+ */
+function removeAccidGes(note) {
+  note.removeAttribute('accid.ges');
+  note.querySelectorAll('[accid\\.ges]').forEach((child) => {
+    child.removeAttribute('accid.ges');
+    if (child.nodeName === 'accid' && !child.hasAttribute('accid')) child.parentNode?.removeChild(child);
+  });
+} // removeAccidGes()
+
+/**
+ * Sets the gestural accidental of a note where it is already encoded (at the note
+ * itself or at a child accid element), otherwise at the note.
+ * @param {Element} note
+ * @param {string} value
+ */
+function setAccidGes(note, value) {
+  const child = note.hasAttribute('accid.ges') ? null : note.querySelector('[accid\\.ges]');
+  (child || note).setAttribute('accid.ges', value);
+} // setAccidGes()
+
+/**
  * Checks accid/accid.ges attributes of all notes against
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
@@ -174,6 +199,7 @@ export function checkAccidGes(v, cm) {
   v.initCodeCheckerPanel(translator.lang.accidGesCodeCheckerTitle.text);
 
   let d = false; // send debug info to console (slow with devtools open)
+  let warnedKeyAccid = false; // warn only once about unsupported keyAccid children
 
   v.loadXml(cm.getValue(), true); // force reload DOM
 
@@ -195,6 +221,9 @@ export function checkAccidGes(v, cm) {
       }
     }
   });
+
+  const tieStartIds = new Set(Object.values(ties)); // notes that start a tie
+  const tieStartAccids = new Map(); // xml:id -> sounding accidental of a tie starting note
 
   let count = 0;
   // key signatures, meter definitions, measures and notes in document order
@@ -235,7 +264,7 @@ export function checkAccidGes(v, cm) {
       checkElement(list[i++]);
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (i < list.length && !v.codeCheckerAbort) {
+    if (i < list.length && !v.toolboxAbort) {
       setProgressBar((100 * i) / list.length);
       statusBar.innerHTML = 'Checking accid.ges... ' + i + ' of ' + list.length + ' elements checked.';
       setTimeout(processAccidGes, 0);
@@ -260,19 +289,25 @@ export function checkAccidGes(v, cm) {
     const hasKeySig = element.hasAttribute('key.sig') || element.hasAttribute('keysig');
     if (element.nodeName === 'scoreDef' && hasKeySig) {
       // key.sig inside scoreDef: write @sig to all staves
-      const value = element.getAttribute('key.sig') || element.getAttribute('keysig');
+      const value = element.getAttribute('key.sig') || element.getAttribute('keysig') || '0';
       keySignatures.fill(value);
       if (d) console.debug('New key.sig in scoreDef: ' + value);
     } else if (element.nodeName === 'staffDef' && hasKeySig) {
       // key.sig inside staffDef: write @sig to that staff
       const n = parseInt(element.getAttribute('n'));
-      const value = element.getAttribute('key.sig') || element.getAttribute('keysig');
+      const value = element.getAttribute('key.sig') || element.getAttribute('keysig') || '0';
       if (n && n > 0 && n <= keySignatures.length) {
         keySignatures[n - 1] = value;
       }
       if (d) console.debug('New key.sig in staffDef(' + element.getAttribute('xml:id') + ', n=' + n + '): ' + value);
-    } else if (element.nodeName === 'keySig' && element.hasAttribute('sig')) {
-      const value = element.getAttribute('sig');
+    } else if (element.nodeName === 'keySig') {
+      // A keySig element without @sig cancels any key signature set before,
+      // i.e. it has the same meaning as sig="0" (valid MEI, rendered that way by Verovio).
+      const value = element.getAttribute('sig') || '0';
+      if (!element.hasAttribute('sig') && !warnedKeyAccid && element.querySelector('keyAccid')) {
+        warnedKeyAccid = true;
+        console.warn('checkAccidGes(): keySig with keyAccid children is not supported, treated as sig="0".');
+      }
       // keySig element in a staffDef
       const n = parseInt(element.closest('staffDef')?.getAttribute('n'));
       if (n && n > 0 && n <= keySignatures.length) {
@@ -328,6 +363,18 @@ export function checkAccidGes(v, cm) {
       }
     }
 
+    // When this note starts a tie, remember the accidental it sounds with, so that the
+    // note ending the tie can be checked against it. That accidental is not necessarily
+    // encoded at the note itself: it may come from an accidental earlier in the measure,
+    // from the key signature, or from a tie that this note itself ends.
+    if (data.xmlId && tieStartIds.has(data.xmlId)) {
+      const tiedFrom = tieStartAccids.get(ties[data.xmlId]);
+      tieStartAccids.set(
+        data.xmlId,
+        accid || accidGesEncoded || tiedFrom || mAccid || (affectedNotes.includes(pName) ? keySigAccid : 'n')
+      );
+    }
+
     // find doubled accid/accid.ges information
     if (accidGesEncoded && accid) {
       data.html =
@@ -355,7 +402,7 @@ export function checkAccidGes(v, cm) {
       data.html += '. ' + translator.lang.codeCheckerRemove.text + ' accid.ges';
       // remove @accid.ges in all cases
       data.correct = () => {
-        element.removeAttribute('accid.ges');
+        removeAccidGes(element);
         writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
@@ -408,7 +455,10 @@ export function checkAccidGes(v, cm) {
           v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         }
+        // the accidental the starting note sounds with, as remembered when it was checked;
+        // only a starting note that has not been visited is read from its attributes
         let startingAccidMeaning =
+          tieStartAccids.get(startId) ||
           startingNote.getAttribute('accid') ||
           startingNote.querySelector('[accid]')?.getAttribute('accid') ||
           startingNote.getAttribute('accid.ges') ||
@@ -433,7 +483,7 @@ export function checkAccidGes(v, cm) {
               ('"' + startingAccidMeaning + '".') +
               (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
             data.correct = () => {
-              element.setAttribute('accid.ges', startingAccidMeaning);
+              setAccidGes(element, startingAccidMeaning);
               writeToEditor(element);
             };
           } else {
@@ -445,7 +495,7 @@ export function checkAccidGes(v, cm) {
               ('"' + startingAccidMeaning + '". ') +
               (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
             data.correct = () => {
-              element.removeAttribute('accid.ges');
+              removeAccidGes(element);
               writeToEditor(element);
             };
           }
@@ -475,7 +525,7 @@ export function checkAccidGes(v, cm) {
         translator.lang.codeCheckerBecauseAlreadyDefined.text +
         '.';
       data.correct = () => {
-        element.setAttribute('accid.ges', mAccid);
+        setAccidGes(element, mAccid);
         writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
@@ -507,7 +557,7 @@ export function checkAccidGes(v, cm) {
         keySigAccid +
         '"';
       data.correct = () => {
-        element.setAttribute('accid.ges', keySigAccid);
+        setAccidGes(element, keySigAccid);
         writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
@@ -539,12 +589,7 @@ export function checkAccidGes(v, cm) {
         accidGesEncoded +
         '".';
       data.correct = () => {
-        let accidChild = element.querySelector('accid[accid\\.ges]');
-        if (accidChild) {
-          element.removeChild(accidChild);
-        } else {
-          element.removeAttribute('accid.ges');
-        }
+        removeAccidGes(element);
         writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
@@ -604,7 +649,7 @@ export function checkMeterConformance(v, cm) {
       }
       if (performance.now() - t0 > BUDGET_MS) break;
     }
-    if (n < list.length && !v.codeCheckerAbort) {
+    if (n < list.length && !v.toolboxAbort) {
       setProgressBar((100 * n) / list.length);
       statusBar.innerHTML = 'Checking meter conformance... ' + n + ' of ' + list.length + ' elements checked.';
       setTimeout(processMeasures, 0);
@@ -650,7 +695,7 @@ export function checkMeterConformance(v, cm) {
       if (ignore || utils.compareNumbersWithTolerance(duration, meterCount, defaults.beatTolerance)) {
         return; // conformant
       }
-      // display non conformance message as entry in code checker panel
+      // display non conformance message as entry in the MEI toolbox
       let data = {};
       data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
       data.html =
@@ -702,8 +747,6 @@ export function checkMeterConformance(v, cm) {
 export function checkLinkedElements(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.linkedElementsCodeCheckerTitle.text);
-  // No automatic fix exists for broken links — remove the Fix all / Ignore all buttons
-  document.querySelectorAll('#codeCheckerTitle .btn:not(#codeCheckerStopButton)').forEach((btn) => btn.remove());
 
   try {
     v.loadXml(cm.getValue(), true);
@@ -731,7 +774,7 @@ export function checkLinkedElements(v, cm) {
           checkElement(elements[n++]);
           if (performance.now() - t0 > BUDGET_MS) break;
         }
-        if (n < elements.length && !v.codeCheckerAbort) {
+        if (n < elements.length && !v.toolboxAbort) {
           setProgressBar((100 * n) / elements.length);
           setTimeout(processNext, 0);
         } else {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Notes carrying both a notated and a gestural accidental, for the accid.ges
+     code checker. Either of the two may sit at the note or at a child accid
+     element, and the fix has to remove the gestural one wherever it is encoded,
+     without losing the notated accidental.
+
+     c1 .. c4 must be reported, c5 (a notated accidental alone) must not. -->
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>contradicting accidentals</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"><keySig xml:id="k1" sig="0"/></staffDef></staffGrp>
+    </scoreDef>
+    <section>
+      <!-- c1: both at the note, contradicting -->
+      <measure n="1" xml:id="mc1"><staff n="1" xml:id="mc1s1"><layer n="1">
+        <note xml:id="c1" pname="c" oct="5" dur="4" accid="s" accid.ges="f"/>
+        <note xml:id="x1" pname="g" oct="4" dur="4"/>
+        <note xml:id="x2" pname="a" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- c2: both at the note, same content -->
+      <measure n="2" xml:id="mc2"><staff n="1" xml:id="mc2s1"><layer n="1">
+        <note xml:id="c2" pname="d" oct="5" dur="4" accid="s" accid.ges="s"/>
+        <note xml:id="x3" pname="g" oct="4" dur="4"/>
+        <note xml:id="x4" pname="a" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- c3: notated at the note, gestural at a child accid element -->
+      <measure n="3" xml:id="mc3"><staff n="1" xml:id="mc3s1"><layer n="1">
+        <note xml:id="c3" pname="f" oct="5" dur="4" accid="s"><accid xml:id="a3" accid.ges="f"/></note>
+        <note xml:id="x5" pname="g" oct="4" dur="4"/>
+        <note xml:id="x6" pname="a" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- c4: both at the same child accid element -->
+      <measure n="4" xml:id="mc4"><staff n="1" xml:id="mc4s1"><layer n="1">
+        <note xml:id="c4" pname="b" oct="4" dur="4"><accid xml:id="a4" accid="s" accid.ges="f"/></note>
+        <note xml:id="x7" pname="g" oct="4" dur="4"/>
+        <note xml:id="x8" pname="a" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- c5: a notated accidental as a child element alone, nothing to report -->
+      <measure n="5" xml:id="mc5"><staff n="1" xml:id="mc5s1"><layer n="1">
+        <note xml:id="c5" pname="e" oct="5" dur="4"><accid xml:id="a5" accid="f"/></note>
+        <note xml:id="x9" pname="g" oct="4" dur="4"/>
+        <note xml:id="x10" pname="a" oct="4" dur="2"/>
+      </layer></staff></measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

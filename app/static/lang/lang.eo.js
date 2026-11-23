@@ -134,6 +134,13 @@ export const lang = {
   replaceMenuText: { text: 'Anstataŭi' },
   replaceAllMenuText: { text: 'Anstataŭi ĉion' },
   indentSelectionText: { text: 'Indentigi elekton' },
+  reformatEncodingText: {
+    text: 'Reformati per XML-analizilo',
+    description:
+      'Reformatas la tutan kodadon per la XML-analizilo: atributoj ordigitaj (unue xml:id, poste alfabete), normigita XML-seriigo (ekz. duoblaj citiloj, malplenaj elementoj kiel memfermaj etikedoj, signoreferencoj kiel signoj), ĉiuj linioj krommarĝenigitaj.',
+  },
+  reformatEncodingDone: { text: 'Kodado reformatita per la XML-analizilo ({lines} linioj).' },
+  reformatEncodingParseError: { text: 'Ne eblas reformati: la kodado ne estas bone formita XML.' },
   surroundWithTagsText: { text: 'Ĉirkaŭi per etikedoj' },
   surroundWithLastTagText: { text: 'Ĉirkaŭi per ' },
   jumpToLineText: { text: 'Salti al linio' },
@@ -150,10 +157,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Priskriba panelo' },
   showFacsimileMenuText: { text: 'Facsimila panelo' },
   showPlaybackControlsText: { text: 'Stiraj kontroliloj' },
+  showMeiToolboxMenuText: { text: 'MEI-ilarkesto' },
   facsimileTop: { text: 'Facsimila supre' },
   facsimileBottom: { text: 'Facsimila malsupre' },
   facsimileLeft: { text: 'Facsimila maldekstre' },
   facsimileRight: { text: 'Facsimila dekstre' },
+  meiToolboxTop: { text: 'MEI-ilarkesto supre' },
+  meiToolboxBottom: { text: 'MEI-ilarkesto malsupre' },
+  meiToolboxLeft: { text: 'MEI-ilarkesto maldekstre' },
+  meiToolboxRight: { text: 'MEI-ilarkesto dekstre' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Manipuli' },
@@ -176,6 +188,118 @@ export const lang = {
   meterConformanceText: { text: 'Kontroli @metcon' },
   renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
+  convertAttributesToElementsText: {
+    text: 'Konverti atributojn al elementoj',
+    description:
+      'Konvertas atributojn, kiuj ankaŭ esprimeblas kiel elementoj, al tiuj elementoj, ekz. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss ĉe notoj kaj akordoj, aŭ kleflajn, tonalajn kaj taktajn atributojn ĉe staffDef kaj scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributoj konvertitaj al {list}.' },
+  convertAttributesToElementsNone: { text: 'Neniuj atributoj troviĝis, kiuj konverteblas al elementoj.' },
+  convertAttributesToElementsProblems: { text: '{count} atributoj ne konverteblis.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Kontroli' },
+  meiToolboxTabConvert: { text: 'Konverti' },
+  meiToolboxTabRenumber: { text: 'Renumeri' },
+  meiToolboxCheckButton: { text: 'Kontroli' },
+  meiToolboxTestButton: { text: 'Testi', description: 'Listigi, kio estus ŝanĝita, sen ŝanĝi la kodadon' },
+  meiToolboxRenumberButton: { text: 'Renumeri' },
+  meiToolboxAttrToElButton: { text: 'Atributoj → elementoj' },
+  meiToolboxElToAttrButton: { text: 'Elementoj → atributoj', description: 'Konvertas elementojn al atributoj, kiam neniu informo perdiĝas; aliaj elementoj restas kaj estas listigitaj.' },
+  meiToolboxAll: { text: 'ĉiuj' },
+  meiToolboxNone: { text: 'neniu' },
+  meiToolboxFilter: { text: 'Filtri rezultojn' },
+  meiToolboxRunAgain: { text: 'Ruli denove' },
+  meiToolboxHideOptions: { text: 'Kaŝi opciojn' },
+  meiToolboxOutdated: { text: '(la kodado ŝanĝiĝis intertempe, la rezultoj eble estas malaktualaj)' },
+  meiToolboxNoResults: { text: 'Ankoraŭ neniuj rezultoj. Elektu la opciojn kaj rulu.' },
+  meiToolboxGroupsSelected: { text: '{n} el {total} atributgrupoj' },
+  meiToolboxCheckAccidGes: { text: 'Akcidencoj (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Taktodaŭroj (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Ligitaj elementoj (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Fermi la MEI-ilarkeston' },
+  meiToolboxTabIds: { text: 'Id-oj' },
+  meiToolboxTabFacsimile: { text: 'Faksimilo' },
+  meiToolboxTabReformat: { text: 'Reformati' },
+  meiToolboxIdsAdd: { text: 'Aldoni xml:id-ojn (al elementoj sen tia)' },
+  meiToolboxIdsChange: {
+    text: 'Ŝanĝi xml:id-ojn (novan por ĉiu elemento)',
+    description: 'Atribuas novan xml:id al ĉiu elemento. Referencoj ene de ĉi tiu kodigo estas ĝisdatigitaj, sed ligiloj el aliaj dosieroj, prinotoj, faksimilaj iloj aŭ URL-oj, kiuj montras al la malnovaj xml:id-oj, ne plu funkcios.',
+  },
+  meiToolboxIdsRemove: { text: 'Forigi xml:id-ojn (krom tiuj, al kiuj oni referencas)' },
+  meiToolboxIdsButton: { text: 'Apliki' },
+  meiToolboxIdsAdded: { text: '{n} aldonitaj' },
+  meiToolboxIdsChanged: { text: '{n} ŝanĝitaj' },
+  meiToolboxIdsRemoved: { text: '{n} forigitaj' },
+  meiToolboxIdsKept: { text: '{n} konservitaj' },
+  meiToolboxIdsReferences: { text: '{n} referencoj ĝisdatigitaj' },
+  meiToolboxIdsKeptReason: { text: 'referencata ene de la kodigo' },
+  meiToolboxIdsNothing: { text: 'Nenio farenda: neniu xml:id estis aldonita, ŝanĝita aŭ forigita.' },
+  meiToolboxIdsCancelled: { text: 'Nuligita, la kodigo restas senŝanĝa.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Ligi la kodigon al paĝbildoj: enigi faksimilon el alia dosiero aŭ aldoni la ankoraŭ mankantajn surfacojn, po unu por ĉiu paĝosalto.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Enigi faksimilon…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Aldoni mankantajn surfacojn',
+    description: 'Aldonas tion, kio mankas: faksimilon, se ne ekzistas, surfacon kun lokokupa graphic por ĉiu paĝo ankoraŭ sen tia, kaj pb@facs montrantan al ĝi. Paĝoj estas kongruigataj kun la jam ekzistantaj surfacoj, kiuj restas senŝanĝaj.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Aldonitaj surfacoj: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Paĝoj ligitaj al jam ekzistanta surfaco: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimilo aldonita.' },
+  meiToolboxFacsimileUpToDate: { text: 'Ĉiu paĝo jam havas sian surfacon; nenio aldonita.' },
+  meiToolboxFacsimileZones: { text: '{n} zonoj' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfacoj, {zones} zonoj' },
+  meiToolboxFacsimileNone: { text: 'Ĉi tiu kodigo ne havas faksimilon.' },
+  meiToolboxReformatVerovio: {
+    text: 'Per Verovio',
+    description: 'Lasas Verovion reskribi la kodigon el sia propra reprezento.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio skribas la kodigon el sia propra reprezento, en sia propra formato kaj atributordo.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Per la XML-analizilo',
+    description: 'Reformatas la kodigon per la XML-analizilo: la enhavo restas, nur la formato kaj la atributordo ŝanĝiĝas. Same kiel Kodo → Reformati per la XML-analizilo.',
+  },
+  meiToolboxReformatUnchanged: { text: 'La kodigo restas senŝanĝa.' },
+  meiToolboxReformatDone: { text: '{lines} linioj' },
+  meiToolboxAttributeOrder: {
+    text: 'Atributordo',
+    description: 'La ordo, en kiu atributoj estas skribataj, kiam ajn mei-friend reskribas elementon.',
+    labels: ['kiel kodigite', 'alfabete', 'xml:id unue, poste alfabete', 'propra…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Ordoŝablono',
+    description: 'Atributnomoj disigitaj per spacoj aŭ komoj, en la dezirata ordo, ekz. „xml:id n label *“. Nomo finiĝanta per * kongruas kun ĉiuj atributoj kun tiu prefikso (clef.*). Unuopa * reprezentas ĉiujn ne nomitajn atributojn, alfabete; sen ĝi ili konservas sian ordon ĉe la fino. Nomspacaj deklaroj ĉiam venas unue.',
+  },
+  codeCheckerFixShown: { text: 'Korekti {n} montritajn' },
+  codeCheckerIgnoreShown: { text: 'Ignori {n} montritajn' },
+  convertGroupAccid: { text: 'Skribitaj akcidencoj (@accid)' },
+  convertGroupAccidGes: { text: 'Sonantaj akcidencoj (@accid.ges)' },
+  convertGroupArtic: { text: 'Artikulacioj (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Kantoteksto (@syl)' },
+  convertGroupFermata: { text: 'Fermatoj (@fermata)' },
+  convertGroupTie: { text: 'Ligarkoj (@tie)' },
+  convertGroupSlur: { text: 'Legatarkoj (@slur)' },
+  convertGroupGliss: { text: 'Glisandoj (@gliss)' },
+  convertGroupDefinitions: { text: 'Klefo, tonalo, takto, mensuro (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Grupsimboloj kaj etikedoj (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Atributoj estus konvertitaj al {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elementoj konvertitaj al atributoj: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Elementoj estus konvertitaj al atributoj: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} elementoj ne konverteblis.' },
+  convertElementsToAttributesNone: { text: 'Neniuj elementoj troviĝis, kiuj konverteblas al atributoj.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementoj → atributoj</b>\n\nAtentu: ĉi tiu operacio povas rompi eksterajn ligilojn.\n\n{count} el la konvertotaj elementoj havas xml:id, kiu estas forigita kune kun la elemento. Elementoj referencitaj ene de ĉi tiu dosiero ne estas konvertitaj.\n\nLigiloj el aliaj dosieroj, prinotoj konservitaj ekster ĉi tiu dosiero, faksimilaj iloj aŭ URL-oj, kiuj montras al ĉi tiuj xml:id-oj, ne plu funkcios.' },
+  elementsToAttributesProceed: { text: 'Konverti' },
+  elementsToAttributesCancel: { text: 'Nuligi' },
+  convertScopeAll: { text: 'Amplekso: tuta kodado (elektu tekston en la redaktilo por limigi la konverton)' },
+  convertScopeSelection: { text: 'Amplekso: elekto, linioj {from}–{to}' },
+  convertSelectionSuffix: { text: 'elekto' },
+  renumberMeasuresStartNumber: { text: 'Komenca numero' },
+  renumberMeasuresUnchanged: { text: 'neŝanĝita' },
+  renumberMeasuresSummary: { text: '{total} taktoj, {changed} renumeritaj.' },
+  renumberMeasuresSummaryTest: { text: '{total} taktoj, {changed} estus renumeritaj.' },
+  renumberMeasuresNoMeasures: { text: 'Neniuj taktoj trovitaj.' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
   removeIdsText: { text: 'Forigi id-ojn el MEI' },
   changeIdsText: {
@@ -191,6 +315,28 @@ export const lang = {
   reRenderMeiVerovio: { text: ' Reeldoni per Verovio' },
   addFacsimile: { text: 'Aldoni facsimilan elementon' },
   ingestFacsimileText: { text: 'Enkonsumi facsimilan' },
+  ingestFacsimileTitle: { text: 'Enkonsumado de faksimilo' },
+  ingestFacsimileProgress: { text: '{file}: {done} el {total} zonoj traktitaj.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimilo enkonsumita' },
+  ingestFacsimileStoppedTitle: { text: 'Enkonsumado de faksimilo haltigita' },
+  ingestFacsimileSummary: {
+    text: 'Faksimilo el {file} kun {surfaces} surfacoj (surface) kaj {zones} zonoj enmetita antaŭ body; atributoj @facs aldonitaj al {added} elementoj.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Haltigita post {done} el {total} zonoj. La ĝisnunaj ŝanĝoj estas malfareblaj per unu paŝo.',
+  },
+  ingestFacsimileProblems: { text: '{count} problemoj okazis:' },
+  ingestFacsimileNotFound: { text: '{type} kun n="{n}" ne trovita.' },
+  ingestFacsimileNotUnique: { text: '{type} kun n="{n}" ne unika.' },
+  ingestFacsimileNoId: { text: '{type} kun n="{n}" ne havas xml:id, @facs ne aldonita.' },
+  ingestFacsimileNotInEditor: { text: '{type} kun n="{n}" ne trovita en la redaktilo, @facs ne aldonita.' },
+  ingestFacsimileNoFacsimile: {
+    text: 'Enkonsumado de faksimilo malsukcesis: neniu elemento facsimile trovita en {file}.',
+  },
+  ingestFacsimileNoBody: { text: 'Enkonsumado de faksimilo malsukcesis: neniu elemento body trovita en la kodigo.' },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'Neniu elemento body trovita en la redaktilo, elemento facsimile ne enmetita.',
+  },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Enmeti' },
@@ -852,10 +998,6 @@ export const lang = {
   },
 
   // Renombri taktojn
-  renumberMeasuresHeading: {
-    text: 'Renombri taktojn',
-    description: 'Agordoj por renombrado de taktaj eroj',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Daŭrigi trans nekompletajn taktojn',
     description: 'Daŭrigi numeradon de taktoj trans nekompletajn taktojn (@metcon="false")',
@@ -925,6 +1067,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Montri faksimilajn titolojn',
     description: 'Montri faksimilajn titolojn super la faksimila bildoj',
+  },
+  titleMeiToolbox: {
+    text: 'MEI-ilarkesto',
+    description: 'Kontroloj kaj modifoj de la kodigo, en panelo apud la redaktilo',
+  },
+  showMeiToolbox: {
+    text: 'Montri la MEI-ilarkeston',
+    description: 'Montri la MEI-ilarkeston kun la langetoj Kontroli, Konverti, Renumeri, Id-oj, Faksimilo kaj Reskribi',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Pozicio de la MEI-ilarkesto',
+    description: 'Elekti la pozicion de la MEI-ilarkesto rilate al la redaktilo',
+    labels: ['maldekstre', 'dekstre', 'supre', 'malsupre'],
   },
 
   // Supplied element
@@ -1206,11 +1361,6 @@ export const lang = {
 
   // Utilaj mezuraj renumerigi
   renumberMeasuresModalText: { text: 'Renombre taktojn' },
-  renumberMeasuresModalTest: { text: 'Testo' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'estus' },
-  renumberMeasuresChangedTo: { text: 'ŝanĝis al' },
-  renumberMeasureMeasuresRenumbered: { text: 'taktoj renumerigis' },
 
   // Kodo-kontrolilo @accid.ges
   accidGesCodeCheckerTitle: {

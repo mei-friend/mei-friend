@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Attribute conversion test: elements</title>
+      </titleStmt>
+      <pubStmt/>
+      <notesStmt>
+        <annot>Test encoding for "Convert elements to attributes" (e2e/attributeConversion.spec.ts). Encoded with elements; the blocked cases follow patterns found in real encodings (trompamusic-encodings: e.g., artic@place, fermata@form, tie/slur@curvedir, label/rend). Elements marked "keep" cannot be expressed as attributes without loss and must remain.</annot>
+      </notesStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef xml:id="sd">
+            <keySig xml:id="ks0" sig="1f"/>
+            <meterSig xml:id="ms0" count="3" unit="4"/>
+            <staffGrp xml:id="sg">
+              <grpSym xml:id="gs0" symbol="bracket"/>
+              <!-- keep: label elements (MEI 5) -->
+              <label xml:id="lb0">
+                <rend fontstyle="italic">Piano</rend>
+              </label>
+              <staffDef xml:id="s1" n="1" lines="5">
+                <label xml:id="lb1">RH</label>
+                <!-- keep: @cautionary -->
+                <clef xml:id="cl1" shape="G" line="2" cautionary="true"/>
+                <keySig xml:id="ks1" sig="1f" mode="major" pname="f"/>
+              </staffDef>
+              <staffDef xml:id="s2" n="2" lines="5">
+                <!-- converted, @color becomes @clef.color -->
+                <clef xml:id="cl2" shape="F" line="4" color="blue"/>
+                <!-- keep: keyAccid children -->
+                <keySig xml:id="ks2" sig="1s">
+                  <keyAccid xml:id="ka1" accid="s" pname="f" oct="3"/>
+                </keySig>
+              </staffDef>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sec">
+            <!-- m1: accidentals and articulations -->
+            <measure xml:id="m1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n1" pname="c" oct="5" dur="4">
+                    <accid xml:id="a1" accid="s"/>
+                  </note>
+                  <!-- note@accid.ges with accid child (frequent in real encodings) -->
+                  <note xml:id="n2" pname="b" oct="4" dur="4" accid.ges="f">
+                    <accid xml:id="a2" accid="f"/>
+                  </note>
+                  <!-- keep: @func -->
+                  <note xml:id="n3" pname="e" oct="5" dur="4">
+                    <accid xml:id="a3" accid="n" func="caution"/>
+                  </note>
+                  <!-- untouched: accid within editorial markup (pattern from Signature-Sound-Vienna) -->
+                  <note xml:id="n3b" pname="f" oct="5" dur="4">
+                    <supplied xml:id="n3bsup">
+                      <accid xml:id="a3b" accid="s"/>
+                    </supplied>
+                  </note>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- keep: xml:id referenced by annot -->
+                  <note xml:id="n4" pname="b" oct="2" dur="4">
+                    <accid xml:id="a4" accid="f"/>
+                  </note>
+                  <!-- ar2 keep: @place; ar1 converted -->
+                  <note xml:id="n5" pname="c" oct="3" dur="4">
+                    <artic xml:id="ar1" artic="stacc"/>
+                    <artic xml:id="ar2" artic="acc" place="below"/>
+                  </note>
+                  <!-- ar4 keep: empty artic -->
+                  <chord xml:id="ch1" dur="4">
+                    <note xml:id="ch1a" pname="e" oct="3"/>
+                    <note xml:id="ch1b" pname="g" oct="3"/>
+                    <artic xml:id="ar3" artic="ten"/>
+                    <artic xml:id="ar4"/>
+                  </chord>
+                </layer>
+              </staff>
+              <annot xml:id="an1" plist="#a4"/>
+            </measure>
+            <!-- m2: lyrics -->
+            <measure xml:id="m2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n6" pname="c" oct="5" dur="4">
+                    <verse xml:id="v1" n="1">
+                      <syl xml:id="sy1">Ky</syl>
+                    </verse>
+                  </note>
+                  <!-- keep: @wordpos/@con -->
+                  <note xml:id="n7" pname="d" oct="5" dur="4">
+                    <verse xml:id="v2" n="1">
+                      <syl xml:id="sy2" wordpos="i" con="d">ri</syl>
+                    </verse>
+                  </note>
+                  <!-- keep: verse 2 -->
+                  <note xml:id="n8" pname="e" oct="5" dur="4">
+                    <verse xml:id="v3" n="2">
+                      <syl xml:id="sy3">e</syl>
+                    </verse>
+                  </note>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <!-- syl directly in note -->
+                  <note xml:id="n9" pname="c" oct="3" dur="4">
+                    <syl xml:id="sy4">son</syl>
+                  </note>
+                  <!-- keep: two verses -->
+                  <note xml:id="n10" pname="d" oct="3" dur="2">
+                    <verse xml:id="v5" n="1">
+                      <syl xml:id="sy5">a</syl>
+                    </verse>
+                    <verse xml:id="v6" n="2">
+                      <syl xml:id="sy6">b</syl>
+                    </verse>
+                  </note>
+                </layer>
+              </staff>
+            </measure>
+            <!-- m3: fermatas -->
+            <measure xml:id="m3" n="3">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n11" pname="c" oct="5" dur="4"/>
+                  <note xml:id="n12" pname="d" oct="5" dur="4"/>
+                  <rest xml:id="r1" dur="4"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n13" pname="c" oct="3" dur="2" dots="1"/>
+                </layer>
+              </staff>
+              <!-- @form="norm" (default) is dropped -->
+              <fermata xml:id="f1" staff="1" startid="#n11" form="norm" place="above"/>
+              <!-- keep: @form="inv" -->
+              <fermata xml:id="f2" staff="1" startid="#n12" form="inv" place="below"/>
+              <!-- no @place: @fermata="above" -->
+              <fermata xml:id="f3" staff="1" startid="#r1"/>
+              <!-- keep: only @tstamp -->
+              <fermata xml:id="f4" staff="2" tstamp="1" place="above"/>
+              <!-- keep: @shape -->
+              <fermata xml:id="f5" staff="2" startid="#n13" shape="square"/>
+              <!-- keep: within editorial markup -->
+              <supplied>
+                <fermata xml:id="f6" staff="2" startid="#n13"/>
+              </supplied>
+            </measure>
+            <!-- m4-m7: ties, slurs, glissandi -->
+            <measure xml:id="m4" n="4">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n14" pname="c" oct="5" dur="4"/>
+                  <note xml:id="n15" pname="d" oct="5" dur="4"/>
+                  <note xml:id="n16" pname="e" oct="5" dur="4"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n17" pname="c" oct="3" dur="2"/>
+                  <note xml:id="n18" pname="e" oct="3" dur="4"/>
+                </layer>
+              </staff>
+              <!-- converted -->
+              <tie xml:id="t1" staff="1" startid="#n14" endid="#n19"/>
+              <!-- keep: different pitch (d5 / f5) -->
+              <tie xml:id="t2" staff="1" startid="#n15" endid="#n20"/>
+              <!-- keep: @curvedir -->
+              <tie xml:id="t3" staff="2" startid="#n17" endid="#n22" curvedir="below"/>
+              <!-- keep: note to chord with different pitches -->
+              <tie xml:id="t4" staff="2" startid="#n18" endid="#ch2"/>
+              <!-- keep: across staves -->
+              <tie xml:id="t5" staff="1 2" startid="#n16" endid="#n23"/>
+              <!-- converted; overlapping slurs receive different numbers -->
+              <slur xml:id="sl1" staff="1" startid="#n14" endid="#n16"/>
+              <slur xml:id="sl2" staff="1" startid="#n14" endid="#n19"/>
+              <!-- keep: @curvedir -->
+              <slur xml:id="sl3" staff="2" startid="#n17" endid="#n18" curvedir="above"/>
+              <!-- keep: only @tstamp/@tstamp2 -->
+              <slur xml:id="sl4" staff="1" tstamp="1" tstamp2="0m+3"/>
+              <!-- keep: @startid with @tstamp2, no @endid (pattern from Signature-Sound-Vienna) -->
+              <slur xml:id="sl6" staff="1" startid="#n15" tstamp2="1m+1"/>
+              <!-- keep: across staves, end precedes start in document order -->
+              <slur xml:id="sl7" staff="2 1" startid="#n17" endid="#n15"/>
+            </measure>
+            <measure xml:id="m5" n="5">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n19" pname="c" oct="5" dur="4"/>
+                  <note xml:id="n20" pname="f" oct="5" dur="4"/>
+                  <note xml:id="n21" pname="g" oct="5" dur="4"/>
+                </layer>
+                <layer n="2">
+                  <space xml:id="sp1" dur="4"/>
+                  <space xml:id="sp2" dur="2"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n22" pname="c" oct="3" dur="4"/>
+                  <chord xml:id="ch2" dur="4">
+                    <note xml:id="ch2a" pname="e" oct="3"/>
+                    <note xml:id="ch2b" pname="g" oct="3"/>
+                  </chord>
+                  <note xml:id="n23" pname="e" oct="5" dur="4"/>
+                </layer>
+              </staff>
+              <!-- keep: start/end are space elements -->
+              <slur xml:id="sl5" staff="1" startid="#sp1" endid="#sp2"/>
+              <!-- converted -->
+              <gliss xml:id="g1" staff="1" startid="#n20" endid="#n21"/>
+              <!-- keep: text content -->
+              <gliss xml:id="g2" staff="1" startid="#n19" endid="#n21">gliss.</gliss>
+              <!-- keep: more than one barline (m5 to m7) -->
+              <tie xml:id="t6" staff="1" startid="#n21" endid="#n26"/>
+            </measure>
+            <measure xml:id="m6" n="6">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n24" pname="g" oct="5" dur="2" dots="1"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n25" pname="c" oct="3" dur="2" dots="1" tie="i"/>
+                </layer>
+              </staff>
+              <!-- keep: n25 already starts a tie (@tie="i") -->
+              <tie xml:id="t7" staff="2" startid="#n25" endid="#n27"/>
+            </measure>
+            <measure xml:id="m7" n="7" right="end">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="n26" pname="g" oct="5" dur="2" dots="1"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="n27" pname="c" oct="3" dur="2" dots="1" tie="t"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>
