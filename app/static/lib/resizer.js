@@ -103,6 +103,27 @@ function sizeToolbox(toolbox, visible, encodingWidth, encodingHeight) {
   }
 } // sizeToolbox()
 
+/**
+ * Sizes the editor and, if shown, the MEI toolbox within the space available to the
+ * encoding panel; the editor loses the toolbox extent (and its resizer) on the side
+ * the toolbox sits on.
+ * @param {CodeMirror} cm
+ * @param {number} encodingWidth px available to the encoding panel
+ * @param {number} encodingHeight px available to the encoding panel
+ */
+function sizeEncodingPanel(cm, encodingWidth, encodingHeight) {
+  const toolbox = document.getElementById('meiToolbox');
+  const visible = !!toolbox && meiToolboxVisible();
+  sizeToolbox(toolbox, visible, encodingWidth, encodingHeight); // clamps the toolbox extent first
+  let mtWidth = 0;
+  let mtHeight = 0;
+  if (visible) {
+    if (meiToolboxBeside()) mtWidth = meiToolboxWidth + meiToolboxResizerWidth;
+    else mtHeight = meiToolboxHeight + meiToolboxResizerWidth;
+  }
+  cm.setSize(encodingWidth - mtWidth, encodingHeight - mtHeight);
+} // sizeEncodingPanel()
+
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 const maxProportion = 0.95;
@@ -167,19 +188,12 @@ export function setOrientation(
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
-  // the toolbox takes its extent from the side it sits on: height at top/bottom,
-  // width at left/right; mtHeight/mtWidth are what the editor loses to it
+  // the toolbox takes its extent from the side it sits on (see sizeEncodingPanel())
   const meiToolbox = document.getElementById('meiToolbox');
   const showToolbox = meiToolboxVisible();
-  let mtHeight = 0;
-  let mtWidth = 0;
   if (meiToolbox) {
     meiToolbox.style.display = showToolbox ? 'flex' : 'none';
     document.getElementById('meiToolboxResizer').style.display = showToolbox ? 'flex' : 'none';
-    if (showToolbox) {
-      if (meiToolboxBeside()) mtWidth = meiToolboxWidth + meiToolboxResizerWidth;
-      else mtHeight = meiToolboxHeight + meiToolboxResizerWidth;
-    }
   }
   let sz = calcSizeOfContainer(); // friendContainer
   // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
@@ -204,8 +218,7 @@ export function setOrientation(
     notationDiv.style.height = sz.height * notationProportion;
     const encodingWidth = sz.width;
     const encodingHeight = sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth;
-    cm.setSize(encodingWidth - mtWidth, encodingHeight - mtHeight);
-    sizeToolbox(meiToolbox, showToolbox, encodingWidth, encodingHeight);
+    sizeEncodingPanel(cm, encodingWidth, encodingHeight);
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -220,8 +233,7 @@ export function setOrientation(
     notationDiv.style.height = sz.height;
     const encodingWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
     const encodingHeight = sz.height;
-    cm.setSize(encodingWidth - mtWidth, encodingHeight - mtHeight);
-    sizeToolbox(meiToolbox, showToolbox, encodingWidth, encodingHeight);
+    sizeEncodingPanel(cm, encodingWidth, encodingHeight);
   }
   friendSz.style.width = sz.width;
   friendSz.style.maxWidth = sz.width;
@@ -355,14 +367,6 @@ export function addNotationResizerHandlers(v, cm) {
     const dx = e.clientX - x;
     const dy = e.clientY - y;
     let sz = notationResizer.parentNode.getBoundingClientRect();
-    const meiToolbox = document.getElementById('meiToolbox');
-    let mtHeight = 0;
-    if (meiToolbox && meiToolbox.style.display !== 'none') {
-      mtHeight = meiToolboxHeight + meiToolboxResizerHeight;
-      document.getElementById('meiToolboxResizer').style.display = 'flex';
-    } else {
-      document.getElementById('meiToolboxResizer').style.display = 'none';
-    }
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
@@ -391,9 +395,7 @@ export function addNotationResizerHandlers(v, cm) {
     //     '/' +
     //     sz.height +
     //     ', Notationproporion: ' +
-    //     notationProportion +
-    //     ', meiToolboxHeight: ' +
-    //     mtHeight
+    //     notationProportion
     // );
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
@@ -403,9 +405,10 @@ export function addNotationResizerHandlers(v, cm) {
       case 'top':
       case 'bottom':
         notationPanel.style.height = notationProportion * sz.height;
-        cm.setSize(
+        sizeEncodingPanel(
+          cm,
           sz.width,
-          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth - mtHeight
+          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth
         );
         if (
           document.getElementById('showFacsimilePanel').checked &&
@@ -421,13 +424,11 @@ export function addNotationResizerHandlers(v, cm) {
       case 'left':
       case 'right':
         notationPanel.style.width = sz.width * notationProportion;
-        let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
-        let cmHeight = sz.height - mtHeight;
-        // console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
-        cm.setSize(cmWidth, cmHeight);
-        if (meiToolbox) {
-          meiToolbox.style.width = cmWidth;
-        }
+        sizeEncodingPanel(
+          cm,
+          sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth,
+          sz.height
+        );
         // set facsimile size
         if (
           document.getElementById('showFacsimilePanel').checked &&
