@@ -511,16 +511,7 @@ async function loadImage(url) {
   if (fileLocationType === 'github' && isLoggedIn && url.startsWith('https://raw.githubusercontent.com')) {
     return embedImage(url);
   } else {
-    return new Promise((resolve) => {
-      const img = document.createElementNS(svgNameSpace, 'image');
-      img.setAttribute('id', 'source-image');
-      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-      img.onload = () => resolve(img);
-      img.onerror = (err) => {
-        console.log('Cannot load image file ' + url + ', error: ', err);
-        resolve(null);
-      };
-    });
+    return svgImage(url);
   }
 } // loadImage()
 
@@ -531,19 +522,45 @@ async function loadImage(url) {
  * @returns {Promise}
  */
 async function embedImage(url) {
+  const dataUrl = await gm.directlyReadFileContents(url).catch((err) => {
+    console.log('Cannot embed image file ' + url + ', error: ', err);
+    return null;
+  });
+  return dataUrl ? svgImage(dataUrl) : null;
+} // embedImage()
+
+/**
+ * Creates the svg image element for url, once that file is known to load.
+ * Whether it loads is awaited on an HTMLImageElement rather than on the svg image
+ * itself, because an svg <image> outside the document fires neither load nor error in
+ * WebKit (Safari) - and the element is only put into the document once its file is
+ * there, which left the facsimile panel at "Loading image..." forever in Safari.
+ * An HTMLImageElement loads detached in every engine, and its request also serves the
+ * svg image, which is answered from the browser cache (verified: one request).
+ * The probe also yields the intrinsic size of the file, which is written to the
+ * element, so that it is drawn and measured (getBBox()) in every browser, also when
+ * the surface carries no @width and @height.
+ * @param {string} url href of the image (http(s) or data url)
+ * @returns {Promise<SVGImageElement|null>} null when the image cannot be loaded
+ */
+function svgImage(url) {
   return new Promise((resolve) => {
-    const img = document.createElementNS(svgNameSpace, 'image');
-    img.setAttribute('id', 'source-image');
-    gm.directlyReadFileContents(url).then((dataUrl) => {
-      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
+    const probe = new Image();
+    probe.onload = () => {
+      const img = document.createElementNS(svgNameSpace, 'image');
+      img.setAttribute('id', 'source-image');
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+      if (probe.naturalWidth) img.setAttribute('width', probe.naturalWidth);
+      if (probe.naturalHeight) img.setAttribute('height', probe.naturalHeight);
       resolve(img);
-    });
-    img.onerror = (err) => {
-      console.log('Cannot embed image file ' + url + ', error: ', err);
+    };
+    probe.onerror = (err) => {
+      console.log('Cannot load image file ' + url + ', error: ', err);
       resolve(null);
     };
+    probe.src = url;
   });
-} // embedImage()
+} // svgImage()
 
 /**
  * Clear all source image divs and svgs
