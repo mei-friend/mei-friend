@@ -1191,8 +1191,12 @@ export default class Viewer {
 
     if (!show) {
       if (this._linkedNavKeyMap) {
-        cm?.removeKeyMap(this._linkedNavKeyMap);
+        // remove it from the editor it was added to: callers may pass no cm here
+        // (e.g. updateHighlight() from the notation's drag selector), and dropping
+        // the reference without removing it left Up/Down captured for good
+        this._linkedNavKeyMapCm?.removeKeyMap(this._linkedNavKeyMap);
         this._linkedNavKeyMap = null;
+        this._linkedNavKeyMapCm = null;
       }
       if (this._linkedNavCurrentMark) {
         this._linkedNavCurrentMark.clear();
@@ -1217,10 +1221,17 @@ export default class Viewer {
     down.style.bottom = `calc(${6 + hHeight}px + var(--editorOffsetBottom, 0px))`;
 
     if (!this._linkedNavKeyMap) {
-      this._linkedNavKeyMap = {
-        Up: () => this.jumpToLinkedMark(cm, -1),
-        Down: () => this.jumpToLinkedMark(cm, 1),
+      // pass the keys on to normal cursor movement whenever there is nothing to
+      // jump to, so that a stale key map can never swallow Up/Down
+      const jump = (direction) => {
+        if (this.getNavigableItems().length < 2) return CodeMirror.Pass;
+        this.jumpToLinkedMark(cm, direction);
       };
+      this._linkedNavKeyMap = {
+        Up: () => jump(-1),
+        Down: () => jump(1),
+      };
+      this._linkedNavKeyMapCm = cm;
       cm.addKeyMap(this._linkedNavKeyMap);
     }
     // Esc deactivating this navigation is handled centrally in
