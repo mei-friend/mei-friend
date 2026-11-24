@@ -11,6 +11,7 @@
 * Fixed undo and redo stepping back two edits at once.
 * Results in the MEI toolbox are cleared as soon as the options they were produced with are touched, so that what is shown always belongs to the options beside it.
 * Linking element highlighting bug fixed that prevented up/down arrows bindings to work in the editor.
+* Facsimile source image loading bug with Safari fixed.
 
 ### 1.6.2 patch: Code checker optimizations and new functionality
 * Substantial speed improvements for accid.ges, metcon, and linking checker functions
