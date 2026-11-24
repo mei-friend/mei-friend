@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend - це редактор для <a href="https://music-encoding.org">музичних кодувань</a>, розміщений на
+      mei-friend - це редактор для <a href="https://music-encoding.org" target="_blank">музичних кодувань</a>, розміщений на
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Університеті музики та виконавських мистецтв у Відні</a>. 
       Будь ласка, ознайомтеся з нашою <a href="https://mei-friend.github.io" target="_blank">розширеною документацією</a> для 
       отримання додаткової інформації.
@@ -70,8 +70,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Австрійським фондом науки (FWF)</a> в рамках проектів
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      і <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> і <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Зрозуміло!' },
@@ -130,6 +130,13 @@ export const lang = {
   replaceMenuText: { text: 'Замінити' },
   replaceAllMenuText: { text: 'Замінити все' },
   indentSelectionText: { text: 'Вставити відступ в виділене' },
+  reformatEncodingText: {
+    text: 'Переформатувати через XML-парсер',
+    description:
+      'Переформатовує все кодування через XML-парсер: атрибути впорядковано (спочатку xml:id, потім за абеткою), нормалізована серіалізація XML (напр. подвійні лапки, порожні елементи як самозакривні теги, посилання на символи як символи), усі рядки з відступами.',
+  },
+  reformatEncodingDone: { text: 'Кодування переформатовано через XML-парсер ({lines} рядків).' },
+  reformatEncodingParseError: { text: 'Неможливо переформатувати: кодування не є правильно сформованим XML.' },
   surroundWithTagsText: { text: 'Обгорнути тегами' },
   surroundWithLastTagText: { text: 'Обгорнути останнім тегом' },
   jumpToLineText: { text: 'Перейти до рядка' },
@@ -146,10 +153,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Панель анотацій' },
   showFacsimileMenuText: { text: 'Панель факсиміле' },
   showPlaybackControlsText: { text: 'Елементи управління відтворенням' },
+  showMeiToolboxMenuText: { text: 'Набір інструментів MEI' },
   facsimileTop: { text: 'Факсиміле зверху' },
   facsimileBottom: { text: 'Факсиміле знизу' },
   facsimileLeft: { text: 'Факсиміле зліва' },
   facsimileRight: { text: 'Факсиміле справа' },
+  meiToolboxTop: { text: 'Набір інструментів MEI зверху' },
+  meiToolboxBottom: { text: 'Набір інструментів MEI знизу' },
+  meiToolboxLeft: { text: 'Набір інструментів MEI ліворуч' },
+  meiToolboxRight: { text: 'Набір інструментів MEI праворуч' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Маніпуляції' },
@@ -172,11 +184,151 @@ export const lang = {
   meterConformanceText: { text: 'Перевірити @metcon' },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },
+  convertAttributesToElementsText: {
+    text: 'Перетворити атрибути на елементи',
+    description:
+      'Перетворює атрибути, які також можна виразити як елементи, на ці елементи, напр. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss у нотах і акордах або атрибути ключа, тональності та розміру в staffDef і scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Атрибути перетворено на {list}.' },
+  convertAttributesToElementsNone: { text: 'Не знайдено атрибутів, які можна перетворити на елементи.' },
+  convertAttributesToElementsProblems: { text: 'Не вдалося перетворити {count} атрибутів.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Перевірка' },
+  meiToolboxTabConvert: { text: 'Перетворення' },
+  meiToolboxTabRenumber: { text: 'Перенумерація' },
+  meiToolboxCheckButton: { text: 'Перевірити' },
+  meiToolboxTestButton: { text: 'Тест', description: 'Показати, що буде змінено, не змінюючи кодування' },
+  meiToolboxRenumberButton: { text: 'Перенумерувати' },
+  meiToolboxAttrToElButton: { text: 'Атрибути → елементи' },
+  meiToolboxElToAttrButton: { text: 'Елементи → атрибути', description: 'Перетворює елементи на атрибути, якщо при цьому не втрачається інформація; інші елементи зберігаються та наводяться в списку.' },
+  meiToolboxAll: { text: 'усі' },
+  meiToolboxNone: { text: 'жодного' },
+  meiToolboxFilter: { text: 'Фільтрувати результати' },
+  meiToolboxRunAgain: { text: 'Запустити знову' },
+  meiToolboxHideOptions: { text: 'Сховати параметри' },
+  meiToolboxOutdated: { text: '(кодування відтоді змінилося, результати можуть бути застарілими)' },
+  meiToolboxNoResults: { text: 'Результатів ще немає. Виберіть параметри та запустіть.' },
+  meiToolboxGroupsSelected: { text: '{n} з {total} груп атрибутів' },
+  meiToolboxCheckAccidGes: { text: 'Знаки альтерації (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Тривалості тактів (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Пов\'язані елементи (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Закрити набір інструментів MEI' },
+  meiToolboxTabIds: { text: 'Ід' },
+  meiToolboxTabFacsimile: { text: 'Факсиміле' },
+  meiToolboxTabReformat: { text: 'Переформатувати' },
+  meiToolboxIdsAdd: { text: 'Додати xml:id (до елементів без нього)' },
+  meiToolboxIdsChange: {
+    text: 'Змінити xml:id (новий для кожного елемента)',
+    description: 'Призначає новий xml:id кожному елементу. Посилання всередині цього кодування оновлюються, але посилання з інших файлів, анотацій, інструментів факсиміле чи URL на старі xml:id більше не працюватимуть.',
+  },
+  meiToolboxIdsRemove: { text: 'Вилучити xml:id (крім тих, на які є посилання)' },
+  meiToolboxIdsButton: { text: 'Застосувати' },
+  meiToolboxIdsAdded: { text: '{n} додано' },
+  meiToolboxIdsChanged: { text: '{n} змінено' },
+  meiToolboxIdsRemoved: { text: '{n} вилучено' },
+  meiToolboxIdsKept: { text: '{n} збережено' },
+  meiToolboxIdsReferences: { text: '{n} посилань оновлено' },
+  meiToolboxIdsKeptReason: { text: 'на нього посилаються в кодуванні' },
+  meiToolboxIdsNothing: { text: 'Немає що робити: жодного xml:id не додано, не змінено й не вилучено.' },
+  meiToolboxIdsCancelled: { text: 'Скасовано, кодування не змінено.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Пов’яжіть кодування із зображеннями сторінок: імпортуйте факсиміле з іншого файлу або додайте surfaces, яких ще бракує, по одній на кожен розрив сторінки.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Імпортувати факсиміле…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Додати відсутні surfaces',
+    description: 'Додає те, чого бракує: факсиміле, якщо його немає, surface із тимчасовим graphic для кожної сторінки, яка ще її не має, і pb@facs, що на неї вказує. Сторінки зіставляються з наявними surfaces, які залишаються без змін.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Додано surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Сторінок пов’язано з наявною surface: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Факсиміле додано.' },
+  meiToolboxFacsimileUpToDate: { text: 'Кожна сторінка вже має свою surface; нічого не додано.' },
+  meiToolboxFacsimileZones: { text: '{n} зон' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} зон' },
+  meiToolboxFacsimileNone: { text: 'Це кодування не має факсиміле.' },
+  meiToolboxReformatVerovio: {
+    text: 'Через Verovio',
+    description: 'Дозволяє Verovio переписати кодування з власного подання.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio записує кодування з власного подання, у власному форматуванні та порядку атрибутів.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Через XML-парсер',
+    description: 'Переформатовує кодування через XML-парсер: вміст зберігається, змінюються лише форматування та порядок атрибутів. Те саме, що Код → Переформатувати через XML-парсер.',
+  },
+  meiToolboxReformatUnchanged: { text: 'Кодування не змінено.' },
+  meiToolboxReformatDone: { text: '{lines} рядків' },
+  meiToolboxAttributeOrder: {
+    text: 'Порядок атрибутів',
+    description: 'Порядок, у якому записуються атрибути щоразу, коли mei-friend записує елемент назад.',
+    labels: ['як закодовано', 'за абеткою', 'спершу xml:id, потім за абеткою', 'власний…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Шаблон порядку',
+    description: 'Імена атрибутів, розділені пробілами або комами, у потрібному порядку, напр. «xml:id n label *». Ім’я, що закінчується на *, відповідає всім атрибутам із цим префіксом (clef.*). Одинарна * позначає всі неназвані атрибути за абеткою; без неї вони зберігають свій порядок у кінці. Оголошення просторів імен завжди йдуть першими.',
+  },
+  codeCheckerFixShown: { text: 'Виправити {n} показаних' },
+  codeCheckerIgnoreShown: { text: 'Ігнорувати {n} показаних' },
+  convertGroupAccid: { text: 'Записані знаки альтерації (@accid)' },
+  convertGroupAccidGes: { text: 'Звукові знаки альтерації (@accid.ges)' },
+  convertGroupArtic: { text: 'Артикуляції (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Текст (@syl)' },
+  convertGroupFermata: { text: 'Фермати (@fermata)' },
+  convertGroupTie: { text: 'Ліги подовження (@tie)' },
+  convertGroupSlur: { text: 'Ліги (@slur)' },
+  convertGroupGliss: { text: 'Глісандо (@gliss)' },
+  convertGroupDefinitions: { text: 'Ключ, тональність, розмір, мензура (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Символи груп і мітки (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Атрибути було б перетворено на {list}.' },
+  convertElementsToAttributesSummary: { text: 'Елементи перетворено на атрибути: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Елементи було б перетворено на атрибути: {list}.' },
+  convertElementsToAttributesProblems: { text: 'Не вдалося перетворити {count} елементів.' },
+  convertElementsToAttributesNone: { text: 'Не знайдено елементів, які можна перетворити на атрибути.' },
+  elementsToAttributesConfirmation: { text: '<b>Елементи → атрибути</b>\n\nУвага: ця операція може зламати зовнішні посилання.\n\n{count} з елементів, що перетворюються, мають xml:id, який буде видалено разом з елементом. Елементи, на які є посилання в цьому файлі, не перетворюються.\n\nПосилання з інших файлів, анотації, збережені поза цим файлом, інструменти факсиміле або URL-адреси, що вказують на ці xml:id, більше не працюватимуть.' },
+  elementsToAttributesProceed: { text: 'Перетворити' },
+  elementsToAttributesCancel: { text: 'Скасувати' },
+  convertScopeAll: { text: 'Обсяг: усе кодування (виділіть текст у редакторі, щоб обмежити перетворення)' },
+  convertScopeSelection: { text: 'Обсяг: виділення, рядки {from}–{to}' },
+  convertSelectionSuffix: { text: 'виділення' },
+  renumberMeasuresStartNumber: { text: 'Початковий номер' },
+  renumberMeasuresUnchanged: { text: 'без змін' },
+  renumberMeasuresSummary: { text: '{total} тактів, {changed} перенумеровано.' },
+  renumberMeasuresSummaryTest: { text: '{total} тактів, {changed} було б перенумеровано.' },
+  renumberMeasuresNoMeasures: { text: 'Тактів не знайдено.' },
   addIdsText: { text: 'Додати ідентифікатори до MEI' },
   removeIdsText: { text: 'Видалити ідентифікатори з MEI' },
+  changeIdsText: {
+    text: 'Змінити ідентифікатори в MEI (порушує зовнішні посилання)',
+    description:
+      'Призначає новий xml:id кожному елементу (або вибраним елементам). Посилання в цьому файлі оновлюються, але посилання з інших файлів, анотацій, інструментів для факсиміле чи URL-адрес на старі xml:id більше не працюватимуть.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Змінити ідентифікатори в MEI</b>\n\nУвага: ця операція порушує зовнішні посилання.\n\nБуде змінено {changed} xml:id і додано {added} нових xml:id; буде оновлено {references} посилань у цьому файлі.\n\nПосилання з інших файлів, анотацій, інструментів для факсиміле чи URL-адрес на старі xml:id більше не працюватимуть.',
+  },
+  changeIdsProceed: { text: 'Змінити ідентифікатори' },
+  changeIdsCancel: { text: 'Скасувати' },
   reRenderMeiVerovio: { text: 'Перерендерити через Verovio' },
   addFacsimile: { text: 'Додати елемент факсиміле' },
   ingestFacsimileText: { text: 'Завантажити факсиміле' },
+  ingestFacsimileTitle: { text: 'Завантаження факсиміле' },
+  ingestFacsimileProgress: { text: '{file}: оброблено {done} з {total} областей.' },
+  ingestFacsimileDoneTitle: { text: 'Факсиміле завантажено' },
+  ingestFacsimileStoppedTitle: { text: 'Завантаження факсиміле зупинено' },
+  ingestFacsimileSummary: {
+    text: 'Факсиміле з {file} із {surfaces} поверхнями (surface) та {zones} областями вставлено перед body; атрибути @facs додано до {added} елементів.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Зупинено після {done} з {total} областей. Зроблені зміни можна скасувати одним кроком.',
+  },
+  ingestFacsimileProblems: { text: 'Виявлено {count} проблем:' },
+  ingestFacsimileNotFound: { text: '{type} з n="{n}" не знайдено.' },
+  ingestFacsimileNotUnique: { text: '{type} з n="{n}" не унікальний.' },
+  ingestFacsimileNoId: { text: '{type} з n="{n}" не має xml:id, @facs не додано.' },
+  ingestFacsimileNotInEditor: { text: '{type} з n="{n}" не знайдено в редакторі, @facs не додано.' },
+  ingestFacsimileNoFacsimile: { text: 'Завантаження факсиміле не вдалося: елемент facsimile не знайдено у {file}.' },
+  ingestFacsimileNoBody: { text: 'Завантаження факсиміле не вдалося: елемент body не знайдено в кодуванні.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Елемент body не знайдено в редакторі, елемент facsimile не вставлено.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Вставити' },
@@ -243,11 +395,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Розміщено на <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'в <a href="https://mdw.ac.at">mdw</a>, з ' +
+      'Розміщено на <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'в <a href="https://mdw.ac.at" target="_blank">mdw</a>, з ' +
       heart +
       ' Відня. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Інформація</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Інформація</a>.',
   },
   loadingVerovio: { text: 'Завантаження Verovio' },
   verovioLoaded: { text: 'завантажено' },
@@ -840,10 +992,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Перенумерувати такти',
-    description: 'Налаштування для перенумерування тактів',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Продовжити через неповні такти',
     description: 'Продовжити номери тактів через неповні такти (@metcon="false")',
@@ -913,6 +1061,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Показати назви факсиміле',
     description: 'Показати назви факсиміле над зображеннями',
+  },
+  titleMeiToolbox: {
+    text: 'Набір інструментів MEI',
+    description: 'Перевірки та зміни кодування на панелі поруч із редактором',
+  },
+  showMeiToolbox: {
+    text: 'Показати набір інструментів MEI',
+    description: 'Показати набір інструментів MEI із вкладками Перевірити, Перетворити, Перенумерувати, Ід, Факсиміле та Перебудувати',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Положення набору інструментів MEI',
+    description: 'Виберіть положення набору інструментів MEI відносно редактора',
+    labels: ['ліворуч', 'праворуч', 'зверху', 'знизу'],
   },
 
   // Supplied element
@@ -1099,6 +1260,70 @@ export const lang = {
   githubFilepath: { text: 'Шлях' },
   githubCommit: { text: 'Зафіксувати' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Зафіксувати як новий файл' } }, value: 'Зафіксувати' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Ви перейшли з <strong>Let's\u00a0Encode!</strong>, щоб працювати над завданням з кодування. mei-friend — один із редакторів, які «Let's\u00a0Encode!» пропонує для цієї роботи. Використовуйте <strong>Зберегти</strong> в меню <strong>Керування завданням</strong> (угорі ліворуч), щоб зберігати свій прогрес під час роботи, і <strong>Завершити завдання</strong>, коли закінчите, щоб зробити свій внесок у кампанію.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Завершити завдання' },
+  letsEncodeMenuLabel: { text: 'Керування завданням' },
+  letsEncodeLoggedInAs: { text: 'Ви увійшли як' },
+  letsEncodeSaveButton: { text: 'Зберегти' },
+  letsEncodeSaving: { text: 'Збереження вашої роботи…' },
+  letsEncodeSaveFailed: { text: 'Не вдалося зберегти вашу роботу.' },
+  letsEncodeDismiss: { value: 'Закрити' },
+  letsEncodeLastSave: { text: 'Останнє збереження:' },
+  letsEncodeLastAutosave: { text: 'Автозбереження:' },
+  letsEncodeSavedAt: { text: 'Збережено' },
+  letsEncodeExpiresAt: { text: 'Спливає' },
+  letsEncodeTimeRemaining: { text: 'на завершення завдання' },
+  letsEncodeHoursShort: { text: 'год' },
+  letsEncodeMinutesShort: { text: 'хв' },
+  letsEncodeDaysShort: { text: 'д' },
+  letsEncodeAgo: { text: '{n} тому' },
+  letsEncodeJustNow: { text: 'щойно' },
+  letsEncodeTimeExpired: { text: 'Час на виконання цього завдання вичерпано' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Інтервал автозбереження (хвилини)',
+    description:
+      'Як часто, у хвилинах, ваша робота автоматично зберігається під час редагування. Збереження відбувається лише тоді, коли ви внесли зміни; 0 вимикає автозбереження.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Налаштування завдання «Let's\u00a0Encode!», над яким ви працюєте" },
+  letsEncodeAbandonTaskButton: { text: 'Відмовитися від завдання' },
+  letsEncodeKeepWorking: { value: 'Продовжити роботу' },
+  letsEncodeCompleteAnyway: { value: 'Усе одно завершити завдання' },
+  letsEncodeAbandonConfirm: { value: 'Відмовитися від завдання' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Ви не змінили це кодування. Це теж має значення: завершивши завдання, ви зафіксуєте, що змін не було потрібно. Або ж можете продовжити роботу.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: "Завершити це завдання? Вашу роботу буде збережено й передано до «Let's\u00a0Encode!», а завдання буде закрито.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Відмовитися від цього завдання? Вашу роботу над ним буде втрачено, зокрема й те, що ви вже зберегли, а «Let's\u00a0Encode!» отримає повідомлення, що ви не завершили завдання.",
+  },
+  letsEncodeLoading: { text: "Завантаження вашого завдання з «Let's\u00a0Encode!»…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Відкрити вашу кампанію «Let's\u00a0Encode!» у новій вкладці (завдання залишиться відкритим тут)",
+  },
+  letsEncodeDragOverlayText: { text: "Під час завдання «Let's\u00a0Encode!» інші файли відкрити не можна." },
+  letsEncodeCommitting: { text: 'Завершення вашого завдання…' },
+  letsEncodeCompleted: { text: "Завдання завершено — повертаємо вас до «Let's\u00a0Encode!»…" },
+  letsEncodeCommitFailed: { text: 'Не вдалося завершити ваше завдання.' },
+  letsEncodeRetryButton: { value: 'Спробувати ще раз' },
+  letsEncodeAbandonButton: { value: "Повернутися до «Let's\u00a0Encode!»" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Це посилання «Let's\u00a0Encode!» неповне: у ньому не вказано кампанію, тож немає куди повідомити результат. Поверніться до «Let's\u00a0Encode!» і відкрийте завдання знову.",
+  },
+  letsEncodeMissingParameterError: { text: "Під час передачі з «Let's\u00a0Encode!» бракувало обов’язкового параметра:" },
+  letsEncodeFileError: { text: 'Не вдалося відкрити на GitHub переданий файл.' },
+  letsEncodeCloneError: { text: 'Не вдалося завантажити ваше завдання з GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Файл було змінено на GitHub, поки ви працювали, тому вашу роботу не вдалося зберегти.',
+  },
   commitLog: { text: 'Журнал фіксацій' },
   githubDate: { text: 'Дата' },
   githubAuthor: { text: 'Автор' },
@@ -1125,11 +1350,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Перенумерувати такти' },
-  renumberMeasuresModalTest: { text: 'Тест' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'буде' },
-  renumberMeasuresChangedTo: { text: 'змінено на' },
-  renumberMeasureMeasuresRenumbered: { text: 'перенумеровані такти' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

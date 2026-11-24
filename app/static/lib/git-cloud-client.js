@@ -156,7 +156,13 @@ export default class GitCloudClient {
     }).then((res) => res.json());
   }
 
-  async getCommits(repo, branch) {
+  /**
+   * @param {string} repo
+   * @param {string} branch
+   * @param {string} [path] restrict to commits touching this file (GitHub only)
+   * @param {string} [since] ISO timestamp; restrict to commits after it (GitHub only)
+   */
+  async getCommits(repo, branch, path = '', since = '') {
     // fetch all commits of the current repository and branch from the cloud provider
     // use appropriate API endpoint based on the provider
     // TODO check this is not totally broken, non-github providers imagined by copilot
@@ -166,8 +172,10 @@ export default class GitCloudClient {
     // this is a hack to get around the GitHub API caching (URL is unique every time)
     switch (this.providerType) {
       case 'github':
+        const filters =
+          (path ? `&path=${encodeURIComponent(path)}` : '') + (since ? `&since=${encodeURIComponent(since)}` : '');
         return this.githubFetch(
-          `https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`,
+          `https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}${filters}`,
           {
             method: 'GET',
             headers: this.apiHeaders,

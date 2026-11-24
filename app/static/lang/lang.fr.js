@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend est un éditeur pour les <a href="https://music-encoding.org">encodages musicaux</a>, hébergé à l'
+        mei-friend est un éditeur pour les <a href="https://music-encoding.org" target="_blank">encodages musicaux</a>, hébergé à l'
         <a href="https://mdw.ac.at" target="_blank">Université de Musique et des Arts du Spectacle de Vienne</a>. 
         Veuillez consulter notre <a href="https://mei-friend.github.io" target="_blank">documentation complète</a> pour 
         plus d'informations.
@@ -76,8 +76,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Fonds autrichien pour la science (FWF)</a> dans le cadre des projets
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        et <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> et <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>
     `,
   },
@@ -138,6 +138,13 @@ export const lang = {
   replaceMenuText: { text: 'Remplacer' },
   replaceAllMenuText: { text: 'Tout remplacer' },
   indentSelectionText: { text: "Sélection d'indentation" },
+  reformatEncodingText: {
+    text: 'Reformater via l\'analyseur XML',
+    description:
+      'Reformate tout l\'encodage via l\'analyseur XML : attributs triés (xml:id d\'abord, puis par ordre alphabétique), sérialisation XML normalisée (p. ex. guillemets doubles, éléments vides en balises auto-fermantes, références de caractères en caractères), toutes les lignes indentées.',
+  },
+  reformatEncodingDone: { text: 'Encodage reformaté via l\'analyseur XML ({lines} lignes).' },
+  reformatEncodingParseError: { text: 'Impossible de reformater : l\'encodage n\'est pas un XML bien formé.' },
   surroundWithTagsText: { text: 'Entourer de tags' },
   surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
@@ -154,10 +161,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Panneau des annotations' },
   showFacsimileMenuText: { text: 'Panneau des fac-similés' },
   showPlaybackControlsText: { text: 'Contrôles de lecture' },
+  showMeiToolboxMenuText: { text: 'Boîte à outils MEI' },
   facsimileTop: { text: 'Fac-similé en haut' },
   facsimileBottom: { text: 'Fac-similé en bas' },
   facsimileLeft: { text: 'Fac-similé à gauche' },
   facsimileRight: { text: 'Fac-similé à droite' },
+  meiToolboxTop: { text: 'Boîte à outils MEI en haut' },
+  meiToolboxBottom: { text: 'Boîte à outils MEI en bas' },
+  meiToolboxLeft: { text: 'Boîte à outils MEI à gauche' },
+  meiToolboxRight: { text: 'Boîte à outils MEI à droite' },
 
   // MANIPULATE MENU ITEM / ELEMENT DE MENU MANIPULATION
   manipulateMenuTitle: { text: 'Manipuler' },
@@ -180,11 +192,153 @@ export const lang = {
   meterConformanceText: { text: 'Vérifier les @metcon' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
+  convertAttributesToElementsText: {
+    text: 'Convertir les attributs en éléments',
+    description:
+      'Convertit les attributs qui peuvent aussi être exprimés sous forme d\'éléments en ces éléments, p. ex. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss sur les notes et accords, ou les attributs de clé, d\'armure et de mesure sur staffDef et scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributs convertis en {list}.' },
+  convertAttributesToElementsNone: { text: 'Aucun attribut convertible en élément trouvé.' },
+  convertAttributesToElementsProblems: { text: '{count} attributs n\'ont pas pu être convertis.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Vérifier' },
+  meiToolboxTabConvert: { text: 'Convertir' },
+  meiToolboxTabRenumber: { text: 'Renuméroter' },
+  meiToolboxCheckButton: { text: 'Vérifier' },
+  meiToolboxTestButton: { text: 'Tester', description: 'Lister ce qui serait modifié, sans modifier l\'encodage' },
+  meiToolboxRenumberButton: { text: 'Renuméroter' },
+  meiToolboxAttrToElButton: { text: 'Attributs → éléments' },
+  meiToolboxElToAttrButton: { text: 'Éléments → attributs', description: 'Convertit les éléments en attributs lorsqu\'aucune information n\'est perdue ; les autres éléments sont conservés et listés.' },
+  meiToolboxAll: { text: 'tous' },
+  meiToolboxNone: { text: 'aucun' },
+  meiToolboxFilter: { text: 'Filtrer les résultats' },
+  meiToolboxRunAgain: { text: 'Relancer' },
+  meiToolboxHideOptions: { text: 'Masquer les options' },
+  meiToolboxOutdated: { text: '(l\'encodage a changé depuis, les résultats peuvent être obsolètes)' },
+  meiToolboxNoResults: { text: 'Pas encore de résultats. Choisissez les options et lancez.' },
+  meiToolboxGroupsSelected: { text: '{n} sur {total} groupes d\'attributs' },
+  meiToolboxCheckAccidGes: { text: 'Altérations (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Durées des mesures (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Éléments liés (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Fermer la boîte à outils MEI' },
+  meiToolboxTabIds: { text: 'Ids' },
+  meiToolboxTabFacsimile: { text: 'Fac-similé' },
+  meiToolboxTabReformat: { text: 'Reformater' },
+  meiToolboxIdsAdd: { text: 'Ajouter des xml:id (aux éléments qui n’en ont pas)' },
+  meiToolboxIdsChange: {
+    text: 'Changer les xml:id (un nouveau pour chaque élément)',
+    description: 'Attribue un nouvel xml:id à chaque élément. Les références au sein de cet encodage sont mises à jour, mais les liens provenant d’autres fichiers, d’annotations, d’outils de fac-similé ou d’URL pointant vers les anciens xml:id ne fonctionneront plus.',
+  },
+  meiToolboxIdsRemove: { text: 'Supprimer les xml:id (sauf ceux qui sont référencés)' },
+  meiToolboxIdsButton: { text: 'Appliquer' },
+  meiToolboxIdsAdded: { text: '{n} ajoutés' },
+  meiToolboxIdsChanged: { text: '{n} modifiés' },
+  meiToolboxIdsRemoved: { text: '{n} supprimés' },
+  meiToolboxIdsKept: { text: '{n} conservés' },
+  meiToolboxIdsReferences: { text: '{n} références mises à jour' },
+  meiToolboxIdsKeptReason: { text: 'référencé dans l’encodage' },
+  meiToolboxIdsNothing: { text: 'Rien à faire : aucun xml:id n’a été ajouté, modifié ou supprimé.' },
+  meiToolboxIdsCancelled: { text: 'Annulé, l’encodage est inchangé.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Relier l’encodage aux images de pages : importer un fac-similé depuis un autre fichier, ou ajouter les surfaces qui manquent encore, une par saut de page.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Importer un fac-similé…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Ajouter les surfaces manquantes',
+    description: 'Ajoute ce qui manque : un fac-similé s’il n’y en a pas, une surface avec un graphic provisoire pour chaque page qui n’en a pas encore, et pb@facs qui y renvoie. Les pages sont associées aux surfaces déjà présentes, qui restent inchangées.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Surfaces ajoutées : {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pages reliées à une surface déjà présente : {n}' },
+  meiToolboxFacsimileCreated: { text: 'Fac-similé ajouté.' },
+  meiToolboxFacsimileUpToDate: { text: 'Chaque page a déjà sa surface ; rien n’a été ajouté.' },
+  meiToolboxFacsimileZones: { text: '{n} zones' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
+  meiToolboxFacsimileNone: { text: 'Cet encodage ne comporte pas de fac-similé.' },
+  meiToolboxReformatVerovio: {
+    text: 'Via Verovio',
+    description: 'Laisse Verovio réécrire l’encodage à partir de sa propre représentation.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio écrit l’encodage à partir de sa propre représentation, avec sa propre mise en forme et son propre ordre d’attributs.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Via l’analyseur XML',
+    description: 'Reformate l’encodage avec l’analyseur XML : le contenu est conservé, seuls la mise en forme et l’ordre des attributs changent. Identique à Code → Reformater via l’analyseur XML.',
+  },
+  meiToolboxReformatUnchanged: { text: 'L’encodage est inchangé.' },
+  meiToolboxReformatDone: { text: '{lines} lignes' },
+  meiToolboxAttributeOrder: {
+    text: 'Ordre des attributs',
+    description: 'L’ordre dans lequel les attributs sont écrits chaque fois que mei-friend réécrit un élément.',
+    labels: ['tel quel', 'alphabétique', 'xml:id en premier, puis alphabétique', 'personnalisé…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Motif d’ordre',
+    description: 'Noms d’attributs séparés par des espaces ou des virgules, dans l’ordre souhaité, p. ex. « xml:id n label * ». Un nom se terminant par * correspond à tous les attributs ayant ce préfixe (clef.*). Un * seul représente tous les attributs non nommés, par ordre alphabétique ; sans lui, ils conservent leur ordre à la fin. Les déclarations d’espaces de noms viennent toujours en premier.',
+  },
+  codeCheckerFixShown: { text: 'Corriger les {n} affichés' },
+  codeCheckerIgnoreShown: { text: 'Ignorer les {n} affichés' },
+  convertGroupAccid: { text: 'Altérations écrites (@accid)' },
+  convertGroupAccidGes: { text: 'Altérations sonores (@accid.ges)' },
+  convertGroupArtic: { text: 'Articulations (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Paroles (@syl)' },
+  convertGroupFermata: { text: 'Points d\'orgue (@fermata)' },
+  convertGroupTie: { text: 'Liaisons de prolongation (@tie)' },
+  convertGroupSlur: { text: 'Liaisons (@slur)' },
+  convertGroupGliss: { text: 'Glissandos (@gliss)' },
+  convertGroupDefinitions: { text: 'Clé, armure, mesure, mensuration (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Symboles de groupe et étiquettes (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Les attributs seraient convertis en {list}.' },
+  convertElementsToAttributesSummary: { text: 'Éléments convertis en attributs : {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Les éléments seraient convertis en attributs : {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} éléments n\'ont pas pu être convertis.' },
+  convertElementsToAttributesNone: { text: 'Aucun élément convertible en attribut trouvé.' },
+  elementsToAttributesConfirmation: { text: '<b>Éléments → attributs</b>\n\nAttention : cette opération peut rompre des liens externes.\n\n{count} des éléments à convertir ont un xml:id, qui est supprimé avec l\'élément. Les éléments référencés dans ce fichier ne sont pas convertis.\n\nLes liens provenant d\'autres fichiers, les annotations enregistrées hors de ce fichier, les outils de fac-similé ou les URL qui pointent vers ces xml:id ne fonctionneront plus.' },
+  elementsToAttributesProceed: { text: 'Convertir' },
+  elementsToAttributesCancel: { text: 'Annuler' },
+  convertScopeAll: { text: 'Portée : tout l\'encodage (sélectionnez du texte dans l\'éditeur pour restreindre la conversion)' },
+  convertScopeSelection: { text: 'Portée : sélection, lignes {from}–{to}' },
+  convertSelectionSuffix: { text: 'sélection' },
+  renumberMeasuresStartNumber: { text: 'Numéro de départ' },
+  renumberMeasuresUnchanged: { text: 'inchangé' },
+  renumberMeasuresSummary: { text: '{total} mesures, {changed} renumérotées.' },
+  renumberMeasuresSummaryTest: { text: '{total} mesures, {changed} seraient renumérotées.' },
+  renumberMeasuresNoMeasures: { text: 'Aucune mesure trouvée.' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
   removeIdsText: { text: 'Supprimer les identifiants de MEI' },
+  changeIdsText: {
+    text: 'Modifier les identifiants dans MEI (rompt les liens externes)',
+    description:
+      'Attribue un nouvel xml:id à chaque élément (ou aux éléments sélectionnés). Les références dans ce fichier sont mises à jour, mais les liens provenant d’autres fichiers, d’annotations, d’outils de fac-similé ou d’URL qui pointent vers les anciens xml:id ne fonctionneront plus.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Modifier les identifiants dans MEI</b>\n\nAttention : cette opération rompt les liens externes.\n\n{changed} xml:id seront modifiés et {added} nouveaux xml:id ajoutés ; {references} références dans ce fichier seront mises à jour.\n\nLes liens provenant d’autres fichiers, d’annotations, d’outils de fac-similé ou d’URL qui pointent vers les anciens xml:id ne fonctionneront plus.',
+  },
+  changeIdsProceed: { text: 'Modifier les identifiants' },
+  changeIdsCancel: { text: 'Annuler' },
   reRenderMeiVerovio: { text: 'Rendu à nouveau via Verovio' },
   addFacsimile: { text: 'Ajouter un élément de fac-similé' },
   ingestFacsimileText: { text: 'Ingestion de fac-similé' },
+  ingestFacsimileTitle: { text: 'Ingestion du fac-similé' },
+  ingestFacsimileProgress: { text: '{file} : {done} zones sur {total} traitées.' },
+  ingestFacsimileDoneTitle: { text: 'Fac-similé ingéré' },
+  ingestFacsimileStoppedTitle: { text: 'Ingestion du fac-similé arrêtée' },
+  ingestFacsimileSummary: {
+    text: 'Fac-similé de {file} avec {surfaces} surfaces et {zones} zones inséré avant body ; attributs @facs ajoutés à {added} éléments.',
+  },
+  ingestFacsimileStopped: {
+    text: "Arrêté après {done} zones sur {total}. Les modifications effectuées jusqu'ici peuvent être annulées en une seule étape.",
+  },
+  ingestFacsimileProblems: { text: '{count} problèmes rencontrés :' },
+  ingestFacsimileNotFound: { text: '{type} avec n="{n}" introuvable.' },
+  ingestFacsimileNotUnique: { text: '{type} avec n="{n}" non unique.' },
+  ingestFacsimileNoId: { text: '{type} avec n="{n}" sans xml:id, @facs non ajouté.' },
+  ingestFacsimileNotInEditor: { text: '{type} avec n="{n}" introuvable dans l\'éditeur, @facs non ajouté.' },
+  ingestFacsimileNoFacsimile: {
+    text: "Échec de l'ingestion du fac-similé : aucun élément facsimile trouvé dans {file}.",
+  },
+  ingestFacsimileNoBody: { text: "Échec de l'ingestion du fac-similé : aucun élément body trouvé dans l'encodage." },
+  ingestFacsimileNoBodyInEditor: { text: "Aucun élément body trouvé dans l'éditeur, élément facsimile non inséré." },
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
@@ -251,11 +405,11 @@ export const lang = {
   // Footer texts / Textes du pied de page
   leftFooter: {
     html:
-      'Hébergé par <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'à <a href="https://mdw.ac.at">mdw</a>, avec ' +
+      'Hébergé par <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'à <a href="https://mdw.ac.at" target="_blank">mdw</a>, avec ' +
       heart +
       ' de Vienne. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Mentions légales</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Mentions légales</a>.',
   },
   loadingVerovio: { text: 'Chargement de Verovio' },
   verovioLoaded: { text: 'chargé' },
@@ -866,10 +1020,6 @@ export const lang = {
   },
 
   // Renumber measures / Renommer les mesures
-  renumberMeasuresHeading: {
-    text: 'Renommer les mesures',
-    description: 'Paramètres pour renommer les mesures',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continuer à travers les mesures incomplètes',
     description: "Continuer les numéros de mesure à travers les mesures incomplètes (@metcon = 'false')",
@@ -939,6 +1089,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Afficher les titres de fac-similé',
     description: 'Afficher les titres de fac-similé au-dessus des images sources',
+  },
+  titleMeiToolbox: {
+    text: 'Boîte à outils MEI',
+    description: 'Vérifications et manipulations de l’encodage, dans un panneau à côté de l’éditeur',
+  },
+  showMeiToolbox: {
+    text: 'Afficher la boîte à outils MEI',
+    description: 'Afficher la boîte à outils MEI avec les onglets Vérifier, Convertir, Renuméroter, Ids, Fac-similé et Régénérer',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Position de la boîte à outils MEI',
+    description: 'Choisir la position de la boîte à outils MEI par rapport à l’éditeur',
+    labels: ['gauche', 'droite', 'haut', 'bas'],
   },
 
   // Supplied element / Élément fourni
@@ -1135,6 +1298,75 @@ export const lang = {
     classes: { commitAsNewFile: { value: 'Valider en tant que nouveau fichier' } },
     value: 'Validation',
   },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Vous arrivez de <strong>Let's\u00a0Encode!</strong> pour travailler sur une tâche d'encodage. mei-friend est l'un des éditeurs que «\u00a0Let's\u00a0Encode!\u00a0» propose pour ce travail. Utilisez <strong>Enregistrer</strong> dans le menu <strong>Gestion de la tâche</strong> (en haut à gauche) pour sauvegarder votre progression au fur et à mesure, puis <strong>Terminer la tâche</strong> lorsque vous avez fini, pour apporter votre contribution à la campagne.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Terminer la tâche' },
+  letsEncodeMenuLabel: { text: 'Gestion de la tâche' },
+  letsEncodeLoggedInAs: { text: 'Connecté en tant que' },
+  letsEncodeSaveButton: { text: 'Enregistrer' },
+  letsEncodeSaving: { text: 'Enregistrement de votre travail…' },
+  letsEncodeSaveFailed: { text: "Votre travail n'a pas pu être enregistré." },
+  letsEncodeDismiss: { value: 'Fermer' },
+  letsEncodeLastSave: { text: 'Dernier enregistrement :' },
+  letsEncodeLastAutosave: { text: 'Enregistré automatiquement :' },
+  letsEncodeSavedAt: { text: 'Enregistré le' },
+  letsEncodeExpiresAt: { text: 'Expire le' },
+  letsEncodeTimeRemaining: { text: 'pour terminer la tâche' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'j' },
+  letsEncodeAgo: { text: 'il y a {n}' },
+  letsEncodeJustNow: { text: "à l'instant" },
+  letsEncodeTimeExpired: { text: 'Le temps imparti pour cette tâche est écoulé' },
+  letsEncodeAutosaveMinutes: {
+    title: "Intervalle d'enregistrement automatique (minutes)",
+    description:
+      "Fréquence, en minutes, à laquelle votre travail est enregistré automatiquement pendant que vous éditez. L'enregistrement n'a lieu que si vous avez fait des modifications ; 0 désactive l'enregistrement automatique.",
+  },
+  titleLetsEncode: {
+    title: 'Let\'s\u00a0Encode!',
+    description: "Paramètres de la tâche «\u00a0Let's\u00a0Encode!\u00a0» sur laquelle vous travaillez",
+  },
+  letsEncodeAbandonTaskButton: { text: 'Abandonner la tâche' },
+  letsEncodeKeepWorking: { value: 'Continuer à travailler' },
+  letsEncodeCompleteAnyway: { value: 'Terminer quand même la tâche' },
+  letsEncodeAbandonConfirm: { value: 'Abandonner la tâche' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      "Vous n'avez pas modifié cet encodage. Cela compte aussi : terminer la tâche indique qu'elle ne nécessitait aucune modification. Vous pouvez aussi continuer à y travailler.",
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Voulez-vous terminer cette tâche ? Votre travail sera enregistré et transmis à «\u00a0Let's\u00a0Encode!\u00a0», et la tâche sera clôturée.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Abandonner cette tâche ? Votre travail sera perdu, y compris ce que vous avez déjà enregistré, et «\u00a0Let's\u00a0Encode!\u00a0» sera informé que vous n'avez pas terminé la tâche.",
+  },
+  letsEncodeLoading: { text: "Chargement de votre tâche depuis «\u00a0Let's\u00a0Encode!\u00a0»…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Ouvrir votre campagne «\u00a0Let's\u00a0Encode!\u00a0» dans un nouvel onglet (votre tâche reste ouverte ici)",
+  },
+  letsEncodeDragOverlayText: { text: "Impossible d'ouvrir d'autres fichiers pendant une tâche «\u00a0Let's\u00a0Encode!\u00a0»." },
+  letsEncodeCommitting: { text: 'Finalisation de votre tâche…' },
+  letsEncodeCompleted: { text: "Tâche terminée — retour vers «\u00a0Let's\u00a0Encode!\u00a0»…" },
+  letsEncodeCommitFailed: { text: "Votre tâche n'a pas pu être terminée." },
+  letsEncodeRetryButton: { value: 'Réessayer' },
+  letsEncodeAbandonButton: { value: "Retourner à «\u00a0Let's\u00a0Encode!\u00a0»" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Ce lien «\u00a0Let's\u00a0Encode!\u00a0» est incomplet : il ne nomme aucune campagne, il n'y a donc nulle part où transmettre le résultat. Veuillez retourner sur «\u00a0Let's\u00a0Encode!\u00a0» et rouvrir la tâche.",
+  },
+  letsEncodeMissingParameterError: { text: "Il manquait un paramètre requis lors du transfert depuis «\u00a0Let's\u00a0Encode!\u00a0» :" },
+  letsEncodeFileError: { text: "Le fichier transmis n'a pas pu être ouvert sur GitHub." },
+  letsEncodeCloneError: { text: "Votre tâche n'a pas pu être chargée depuis GitHub." },
+  letsEncodeRemoteChangedError: {
+    text:
+      "Le fichier a été modifié sur GitHub pendant que vous travailliez ; votre travail n'a donc pas pu être enregistré.",
+  },
   commitLog: { text: 'Journal des validations' },
   githubDate: { text: 'Date' },
   githubAuthor: { text: 'Auteur' },
@@ -1163,11 +1395,6 @@ export const lang = {
 
   // utils renumber measures
   renumberMeasuresModalText: { text: 'Renommer les mesures' },
-  renumberMeasuresModalTest: { text: 'Tester' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'serait' },
-  renumberMeasuresChangedTo: { text: 'changé en' },
-  renumberMeasureMeasuresRenumbered: { text: 'mesures renommées' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

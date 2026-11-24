@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { setupPage, openUrl } from './setup';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { setupPage, openUrl, dropFile } from './setup';
 
 test.beforeEach(async ({ page }) => {
   console.log('Testing input functions.');
@@ -73,7 +75,13 @@ test.describe('2 Test input via URL', () => {
 });
 
 test.describe('3 Drag and drop functionality', () => {
-  test.fixme('3.1 Test drag and drop of a local MEI file onto the mei-friend window', async ({ page }) => {
-    // TODO: drag and drop MEI file from e2e/test-encodings/BeetAnGeSample.mei onto the browser window
+  test('3.1 Test drag and drop of a local MEI file onto the mei-friend window', async ({ page }) => {
+    const mei = readFileSync(join(__dirname, 'fixtures', 'expansion-repeat.mei'), 'utf-8');
+    const seen = await dropFile(page, 'expansion-repeat.mei', mei);
+    expect(seen.overlayShown).toBe(true);
+    expect(seen.dropPrevented).toBe(true); // not left to the browser
+    expect(seen.overlayShownAfterDrop).toBe(false);
+    await expect(page.locator('#fileName')).toHaveText('expansion-repeat.mei');
+    await expect(page.locator('.CodeMirror')).toContainText('Expansion playback fixture');
   });
 });

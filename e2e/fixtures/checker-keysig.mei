@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Key signatures for the accid.ges code checker.
+
+     A keySig element without @sig cancels the signature set before it, i.e. it
+     means the same as sig="0" (Verovio renders it as a cancellation). Every note
+     in this encoding is correct, so the checker must report nothing at all. -->
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead><fileDesc><titleStmt><title>keySig clearing</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp>
+        <staffDef n="1" lines="5" clef.shape="G" clef.line="2"><keySig xml:id="ks1" sig="3s"/></staffDef>
+        <staffDef n="2" lines="5" clef.shape="F" clef.line="4"><keySig xml:id="ks2" sig="3s"/></staffDef>
+      </staffGrp>
+    </scoreDef>
+    <section>
+      <!-- 3 sharps in force: f, c and g sound sharp -->
+      <measure n="1" xml:id="m1">
+        <staff n="1" xml:id="m1s1"><layer n="1">
+          <note xml:id="n1" pname="f" oct="4" dur="4" accid.ges="s"/>
+          <note xml:id="n2" pname="c" oct="5" dur="4" accid.ges="s"/>
+          <note xml:id="n3" pname="d" oct="5" dur="4" accid="s"/>
+          <note xml:id="n4" pname="e" oct="4" dur="4"/>
+        </layer></staff>
+        <staff n="2" xml:id="m1s2"><layer n="1"><note xml:id="n5" pname="g" oct="3" dur="1" accid.ges="s"/></layer></staff>
+        <tie xml:id="t1" startid="#n3" endid="#n6"/>
+      </measure>
+      <measure n="2" xml:id="m2">
+        <staff n="1" xml:id="m2s1"><layer n="1">
+          <note xml:id="n6" pname="d" oct="5" dur="4" accid.ges="s"/>
+          <note xml:id="n7" pname="f" oct="4" dur="4" accid.ges="s"/>
+          <note xml:id="n8" pname="g" oct="4" dur="4" accid.ges="s"/>
+          <note xml:id="n9" pname="a" oct="4" dur="4"/>
+        </layer></staff>
+        <staff n="2" xml:id="m2s2"><layer n="1"><note xml:id="n10" pname="g" oct="3" dur="1" accid.ges="s"/></layer></staff>
+      </measure>
+      <!-- keySig without @sig: the three sharps are cancelled on both staves -->
+      <scoreDef xml:id="sd2">
+        <staffGrp>
+          <staffDef n="1" lines="5"><keySig xml:id="ks3"/></staffDef>
+          <staffDef n="2" lines="5"><keySig xml:id="ks4"/></staffDef>
+        </staffGrp>
+      </scoreDef>
+      <!-- no signature any more: plain f, c and g must not be asked for accid.ges -->
+      <measure n="3" xml:id="m3">
+        <staff n="1" xml:id="m3s1"><layer n="1">
+          <note xml:id="n11" pname="f" oct="4" dur="4"/>
+          <note xml:id="n12" pname="c" oct="5" dur="4"/>
+          <note xml:id="n13" pname="g" oct="4" dur="4" accid="s"/>
+          <note xml:id="n14" pname="e" oct="4" dur="4"/>
+        </layer></staff>
+        <staff n="2" xml:id="m3s2"><layer n="1"><note xml:id="n15" pname="g" oct="3" dur="1"/></layer></staff>
+        <tie xml:id="t2" startid="#n13" endid="#n16"/>
+      </measure>
+      <measure n="4" xml:id="m4">
+        <staff n="1" xml:id="m4s1"><layer n="1">
+          <note xml:id="n16" pname="g" oct="4" dur="4" accid.ges="s"/>
+          <note xml:id="n17" pname="g" oct="4" dur="4"/>
+          <chord xml:id="ch1" dur="2"><note xml:id="n18" pname="b" oct="4" accid="f"/><note xml:id="n19" pname="d" oct="5"/></chord>
+        </layer></staff>
+        <staff n="2" xml:id="m4s2"><layer n="1"><note xml:id="n20" pname="g" oct="3" dur="1"/></layer></staff>
+        <tie xml:id="t3" startid="#n18" endid="#n21"/>
+      </measure>
+      <!-- a tie out of a chord, and a chained tie from its ending note -->
+      <measure n="5" xml:id="m5">
+        <staff n="1" xml:id="m5s1"><layer n="1">
+          <note xml:id="n21" pname="b" oct="4" dur="4" accid.ges="f"/>
+          <note xml:id="n22" pname="c" oct="5" dur="4"/>
+          <note xml:id="n23" pname="b" oct="4" dur="2" accid.ges="f"/>
+        </layer></staff>
+        <staff n="2" xml:id="m5s2"><layer n="1"><note xml:id="n24" pname="g" oct="3" dur="1"/></layer></staff>
+        <tie xml:id="t4" startid="#n21" endid="#n23"/>
+      </measure>
+      <scoreDef xml:id="sd3" key.sig="2f"/>
+      <measure n="6" xml:id="m6">
+        <staff n="1" xml:id="m6s1"><layer n="1">
+          <note xml:id="n25" pname="b" oct="4" dur="4" accid.ges="f"/>
+          <note xml:id="n26" pname="e" oct="4" dur="4" accid.ges="f"/>
+          <note xml:id="n27" pname="c" oct="5" dur="2"/>
+        </layer></staff>
+        <staff n="2" xml:id="m6s2"><layer n="1"><note xml:id="n28" pname="b" oct="3" dur="1" accid.ges="f"/></layer></staff>
+      </measure>
+      <!-- a staffDef keySig without @sig cancels the signature of staff 1 only -->
+      <scoreDef xml:id="sd4"><staffGrp><staffDef n="1" lines="5"><keySig xml:id="ks5"/></staffDef></staffGrp></scoreDef>
+      <measure n="7" xml:id="m7">
+        <staff n="1" xml:id="m7s1"><layer n="1">
+          <note xml:id="n29" pname="b" oct="4" dur="4"/>
+          <note xml:id="n30" pname="e" oct="4" dur="4"/>
+          <note xml:id="n31" pname="c" oct="5" dur="2"/>
+        </layer></staff>
+        <staff n="2" xml:id="m7s2"><layer n="1"><note xml:id="n32" pname="b" oct="3" dur="1" accid.ges="f"/></layer></staff>
+      </measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

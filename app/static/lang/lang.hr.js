@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend je uređivač za <a href="https://music-encoding.org">muzičke kodove</a>, hostiran na
+      mei-friend je uređivač za <a href="https://music-encoding.org" target="_blank">muzičke kodove</a>, hostiran na
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Univerzitetu muzike i izvođačkih umetnosti u Beču</a>. 
       Molimo vas da pogledate našu <a href="https://mei-friend.github.io" target="_blank">obimnu dokumentaciju</a> za 
       dodatne informacije.
@@ -70,8 +70,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> u okviru projekata
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Razumem!' },
@@ -131,6 +131,13 @@ export const lang = {
   replaceMenuText: { text: 'Zameni' },
   replaceAllMenuText: { text: 'Zameni sve' },
   indentSelectionText: { text: 'Uvuci izbor' },
+  reformatEncodingText: {
+    text: 'Preformatiraj putem XML parsera',
+    description:
+      'Preformatira cijelo kodiranje putem XML parsera: atributi sortirani (najprije xml:id, zatim abecedno), normalizirana XML serijalizacija (npr. dvostruki navodnici, prazni elementi kao samozatvarajuće oznake, reference znakova kao znakovi), svi retci uvučeni.',
+  },
+  reformatEncodingDone: { text: 'Kodiranje preformatirano putem XML parsera ({lines} redaka).' },
+  reformatEncodingParseError: { text: 'Preformatiranje nije moguće: kodiranje nije dobro oblikovan XML.' },
   surroundWithTagsText: { text: 'Ograniči oznakama' },
   surroundWithLastTagText: { text: 'Ograniči sa ' },
   jumpToLineText: { text: 'Idi na liniju' },
@@ -147,10 +154,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Panel sa napomenama' },
   showFacsimileMenuText: { text: 'Panel sa faksimilom' },
   showPlaybackControlsText: { text: 'Kontrole reprodukcije' },
+  showMeiToolboxMenuText: { text: 'MEI alatnica' },
   facsimileTop: { text: 'Faksimil gore' },
   facsimileBottom: { text: 'Faksimil dole' },
   facsimileLeft: { text: 'Faksimil levo' },
   facsimileRight: { text: 'Faksimil desno' },
+  meiToolboxTop: { text: 'MEI alatnica gore' },
+  meiToolboxBottom: { text: 'MEI alatnica dolje' },
+  meiToolboxLeft: { text: 'MEI alatnica lijevo' },
+  meiToolboxRight: { text: 'MEI alatnica desno' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Manipulacija' },
@@ -173,11 +185,151 @@ export const lang = {
   meterConformanceText: { text: 'Proveri @metcon' },
   renumberMeasuresTestText: { text: ' Renumeriraj mere (test)' },
   renumberMeasuresExecText: { text: ' Renumeriraj mere (izvrši)' },
+  convertAttributesToElementsText: {
+    text: 'Pretvori atribute u elemente',
+    description:
+      'Pretvara atribute koji se mogu izraziti i kao elementi u te elemente, npr. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss na notama i akordima, ili atribute ključa, predznaka i mjere na staffDef i scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributi pretvoreni u {list}.' },
+  convertAttributesToElementsNone: { text: 'Nisu pronađeni atributi koji se mogu pretvoriti u elemente.' },
+  convertAttributesToElementsProblems: { text: '{count} atributa nije moguće pretvoriti.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Provjera' },
+  meiToolboxTabConvert: { text: 'Pretvaranje' },
+  meiToolboxTabRenumber: { text: 'Renumeriranje' },
+  meiToolboxCheckButton: { text: 'Provjeri' },
+  meiToolboxTestButton: { text: 'Testiraj', description: 'Prikaži što bi bilo promijenjeno, bez mijenjanja kodiranja' },
+  meiToolboxRenumberButton: { text: 'Renumeriraj' },
+  meiToolboxAttrToElButton: { text: 'Atributi → elementi' },
+  meiToolboxElToAttrButton: { text: 'Elementi → atributi', description: 'Pretvara elemente u atribute kada se ne gubi nikakva informacija; ostali elementi se zadržavaju i navode.' },
+  meiToolboxAll: { text: 'sve' },
+  meiToolboxNone: { text: 'ništa' },
+  meiToolboxFilter: { text: 'Filtriraj rezultate' },
+  meiToolboxRunAgain: { text: 'Pokreni ponovno' },
+  meiToolboxHideOptions: { text: 'Sakrij opcije' },
+  meiToolboxOutdated: { text: '(kodiranje je u međuvremenu promijenjeno, rezultati su možda zastarjeli)' },
+  meiToolboxNoResults: { text: 'Još nema rezultata. Odaberite opcije i pokrenite.' },
+  meiToolboxGroupsSelected: { text: '{n} od {total} grupa atributa' },
+  meiToolboxCheckAccidGes: { text: 'Predznaci (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Trajanja taktova (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Povezani elementi (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Zatvori MEI alatnicu' },
+  meiToolboxTabIds: { text: 'Id-ovi' },
+  meiToolboxTabFacsimile: { text: 'Faksimil' },
+  meiToolboxTabReformat: { text: 'Preoblikuj' },
+  meiToolboxIdsAdd: { text: 'Dodaj xml:id (elementima bez njega)' },
+  meiToolboxIdsChange: {
+    text: 'Promijeni xml:id (novi za svaki element)',
+    description: 'Dodjeljuje novi xml:id svakom elementu. Reference unutar ovog kodiranja se ažuriraju, ali poveznice iz drugih datoteka, anotacija, alata za faksimil ili URL-ova koje pokazuju na stare xml:id-ove više neće raditi.',
+  },
+  meiToolboxIdsRemove: { text: 'Ukloni xml:id (osim onih na koje se upućuje)' },
+  meiToolboxIdsButton: { text: 'Primijeni' },
+  meiToolboxIdsAdded: { text: '{n} dodano' },
+  meiToolboxIdsChanged: { text: '{n} promijenjeno' },
+  meiToolboxIdsRemoved: { text: '{n} uklonjeno' },
+  meiToolboxIdsKept: { text: '{n} zadržano' },
+  meiToolboxIdsReferences: { text: '{n} referenci ažurirano' },
+  meiToolboxIdsKeptReason: { text: 'na njega se upućuje unutar kodiranja' },
+  meiToolboxIdsNothing: { text: 'Nema što raditi: nijedan xml:id nije dodan, promijenjen ni uklonjen.' },
+  meiToolboxIdsCancelled: { text: 'Otkazano, kodiranje je nepromijenjeno.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Povežite kodiranje sa slikama stranica: uvezite faksimil iz druge datoteke ili dodajte površine koje još nedostaju, po jednu za svaki prijelom stranice.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Uvezi faksimil…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Dodaj površine koje nedostaju',
+    description: 'Dodaje ono što nedostaje: faksimil ako ga nema, površinu s rezerviranim grafikom za svaku stranicu koja je još nema, i pb@facs koji na nju upućuje. Stranice se povezuju s već postojećim površinama, koje ostaju nepromijenjene.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Dodano površina: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Stranica povezanih s već postojećom površinom: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimil dodan.' },
+  meiToolboxFacsimileUpToDate: { text: 'Svaka stranica već ima svoju površinu; ništa nije dodano.' },
+  meiToolboxFacsimileZones: { text: '{n} zona' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} površina, {zones} zona' },
+  meiToolboxFacsimileNone: { text: 'Ovo kodiranje nema faksimil.' },
+  meiToolboxReformatVerovio: {
+    text: 'Preko Verovija',
+    description: 'Pušta Verovio da iznova ispiše kodiranje iz vlastitog prikaza.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio ispisuje kodiranje iz vlastitog prikaza, u vlastitom oblikovanju i redoslijedu atributa.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Preko XML parsera',
+    description: 'Preoblikuje kodiranje kroz XML parser: sadržaj ostaje isti, mijenjaju se samo oblikovanje i redoslijed atributa. Isto kao Kôd → Preoblikuj preko XML parsera.',
+  },
+  meiToolboxReformatUnchanged: { text: 'Kodiranje je nepromijenjeno.' },
+  meiToolboxReformatDone: { text: '{lines} redaka' },
+  meiToolboxAttributeOrder: {
+    text: 'Redoslijed atributa',
+    description: 'Redoslijed kojim se atributi ispisuju kad god mei-friend zapiše element natrag.',
+    labels: ['kako je kodirano', 'abecedno', 'prvo xml:id, zatim abecedno', 'prilagođeno…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Uzorak redoslijeda',
+    description: 'Imena atributa odvojena razmacima ili zarezima, redoslijedom kojim ih želite, npr. „xml:id n label *”. Ime koje završava s * odgovara svim atributima s tim prefiksom (clef.*). Jedan * označava sve neimenovane atribute, abecedno; bez njega zadržavaju svoj redoslijed na kraju. Deklaracije imenskih prostora uvijek dolaze prve.',
+  },
+  codeCheckerFixShown: { text: 'Popravi {n} prikazanih' },
+  codeCheckerIgnoreShown: { text: 'Zanemari {n} prikazanih' },
+  convertGroupAccid: { text: 'Pisani predznaci (@accid)' },
+  convertGroupAccidGes: { text: 'Zvučni predznaci (@accid.ges)' },
+  convertGroupArtic: { text: 'Artikulacije (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Tekst (@syl)' },
+  convertGroupFermata: { text: 'Fermate (@fermata)' },
+  convertGroupTie: { text: 'Ligature (@tie)' },
+  convertGroupSlur: { text: 'Lukovi (@slur)' },
+  convertGroupGliss: { text: 'Glisanda (@gliss)' },
+  convertGroupDefinitions: { text: 'Ključ, predznaci, mjera, menzura (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Simboli grupa i oznake (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Atributi bi bili pretvoreni u {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elementi pretvoreni u atribute: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Elementi bi bili pretvoreni u atribute: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} elemenata nije moguće pretvoriti.' },
+  convertElementsToAttributesNone: { text: 'Nisu pronađeni elementi koji se mogu pretvoriti u atribute.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementi → atributi</b>\n\nPozor: ova operacija može prekinuti vanjske poveznice.\n\n{count} elemenata koji se pretvaraju ima xml:id, koji se uklanja zajedno s elementom. Elementi na koje se upućuje unutar ove datoteke ne pretvaraju se.\n\nPoveznice iz drugih datoteka, anotacije pohranjene izvan ove datoteke, alati za faksimile ili URL-ovi koji upućuju na ove xml:id-ove više neće raditi.' },
+  elementsToAttributesProceed: { text: 'Pretvori' },
+  elementsToAttributesCancel: { text: 'Odustani' },
+  convertScopeAll: { text: 'Opseg: cijelo kodiranje (označite tekst u uređivaču da ograničite pretvaranje)' },
+  convertScopeSelection: { text: 'Opseg: odabir, retci {from}–{to}' },
+  convertSelectionSuffix: { text: 'odabir' },
+  renumberMeasuresStartNumber: { text: 'Početni broj' },
+  renumberMeasuresUnchanged: { text: 'nepromijenjeno' },
+  renumberMeasuresSummary: { text: '{total} taktova, {changed} renumerirano.' },
+  renumberMeasuresSummaryTest: { text: '{total} taktova, {changed} bi bilo renumerirano.' },
+  renumberMeasuresNoMeasures: { text: 'Nisu pronađeni taktovi.' },
   addIdsText: { text: 'Dodaj ID-ove MEI' },
   removeIdsText: { text: 'Ukloni ID-ove iz MEI' },
+  changeIdsText: {
+    text: 'Promijeni ID-ove u MEI (prekida vanjske poveznice)',
+    description:
+      'Dodjeljuje novi xml:id svakom elementu (ili odabranim elementima). Reference unutar ove datoteke se ažuriraju, ali poveznice iz drugih datoteka, anotacija, alata za faksimile ili URL-ova koje upućuju na stare xml:id-ove više neće raditi.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Promijeni ID-ove u MEI</b>\n\nPažnja: ova operacija prekida vanjske poveznice.\n\nBit će promijenjeno {changed} xml:id-ova i dodano {added} novih xml:id-ova; bit će ažurirano {references} referenci unutar ove datoteke.\n\nPoveznice iz drugih datoteka, anotacija, alata za faksimile ili URL-ova koje upućuju na stare xml:id-ove više neće raditi.',
+  },
+  changeIdsProceed: { text: 'Promijeni ID-ove' },
+  changeIdsCancel: { text: 'Odustani' },
   reRenderMeiVerovio: { text: ' Ponovo renderuj putem Verovio' },
   addFacsimile: { text: 'Dodaj element faksimila' },
   ingestFacsimileText: { text: 'Unesi faksimil' },
+  ingestFacsimileTitle: { text: 'Unos faksimila' },
+  ingestFacsimileProgress: { text: '{file}: obrađeno {done} od {total} zona.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimil unesen' },
+  ingestFacsimileStoppedTitle: { text: 'Unos faksimila prekinut' },
+  ingestFacsimileSummary: {
+    text: 'Faksimil iz {file} s {surfaces} površina (surface) i {zones} zona umetnut prije body; atributi @facs dodani u {added} elemenata.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Prekinuto nakon {done} od {total} zona. Dosadašnje promjene mogu se poništiti u jednom koraku.',
+  },
+  ingestFacsimileProblems: { text: 'Pojavilo se {count} problema:' },
+  ingestFacsimileNotFound: { text: '{type} s n="{n}" nije pronađen.' },
+  ingestFacsimileNotUnique: { text: '{type} s n="{n}" nije jedinstven.' },
+  ingestFacsimileNoId: { text: '{type} s n="{n}" nema xml:id, @facs nije dodan.' },
+  ingestFacsimileNotInEditor: { text: '{type} s n="{n}" nije pronađen u uređivaču, @facs nije dodan.' },
+  ingestFacsimileNoFacsimile: { text: 'Unos faksimila nije uspio: u {file} nije pronađen element facsimile.' },
+  ingestFacsimileNoBody: { text: 'Unos faksimila nije uspio: u kodiranju nije pronađen element body.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Element body nije pronađen u uređivaču, element facsimile nije umetnut.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Umetni' },
@@ -247,11 +399,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impresum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impresum</a>.',
   },
   loadingVerovio: { text: 'Učitavanje Verovija' },
   verovioLoaded: { text: 'učitan' },
@@ -749,10 +901,6 @@ export const lang = {
   },
 
   // Renumeracija takta
-  renumberMeasuresHeading: {
-    text: 'Renumeracija takta',
-    description: 'Postavke za renumeraciju taktova',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Nastavi preko nepotpunih taktova',
     description: 'Nastavi brojanje taktova preko nepotpunih taktova (@metcon="false")',
@@ -822,6 +970,16 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Show facsimile titles', // TODO: translate
     description: 'Show facsimile titles above source images', // TODO: translate
+  },
+  titleMeiToolbox: { text: 'MEI alatnica', description: 'Provjere i izmjene kodiranja, u ploči pored uređivača' },
+  showMeiToolbox: {
+    text: 'Prikaži MEI alatnicu',
+    description: 'Prikaži MEI alatnicu s karticama Provjeri, Pretvori, Prenumeriraj, Id-ovi, Faksimil i Ponovno iscrtaj',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Položaj MEI alatnice',
+    description: 'Odaberite položaj MEI alatnice u odnosu na uređivač',
+    labels: ['lijevo', 'desno', 'gore', 'dolje'],
   },
 
   // Elementi dopune
@@ -980,6 +1138,71 @@ export const lang = {
   githubFilepath: { text: 'Putanja' },
   githubCommit: { text: 'Komit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Komituj kao novi fajl' } }, value: 'Komituj' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Došli ste s <strong>Let's\u00a0Encode!</strong> kako biste radili na zadatku kodiranja. mei-friend jedan je od uređivača koje „Let's\u00a0Encode!“ nudi za ovaj rad. Upotrijebite <strong>Spremi</strong> u izborniku <strong>Upravljanje zadatkom</strong> (gore lijevo) kako biste usput spremali svoj napredak, a <strong>Završi zadatak</strong> kada završite, kako biste dali svoj doprinos kampanji.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Završi zadatak' },
+  letsEncodeMenuLabel: { text: 'Upravljanje zadatkom' },
+  letsEncodeLoggedInAs: { text: 'Prijavljeni ste kao' },
+  letsEncodeSaveButton: { text: 'Spremi' },
+  letsEncodeSaving: { text: 'Vaš se rad sprema…' },
+  letsEncodeSaveFailed: { text: 'Vaš rad nije bilo moguće spremiti.' },
+  letsEncodeDismiss: { value: 'Zatvori' },
+  letsEncodeLastSave: { text: 'Posljednje spremanje:' },
+  letsEncodeLastAutosave: { text: 'Automatski spremljeno:' },
+  letsEncodeSavedAt: { text: 'Spremljeno' },
+  letsEncodeExpiresAt: { text: 'Istječe' },
+  letsEncodeTimeRemaining: { text: 'preostalo za završetak zadatka' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'prije {n}' },
+  letsEncodeJustNow: { text: 'upravo sada' },
+  letsEncodeTimeExpired: { text: 'Vrijeme za završetak ovog zadatka je isteklo' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval automatskog spremanja (minute)',
+    description:
+      'Koliko se često vaš rad automatski sprema dok uređujete, u minutama. Sprema se samo ako ste nešto izmijenili; 0 isključuje automatsko spremanje.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Postavke zadatka „Let's\u00a0Encode!“ na kojem radite" },
+  letsEncodeAbandonTaskButton: { text: 'Odustani od zadatka' },
+  letsEncodeKeepWorking: { value: 'Nastavi s radom' },
+  letsEncodeCompleteAnyway: { value: 'Ipak završi zadatak' },
+  letsEncodeAbandonConfirm: { value: 'Odustani od zadatka' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Niste mijenjali ovo kodiranje. I to se računa: završetkom zadatka bilježi se da izmjene nisu bile potrebne. Možete i nastaviti s radom.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Želite li završiti ovaj zadatak? Vaš će rad biti spremljen i proslijeđen platformi „Let's\u00a0Encode!“, a zadatak će biti zatvoren.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Odustati od ovog zadatka? Vaš će rad na njemu biti izgubljen, uključujući ono što ste već spremili, a platforma „Let's\u00a0Encode!“ bit će obaviještena da niste završili zadatak.",
+  },
+  letsEncodeLoading: { text: "Učitavanje vašeg zadatka s platforme „Let's\u00a0Encode!“…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Otvorite svoju kampanju „Let's\u00a0Encode!“ u novoj kartici (vaš zadatak ostaje ovdje otvoren)",
+  },
+  letsEncodeDragOverlayText: { text: "Druge datoteke ne mogu se otvoriti tijekom zadatka „Let's\u00a0Encode!“." },
+  letsEncodeCommitting: { text: 'Završavanje vašeg zadatka…' },
+  letsEncodeCompleted: { text: "Zadatak je završen — vraćamo vas na „Let's\u00a0Encode!“…" },
+  letsEncodeCommitFailed: { text: 'Vaš zadatak nije bilo moguće završiti.' },
+  letsEncodeRetryButton: { value: 'Pokušaj ponovno' },
+  letsEncodeAbandonButton: { value: "Povratak na „Let's\u00a0Encode!“" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Ova poveznica „Let's\u00a0Encode!“ nije potpuna: ne navodi nijednu kampanju, pa nema kamo prijaviti rezultat. Vratite se na „Let's\u00a0Encode!“ i ponovno otvorite zadatak.",
+  },
+  letsEncodeMissingParameterError: { text: "Pri predaji s platforme „Let's\u00a0Encode!“ nedostajao je obvezan parametar:" },
+  letsEncodeFileError: { text: 'Predanu datoteku nije bilo moguće otvoriti na GitHubu.' },
+  letsEncodeCloneError: { text: 'Vaš zadatak nije bilo moguće učitati s GitHuba.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Datoteka je izmijenjena na GitHubu dok ste radili, pa vaš rad nije bilo moguće spremiti.',
+  },
   commitLog: { text: 'Zapis komita' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Autor' },
@@ -1006,11 +1229,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Renumeracija takta' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'biće' },
-  renumberMeasuresChangedTo: { text: 'promenjeno u' },
-  renumberMeasureMeasuresRenumbered: { text: 'taktova je renumerisano' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

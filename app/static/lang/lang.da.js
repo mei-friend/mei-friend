@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend er en editor for <a href="https://music-encoding.org">musik kodninger</a>, hostet på
+        mei-friend er en editor for <a href="https://music-encoding.org" target="_blank">musik kodninger</a>, hostet på
         <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>.
         Se venligst vores <a href="https://mei-friend.github.io" target="_blank">omfattende dokumentation</a> for
         yderligere information.
@@ -73,8 +73,8 @@ export const lang = {
       <p>
         Udviklingen af mei-friend webapplikationen er finansieret af
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projekterne
-        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>
-        og <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> og <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Forstået!' },
@@ -134,6 +134,13 @@ export const lang = {
   replaceMenuText: { text: 'Erstat' },
   replaceAllMenuText: { text: 'Erstat alle' },
   indentSelectionText: { text: 'Indryk markering' },
+  reformatEncodingText: {
+    text: 'Omformater via XML-parser',
+    description:
+      'Omformaterer hele kodningen via XML-parseren: attributter sorteret (xml:id først, derefter alfabetisk), normaliseret XML-serialisering (f.eks. dobbelte anførselstegn, tomme elementer som selvlukkende tags, tegnreferencer som tegn), alle linjer indrykket.',
+  },
+  reformatEncodingDone: { text: 'Kodningen er omformateret via XML-parseren ({lines} linjer).' },
+  reformatEncodingParseError: { text: 'Kan ikke omformatere: kodningen er ikke velformet XML.' },
   surroundWithTagsText: { text: 'Omslut med tags' },
   surroundWithLastTagText: { text: 'Omslut med ' },
   jumpToLineText: { text: 'Hop til linje' },
@@ -152,10 +159,15 @@ export const lang = {
     text: 'Facsim ile panel',
   },
   showPlaybackControlsText: { text: 'Afspilningskontrol' },
+  showMeiToolboxMenuText: { text: 'MEI-værktøjskasse' },
   facsimileTop: { text: 'Facsimile top' },
   facsimileBottom: { text: 'Facsimile bund' },
   facsimileLeft: { text: 'Facsimile venstre' },
   facsimileRight: { text: 'Facsimile højre' },
+  meiToolboxTop: { text: 'MEI-værktøjskasse øverst' },
+  meiToolboxBottom: { text: 'MEI-værktøjskasse nederst' },
+  meiToolboxLeft: { text: 'MEI-værktøjskasse til venstre' },
+  meiToolboxRight: { text: 'MEI-værktøjskasse til højre' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Manipuler' },
@@ -178,11 +190,153 @@ export const lang = {
   meterConformanceText: { text: 'Kontroller @metcon' },
   renumberMeasuresTestText: { text: 'Omdøbn mål (test)' },
   renumberMeasuresExecText: { text: 'Omdøbn mål (exec)' },
+  convertAttributesToElementsText: {
+    text: 'Konverter attributter til elementer',
+    description:
+      'Konverterer attributter, der også kan udtrykkes som elementer, til disse elementer, f.eks. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss på noder og akkorder eller nøgle-, toneart- og taktattributter på staffDef og scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributter konverteret til {list}.' },
+  convertAttributesToElementsNone: { text: 'Ingen attributter fundet, der kan konverteres til elementer.' },
+  convertAttributesToElementsProblems: { text: '{count} attributter kunne ikke konverteres.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Kontrol' },
+  meiToolboxTabConvert: { text: 'Konverter' },
+  meiToolboxTabRenumber: { text: 'Omnummerer' },
+  meiToolboxCheckButton: { text: 'Kontroller' },
+  meiToolboxTestButton: { text: 'Test', description: 'Vis hvad der ville blive ændret, uden at ændre kodningen' },
+  meiToolboxRenumberButton: { text: 'Omnummerer' },
+  meiToolboxAttrToElButton: { text: 'Attributter → elementer' },
+  meiToolboxElToAttrButton: { text: 'Elementer → attributter', description: 'Konverterer elementer til attributter, hvor ingen information går tabt; andre elementer bevares og vises.' },
+  meiToolboxAll: { text: 'alle' },
+  meiToolboxNone: { text: 'ingen' },
+  meiToolboxFilter: { text: 'Filtrer resultater' },
+  meiToolboxRunAgain: { text: 'Kør igen' },
+  meiToolboxHideOptions: { text: 'Skjul indstillinger' },
+  meiToolboxOutdated: { text: '(kodningen er ændret siden, resultaterne kan være forældede)' },
+  meiToolboxNoResults: { text: 'Ingen resultater endnu. Vælg indstillingerne og kør.' },
+  meiToolboxGroupsSelected: { text: '{n} af {total} attributgrupper' },
+  meiToolboxCheckAccidGes: { text: 'Fortegn (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Taktvarigheder (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Forbundne elementer (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Luk MEI-værktøjskassen' },
+  meiToolboxTabIds: { text: 'Id’er' },
+  meiToolboxTabFacsimile: { text: 'Faksimile' },
+  meiToolboxTabReformat: { text: 'Reformatér' },
+  meiToolboxIdsAdd: { text: 'Tilføj xml:id (til elementer uden)' },
+  meiToolboxIdsChange: {
+    text: 'Skift xml:id (et nyt til hvert element)',
+    description: 'Tildeler hvert element et nyt xml:id. Referencer inden for denne kodning opdateres, men links fra andre filer, annotationer, faksimileværktøjer eller URL’er, der peger på de gamle xml:id’er, virker ikke længere.',
+  },
+  meiToolboxIdsRemove: { text: 'Fjern xml:id (undtagen dem, der henvises til)' },
+  meiToolboxIdsButton: { text: 'Anvend' },
+  meiToolboxIdsAdded: { text: '{n} tilføjet' },
+  meiToolboxIdsChanged: { text: '{n} ændret' },
+  meiToolboxIdsRemoved: { text: '{n} fjernet' },
+  meiToolboxIdsKept: { text: '{n} bevaret' },
+  meiToolboxIdsReferences: { text: '{n} referencer opdateret' },
+  meiToolboxIdsKeptReason: { text: 'der henvises til det i kodningen' },
+  meiToolboxIdsNothing: { text: 'Intet at gøre: ingen xml:id blev tilføjet, ændret eller fjernet.' },
+  meiToolboxIdsCancelled: { text: 'Annulleret, kodningen er uændret.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Forbind kodningen med sidebillederne: indlæs en faksimile fra en anden fil, eller tilføj de surfaces, der stadig mangler, én pr. sideskift.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Indlæs faksimile…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Tilføj manglende surfaces',
+    description: 'Tilføjer det, der mangler: en faksimile, hvis der ingen er, en surface med en pladsholder-graphic til hver side, der ikke har en endnu, og pb@facs, der peger på den. Sider knyttes til de surfaces, der allerede er der, og som ikke ændres.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Tilføjede surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Sider forbundet med en surface, der allerede var der: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimile tilføjet.' },
+  meiToolboxFacsimileUpToDate: { text: 'Hver side har allerede sin surface; intet blev tilføjet.' },
+  meiToolboxFacsimileZones: { text: '{n} zoner' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zoner' },
+  meiToolboxFacsimileNone: { text: 'Denne kodning har ingen faksimile.' },
+  meiToolboxReformatVerovio: {
+    text: 'Via Verovio',
+    description: 'Lader Verovio skrive kodningen på ny ud fra sin egen repræsentation.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio skriver kodningen ud fra sin egen repræsentation, i sin egen formatering og attributrækkefølge.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Via XML-parseren',
+    description: 'Reformaterer kodningen via XML-parseren: indholdet bevares, kun formateringen og attributrækkefølgen ændres. Samme som Kode → Reformatér via XML-parseren.',
+  },
+  meiToolboxReformatUnchanged: { text: 'Kodningen er uændret.' },
+  meiToolboxReformatDone: { text: '{lines} linjer' },
+  meiToolboxAttributeOrder: {
+    text: 'Attributrækkefølge',
+    description: 'Den rækkefølge, attributter skrives i, hver gang mei-friend skriver et element tilbage.',
+    labels: ['som kodet', 'alfabetisk', 'xml:id først, derefter alfabetisk', 'tilpasset…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Rækkefølgemønster',
+    description: 'Attributnavne adskilt af mellemrum eller kommaer, i den ønskede rækkefølge, f.eks. “xml:id n label *”. Et navn, der ender på *, matcher alle attributter med det præfiks (clef.*). Et enkelt * står for alle ikke-nævnte attributter i alfabetisk orden; uden det bevarer de deres rækkefølge til sidst. Namespace-erklæringer kommer altid først.',
+  },
+  codeCheckerFixShown: { text: 'Ret {n} viste' },
+  codeCheckerIgnoreShown: { text: 'Ignorer {n} viste' },
+  convertGroupAccid: { text: 'Noterede fortegn (@accid)' },
+  convertGroupAccidGes: { text: 'Klingende fortegn (@accid.ges)' },
+  convertGroupArtic: { text: 'Artikulationer (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Sangtekst (@syl)' },
+  convertGroupFermata: { text: 'Fermater (@fermata)' },
+  convertGroupTie: { text: 'Bindebuer (@tie)' },
+  convertGroupSlur: { text: 'Legatobuer (@slur)' },
+  convertGroupGliss: { text: 'Glissandi (@gliss)' },
+  convertGroupDefinitions: { text: 'Nøgle, toneart, taktart, mensur (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Gruppesymboler og etiketter (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Attributter ville blive konverteret til {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elementer konverteret til attributter: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Elementer ville blive konverteret til attributter: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} elementer kunne ikke konverteres.' },
+  convertElementsToAttributesNone: { text: 'Ingen elementer fundet, der kan konverteres til attributter.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementer → attributter</b>\n\nAdvarsel: denne handling kan ødelægge eksterne links.\n\n{count} af de elementer, der konverteres, har en xml:id, som fjernes sammen med elementet. Elementer, der henvises til i denne fil, konverteres ikke.\n\nLinks fra andre filer, annotationer gemt uden for denne fil, faksimileværktøjer eller URL\'er, der peger på disse xml:id\'er, vil ikke længere virke.' },
+  elementsToAttributesProceed: { text: 'Konverter' },
+  elementsToAttributesCancel: { text: 'Annuller' },
+  convertScopeAll: { text: 'Omfang: hele kodningen (markér tekst i editoren for at begrænse konverteringen)' },
+  convertScopeSelection: { text: 'Omfang: markering, linje {from}–{to}' },
+  convertSelectionSuffix: { text: 'markering' },
+  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresUnchanged: { text: 'uændret' },
+  renumberMeasuresSummary: { text: '{total} takter, {changed} omnummereret.' },
+  renumberMeasuresSummaryTest: { text: '{total} takter, {changed} ville blive omnummereret.' },
+  renumberMeasuresNoMeasures: { text: 'Ingen takter fundet.' },
   addIdsText: { text: 'Tilføj ids til MEI' },
   removeIdsText: { text: 'Fjern ids fra MEI' },
+  changeIdsText: {
+    text: 'Ændr ids i MEI (bryder eksterne links)',
+    description:
+      'Tildeler et nyt xml:id til hvert element (eller til de valgte elementer). Referencer i denne fil opdateres, men links fra andre filer, annotationer, faksimileværktøjer eller URL’er, der peger på de gamle xml:id’er, vil ikke længere virke.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Ændr ids i MEI</b>\n\nAdvarsel: denne handling bryder eksterne links.\n\n{changed} xml:id’er ændres, og {added} nye xml:id’er tilføjes; {references} referencer i denne fil opdateres.\n\nLinks fra andre filer, annotationer, faksimileværktøjer eller URL’er, der peger på de gamle xml:id’er, vil ikke længere virke.',
+  },
+  changeIdsProceed: { text: 'Ændr ids' },
+  changeIdsCancel: { text: 'Annuller' },
   reRenderMeiVerovio: { text: 'Genrender via Verovio' },
   addFacsimile: { text: 'Tilføj facsimile element' },
   ingestFacsimileText: { text: 'Indtag facsimile' },
+  ingestFacsimileTitle: { text: 'Indlæser facsimile' },
+  ingestFacsimileProgress: { text: '{file}: {done} af {total} zoner behandlet.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile indlæst' },
+  ingestFacsimileStoppedTitle: { text: 'Indlæsning af facsimile stoppet' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile fra {file} med {surfaces} sider (surface) og {zones} zoner indsat før body; @facs-attributter tilføjet til {added} elementer.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Stoppet efter {done} af {total} zoner. De hidtidige ændringer kan fortrydes i ét trin.',
+  },
+  ingestFacsimileProblems: { text: 'Der opstod {count} problemer:' },
+  ingestFacsimileNotFound: { text: '{type} med n="{n}" ikke fundet.' },
+  ingestFacsimileNotUnique: { text: '{type} med n="{n}" ikke entydig.' },
+  ingestFacsimileNoId: { text: '{type} med n="{n}" har ingen xml:id, @facs ikke tilføjet.' },
+  ingestFacsimileNotInEditor: { text: '{type} med n="{n}" ikke fundet i editoren, @facs ikke tilføjet.' },
+  ingestFacsimileNoFacsimile: { text: 'Indlæsning af facsimile mislykkedes: intet facsimile-element fundet i {file}.' },
+  ingestFacsimileNoBody: { text: 'Indlæsning af facsimile mislykkedes: intet body-element fundet i kodningen.' },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'Intet body-element fundet i editoren, facsimile-elementet blev ikke indsat.',
+  },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Indsæt' },
@@ -252,11 +406,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Hostet af <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'på <a href="https://mdw.ac.at">mdw</a>, med ' +
+      'Hostet af <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'på <a href="https://mdw.ac.at" target="_blank">mdw</a>, med ' +
       heart +
       ' fra Wien. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Indlæser Verovio' },
   verovioLoaded: { text: 'indlæst' },
@@ -754,10 +908,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Omdøb mål',
-    description: 'Indstillinger for omdøbning af mål',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Fortsæt på tværs af ufuldstændige mål',
     description: 'Fortsæt målnumre på tværs af ufuldstændige mål (@metcon="false")',
@@ -827,6 +977,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Vis facsimile titler',
     description: 'Vis facsimile titler over kildebilleder',
+  },
+  titleMeiToolbox: {
+    text: 'MEI-værktøjskasse',
+    description: 'Kontroller og ændringer af kodningen i et panel ved siden af editoren',
+  },
+  showMeiToolbox: {
+    text: 'Vis MEI-værktøjskassen',
+    description: 'Vis MEI-værktøjskassen med fanerne Kontrollér, Konvertér, Omnummerér, Id’er, Faksimile og Gengiv igen',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'MEI-værktøjskassens placering',
+    description: 'Vælg MEI-værktøjskassens placering i forhold til editoren',
+    labels: ['venstre', 'højre', 'øverst', 'nederst'],
   },
 
   // Supplied element
@@ -984,6 +1147,68 @@ export const lang = {
   githubFilepath: { text: 'Sti' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit som ny fil' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Du kommer fra <strong>Let's\u00a0Encode!</strong> for at arbejde på en kodningsopgave. mei-friend er en af de editorer, som »Let's\u00a0Encode!« tilbyder til dette arbejde. Brug <strong>Gem</strong> i menuen <strong>Opgavestyring</strong> (øverst til venstre) til at gemme dine fremskridt undervejs, og <strong>Afslut opgave</strong>, når du er færdig, for at bidrage med dit arbejde til kampagnen.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Afslut opgave' },
+  letsEncodeMenuLabel: { text: 'Opgavestyring' },
+  letsEncodeLoggedInAs: { text: 'Logget ind som' },
+  letsEncodeSaveButton: { text: 'Gem' },
+  letsEncodeSaving: { text: 'Gemmer dit arbejde…' },
+  letsEncodeSaveFailed: { text: 'Dit arbejde kunne ikke gemmes.' },
+  letsEncodeDismiss: { value: 'Luk' },
+  letsEncodeLastSave: { text: 'Sidst gemt:' },
+  letsEncodeLastAutosave: { text: 'Automatisk gemt:' },
+  letsEncodeSavedAt: { text: 'Gemt' },
+  letsEncodeExpiresAt: { text: 'Udløber' },
+  letsEncodeTimeRemaining: { text: 'tilbage til at afslutte opgaven' },
+  letsEncodeHoursShort: { text: 't' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'for {n} siden' },
+  letsEncodeJustNow: { text: 'lige nu' },
+  letsEncodeTimeExpired: { text: 'Tiden til at afslutte opgaven er udløbet' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval for automatisk gemning (minutter)',
+    description:
+      'Hvor ofte dit arbejde gemmes automatisk, mens du redigerer, i minutter. Der gemmes kun, når du har lavet ændringer; 0 slår automatisk gemning fra.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Indstillinger for den »Let's\u00a0Encode!«-opgave, du arbejder på" },
+  letsEncodeAbandonTaskButton: { text: 'Opgiv opgave' },
+  letsEncodeKeepWorking: { value: 'Arbejd videre' },
+  letsEncodeCompleteAnyway: { value: 'Afslut opgaven alligevel' },
+  letsEncodeAbandonConfirm: { value: 'Opgiv opgave' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'Du har ikke ændret denne kodning. Det tæller også: når du afslutter opgaven, registreres det, at den ikke krævede ændringer. Du kan også arbejde videre.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: "Vil du afslutte denne opgave? Dit arbejde gemmes og overdrages til »Let's\u00a0Encode!«, og opgaven lukkes.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Opgive denne opgave? Dit arbejde med den går tabt, også det, du allerede har gemt, og »Let's\u00a0Encode!« får besked om, at du ikke afsluttede opgaven.",
+  },
+  letsEncodeLoading: { text: "Henter din opgave fra »Let's\u00a0Encode!«…" },
+  letsEncodeLogoLinkTitle: { text: "Åbn din »Let's\u00a0Encode!«-kampagne i en ny fane (din opgave forbliver åben her)" },
+  letsEncodeDragOverlayText: { text: "Andre filer kan ikke åbnes under en »Let's\u00a0Encode!«-opgave." },
+  letsEncodeCommitting: { text: 'Afslutter din opgave…' },
+  letsEncodeCompleted: { text: "Opgaven er afsluttet — du sendes tilbage til »Let's\u00a0Encode!«…" },
+  letsEncodeCommitFailed: { text: 'Din opgave kunne ikke afsluttes.' },
+  letsEncodeRetryButton: { value: 'Prøv igen' },
+  letsEncodeAbandonButton: { value: "Tilbage til »Let's\u00a0Encode!«" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Dette »Let's\u00a0Encode!«-link er ufuldstændigt: det nævner ingen kampagne, så resultatet kan ikke meldes tilbage nogen steder. Gå tilbage til »Let's\u00a0Encode!«, og åbn opgaven igen.",
+  },
+  letsEncodeMissingParameterError: { text: "Overdragelsen fra »Let's\u00a0Encode!« manglede en påkrævet parameter:" },
+  letsEncodeFileError: { text: 'Den overdragne fil kunne ikke åbnes på GitHub.' },
+  letsEncodeCloneError: { text: 'Din opgave kunne ikke indlæses fra GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Filen blev ændret på GitHub, mens du arbejdede, så dit arbejde kunne ikke gemmes.',
+  },
   commitLog: { text: 'Commit log' },
   githubDate: { text: 'Dato' },
   githubAuthor: { text: 'Forfatter' },
@@ -1010,11 +1235,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Omdøb mål' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'ville være' },
-  renumberMeasuresChangedTo: { text: 'ændret til' },
-  renumberMeasureMeasuresRenumbered: { text: 'mål omdøbt' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: 'Kontroller @accid.ges attributter (mod toneart, mål accids og bindinger).' },

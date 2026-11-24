@@ -7,7 +7,10 @@ import {
   defaultNotationProportion,
   defaultFacsimileProportion,
   defaultFacsimileResizerWidth,
-  defaultCodeCheckerHeight,
+  defaultMeiToolboxHeight,
+  defaultMeiToolboxWidth,
+  defaultMeiToolboxResizerWidth,
+  defaultMeiToolboxOrientation,
 } from './defaults.js';
 
 // notation variables (verovioContainer)
@@ -20,8 +23,116 @@ let facsimileProportion = defaultFacsimileProportion;
 const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
 const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
 const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
-const codeCheckerResizerHeight = 6; // px, border width of code checker panel, cf. default.css #codeChecker
-export let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
+// MEI toolbox variables (#meiToolbox inside #encoding)
+let meiToolboxOrientation = defaultMeiToolboxOrientation; // position of the toolbox relative to the editor
+const meiToolboxResizerWidth = defaultMeiToolboxResizerWidth; // px, cf. css toolbox-[left/right/top/bottom].css
+export let meiToolboxHeight = defaultMeiToolboxHeight; // px, extent of the toolbox at top/bottom
+export let meiToolboxWidth = defaultMeiToolboxWidth; // px, extent of the toolbox at left/right
+
+/**
+ * Whether the MEI toolbox is currently shown. Like the facsimile panel, the
+ * settings checkbox is the single source of truth for its visibility.
+ * @returns {boolean}
+ */
+export function meiToolboxVisible() {
+  return !!document.getElementById('showMeiToolbox')?.checked;
+} // meiToolboxVisible()
+
+/**
+ * Whether the MEI toolbox currently sits beside the editor (rather than above or below).
+ * @returns {boolean}
+ */
+export function meiToolboxBeside() {
+  return meiToolboxOrientation === 'left' || meiToolboxOrientation === 'right';
+} // meiToolboxBeside()
+
+const minToolboxWidth = 220; // px, narrower than this the toolbox is not usable
+const minToolboxHeight = 120;
+const minEditorWidth = 200; // px, the editor keeps at least this much beside the toolbox
+const minEditorHeight = 80;
+
+/**
+ * Keeps the extent of the toolbox between its own minimum and the extent that
+ * leaves the editor its minimum; an extent larger than the panel wins over the
+ * minimum of the editor, so that the toolbox stays usable in a small window.
+ * @param {number} extent
+ * @param {number} available extent of the encoding panel on the same axis
+ * @param {number} minExtent
+ * @param {number} minEditor
+ * @returns {number}
+ */
+function clampExtent(extent, available, minExtent, minEditor) {
+  const max = Math.max(minExtent, available - meiToolboxResizerWidth - minEditor);
+  return Math.round(Math.min(Math.max(extent, minExtent), max));
+} // clampExtent()
+
+/**
+ * Restores the stored extents of the MEI toolbox (px). Values that are not a
+ * number (nothing stored yet) leave the current extent untouched.
+ * @param {number} width
+ * @param {number} height
+ */
+export function setMeiToolboxExtent(width, height) {
+  if (Number.isFinite(width) && width > 0) meiToolboxWidth = width;
+  if (Number.isFinite(height) && height > 0) meiToolboxHeight = height;
+} // setMeiToolboxExtent()
+
+/**
+ * Sizes the MEI toolbox within the encoding panel: it spans the encoding panel on
+ * the axis it does not take its extent from, so that it fills the side it sits on.
+ * @param {Element} toolbox #meiToolbox
+ * @param {boolean} visible
+ * @param {number} encodingWidth px available to the encoding panel
+ * @param {number} encodingHeight px available to the encoding panel
+ */
+function sizeToolbox(toolbox, visible, encodingWidth, encodingHeight) {
+  if (!toolbox) return;
+  if (!visible) {
+    toolbox.style.width = '';
+    toolbox.style.height = '';
+    return;
+  }
+  if (meiToolboxBeside()) {
+    meiToolboxWidth = clampExtent(meiToolboxWidth, encodingWidth, minToolboxWidth, minEditorWidth);
+    toolbox.style.width = meiToolboxWidth + 'px';
+    toolbox.style.height = encodingHeight + 'px';
+  } else {
+    meiToolboxHeight = clampExtent(meiToolboxHeight, encodingHeight, minToolboxHeight, minEditorHeight);
+    toolbox.style.width = encodingWidth + 'px';
+    toolbox.style.height = meiToolboxHeight + 'px';
+  }
+} // sizeToolbox()
+
+/**
+ * Sizes the editor and, if shown, the MEI toolbox within the space available to the
+ * encoding panel; the editor loses the toolbox extent (and its resizer) on the side
+ * the toolbox sits on.
+ * @param {CodeMirror} cm
+ * @param {number} encodingWidth px available to the encoding panel
+ * @param {number} encodingHeight px available to the encoding panel
+ */
+function sizeEncodingPanel(cm, encodingWidth, encodingHeight) {
+  const toolbox = document.getElementById('meiToolbox');
+  const visible = !!toolbox && meiToolboxVisible();
+  sizeToolbox(toolbox, visible, encodingWidth, encodingHeight); // clamps the toolbox extent first
+  let mtWidth = 0;
+  let mtHeight = 0;
+  if (visible) {
+    if (meiToolboxBeside()) mtWidth = meiToolboxWidth + meiToolboxResizerWidth;
+    else mtHeight = meiToolboxHeight + meiToolboxResizerWidth;
+  }
+  cm.setSize(encodingWidth - mtWidth, encodingHeight - mtHeight);
+  // offsets of the editor from each edge of #encoding, so that overlays anchored to
+  // the editor (#validation-status, #validation-report, #linkedNavUp/Down, cf.
+  // default.css) stay on it instead of the toolbox
+  const encoding = document.getElementById('encoding');
+  if (encoding) {
+    const offset = (side) => (meiToolboxOrientation === side ? (meiToolboxBeside() ? mtWidth : mtHeight) : 0) + 'px';
+    for (const side of ['Left', 'Top', 'Right', 'Bottom']) {
+      encoding.style.setProperty('--editorOffset' + side, offset(side.toLowerCase()));
+    }
+  }
+} // sizeEncodingPanel()
 
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
@@ -36,13 +147,26 @@ let storage; // storage object for local storage
  * @param {String} _facsimileOrientation
  * @param {Viewer} v
  * @param {Object} _storage
+ * @param {String} _meiToolboxOrientation
  */
-export function setOrientation(cm, _notationOrientation = '', _facsimileOrientation = '', v = null, _storage = null) {
+export function setOrientation(
+  cm,
+  _notationOrientation = '',
+  _facsimileOrientation = '',
+  v = null,
+  _storage = null,
+  _meiToolboxOrientation = ''
+) {
   // store arguments
   if (_notationOrientation) notationOrientation = _notationOrientation;
   if (_facsimileOrientation) {
     facsimileOrientation = _facsimileOrientation;
     document.getElementById('selectFacsimilePanelOrientation').value = facsimileOrientation;
+  }
+  if (_meiToolboxOrientation) {
+    meiToolboxOrientation = _meiToolboxOrientation;
+    const select = document.getElementById('selectMeiToolboxOrientation');
+    if (select) select.value = meiToolboxOrientation;
   }
   if (_storage !== null) storage = _storage;
 
@@ -50,6 +174,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   if (storage && storage.supported) {
     storage.notationOrientation = notationOrientation;
     storage.facsimileOrientation = facsimileOrientation;
+    storage.meiToolboxOrientation = meiToolboxOrientation;
   }
 
   // change CSS for notation orientation
@@ -59,6 +184,11 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   facsimileOrientation = document.getElementById('selectFacsimilePanelOrientation').value;
   let facsCss = document.getElementById('facsimileOrientationCSS');
   facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');
+  // change CSS for MEI toolbox orientation
+  const toolboxSelect = document.getElementById('selectMeiToolboxOrientation');
+  if (toolboxSelect) meiToolboxOrientation = toolboxSelect.value;
+  const toolboxCss = document.getElementById('meiToolboxOrientationCSS');
+  if (toolboxCss) toolboxCss.setAttribute('href', root + 'css/toolbox-' + meiToolboxOrientation + '.css');
 
   const friendSz = document.getElementById('friendContainer');
   const notationDiv = document.getElementById('notation');
@@ -68,13 +198,12 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
-  const codeChecker = document.getElementById('codeChecker');
-  let ccHeight = 0;
-  if (codeChecker && codeChecker.style.display !== 'none') {
-    ccHeight = codeCheckerHeight + codeCheckerResizerHeight;
-    document.getElementById('codeCheckerResizer').style.display = 'flex';
-  } else {
-    document.getElementById('codeCheckerResizer').style.display = 'none';
+  // the toolbox takes its extent from the side it sits on (see sizeEncodingPanel())
+  const meiToolbox = document.getElementById('meiToolbox');
+  const showToolbox = meiToolboxVisible();
+  if (meiToolbox) {
+    meiToolbox.style.display = showToolbox ? 'flex' : 'none';
+    document.getElementById('meiToolboxResizer').style.display = showToolbox ? 'flex' : 'none';
   }
   let sz = calcSizeOfContainer(); // friendContainer
   // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
@@ -97,13 +226,9 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     }
     notationDiv.style.width = sz.width; // - 2 * notationBorderWidth;
     notationDiv.style.height = sz.height * notationProportion;
-    cm.setSize(
-      sz.width,
-      sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth - ccHeight
-    );
-    if (codeChecker) {
-      codeChecker.style.width = 'unset';
-    }
+    const encodingWidth = sz.width;
+    const encodingHeight = sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth;
+    sizeEncodingPanel(cm, encodingWidth, encodingHeight);
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -116,11 +241,9 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     }
     notationDiv.style.width = Math.floor(sz.width * notationProportion);
     notationDiv.style.height = sz.height;
-    let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
-    cm.setSize(cmWidth, sz.height - ccHeight);
-    if (codeChecker) {
-      codeChecker.style.width = cmWidth;
-    }
+    const encodingWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
+    const encodingHeight = sz.height;
+    sizeEncodingPanel(cm, encodingWidth, encodingHeight);
   }
   friendSz.style.width = sz.width;
   friendSz.style.maxWidth = sz.width;
@@ -254,14 +377,6 @@ export function addNotationResizerHandlers(v, cm) {
     const dx = e.clientX - x;
     const dy = e.clientY - y;
     let sz = notationResizer.parentNode.getBoundingClientRect();
-    const codeChecker = document.getElementById('codeChecker');
-    let ccHeight = 0;
-    if (codeChecker && codeChecker.style.display !== 'none') {
-      ccHeight = codeCheckerHeight + codeCheckerResizerHeight;
-      document.getElementById('codeCheckerResizer').style.display = 'flex';
-    } else {
-      document.getElementById('codeCheckerResizer').style.display = 'none';
-    }
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
@@ -290,9 +405,7 @@ export function addNotationResizerHandlers(v, cm) {
     //     '/' +
     //     sz.height +
     //     ', Notationproporion: ' +
-    //     notationProportion +
-    //     ', codeCheckerHeight: ' +
-    //     ccHeight
+    //     notationProportion
     // );
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
@@ -302,9 +415,10 @@ export function addNotationResizerHandlers(v, cm) {
       case 'top':
       case 'bottom':
         notationPanel.style.height = notationProportion * sz.height;
-        cm.setSize(
+        sizeEncodingPanel(
+          cm,
           sz.width,
-          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth - ccHeight
+          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth
         );
         if (
           document.getElementById('showFacsimilePanel').checked &&
@@ -320,13 +434,11 @@ export function addNotationResizerHandlers(v, cm) {
       case 'left':
       case 'right':
         notationPanel.style.width = sz.width * notationProportion;
-        let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
-        let cmHeight = sz.height - ccHeight;
-        // console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
-        cm.setSize(cmWidth, cmHeight);
-        if (codeChecker) {
-          codeChecker.style.width = cmWidth;
-        }
+        sizeEncodingPanel(
+          cm,
+          sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth,
+          sz.height
+        );
         // set facsimile size
         if (
           document.getElementById('showFacsimilePanel').checked &&
@@ -495,45 +607,64 @@ export function addFacsimilerResizerHandlers(v, cm) {
 } // addFacsimilerResizerHandlers()
 
 /**
- * Adds resizer handlers for resizing the code checker panel
+ * Adds resizer handlers for resizing the MEI toolbox
  */
-export function addCodeCheckerResizerHandlers(v, cm) {
-  const codeCheckerResizer = document.getElementById('codeCheckerResizer');
+export function addMeiToolboxResizerHandlers(v, cm) {
+  const meiToolboxResizer = document.getElementById('meiToolboxResizer');
   const encodingPanel = document.getElementById('encoding');
-  const codeChecker = document.getElementById('codeChecker');
-  const codeMirror = document.querySelector('.CodeMirror');
-  let y = 0;
-  let dy = 0;
+  const meiToolbox = document.getElementById('meiToolbox');
+  let start = 0; // mouse position at mouse down, on the axis being dragged
+  let delta = 0;
   let sz;
+  let beside = false;
+  let startExtent = 0; // toolbox extent at mouse down
 
   const mouseDownHandler = function (e) {
-    codeCheckerHeight =
-      encodingPanel.getBoundingClientRect().height -
-      codeMirror.getBoundingClientRect().height -
-      codeCheckerResizerHeight;
-
-    y = e.clientY;
-    dy = 0;
+    hideAllOverflowContents();
+    beside = meiToolboxBeside();
     sz = encodingPanel.getBoundingClientRect();
+    const toolboxSz = meiToolbox.getBoundingClientRect();
+    startExtent = beside ? toolboxSz.width : toolboxSz.height;
+    start = beside ? e.clientX : e.clientY;
+    delta = 0;
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
-    dy = y - e.clientY;
-    let cmHeight = sz.height - codeCheckerHeight - dy - codeCheckerResizerHeight;
-    cm.setSize(null, cmHeight);
-    codeChecker.style.height = codeCheckerHeight + dy - codeCheckerResizerHeight;
+    // dragging towards the editor grows the toolbox, whichever side it sits on
+    const raw = beside ? e.clientX - start : e.clientY - start;
+    delta = meiToolboxOrientation === 'left' || meiToolboxOrientation === 'top' ? raw : -raw;
+    const extent = clampExtent(
+      startExtent + delta,
+      beside ? sz.width : sz.height,
+      beside ? minToolboxWidth : minToolboxHeight,
+      beside ? minEditorWidth : minEditorHeight
+    );
+    if (beside) {
+      meiToolboxWidth = extent;
+      meiToolbox.style.width = extent + 'px';
+      cm.setSize(sz.width - extent - meiToolboxResizerWidth, null);
+    } else {
+      meiToolboxHeight = extent;
+      meiToolbox.style.height = extent + 'px';
+      cm.setSize(null, sz.height - extent - meiToolboxResizerWidth);
+    }
+    document.body.style.cursor = beside ? 'col-resize' : 'row-resize';
+    encodingPanel.style.userSelect = 'none';
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
-    codeCheckerHeight = codeCheckerHeight + dy;
+    document.body.style.removeProperty('cursor');
+    encodingPanel.style.removeProperty('user-select');
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    if (v) {
-      setOrientation(cm, '', '', v);
+    if (v) setOrientation(cm, '', '', v);
+    if (storage && storage.supported) {
+      storage.meiToolboxWidth = meiToolboxWidth;
+      storage.meiToolboxHeight = meiToolboxHeight;
     }
   }; // mouseUpHandler
 
-  codeCheckerResizer.addEventListener('mousedown', mouseDownHandler);
-} // addCodeCheckerResizerHandlers()
+  meiToolboxResizer.addEventListener('mousedown', mouseDownHandler);
+} // addMeiToolboxResizerHandlers()

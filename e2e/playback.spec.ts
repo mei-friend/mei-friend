@@ -1,5 +1,23 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { setupPage, openUrl, forceSelectOption, forceSetCheckbox } from './setup';
+
+/**
+ * Clicks a note in the notation and makes sure that it became the selection.
+ * A change of the breaks or of speed mode re-renders the notation, and a click that
+ * arrives while that is going on does not select the note: the selection then points
+ * at an element that is not in the notation (viewer.findFirstNoteInSelection() warns
+ * about it), and playback starts at the beginning of the page instead of at the note
+ * that was clicked - the page is not turned, and nothing says why. The click is
+ * therefore repeated until the note carries the class 'highlighted', which
+ * viewer.updateHighlight() sets on the elements of the current selection.
+ */
+async function selectNote(page: Page, noteId: string) {
+  const note = page.locator('#' + noteId);
+  await expect(async () => {
+    await note.locator('use').first().click({ force: true });
+    await expect(note).toHaveClass(/highlighted/, { timeout: 2000 });
+  }).toPass({ timeout: 30000 });
+} // selectNote()
 
 test.beforeEach(async ({ page }) => {
   await setupPage(page);
@@ -75,7 +93,7 @@ test.describe('2 Test that MIDI playback works correctly', () => {
     // wait for re-render after breaks change — wait for the specific note we'll click
     await expect(page.locator('#note-0000001030232648')).toBeVisible({ timeout: 30000 });
     // click on a note near end of first system to select it and give notation focus
-    await page.locator('#note-0000001030232648 use').first().click({ force: true });
+    await selectNote(page, 'note-0000001030232648');
     // test whether #verovio-panel eventually changes its scroll position
     const initialScroll = await page.locator('#verovio-panel').evaluate((el) => el.scrollTop);
     // commence playback
@@ -103,7 +121,7 @@ test.describe('2 Test that MIDI playback works correctly', () => {
     // enable speedmode, preventing automatic page turning
     await forceSetCheckbox(page, '#speedCheckbox', true);
     // click on a note near end of first page to give notation focus
-    await page.locator('#note-0000000547593172 use').first().click({ force: true });
+    await selectNote(page, 'note-0000000547593172');
     // commence playback
     await page.keyboard.press('Space');
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible({ timeout: 15000 });
@@ -133,7 +151,7 @@ test.describe('2 Test that MIDI playback works correctly', () => {
     // disable speedmode to allow playback beyond first page
     await forceSetCheckbox(page, '#speedCheckbox', false);
     // click on a note near end of first page to give notation focus
-    await page.locator('#note-0000000547593172 use').first().click({ force: true });
+    await selectNote(page, 'note-0000000547593172');
     // expect that the page number is 1
     await expect(page.locator('#pagination2')).toHaveText(' 1 ');
     // commence playback

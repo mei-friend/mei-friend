@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend és un editor per a les <a href="https://music-encoding.org">codificacions musicals</a>, allotjat a
+        mei-friend és un editor per a les <a href="https://music-encoding.org" target="_blank">codificacions musicals</a>, allotjat a
         <a href="https://mdw.ac.at" target="_blank">la Universitat de Música i Arts Escèniques de Viena</a>. 
         Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
         més informació.
@@ -76,8 +76,8 @@ export const lang = {
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> en els projectes
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
-        >
-        i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+        >,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> i <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>
     `,
   },
@@ -138,6 +138,13 @@ export const lang = {
   replaceMenuText: { text: 'Reemplaça' },
   replaceAllMenuText: { text: 'Reemplaça-ho tot' },
   indentSelectionText: { text: 'Indentar selecció' },
+  reformatEncodingText: {
+    text: 'Reformata amb l\'analitzador XML',
+    description:
+      'Reformata tota la codificació amb l\'analitzador XML: atributs ordenats (primer xml:id, després alfabèticament), serialització XML normalitzada (p. ex. cometes dobles, elements buits com a etiquetes autotancades, referències de caràcter com a caràcters), totes les línies sagnades.',
+  },
+  reformatEncodingDone: { text: 'Codificació reformatada amb l\'analitzador XML ({lines} línies).' },
+  reformatEncodingParseError: { text: 'No es pot reformatar: la codificació no és XML ben format.' },
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a la línia' },
@@ -154,10 +161,15 @@ export const lang = {
   showAnnotationMenuText: { text: "Panell d'anotacions" },
   showFacsimileMenuText: { text: 'Panell de facsímil' },
   showPlaybackControlsText: { text: 'Controls de reproducció' },
+  showMeiToolboxMenuText: { text: 'Caixa d’eines MEI' },
   facsimileTop: { text: 'Facsímil a dalt' },
   facsimileBottom: { text: 'Facsímil a baix' },
   facsimileLeft: { text: "Facsímil a l'esquerra" },
   facsimileRight: { text: 'Facsímil a la dreta' },
+  meiToolboxTop: { text: 'Caixa d’eines MEI a dalt' },
+  meiToolboxBottom: { text: 'Caixa d’eines MEI a baix' },
+  meiToolboxLeft: { text: 'Caixa d’eines MEI a l’esquerra' },
+  meiToolboxRight: { text: 'Caixa d’eines MEI a la dreta' },
 
   // MANIPULATE MENU ITEM / MANIPULACIÓ DELS ELEMENTS DEL MENÚ
   manipulateMenuTitle: { text: 'Manipula' },
@@ -180,11 +192,157 @@ export const lang = {
   meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
+  convertAttributesToElementsText: {
+    text: 'Converteix atributs en elements',
+    description:
+      'Converteix els atributs que també es poden expressar com a elements en aquests elements, p. ex. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss en notes i acords, o els atributs de clau, armadura i compàs a staffDef i scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Atributs convertits en {list}.' },
+  convertAttributesToElementsNone: { text: 'No s\'han trobat atributs que es puguin convertir en elements.' },
+  convertAttributesToElementsProblems: { text: '{count} atributs no s\'han pogut convertir.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Comprova' },
+  meiToolboxTabConvert: { text: 'Converteix' },
+  meiToolboxTabRenumber: { text: 'Renumera' },
+  meiToolboxCheckButton: { text: 'Comprova' },
+  meiToolboxTestButton: { text: 'Prova', description: 'Llista què es canviaria, sense canviar la codificació' },
+  meiToolboxRenumberButton: { text: 'Renumera' },
+  meiToolboxAttrToElButton: { text: 'Atributs → elements' },
+  meiToolboxElToAttrButton: { text: 'Elements → atributs', description: 'Converteix elements en atributs quan no es perd cap informació; els altres elements es conserven i es llisten.' },
+  meiToolboxAll: { text: 'tots' },
+  meiToolboxNone: { text: 'cap' },
+  meiToolboxFilter: { text: 'Filtra els resultats' },
+  meiToolboxRunAgain: { text: 'Torna a executar' },
+  meiToolboxHideOptions: { text: 'Amaga les opcions' },
+  meiToolboxOutdated: { text: '(la codificació ha canviat des d\'aleshores, els resultats poden estar desactualitzats)' },
+  meiToolboxNoResults: { text: 'Encara no hi ha resultats. Trieu les opcions i executeu.' },
+  meiToolboxGroupsSelected: { text: '{n} de {total} grups d\'atributs' },
+  meiToolboxCheckAccidGes: { text: 'Alteracions (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Durades dels compassos (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Elements enllaçats (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'Tanca la caixa d’eines MEI' },
+  meiToolboxTabIds: { text: 'Ids' },
+  meiToolboxTabFacsimile: { text: 'Facsímil' },
+  meiToolboxTabReformat: { text: 'Reformata' },
+  meiToolboxIdsAdd: { text: 'Afegeix xml:id (als elements que no en tenen)' },
+  meiToolboxIdsChange: {
+    text: 'Canvia els xml:id (un de nou per a cada element)',
+    description: 'Assigna un nou xml:id a cada element. Les referències dins d’aquesta codificació s’actualitzen, però els enllaços des d’altres fitxers, anotacions, eines de facsímil o URL que apunten als xml:id antics deixaran de funcionar.',
+  },
+  meiToolboxIdsRemove: { text: 'Elimina els xml:id (excepte els referenciats)' },
+  meiToolboxIdsButton: { text: 'Aplica' },
+  meiToolboxIdsAdded: { text: '{n} afegits' },
+  meiToolboxIdsChanged: { text: '{n} canviats' },
+  meiToolboxIdsRemoved: { text: '{n} eliminats' },
+  meiToolboxIdsKept: { text: '{n} conservats' },
+  meiToolboxIdsReferences: { text: '{n} referències actualitzades' },
+  meiToolboxIdsKeptReason: { text: 'referenciat dins de la codificació' },
+  meiToolboxIdsNothing: { text: 'Res a fer: no s’ha afegit, canviat ni eliminat cap xml:id.' },
+  meiToolboxIdsCancelled: { text: 'Cancel·lat, la codificació no ha canviat.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Enllaça la codificació amb les imatges de les pàgines: incorpora un facsímil d’un altre fitxer o afegeix les superfícies que encara falten, una per salt de pàgina.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Incorpora un facsímil…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Afegeix les superfícies que falten',
+    description: 'Afegeix el que falta: un facsímil si no n’hi ha cap, una superfície amb un gràfic provisional per a cada pàgina que encara no en té, i pb@facs que hi apunta. Les pàgines s’associen a les superfícies ja existents, que es deixen tal com estan.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Superfícies afegides: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pàgines enllaçades a una superfície ja existent: {n}' },
+  meiToolboxFacsimileCreated: { text: 'S’ha afegit el facsímil.' },
+  meiToolboxFacsimileUpToDate: { text: 'Cada pàgina ja té la seva superfície; no s’ha afegit res.' },
+  meiToolboxFacsimileZones: { text: '{n} zones' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} superfícies, {zones} zones' },
+  meiToolboxFacsimileNone: { text: 'Aquesta codificació no té facsímil.' },
+  meiToolboxReformatVerovio: {
+    text: 'Amb Verovio',
+    description: 'Deixa que Verovio torni a escriure la codificació a partir de la seva pròpia representació.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio escriu la codificació a partir de la seva pròpia representació, amb el seu propi format i ordre d’atributs.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Amb l’analitzador XML',
+    description: 'Reformata la codificació amb l’analitzador XML: el contingut es manté, només canvien el format i l’ordre dels atributs. Igual que Codi → Reformata amb l’analitzador XML.',
+  },
+  meiToolboxReformatUnchanged: { text: 'La codificació no ha canviat.' },
+  meiToolboxReformatDone: { text: '{lines} línies' },
+  meiToolboxAttributeOrder: {
+    text: 'Ordre dels atributs',
+    description: 'L’ordre en què s’escriuen els atributs cada vegada que mei-friend torna a escriure un element.',
+    labels: ['tal com està codificat', 'alfabèticament', 'xml:id primer, després alfabèticament', 'personalitzat…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Patró d’ordre',
+    description: 'Noms d’atribut separats per espais o comes, en l’ordre que vulgueu, p. ex. «xml:id n label *». Un nom acabat en * concorda amb tots els atributs amb aquest prefix (clef.*). Un sol * representa tots els atributs no anomenats, per ordre alfabètic; sense ell conserven el seu ordre al final. Les declaracions d’espais de noms sempre van primer.',
+  },
+  codeCheckerFixShown: { text: 'Corregeix els {n} mostrats' },
+  codeCheckerIgnoreShown: { text: 'Ignora els {n} mostrats' },
+  convertGroupAccid: { text: 'Alteracions escrites (@accid)' },
+  convertGroupAccidGes: { text: 'Alteracions sonores (@accid.ges)' },
+  convertGroupArtic: { text: 'Articulacions (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Lletra (@syl)' },
+  convertGroupFermata: { text: 'Calderons (@fermata)' },
+  convertGroupTie: { text: 'Lligadures de prolongació (@tie)' },
+  convertGroupSlur: { text: 'Lligadures d\'expressió (@slur)' },
+  convertGroupGliss: { text: 'Glissandos (@gliss)' },
+  convertGroupDefinitions: { text: 'Clau, armadura, compàs, mensuració (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Símbols de grup i etiquetes (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Els atributs es convertirien en {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elements convertits en atributs: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Els elements es convertirien en atributs: {list}.' },
+  convertElementsToAttributesProblems: { text: 'No s\'han pogut convertir {count} elements.' },
+  convertElementsToAttributesNone: { text: 'No s\'han trobat elements que es puguin convertir en atributs.' },
+  elementsToAttributesConfirmation: { text: '<b>Elements → atributs</b>\n\nAtenció: aquesta operació pot trencar enllaços externs.\n\n{count} dels elements que es convertiran tenen un xml:id, que s\'elimina juntament amb l\'element. Els elements referenciats dins d\'aquest fitxer no es converteixen.\n\nEls enllaços d\'altres fitxers, les anotacions desades fora d\'aquest fitxer, les eines de facsímil o els URL que apunten a aquests xml:id deixaran de funcionar.' },
+  elementsToAttributesProceed: { text: 'Converteix' },
+  elementsToAttributesCancel: { text: 'Cancel·la' },
+  convertScopeAll: { text: 'Abast: tota la codificació (seleccioneu text a l\'editor per restringir la conversió)' },
+  convertScopeSelection: { text: 'Abast: selecció, línies {from}–{to}' },
+  convertSelectionSuffix: { text: 'selecció' },
+  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresUnchanged: { text: 'sense canvis' },
+  renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
+  renumberMeasuresSummaryTest: { text: '{total} compassos, {changed} es renumerarien.' },
+  renumberMeasuresNoMeasures: { text: 'No s\'han trobat compassos.' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
   removeIdsText: { text: 'Elimina IDs de MEI' },
+  changeIdsText: {
+    text: 'Canvia IDs a MEI (trenca els enllaços externs)',
+    description:
+      'Assigna un nou xml:id a cada element (o als elements seleccionats). Les referències dins d’aquest fitxer s’actualitzen, però els enllaços des d’altres fitxers, anotacions, eines de facsímil o URL que apunten als xml:id antics deixaran de funcionar.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Canvia IDs a MEI</b>\n\nAtenció: aquesta operació trenca els enllaços externs.\n\nEs canviaran {changed} xml:id i s’afegiran {added} xml:id nous; s’actualitzaran {references} referències dins d’aquest fitxer.\n\nEls enllaços des d’altres fitxers, anotacions, eines de facsímil o URL que apunten als xml:id antics deixaran de funcionar.',
+  },
+  changeIdsProceed: { text: 'Canvia IDs' },
+  changeIdsCancel: { text: 'Cancel·la' },
   reRenderMeiVerovio: { text: 'Torna a renderitzar via Verovio' },
   addFacsimile: { text: 'Afegeix element facsímil' },
   ingestFacsimileText: { text: 'Incorpora facsímil' },
+  ingestFacsimileTitle: { text: 'Incorporant el facsímil' },
+  ingestFacsimileProgress: { text: '{file}: {done} de {total} zones processades.' },
+  ingestFacsimileDoneTitle: { text: 'Facsímil incorporat' },
+  ingestFacsimileStoppedTitle: { text: 'Incorporació del facsímil aturada' },
+  ingestFacsimileSummary: {
+    text: 'Facsímil de {file} amb {surfaces} superfícies (surface) i {zones} zones inserit abans de body; atributs @facs afegits a {added} elements.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Aturat després de {done} de {total} zones. Els canvis fets fins ara es poden desfer en un sol pas.',
+  },
+  ingestFacsimileProblems: { text: "S'han trobat {count} problemes:" },
+  ingestFacsimileNotFound: { text: '{type} amb n="{n}" no trobat.' },
+  ingestFacsimileNotUnique: { text: '{type} amb n="{n}" no és únic.' },
+  ingestFacsimileNoId: { text: '{type} amb n="{n}" no té xml:id, @facs no afegit.' },
+  ingestFacsimileNotInEditor: { text: '{type} amb n="{n}" no trobat a l\'editor, @facs no afegit.' },
+  ingestFacsimileNoFacsimile: {
+    text: "La incorporació del facsímil ha fallat: no s'ha trobat cap element facsimile a {file}.",
+  },
+  ingestFacsimileNoBody: {
+    text: "La incorporació del facsímil ha fallat: no s'ha trobat cap element body a la codificació.",
+  },
+  ingestFacsimileNoBodyInEditor: {
+    text: "No s'ha trobat cap element body a l'editor, l'element facsimile no s'ha inserit.",
+  },
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },
@@ -254,11 +412,11 @@ export const lang = {
   // Footer texts // Textos del peu de pàgina
   leftFooter: {
     html:
-      'Allotjat per <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'a <a href="https://mdw.ac.at">mdw</a>, amb ' +
+      'Allotjat per <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'a <a href="https://mdw.ac.at" target="_blank">mdw</a>, amb ' +
       heart +
       ' des de Viena. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Avís legal</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Avís legal</a>.',
   },
   loadingVerovio: { text: "S'està carregant Verovio" },
   verovioLoaded: { text: 'carregat' },
@@ -864,10 +1022,6 @@ export const lang = {
   },
 
   // Renumber measures / Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Reenumerar compassos',
-    description: 'Opcions per reenumerar els compassos',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Continuar a través de compassos incomplets',
     description: "Continuar la numeració de compassos a través de compassos incomplets (@metcon='false')",
@@ -937,6 +1091,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Mostra els títols dels facsímils',
     description: 'Mostra els títols dels facsímils sobre les imatges de facsímil',
+  },
+  titleMeiToolbox: {
+    text: 'Caixa d’eines MEI',
+    description: 'Comprovacions i manipulacions de la codificació, en un plafó al costat de l’editor',
+  },
+  showMeiToolbox: {
+    text: 'Mostra la caixa d’eines MEI',
+    description: 'Mostra la caixa d’eines MEI amb les pestanyes Comprova, Converteix, Renumera, Ids, Facsímil i Re-renderitza',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Posició de la caixa d’eines MEI',
+    description: 'Selecciona la posició de la caixa d’eines MEI respecte a l’editor',
+    labels: ['esquerra', 'dreta', 'a dalt', 'a baix'],
   },
 
   // Supplied element / Element subministrat
@@ -1126,6 +1293,74 @@ export const lang = {
   githubFilepath: { text: 'Camí' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar com a nou fitxer' } }, value: 'Confirmar' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>Arribes des de <strong>Let's\u00a0Encode!</strong> per treballar en una tasca de codificació. mei-friend és un dels editors que «Let's\u00a0Encode!» ofereix per a aquesta feina. Fes servir <strong>Desa</strong> al menú <strong>Gestió de la tasca</strong> (a dalt a l'esquerra) per anar desant el teu progrés, i <strong>Completa la tasca</strong> quan hagis acabat, per aportar la teva feina a la campanya.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Completa la tasca' },
+  letsEncodeMenuLabel: { text: 'Gestió de la tasca' },
+  letsEncodeLoggedInAs: { text: 'Sessió iniciada com a' },
+  letsEncodeSaveButton: { text: 'Desa' },
+  letsEncodeSaving: { text: "S'està desant la teva feina…" },
+  letsEncodeSaveFailed: { text: "No s'ha pogut desar la teva feina." },
+  letsEncodeDismiss: { value: 'Tanca' },
+  letsEncodeLastSave: { text: 'Últim desament:' },
+  letsEncodeLastAutosave: { text: 'Desat automàticament:' },
+  letsEncodeSavedAt: { text: 'Desat el' },
+  letsEncodeExpiresAt: { text: 'Venç el' },
+  letsEncodeTimeRemaining: { text: 'per completar la tasca' },
+  letsEncodeHoursShort: { text: 'h' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: 'fa {n}' },
+  letsEncodeJustNow: { text: 'ara mateix' },
+  letsEncodeTimeExpired: { text: "S'ha esgotat el temps per completar aquesta tasca" },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval de desament automàtic (minuts)',
+    description:
+      'Cada quants minuts es desa automàticament la teva feina mentre edites. Només es desa si has fet canvis; 0 desactiva el desament automàtic.',
+  },
+  titleLetsEncode: {
+    title: 'Let\'s\u00a0Encode!',
+    description: "Configuració de la tasca de «Let's\u00a0Encode!» en què estàs treballant",
+  },
+  letsEncodeAbandonTaskButton: { text: 'Abandona la tasca' },
+  letsEncodeKeepWorking: { value: 'Continua treballant' },
+  letsEncodeCompleteAnyway: { value: 'Completa la tasca igualment' },
+  letsEncodeAbandonConfirm: { value: 'Abandona la tasca' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'No has modificat aquesta codificació. Això també compta: en completar la tasca queda constància que no calia cap canvi. També pots continuar treballant-hi.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Vols completar aquesta tasca? La teva feina es desarà i es lliurarà a «Let's\u00a0Encode!», i la tasca quedarà tancada.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Vols abandonar aquesta tasca? La feina que hi has fet es perdrà, fins i tot el que ja hagis desat, i es comunicarà a «Let's\u00a0Encode!» que no has completat la tasca.",
+  },
+  letsEncodeLoading: { text: "S'està carregant la teva tasca des de «Let's\u00a0Encode!»…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Obre la teva campanya de «Let's\u00a0Encode!» en una pestanya nova (la teva tasca continua oberta aquí)",
+  },
+  letsEncodeDragOverlayText: { text: "No es poden obrir altres fitxers durant una tasca de «Let's\u00a0Encode!»." },
+  letsEncodeCommitting: { text: "S'està completant la teva tasca…" },
+  letsEncodeCompleted: { text: "Tasca completada: tornant a «Let's\u00a0Encode!»…" },
+  letsEncodeCommitFailed: { text: "No s'ha pogut completar la teva tasca." },
+  letsEncodeRetryButton: { value: 'Torna-ho a provar' },
+  letsEncodeAbandonButton: { value: "Torna a «Let's\u00a0Encode!»" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Aquest enllaç de «Let's\u00a0Encode!» és incomplet: no indica cap campanya, de manera que no hi ha on enviar el resultat. Torna a «Let's\u00a0Encode!» i obre la tasca de nou.",
+  },
+  letsEncodeMissingParameterError: { text: "Al traspàs des de «Let's\u00a0Encode!» hi faltava un paràmetre obligatori:" },
+  letsEncodeFileError: { text: "No s'ha pogut obrir a GitHub el fitxer rebut." },
+  letsEncodeCloneError: { text: "No s'ha pogut carregar la teva tasca des de GitHub." },
+  letsEncodeRemoteChangedError: {
+    text: "El fitxer s'ha modificat a GitHub mentre treballaves, de manera que no s'ha pogut desar la teva feina.",
+  },
   commitLog: { text: 'Registre de confirmacions' },
   githubDate: { text: 'Data' },
   githubAuthor: { text: 'Autor' },
@@ -1154,11 +1389,6 @@ export const lang = {
 
   // utils renumber measures / fork-repository.js
   renumberMeasuresModalText: { text: 'Reenumerar compassos' },
-  renumberMeasuresModalTest: { text: 'Prova' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'seria' },
-  renumberMeasuresChangedTo: { text: 'canviat a' },
-  renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
   accidGesCodeCheckerTitle: {

@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend is een editor voor <a href="https://music-encoding.org">muziekcoderingen</a>, gehost bij de
+        mei-friend is een editor voor <a href="https://music-encoding.org" target="_blank">muziekcoderingen</a>, gehost bij de
         <a href="https://mdw.ac.at" target="_blank">mdw – Universiteit voor Muziek en Podiumkunsten Wenen</a>.
         Raadpleeg onze <a href="https://mei-friend.github.io" target="_blank">uitgebreide documentatie</a> voor
         meer informatie.
@@ -71,8 +71,8 @@ export const lang = {
         De ontwikkeling van de mei-friend webapplicatie wordt gefinancierd door het
         <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> onder projecten
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
-          >P 34664-G (Signature Sound Vienna)</a>
-        en <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+          >P 34664-G (Signature Sound Vienna)</a>,
+        <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> en <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
       </p>`,
   },
   splashGotItButtonText: { text: 'Begrepen!' },
@@ -132,6 +132,13 @@ export const lang = {
   replaceMenuText: { text: 'Vervangen' },
   replaceAllMenuText: { text: 'Alles vervangen' },
   indentSelectionText: { text: 'Selectie inspringen' },
+  reformatEncodingText: {
+    text: 'Herformatteren via XML-parser',
+    description:
+      'Herformatteert de volledige codering via de XML-parser: attributen gesorteerd (eerst xml:id, daarna alfabetisch), genormaliseerde XML-serialisatie (bijv. dubbele aanhalingstekens, lege elementen als zelfsluitende tags, tekenreferenties als tekens), alle regels ingesprongen.',
+  },
+  reformatEncodingDone: { text: 'Codering geherformatteerd via de XML-parser ({lines} regels).' },
+  reformatEncodingParseError: { text: 'Herformatteren niet mogelijk: de codering is geen welgevormde XML.' },
   surroundWithTagsText: { text: 'Omringen met tags' },
   surroundWithLastTagText: { text: 'Omringen met' },
   jumpToLineText: { text: 'Ga naar regel' },
@@ -148,10 +155,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Annotatiespaneel' },
   showFacsimileMenuText: { text: 'Facsimilepaneel' },
   showPlaybackControlsText: { text: 'Afspelen bediening' },
+  showMeiToolboxMenuText: { text: 'MEI-gereedschapskist' },
   facsimileTop: { text: 'Facsimile boven' },
   facsimileBottom: { text: 'Facsimile onder' },
   facsimileLeft: { text: 'Facsimile links' },
   facsimileRight: { text: 'Facsimile rechts' },
+  meiToolboxTop: { text: 'MEI-gereedschapskist boven' },
+  meiToolboxBottom: { text: 'MEI-gereedschapskist onder' },
+  meiToolboxLeft: { text: 'MEI-gereedschapskist links' },
+  meiToolboxRight: { text: 'MEI-gereedschapskist rechts' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Manipuleren' },
@@ -174,11 +186,151 @@ export const lang = {
   meterConformanceText: { text: 'Controleer @metcon' },
   renumberMeasuresTestText: { text: 'Herhaal maten (test)' },
   renumberMeasuresExecText: { text: 'Herhaal maten (uitvoeren)' },
+  convertAttributesToElementsText: {
+    text: 'Attributen naar elementen omzetten',
+    description:
+      'Zet attributen die ook als elementen kunnen worden uitgedrukt om naar deze elementen, bijv. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss op noten en akkoorden, of sleutel-, toonsoort- en maatsoortattributen op staffDef en scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attributen omgezet naar {list}.' },
+  convertAttributesToElementsNone: { text: 'Geen attributen gevonden die naar elementen kunnen worden omgezet.' },
+  convertAttributesToElementsProblems: { text: '{count} attributen konden niet worden omgezet.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Controleren' },
+  meiToolboxTabConvert: { text: 'Omzetten' },
+  meiToolboxTabRenumber: { text: 'Hernummeren' },
+  meiToolboxCheckButton: { text: 'Controleren' },
+  meiToolboxTestButton: { text: 'Testen', description: 'Weergeven wat er zou veranderen, zonder de codering te wijzigen' },
+  meiToolboxRenumberButton: { text: 'Hernummeren' },
+  meiToolboxAttrToElButton: { text: 'Attributen → elementen' },
+  meiToolboxElToAttrButton: { text: 'Elementen → attributen', description: 'Zet elementen om naar attributen wanneer er geen informatie verloren gaat; andere elementen blijven behouden en worden weergegeven.' },
+  meiToolboxAll: { text: 'alle' },
+  meiToolboxNone: { text: 'geen' },
+  meiToolboxFilter: { text: 'Resultaten filteren' },
+  meiToolboxRunAgain: { text: 'Opnieuw uitvoeren' },
+  meiToolboxHideOptions: { text: 'Opties verbergen' },
+  meiToolboxOutdated: { text: '(codering sindsdien gewijzigd, resultaten mogelijk verouderd)' },
+  meiToolboxNoResults: { text: 'Nog geen resultaten. Kies de opties en voer uit.' },
+  meiToolboxGroupsSelected: { text: '{n} van {total} attribuutgroepen' },
+  meiToolboxCheckAccidGes: { text: 'Voortekens (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Maatduren (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Gekoppelde elementen (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'MEI-gereedschapskist sluiten' },
+  meiToolboxTabIds: { text: 'Id\'s' },
+  meiToolboxTabFacsimile: { text: 'Facsimile' },
+  meiToolboxTabReformat: { text: 'Herformatteren' },
+  meiToolboxIdsAdd: { text: 'xml:id\'s toevoegen (aan elementen zonder)' },
+  meiToolboxIdsChange: {
+    text: 'xml:id\'s wijzigen (een nieuwe voor elk element)',
+    description: 'Kent elk element een nieuw xml:id toe. Verwijzingen binnen deze codering worden bijgewerkt, maar links vanuit andere bestanden, annotaties, facsimilegereedschappen of URL\'s die naar de oude xml:id\'s verwijzen, werken niet meer.',
+  },
+  meiToolboxIdsRemove: { text: 'xml:id\'s verwijderen (behalve die waarnaar verwezen wordt)' },
+  meiToolboxIdsButton: { text: 'Toepassen' },
+  meiToolboxIdsAdded: { text: '{n} toegevoegd' },
+  meiToolboxIdsChanged: { text: '{n} gewijzigd' },
+  meiToolboxIdsRemoved: { text: '{n} verwijderd' },
+  meiToolboxIdsKept: { text: '{n} behouden' },
+  meiToolboxIdsReferences: { text: '{n} verwijzingen bijgewerkt' },
+  meiToolboxIdsKeptReason: { text: 'waarnaar binnen de codering wordt verwezen' },
+  meiToolboxIdsNothing: { text: 'Niets te doen: er zijn geen xml:id\'s toegevoegd, gewijzigd of verwijderd.' },
+  meiToolboxIdsCancelled: { text: 'Geannuleerd, de codering is ongewijzigd.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Verbind de codering met paginabeelden: neem een facsimile uit een ander bestand over, of voeg de surfaces toe die nog ontbreken, één per pagina-einde.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Facsimile overnemen…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Ontbrekende surfaces toevoegen',
+    description: 'Voegt toe wat ontbreekt: een facsimile als er geen is, een surface met een tijdelijke graphic voor elke pagina die er nog geen heeft, en pb@facs dat ernaar verwijst. Pagina’s worden gekoppeld aan de al aanwezige surfaces, die onveranderd blijven.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Toegevoegde surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Pagina\'s gekoppeld aan een al aanwezige surface: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Facsimile toegevoegd.' },
+  meiToolboxFacsimileUpToDate: { text: 'Elke pagina heeft al zijn surface; er is niets toegevoegd.' },
+  meiToolboxFacsimileZones: { text: '{n} zones' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} zones' },
+  meiToolboxFacsimileNone: { text: 'Deze codering heeft geen facsimile.' },
+  meiToolboxReformatVerovio: {
+    text: 'Via Verovio',
+    description: 'Laat Verovio de codering opnieuw schrijven vanuit zijn eigen representatie.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio schrijft de codering vanuit zijn eigen representatie, met zijn eigen opmaak en attribuutvolgorde.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Via de XML-parser',
+    description: 'Formatteert de codering opnieuw via de XML-parser: de inhoud blijft behouden, alleen opmaak en attribuutvolgorde veranderen. Hetzelfde als Code → Herformatteren via de XML-parser.',
+  },
+  meiToolboxReformatUnchanged: { text: 'De codering is ongewijzigd.' },
+  meiToolboxReformatDone: { text: '{lines} regels' },
+  meiToolboxAttributeOrder: {
+    text: 'Attribuutvolgorde',
+    description: 'De volgorde waarin attributen worden geschreven telkens als mei-friend een element terugschrijft.',
+    labels: ['zoals gecodeerd', 'alfabetisch', 'xml:id eerst, dan alfabetisch', 'aangepast…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Volgordepatroon',
+    description: 'Attribuutnamen gescheiden door spaties of komma’s, in de gewenste volgorde, bijv. “xml:id n label *”. Een naam die op * eindigt, komt overeen met alle attributen met dat voorvoegsel (clef.*). Eén enkele * staat voor alle niet-genoemde attributen, alfabetisch; zonder * behouden ze hun volgorde aan het eind. Namespace-declaraties komen altijd eerst.',
+  },
+  codeCheckerFixShown: { text: '{n} getoonde herstellen' },
+  codeCheckerIgnoreShown: { text: '{n} getoonde negeren' },
+  convertGroupAccid: { text: 'Genoteerde voortekens (@accid)' },
+  convertGroupAccidGes: { text: 'Klinkende voortekens (@accid.ges)' },
+  convertGroupArtic: { text: 'Articulaties (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Liedtekst (@syl)' },
+  convertGroupFermata: { text: 'Fermates (@fermata)' },
+  convertGroupTie: { text: 'Overbindingen (@tie)' },
+  convertGroupSlur: { text: 'Legatobogen (@slur)' },
+  convertGroupGliss: { text: 'Glissandi (@gliss)' },
+  convertGroupDefinitions: { text: 'Sleutel, toonsoort, maatsoort, mensuur (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Groepssymbolen en labels (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Attributen zouden worden omgezet naar {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elementen omgezet naar attributen: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Elementen zouden worden omgezet naar attributen: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} elementen konden niet worden omgezet.' },
+  convertElementsToAttributesNone: { text: 'Geen elementen gevonden die naar attributen kunnen worden omgezet.' },
+  elementsToAttributesConfirmation: { text: '<b>Elementen → attributen</b>\n\nLet op: deze bewerking kan externe links verbreken.\n\n{count} van de om te zetten elementen hebben een xml:id, die samen met het element wordt verwijderd. Elementen waarnaar binnen dit bestand wordt verwezen, worden niet omgezet.\n\nLinks vanuit andere bestanden, annotaties die buiten dit bestand zijn opgeslagen, facsimile-tools of URL\'s die naar deze xml:id\'s verwijzen, werken daarna niet meer.' },
+  elementsToAttributesProceed: { text: 'Omzetten' },
+  elementsToAttributesCancel: { text: 'Annuleren' },
+  convertScopeAll: { text: 'Bereik: volledige codering (selecteer tekst in de editor om de omzetting te beperken)' },
+  convertScopeSelection: { text: 'Bereik: selectie, regels {from}–{to}' },
+  convertSelectionSuffix: { text: 'selectie' },
+  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresUnchanged: { text: 'ongewijzigd' },
+  renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
+  renumberMeasuresSummaryTest: { text: '{total} maten, {changed} zouden worden hernummerd.' },
+  renumberMeasuresNoMeasures: { text: 'Geen maten gevonden.' },
   addIdsText: { text: 'Ids toevoegen aan MEI' },
   removeIdsText: { text: 'Ids verwijderen uit MEI' },
+  changeIdsText: {
+    text: 'Ids in MEI wijzigen (verbreekt externe links)',
+    description:
+      'Kent aan elk element (of aan de geselecteerde elementen) een nieuwe xml:id toe. Verwijzingen binnen dit bestand worden bijgewerkt, maar links vanuit andere bestanden, annotaties, facsimile-tools of URL’s die naar de oude xml:ids verwijzen, werken daarna niet meer.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Ids in MEI wijzigen</b>\n\nLet op: deze bewerking verbreekt externe links.\n\n{changed} xml:ids worden gewijzigd en {added} nieuwe xml:ids toegevoegd; {references} verwijzingen binnen dit bestand worden bijgewerkt.\n\nLinks vanuit andere bestanden, annotaties, facsimile-tools of URL’s die naar de oude xml:ids verwijzen, werken daarna niet meer.',
+  },
+  changeIdsProceed: { text: 'Ids wijzigen' },
+  changeIdsCancel: { text: 'Annuleren' },
   reRenderMeiVerovio: { text: 'Opnieuw renderen via Verovio' },
   addFacsimile: { text: 'Facsimile element toevoegen' },
   ingestFacsimileText: { text: 'Facsimile verwerken' },
+  ingestFacsimileTitle: { text: 'Facsimile wordt verwerkt' },
+  ingestFacsimileProgress: { text: '{file}: {done} van {total} zones verwerkt.' },
+  ingestFacsimileDoneTitle: { text: 'Facsimile verwerkt' },
+  ingestFacsimileStoppedTitle: { text: 'Verwerken van facsimile gestopt' },
+  ingestFacsimileSummary: {
+    text: 'Facsimile uit {file} met {surfaces} surfaces en {zones} zones ingevoegd vóór body; @facs-attributen toegevoegd aan {added} elementen.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Gestopt na {done} van {total} zones. De wijzigingen tot nu toe kunnen in één stap ongedaan worden gemaakt.',
+  },
+  ingestFacsimileProblems: { text: 'Er zijn {count} problemen opgetreden:' },
+  ingestFacsimileNotFound: { text: '{type} met n="{n}" niet gevonden.' },
+  ingestFacsimileNotUnique: { text: '{type} met n="{n}" niet uniek.' },
+  ingestFacsimileNoId: { text: '{type} met n="{n}" heeft geen xml:id, @facs niet toegevoegd.' },
+  ingestFacsimileNotInEditor: { text: '{type} met n="{n}" niet gevonden in de editor, @facs niet toegevoegd.' },
+  ingestFacsimileNoFacsimile: { text: 'Verwerken van facsimile mislukt: geen facsimile-element gevonden in {file}.' },
+  ingestFacsimileNoBody: { text: 'Verwerken van facsimile mislukt: geen body-element gevonden in de codering.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Geen body-element gevonden in de editor, facsimile-element niet ingevoegd.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Invoegen' },
@@ -248,11 +400,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Gehost door <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'bij <a href="https://mdw.ac.at">mdw</a>, met ' +
+      'Gehost door <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'bij <a href="https://mdw.ac.at" target="_blank">mdw</a>, met ' +
       heart +
       ' uit Wenen. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Verovio laden' },
   verovioLoaded: { text: 'geladen' },
@@ -758,10 +910,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Maten hernummeren',
-    description: 'Instellingen voor het hernummeren van maten',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Doorgaan bij onvolledige maten',
     description: 'Doorgaan met maatnummers bij onvolledige maten (@metcon="false")',
@@ -831,6 +979,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Toon facsimile titels',
     description: 'Toon facsimile titels boven bronafbeeldingen',
+  },
+  titleMeiToolbox: {
+    text: 'MEI-gereedschapskist',
+    description: 'Controles en bewerkingen van de codering, in een paneel naast de editor',
+  },
+  showMeiToolbox: {
+    text: 'MEI-gereedschapskist tonen',
+    description: 'Toon de MEI-gereedschapskist met de tabbladen Controleren, Converteren, Hernummeren, Id\'s, Facsimile en Opnieuw opbouwen',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Positie van de MEI-gereedschapskist',
+    description: 'Kies de positie van de MEI-gereedschapskist ten opzichte van de editor',
+    labels: ['links', 'rechts', 'boven', 'onder'],
   },
 
   // Supplied element
@@ -989,6 +1150,71 @@ export const lang = {
   githubFilepath: { text: 'Pad' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als nieuw bestand' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>U komt van <strong>Let's\u00a0Encode!</strong> om aan een coderingstaak te werken. mei-friend is een van de editors die ‘Let's\u00a0Encode!’ hiervoor aanbiedt. Gebruik <strong>Opslaan</strong> in het menu <strong>Taakbeheer</strong> (linksboven) om uw voortgang tussendoor te bewaren, en <strong>Taak voltooien</strong> wanneer u klaar bent, om uw werk bij te dragen aan de campagne.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Taak voltooien' },
+  letsEncodeMenuLabel: { text: 'Taakbeheer' },
+  letsEncodeLoggedInAs: { text: 'Ingelogd als' },
+  letsEncodeSaveButton: { text: 'Opslaan' },
+  letsEncodeSaving: { text: 'Uw werk wordt opgeslagen…' },
+  letsEncodeSaveFailed: { text: 'Uw werk kon niet worden opgeslagen.' },
+  letsEncodeDismiss: { value: 'Sluiten' },
+  letsEncodeLastSave: { text: 'Laatst opgeslagen:' },
+  letsEncodeLastAutosave: { text: 'Automatisch opgeslagen:' },
+  letsEncodeSavedAt: { text: 'Opgeslagen op' },
+  letsEncodeExpiresAt: { text: 'Verloopt op' },
+  letsEncodeTimeRemaining: { text: 'resterend om de taak te voltooien' },
+  letsEncodeHoursShort: { text: 'u' },
+  letsEncodeMinutesShort: { text: 'min' },
+  letsEncodeDaysShort: { text: 'd' },
+  letsEncodeAgo: { text: '{n} geleden' },
+  letsEncodeJustNow: { text: 'zojuist' },
+  letsEncodeTimeExpired: { text: 'De tijd om deze taak te voltooien is verstreken' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Interval voor automatisch opslaan (minuten)',
+    description:
+      'Hoe vaak uw werk tijdens het bewerken automatisch wordt opgeslagen, in minuten. Er wordt alleen opgeslagen als u iets hebt gewijzigd; 0 schakelt automatisch opslaan uit.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "Instellingen voor de ‘Let's\u00a0Encode!’-taak waaraan u werkt" },
+  letsEncodeAbandonTaskButton: { text: 'Taak afbreken' },
+  letsEncodeKeepWorking: { value: 'Verder werken' },
+  letsEncodeCompleteAnyway: { value: 'Taak toch voltooien' },
+  letsEncodeAbandonConfirm: { value: 'Taak afbreken' },
+  letsEncodeNoChangesPrompt: {
+    text:
+      'U hebt deze codering niet gewijzigd. Ook dat telt: door de taak te voltooien wordt vastgelegd dat er geen wijzigingen nodig waren. U kunt ook verder werken.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text:
+      "Wilt u deze taak voltooien? Uw werk wordt opgeslagen en doorgegeven aan ‘Let's\u00a0Encode!’, en de taak wordt afgesloten.",
+  },
+  letsEncodeAbandonPrompt: {
+    text:
+      "Deze taak afbreken? Uw werk eraan gaat verloren, ook wat u al hebt opgeslagen, en ‘Let's\u00a0Encode!’ krijgt te horen dat u de taak niet hebt voltooid.",
+  },
+  letsEncodeLoading: { text: "Uw taak wordt opgehaald bij ‘Let's\u00a0Encode!’…" },
+  letsEncodeLogoLinkTitle: {
+    text: "Uw ‘Let's\u00a0Encode!’-campagne openen in een nieuw tabblad (uw taak blijft hier geopend)",
+  },
+  letsEncodeDragOverlayText: { text: "Andere bestanden kunnen niet worden geopend tijdens een ‘Let's\u00a0Encode!’-taak." },
+  letsEncodeCommitting: { text: 'Uw taak wordt voltooid…' },
+  letsEncodeCompleted: { text: "Taak voltooid — u wordt teruggestuurd naar ‘Let's\u00a0Encode!’…" },
+  letsEncodeCommitFailed: { text: 'Uw taak kon niet worden voltooid.' },
+  letsEncodeRetryButton: { value: 'Opnieuw proberen' },
+  letsEncodeAbandonButton: { value: "Terug naar ‘Let's\u00a0Encode!’" },
+  letsEncodeNoCampaignError: {
+    text:
+      "Deze ‘Let's\u00a0Encode!’-link is onvolledig: er wordt geen campagne genoemd, dus het resultaat kan nergens worden gemeld. Ga terug naar ‘Let's\u00a0Encode!’ en open de taak opnieuw.",
+  },
+  letsEncodeMissingParameterError: { text: "Bij de overdracht vanuit ‘Let's\u00a0Encode!’ ontbrak een verplichte parameter:" },
+  letsEncodeFileError: { text: 'Het overgedragen bestand kon niet worden geopend op GitHub.' },
+  letsEncodeCloneError: { text: 'Uw taak kon niet worden geladen vanaf GitHub.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Het bestand is op GitHub gewijzigd terwijl u werkte, waardoor uw werk niet kon worden opgeslagen.',
+  },
   commitLog: { text: 'Commitlogboek' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Auteur' },
@@ -1015,11 +1241,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: 'Maten hernummeren' },
-  renumberMeasuresModalTest: { text: 'Testen' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'zou zijn' },
-  renumberMeasuresChangedTo: { text: 'veranderd naar' },
-  renumberMeasureMeasuresRenumbered: { text: 'maten hernummerd' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {

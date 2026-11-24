@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org" target="_blank">Musik-Kodierungen</a>, gehostet an der
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
       Bitte besuchen Sie für weitere Informationen unsere
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
@@ -79,8 +79,8 @@ export const lang = {
       <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
-      >
-      und <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      >,
+      <a href="https://e-laute.info" target="_blank">I 6019 (E-LAUTE)</a> und <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625 (Let's\u00a0Encode!)</a>.
     </p>`,
   },
   splashGotItButtonText: { text: 'Verstanden!' },
@@ -137,6 +137,13 @@ export const lang = {
   replaceMenuText: { text: 'Ersetzen' },
   replaceAllMenuText: { text: 'Alles ersetzen' },
   indentSelectionText: { text: 'Auswahl einrücken' },
+  reformatEncodingText: {
+    text: 'Über XML-Parser neu formatieren',
+    description:
+      'Formatiert die gesamte Kodierung über den XML-Parser neu: Attribute sortiert (xml:id zuerst, dann alphabetisch), normalisierte XML-Serialisierung (z. B. doppelte Anführungszeichen, leere Elemente als selbstschließende Tags, Zeichenreferenzen als Zeichen), alle Zeilen eingerückt.',
+  },
+  reformatEncodingDone: { text: 'Kodierung über den XML-Parser neu formatiert ({lines} Zeilen).' },
+  reformatEncodingParseError: { text: 'Neuformatierung nicht möglich: Die Kodierung ist kein wohlgeformtes XML.' },
   surroundWithTagsText: { text: 'Mit Tags umschließen' },
   surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
@@ -153,10 +160,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'Annotationen' },
   showFacsimileMenuText: { text: 'Faksimile' },
   showPlaybackControlsText: { text: 'Wiedergabe' },
+  showMeiToolboxMenuText: { text: 'MEI-Werkzeugkasten' },
   facsimileTop: { text: 'Faksimile oben' },
   facsimileBottom: { text: 'Faksimile unten' },
   facsimileLeft: { text: 'Faksimile links' },
   facsimileRight: { text: 'Faksimile rechts' },
+  meiToolboxTop: { text: 'MEI-Werkzeugkasten oben' },
+  meiToolboxBottom: { text: 'MEI-Werkzeugkasten unten' },
+  meiToolboxLeft: { text: 'MEI-Werkzeugkasten links' },
+  meiToolboxRight: { text: 'MEI-Werkzeugkasten rechts' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: 'Verändern' },
@@ -179,11 +191,151 @@ export const lang = {
   meterConformanceText: { text: '@metcon überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
+  convertAttributesToElementsText: {
+    text: 'Attribute in Elemente umwandeln',
+    description:
+      'Wandelt Attribute, die auch als Elemente ausgedrückt werden können, in diese Elemente um, z. B. @accid, @artic, @syl, @fermata, @tie, @slur, @gliss an Noten und Akkorden oder Schlüssel-, Tonart- und Taktattribute an staffDef und scoreDef.',
+  },
+  convertAttributesToElementsSummary: { text: 'Attribute umgewandelt in {list}.' },
+  convertAttributesToElementsNone: { text: 'Keine Attribute gefunden, die in Elemente umgewandelt werden können.' },
+  convertAttributesToElementsProblems: { text: '{count} Attribute konnten nicht umgewandelt werden.' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'Prüfen' },
+  meiToolboxTabConvert: { text: 'Umwandeln' },
+  meiToolboxTabRenumber: { text: 'Neu nummerieren' },
+  meiToolboxCheckButton: { text: 'Prüfen' },
+  meiToolboxTestButton: { text: 'Testen', description: 'Auflisten, was geändert würde, ohne die Kodierung zu ändern' },
+  meiToolboxRenumberButton: { text: 'Neu nummerieren' },
+  meiToolboxAttrToElButton: { text: 'Attribute → Elemente' },
+  meiToolboxElToAttrButton: { text: 'Elemente → Attribute', description: 'Wandelt Elemente in Attribute um, sofern dabei keine Information verloren geht; andere Elemente bleiben erhalten und werden aufgelistet.' },
+  meiToolboxAll: { text: 'alle' },
+  meiToolboxNone: { text: 'keine' },
+  meiToolboxFilter: { text: 'Ergebnisse filtern' },
+  meiToolboxRunAgain: { text: 'Erneut ausführen' },
+  meiToolboxHideOptions: { text: 'Optionen ausblenden' },
+  meiToolboxOutdated: { text: '(Kodierung seither geändert, Ergebnisse möglicherweise veraltet)' },
+  meiToolboxNoResults: { text: 'Noch keine Ergebnisse. Optionen wählen und ausführen.' },
+  meiToolboxGroupsSelected: { text: '{n} von {total} Attributgruppen' },
+  meiToolboxCheckAccidGes: { text: 'Vorzeichen (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: 'Taktdauern (@metcon)' },
+  meiToolboxCheckLinked: { text: 'Verknüpfte Elemente (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'MEI-Werkzeugkasten schließen' },
+  meiToolboxTabIds: { text: 'Ids' },
+  meiToolboxTabFacsimile: { text: 'Faksimile' },
+  meiToolboxTabReformat: { text: 'Neu formatieren' },
+  meiToolboxIdsAdd: { text: 'xml:ids hinzufügen (zu Elementen ohne)' },
+  meiToolboxIdsChange: {
+    text: 'xml:ids ändern (neue für jedes Element)',
+    description: 'Weist jedem Element eine neue xml:id zu. Verweise innerhalb dieser Kodierung werden aktualisiert, aber Links aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs, die auf die alten xml:ids zeigen, funktionieren nicht mehr.',
+  },
+  meiToolboxIdsRemove: { text: 'xml:ids entfernen (außer referenzierte)' },
+  meiToolboxIdsButton: { text: 'Anwenden' },
+  meiToolboxIdsAdded: { text: '{n} hinzugefügt' },
+  meiToolboxIdsChanged: { text: '{n} geändert' },
+  meiToolboxIdsRemoved: { text: '{n} entfernt' },
+  meiToolboxIdsKept: { text: '{n} behalten' },
+  meiToolboxIdsReferences: { text: '{n} Verweise aktualisiert' },
+  meiToolboxIdsKeptReason: { text: 'wird innerhalb der Kodierung referenziert' },
+  meiToolboxIdsNothing: { text: 'Nichts zu tun: Es wurden keine xml:ids hinzugefügt, geändert oder entfernt.' },
+  meiToolboxIdsCancelled: { text: 'Abgebrochen, die Kodierung ist unverändert.' },
+  meiToolboxFacsimileInfo: {
+    text: 'Die Kodierung mit Seitenbildern verbinden: ein Faksimile aus einer anderen Datei übernehmen oder die noch fehlenden surfaces anlegen, eine je Seitenumbruch.',
+  },
+  meiToolboxFacsimileIngest: { text: 'Faksimile übernehmen…' },
+  meiToolboxFacsimileAddMissing: {
+    text: 'Fehlende surfaces anlegen',
+    description: 'Fügt hinzu, was fehlt: ein Faksimile, wenn es keines gibt, eine surface mit Platzhalter-graphic für jede Seite, die noch keine hat, und pb@facs, das darauf zeigt. Seiten werden den schon vorhandenen surfaces zugeordnet, die unverändert bleiben.',
+  },
+  meiToolboxFacsimileAdded: { text: 'Hinzugefügte surfaces: {n}' },
+  meiToolboxFacsimileLinked: { text: 'Mit einer schon vorhandenen surface verknüpfte Seiten: {n}' },
+  meiToolboxFacsimileCreated: { text: 'Faksimile angelegt.' },
+  meiToolboxFacsimileUpToDate: { text: 'Jede Seite hat bereits ihre surface; nichts hinzugefügt.' },
+  meiToolboxFacsimileZones: { text: '{n} Zonen' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} surfaces, {zones} Zonen' },
+  meiToolboxFacsimileNone: { text: 'Diese Kodierung hat kein Faksimile.' },
+  meiToolboxReformatVerovio: {
+    text: 'Über Verovio',
+    description: 'Lässt Verovio die Kodierung aus seiner eigenen Repräsentation neu schreiben.',
+  },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio schreibt die Kodierung aus seiner eigenen Repräsentation, in eigener Formatierung und Attributreihenfolge.',
+  },
+  meiToolboxReformatXml: {
+    text: 'Über XML-Parser',
+    description: 'Formatiert die Kodierung über den XML-Parser neu: Der Inhalt bleibt erhalten, nur Formatierung und Attributreihenfolge ändern sich. Dasselbe wie Code → Über XML-Parser neu formatieren.',
+  },
+  meiToolboxReformatUnchanged: { text: 'Die Kodierung ist unverändert.' },
+  meiToolboxReformatDone: { text: '{lines} Zeilen' },
+  meiToolboxAttributeOrder: {
+    text: 'Attributreihenfolge',
+    description: 'Die Reihenfolge, in der Attribute geschrieben werden, wann immer mei-friend ein Element zurückschreibt.',
+    labels: ['wie kodiert', 'alphabetisch', 'xml:id zuerst, dann alphabetisch', 'eigene…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: 'Reihenfolgemuster',
+    description: 'Attributnamen, getrennt durch Leerzeichen oder Kommata, in der gewünschten Reihenfolge, z. B. „xml:id n label *“. Ein Name mit * am Ende passt auf alle Attribute mit diesem Präfix (clef.*). Ein einzelner * steht für alle nicht genannten Attribute in alphabetischer Reihenfolge; ohne ihn behalten sie am Ende ihre Reihenfolge. Namensraum-Deklarationen stehen immer zuerst.',
+  },
+  codeCheckerFixShown: { text: '{n} angezeigte beheben' },
+  codeCheckerIgnoreShown: { text: '{n} angezeigte ignorieren' },
+  convertGroupAccid: { text: 'Notierte Vorzeichen (@accid)' },
+  convertGroupAccidGes: { text: 'Klingende Vorzeichen (@accid.ges)' },
+  convertGroupArtic: { text: 'Artikulationen (@artic, @artic.ges)' },
+  convertGroupSyl: { text: 'Liedtext (@syl)' },
+  convertGroupFermata: { text: 'Fermaten (@fermata)' },
+  convertGroupTie: { text: 'Haltebögen (@tie)' },
+  convertGroupSlur: { text: 'Bögen (@slur)' },
+  convertGroupGliss: { text: 'Glissandi (@gliss)' },
+  convertGroupDefinitions: { text: 'Schlüssel, Tonart, Taktart, Mensur (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'Gruppensymbole und Bezeichnungen (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: 'Attribute würden umgewandelt in {list}.' },
+  convertElementsToAttributesSummary: { text: 'Elemente in Attribute umgewandelt: {list}.' },
+  convertElementsToAttributesTestSummary: { text: 'Elemente würden in Attribute umgewandelt: {list}.' },
+  convertElementsToAttributesProblems: { text: '{count} Elemente konnten nicht umgewandelt werden.' },
+  convertElementsToAttributesNone: { text: 'Keine Elemente gefunden, die in Attribute umgewandelt werden können.' },
+  elementsToAttributesConfirmation: { text: '<b>Elemente → Attribute</b>\n\nAchtung: Dieser Vorgang kann externe Links ungültig machen.\n\n{count} der umzuwandelnden Elemente haben eine xml:id, die zusammen mit dem Element entfernt wird. Elemente, auf die innerhalb dieser Datei verwiesen wird, werden nicht umgewandelt.\n\nLinks aus anderen Dateien, außerhalb dieser Datei gespeicherte Annotationen, Faksimile-Werkzeuge oder URLs, die auf diese xml:ids verweisen, funktionieren danach nicht mehr.' },
+  elementsToAttributesProceed: { text: 'Umwandeln' },
+  elementsToAttributesCancel: { text: 'Abbrechen' },
+  convertScopeAll: { text: 'Bereich: gesamte Kodierung (Text im Editor markieren, um die Umwandlung einzuschränken)' },
+  convertScopeSelection: { text: 'Bereich: Auswahl, Zeilen {from}–{to}' },
+  convertSelectionSuffix: { text: 'Auswahl' },
+  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresUnchanged: { text: 'unverändert' },
+  renumberMeasuresSummary: { text: '{total} Takte, {changed} neu nummeriert.' },
+  renumberMeasuresSummaryTest: { text: '{total} Takte, {changed} würden neu nummeriert.' },
+  renumberMeasuresNoMeasures: { text: 'Keine Takte gefunden.' },
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
   removeIdsText: { text: 'Ids von MEI entfernen' },
+  changeIdsText: {
+    text: 'Ids in MEI ändern (macht externe Links ungültig)',
+    description:
+      'Weist jedem Element (oder den ausgewählten Elementen) eine neue xml:id zu. Links innerhalb dieser Datei werden aktualisiert, aber Links aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
+  },
+  changeIdsConfirmation: {
+    text: '<b>Ids in MEI ändern</b>\n\nAchtung: Dieser Vorgang macht externe Links ungültig.\n\n{changed} xml:ids werden geändert und {added} neue xml:ids hinzugefügt; {references} Links innerhalb dieser Datei werden aktualisiert.\n\nLinks aus anderen Dateien, Annotationen, Faksimile-Werkzeugen oder URLs auf die alten xml:ids funktionieren danach nicht mehr.',
+  },
+  changeIdsProceed: { text: 'Ids ändern' },
+  changeIdsCancel: { text: 'Abbrechen' },
   reRenderMeiVerovio: { text: 'Mit Verovio neu rendern' },
   addFacsimile: { text: 'Faksimile-Element hinzufügen' },
   ingestFacsimileText: { text: 'Faksimile-Information einlesen' },
+  ingestFacsimileTitle: { text: 'Faksimile-Information wird eingelesen' },
+  ingestFacsimileProgress: { text: '{file}: {done} von {total} Zonen verarbeitet.' },
+  ingestFacsimileDoneTitle: { text: 'Faksimile-Information eingelesen' },
+  ingestFacsimileStoppedTitle: { text: 'Einlesen der Faksimile-Information abgebrochen' },
+  ingestFacsimileSummary: {
+    text: 'Faksimile aus {file} mit {surfaces} Seiten (surface) und {zones} Zonen vor body eingefügt; @facs-Attribute zu {added} Elementen hinzugefügt.',
+  },
+  ingestFacsimileStopped: {
+    text: 'Abgebrochen nach {done} von {total} Zonen. Die bisherigen Änderungen können in einem Schritt rückgängig gemacht werden.',
+  },
+  ingestFacsimileProblems: { text: '{count} Probleme sind aufgetreten:' },
+  ingestFacsimileNotFound: { text: '{type} mit n="{n}" nicht gefunden.' },
+  ingestFacsimileNotUnique: { text: '{type} mit n="{n}" nicht eindeutig.' },
+  ingestFacsimileNoId: { text: '{type} mit n="{n}" hat keine xml:id, @facs nicht hinzugefügt.' },
+  ingestFacsimileNotInEditor: { text: '{type} mit n="{n}" im Editor nicht gefunden, @facs nicht hinzugefügt.' },
+  ingestFacsimileNoFacsimile: { text: 'Einlesen fehlgeschlagen: kein facsimile-Element in {file} gefunden.' },
+  ingestFacsimileNoBody: { text: 'Einlesen fehlgeschlagen: kein body-Element in der Kodierung gefunden.' },
+  ingestFacsimileNoBodyInEditor: { text: 'Kein body-Element im Editor gefunden, facsimile-Element nicht eingefügt.' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
@@ -250,11 +402,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      'Gehosted von <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      '@ <a href="https://mdw.ac.at">mdw</a>, mit ' +
+      'Gehosted von <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      '@ <a href="https://mdw.ac.at" target="_blank">mdw</a>, mit ' +
       heart +
       ' aus Wien. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Impressum</a>.',
   },
   loadingVerovio: { text: 'Lade Verovio' },
   verovioLoaded: { text: 'geladen' },
@@ -873,10 +1025,6 @@ export const lang = {
       '"Mit Verovio neu rendern" im Dropdown-Menü "Manipulieren".',
   },
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Takte neu nummerieren',
-    description: 'Einstellungen für Takte neu nummerieren',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: 'Weiter bei unvollständigen Takten',
     description: 'Taktnummer wird bei unvollständigen Takten erhöht (@metcon="false")',
@@ -944,6 +1092,19 @@ export const lang = {
   showFacsimileTitles: {
     text: 'Faksimile-Titel anzeigen',
     description: 'Faksimile-Titel über den Faksimile-Bildern anzeigen',
+  },
+  titleMeiToolbox: {
+    text: 'MEI-Werkzeugkasten',
+    description: 'Prüfungen und Bearbeitungen der Kodierung in einem Panel neben dem Editor',
+  },
+  showMeiToolbox: {
+    text: 'MEI-Werkzeugkasten anzeigen',
+    description: 'Den MEI-Werkzeugkasten mit den Reitern Prüfen, Umwandeln, Neu nummerieren, Ids, Faksimile und Neu schreiben anzeigen',
+  },
+  selectMeiToolboxOrientation: {
+    text: 'Position des MEI-Werkzeugkastens',
+    description: 'Position des MEI-Werkzeugkastens relativ zum Editor wählen',
+    labels: ['links', 'rechts', 'oben', 'unten'],
   },
   // Supplied element
   titleSupplied: {
@@ -1135,6 +1296,64 @@ export const lang = {
   githubFilepath: { text: 'Pfad' },
   githubCommit: { text: 'Commit' },
   githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als neue Datei' } }, value: 'Commit' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html: "<p>Sie kommen von <strong>Let's\u00a0Encode!</strong>, um an einer Kodierungsaufgabe zu arbeiten. mei-friend ist einer der Editoren, die „Let's\u00a0Encode!“ für diese Arbeit anbietet. Sichern Sie Ihren Fortschritt zwischendurch mit <strong>Speichern</strong> im Menü <strong>Aufgabenverwaltung</strong> (oben links), und wählen Sie <strong>Aufgabe abschließen</strong>, wenn Sie fertig sind, um Ihr Ergebnis der Kampagne bereitzustellen.</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'Aufgabe abschließen' },
+  letsEncodeMenuLabel: { text: 'Aufgabenverwaltung' },
+  letsEncodeLoggedInAs: { text: 'Angemeldet als' },
+  letsEncodeSaveButton: { text: 'Speichern' },
+  letsEncodeSaving: { text: 'Ihre Arbeit wird gespeichert…' },
+  letsEncodeSaveFailed: { text: 'Ihre Arbeit konnte nicht gespeichert werden.' },
+  letsEncodeDismiss: { value: 'Schließen' },
+  letsEncodeLastSave: { text: 'Zuletzt gespeichert:' },
+  letsEncodeLastAutosave: { text: 'Automatisch gespeichert:' },
+  letsEncodeSavedAt: { text: 'Gespeichert am' },
+  letsEncodeExpiresAt: { text: 'Läuft ab am' },
+  letsEncodeTimeRemaining: { text: 'verbleiben, um die Aufgabe abzuschließen' },
+  letsEncodeHoursShort: { text: 'Std.' },
+  letsEncodeMinutesShort: { text: 'Min.' },
+  letsEncodeDaysShort: { text: 'Tg.' },
+  letsEncodeAgo: { text: 'vor {n}' },
+  letsEncodeJustNow: { text: 'gerade eben' },
+  letsEncodeTimeExpired: { text: 'Die Zeit für diese Aufgabe ist abgelaufen' },
+  letsEncodeAutosaveMinutes: {
+    title: 'Intervall für automatisches Speichern (Minuten)',
+    description:
+      'Wie oft Ihre Arbeit während der Bearbeitung automatisch gespeichert wird, in Minuten. Gespeichert wird nur, wenn Sie etwas geändert haben; 0 schaltet das automatische Speichern aus.',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: 'Einstellungen für die „Let\'s\u00a0Encode!“-Aufgabe, an der Sie arbeiten' },
+  letsEncodeAbandonTaskButton: { text: 'Aufgabe abbrechen' },
+  letsEncodeKeepWorking: { value: 'Weiterarbeiten' },
+  letsEncodeCompleteAnyway: { value: 'Aufgabe trotzdem abschließen' },
+  letsEncodeAbandonConfirm: { value: 'Aufgabe abbrechen' },
+  letsEncodeNoChangesPrompt: {
+    text: 'Sie haben an dieser Kodierung nichts geändert. Auch das zählt: Wenn Sie die Aufgabe abschließen, wird festgehalten, dass keine Änderungen nötig waren. Sie können aber auch weiterarbeiten.',
+  },
+  letsEncodeConfirmCompletePrompt: {
+    text: 'Möchten Sie diese Aufgabe abschließen? Ihre Arbeit wird gespeichert und an „Let\'s\u00a0Encode!“ übermittelt; die Aufgabe ist damit beendet.',
+  },
+  letsEncodeAbandonPrompt: {
+    text: 'Diese Aufgabe abbrechen? Ihre Arbeit daran geht verloren, auch was Sie bereits gespeichert haben, und „Let\'s\u00a0Encode!“ wird mitgeteilt, dass Sie die Aufgabe nicht abgeschlossen haben.',
+  },
+  letsEncodeLoading: { text: 'Ihre Aufgabe wird von „Let\'s\u00a0Encode!“ geladen…' },
+  letsEncodeLogoLinkTitle: { text: 'Ihre „Let\'s\u00a0Encode!“-Kampagne in einem neuen Tab öffnen (Ihre Aufgabe bleibt hier geöffnet)' },
+  letsEncodeDragOverlayText: { text: "Andere Dateien können während einer „Let's\u00a0Encode!“-Aufgabe nicht geöffnet werden." },
+  letsEncodeCommitting: { text: 'Ihre Aufgabe wird abgeschlossen…' },
+  letsEncodeCompleted: { text: "Aufgabe abgeschlossen – Sie werden zu „Let's\u00a0Encode!“ zurückgeleitet…" },
+  letsEncodeCommitFailed: { text: 'Ihre Aufgabe konnte nicht abgeschlossen werden.' },
+  letsEncodeRetryButton: { value: 'Erneut versuchen' },
+  letsEncodeAbandonButton: { value: "Zurück zu „Let's\u00a0Encode!“" },
+  letsEncodeNoCampaignError: {
+    text: "Dieser „Let's\u00a0Encode!“-Link ist unvollständig: Er nennt keine Kampagne, daher kann kein Ergebnis zurückgemeldet werden. Bitte kehren Sie zu „Let's\u00a0Encode!“ zurück und öffnen Sie die Aufgabe erneut.",
+  },
+  letsEncodeMissingParameterError: { text: "Bei der Übergabe von „Let's\u00a0Encode!“ fehlte ein erforderlicher Parameter:" },
+  letsEncodeFileError: { text: 'Die übergebene Datei konnte auf GitHub nicht geöffnet werden.' },
+  letsEncodeCloneError: { text: 'Ihre Aufgabe konnte nicht von GitHub geladen werden.' },
+  letsEncodeRemoteChangedError: {
+    text: 'Die Datei wurde auf GitHub geändert, während Sie gearbeitet haben; Ihre Arbeit konnte daher nicht gespeichert werden.',
+  },
   commitLog: { text: 'Commit-Log' },
   githubDate: { text: 'Datum' },
   githubAuthor: { text: 'Author' },
@@ -1163,11 +1382,6 @@ export const lang = {
 
   // utils renumber measures
   renumberMeasuresModalText: { text: 'Takte neu nummerieren' },
-  renumberMeasuresModalTest: { text: 'Test' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'würde' },
-  renumberMeasuresChangedTo: { text: 'geändert in' },
-  renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: {
@@ -1180,6 +1394,8 @@ export const lang = {
   codeCheckerFixAll: { text: 'Alle korrigieren' },
   codeCheckerIgnore: { text: 'Ignorieren' },
   codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
+  codeCheckerStop: { text: 'Stopp' },
+  codeCheckerStopped: { text: 'Überprüfung abgebrochen.' },
   codeCheckerCheckingCode: { text: 'Überprüfe Kodierung...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
   codeCheckerMeterConformanceMessage: { text: 'Alle Systeme stimmen mit Taktangabe überein.' },

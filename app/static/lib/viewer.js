@@ -1,4 +1,5 @@
 import * as att from './attribute-classes.js';
+import { isLetsEncodeMode } from './lets-encode.js';
 import * as dutils from './dom-utils.js';
 import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as pageRagenSelector from './page-range-selector.js';
@@ -14,11 +15,12 @@ import {
 } from './control-menu.js';
 import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
-import { codeCheckerHeight } from './resizer.js';
+import * as meiToolbox from './mei-toolbox.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
   cmd,
+  handleEditorChanges,
   meiFileName,
   rngLoader,
   storage,
@@ -1190,8 +1192,12 @@ export default class Viewer {
 
     if (!show) {
       if (this._linkedNavKeyMap) {
-        cm?.removeKeyMap(this._linkedNavKeyMap);
+        // remove it from the editor it was added to: callers may pass no cm here
+        // (e.g. updateHighlight() from the notation's drag selector), and dropping
+        // the reference without removing it left Up/Down captured for good
+        this._linkedNavKeyMapCm?.removeKeyMap(this._linkedNavKeyMap);
         this._linkedNavKeyMap = null;
+        this._linkedNavKeyMapCm = null;
       }
       if (this._linkedNavCurrentMark) {
         this._linkedNavCurrentMark.clear();
@@ -1211,14 +1217,22 @@ export default class Viewer {
     const hScrollbar = wrapper.querySelector('.CodeMirror-hscrollbar');
     const vWidth = vScrollbar && vScrollbar.offsetWidth > 0 ? vScrollbar.offsetWidth : 0;
     const hHeight = hScrollbar && hScrollbar.offsetHeight > 0 ? hScrollbar.offsetHeight : 0;
-    up.style.right = down.style.right = `${6 + vWidth}px`;
-    down.style.bottom = `${6 + hHeight}px`;
+    // the --editorOffset* variables skip the MEI toolbox (cf. resizer.sizeEncodingPanel())
+    up.style.right = down.style.right = `calc(${6 + vWidth}px + var(--editorOffsetRight, 0px))`;
+    down.style.bottom = `calc(${6 + hHeight}px + var(--editorOffsetBottom, 0px))`;
 
     if (!this._linkedNavKeyMap) {
-      this._linkedNavKeyMap = {
-        Up: () => this.jumpToLinkedMark(cm, -1),
-        Down: () => this.jumpToLinkedMark(cm, 1),
+      // pass the keys on to normal cursor movement whenever there is nothing to
+      // jump to, so that a stale key map can never swallow Up/Down
+      const jump = (direction) => {
+        if (this.getNavigableItems().length < 2) return CodeMirror.Pass;
+        this.jumpToLinkedMark(cm, direction);
       };
+      this._linkedNavKeyMap = {
+        Up: () => jump(-1),
+        Down: () => jump(1),
+      };
+      this._linkedNavKeyMapCm = cm;
       cm.addKeyMap(this._linkedNavKeyMap);
     }
     // Esc deactivating this navigation is handled centrally in
@@ -1529,6 +1543,13 @@ export default class Viewer {
         '--annotationPanelBorderColor',
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30)
       );
+    }
+    if (isLetsEncodeMode()) {
+      // In Let's Encode mode Eulise keeps her perch but wears the joint logo.
+      // Only a light and a dark variant exist, so this deliberately bypasses the
+      // environment prefix, the asleep state, and the Safari PNG fallback.
+      const owlDir = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
+      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + '.svg';
     }
     owl.setAttribute('src', owlSrc);
     splashOwl.setAttribute('src', splashOwlSrc);
@@ -1892,6 +1913,8 @@ export default class Viewer {
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
       let o = meiFriendSettingsOptions[opt];
+      // Let's Encode settings are meaningless outside a campaign hand-off
+      if (o.letsEncodeOnly && !isLetsEncodeMode()) return;
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {
@@ -2021,18 +2044,6 @@ export default class Viewer {
         }
       }
       switch (opt) {
-        case 'renumberMeasuresUseSuffixAtEndings':
-          this.disableElementThroughCheckbox(
-            'renumberMeasuresContinueAcrossEndings',
-            'renumberMeasuresUseSuffixAtEndings'
-          );
-          break;
-        case 'renumberMeasuresUseSuffixAtMeasures':
-          this.disableElementThroughCheckbox(
-            'renumberMeasureContinueAcrossIncompleteMeasures',
-            'renumberMeasuresUseSuffixAtMeasures'
-          );
-          break;
         case 'transposeKey':
           if (o.radioChecked && document.getElementById('enableTransposition').checked) {
             this.setDisablednessInOptionsItem(['transposeKey'], ['']);
@@ -2161,6 +2172,12 @@ export default class Viewer {
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
+          case 'showMeiToolbox':
+            value ? cmd.showMeiToolbox() : cmd.hideMeiToolbox();
+            break;
+          case 'selectMeiToolboxOrientation':
+            setOrientation(cm, '', '', this);
+            break;
           case 'selectFacsimilePanelOrientation':
             facs.drawFacsimile();
             break;
@@ -2264,18 +2281,6 @@ export default class Viewer {
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
             document.getElementById('updateControls').style.display = u ? 'flex' : 'none';
-            break;
-          case 'renumberMeasuresContinueAcrossEndings':
-            this.disableElementThroughCheckbox(
-              'renumberMeasuresContinueAcrossEndings',
-              'renumberMeasuresUseSuffixAtEndings'
-            );
-            break;
-          case 'renumberMeasureContinueAcrossIncompleteMeasures':
-            this.disableElementThroughCheckbox(
-              'renumberMeasureContinueAcrossIncompleteMeasures',
-              'renumberMeasuresUseSuffixAtMeasures'
-            );
             break;
           case 'supplyWorkpackageGithubActionsConfiguration':
             console.log('Update to GitHub Actions configuration URL');
@@ -3156,15 +3161,6 @@ export default class Viewer {
     }
   }
 
-  // toggle disabled at one specific checkbox
-  disableElementThroughCheckbox(checkbox, affectedElement) {
-    let cont = document.getElementById(checkbox).checked;
-    let el = document.getElementById(affectedElement);
-    el.disabled = cont;
-    if (cont) el.parentNode.classList.add('disabled');
-    else el.parentNode.classList.remove('disabled');
-  } // disableElementThroughCheckbox()
-
   /**
    * Sets disabled to offItems (and removes it to onItems) of
    * current element and its previous sibling (label)
@@ -3229,10 +3225,15 @@ export default class Viewer {
   } // showAlert()
 
   /**
-   * Show a user prompt in #alertOverlay
-   * Pretty similar to showAlert() but with buttons and returning user response
-   * @param {string} message user message
-   * @param {Array} buttons button labels and onclick functions
+   * Show a blocking user prompt in #promptOverlay
+   * Similar to showAlert(), but with buttons; a backdrop (#promptBackdrop) blocks
+   * the rest of the page until one of the buttons is chosen.
+   * Keyboard: focus is put on the cancel button (or the first button), Tab cycles
+   * through the buttons, ESC activates the cancel button. All other key strokes
+   * are kept away from the page behind the prompt.
+   * @param {string} message user message (HTML)
+   * @param {Array<{label: string, event: Function, cancel?: boolean}>} buttons button
+   *        labels and onclick functions; the button with cancel: true is triggered by ESC
    * @param {*} type ['error'] 'warning' 'info'
    */
   showUserPrompt(message, buttons, type = 'error') {
@@ -3256,22 +3257,64 @@ export default class Viewer {
     }
     promptMessage.innerHTML = message;
 
-    buttons.forEach((button) => {
+    let cancelButton = null;
+    const buttonElements = buttons.map((button) => {
       let newButton = document.createElement('button');
       newButton.classList.add('promptButton');
       newButton.textContent = button.label;
       newButton.addEventListener('click', button.event);
+      if (button.cancel) {
+        newButton.classList.add('promptCancelButton');
+        cancelButton = newButton;
+      }
       promptButtons.appendChild(newButton);
+      return newButton;
     });
     promptButtons.style.display = 'block';
 
+    // remove handler of a previous prompt, if still active
+    if (this.promptKeyHandler) window.removeEventListener('keydown', this.promptKeyHandler, true);
+    if (!promptOverlay.contains(document.activeElement)) this.promptPreviousFocus = document.activeElement;
+    this.promptKeyHandler = (ev) => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (cancelButton) cancelButton.click();
+      } else if (ev.key === 'Tab') {
+        // keep focus within the prompt buttons
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (buttonElements.length === 0) return;
+        let i = buttonElements.indexOf(document.activeElement);
+        i = i < 0 ? 0 : (i + (ev.shiftKey ? -1 : 1) + buttonElements.length) % buttonElements.length;
+        buttonElements[i].focus();
+      } else if (!promptOverlay.contains(ev.target)) {
+        // block all other key strokes (editor, keyboard shortcuts) while prompt is shown
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', this.promptKeyHandler, true);
+
+    document.getElementById('promptBackdrop').style.display = 'block';
     promptOverlay.style.display = 'flex';
-    this.setFocusToVerovioPane();
+    (cancelButton || buttonElements[0])?.focus();
   } // showUserPrompt()
 
+  /**
+   * Hides the user prompt and its backdrop, and returns focus to where it was
+   * @param {string} modalid
+   */
   hideUserPrompt(modalid = 'promptOverlay') {
     document.getElementById(modalid).style.display = 'none';
-  }
+    document.getElementById('promptBackdrop').style.display = 'none';
+    if (this.promptKeyHandler) {
+      window.removeEventListener('keydown', this.promptKeyHandler, true);
+      this.promptKeyHandler = null;
+    }
+    if (this.promptPreviousFocus && document.contains(this.promptPreviousFocus)) this.promptPreviousFocus.focus();
+    this.promptPreviousFocus = null;
+  } // hideUserPrompt()
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
@@ -3679,197 +3722,31 @@ export default class Viewer {
   } // toggleValidationReportVisibility()
 
   /**
-   * Initializes and shows code checker panel below the CodeMirror encoding.
-   * codeCheckerEntries to be added through addCodeCheckerEntry(data).
+   * Starts a new run of a check in the Check tab of the MEI toolbox (see
+   * mei-toolbox.js), which lists entries added through addCodeCheckerEntry(data).
    * @param {string} title
-   * @returns
    */
   initCodeCheckerPanel(title = 'Code Checker') {
-    let codeChecker = document.getElementById('codeChecker');
-    if (!codeChecker) return;
-    codeChecker.innerHTML = '';
-    codeChecker.style.height = codeCheckerHeight + 'px';
-    codeChecker.style.display = 'flex';
-    setOrientation(cm, '', '', this);
-
-    let headerDiv = document.createElement('div');
-    headerDiv.classList.add('validation-title');
-    headerDiv.id = 'codeCheckerTitle';
-    codeChecker.appendChild(headerDiv);
-
-    let titleSpan = document.createElement('span');
-    titleSpan.innerHTML = title;
-    titleSpan.title = title;
-    titleSpan.classList.add('codeCheckerMessage');
-    headerDiv.appendChild(titleSpan);
-
-    // Correct/Fix all
-    let correctAllButton = document.createElement('button');
-    correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
-    correctAllButton.classList.add('btn');
-    correctAllButton.addEventListener('click', () => {
-      let count = 0;
-      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
-      fixButtonList.forEach((button) => {
-        count++;
-        setTimeout(() => button.click(), 0);
-      });
-      infoSpanCurrent.innerHTML = '0';
-      infoSpanOf.innerHTML = '/';
-      infoSpanTotal.innerHTML = fixButtonList.length;
-      correctAllButton.classList.add('disabled');
-      correctAllButton.disabled = true;
-      ignoreAllButton.classList.add('disabled');
-      ignoreAllButton.disabled = true;
-    });
-    headerDiv.appendChild(correctAllButton);
-
-    let ignoreAllButton = document.createElement('button');
-    ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
-    ignoreAllButton.classList.add('btn');
-    ignoreAllButton.addEventListener('click', () => {
-      codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
-        let button = ch.querySelector('button.ignore');
-        let span = ch.querySelector('.codeCheckerMessage');
-        if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
-          button.click();
-        }
-      });
-    });
-    headerDiv.appendChild(ignoreAllButton);
-
-    let infoSpanCurrent = document.createElement('span');
-    infoSpanCurrent.id = 'codeCheckerInfoCurrent';
-    headerDiv.appendChild(infoSpanCurrent);
-    let infoSpanOf = document.createElement('span');
-    infoSpanOf.id = 'codeCheckerInfoOf';
-    headerDiv.appendChild(infoSpanOf);
-    let infoSpanTotal = document.createElement('span');
-    infoSpanTotal.id = 'codeCheckerInfoTotal';
-    headerDiv.appendChild(infoSpanTotal);
-
-    let closeButton = document.createElement('span');
-    closeButton.classList.add('rightButton');
-    closeButton.id = 'codeCheckerCloseButton';
-    closeButton.innerHTML = '&times';
-    closeButton.addEventListener('click', () => {
-      codeChecker.style.display = 'none';
-      setOrientation(cm, '', '', this);
-    });
-    headerDiv.appendChild(closeButton);
-
-    // add empty validation-item to show that the panel is open
-    let emptyDiv = document.createElement('div');
-    emptyDiv.classList.add('validation-item');
-    emptyDiv.classList.add('codeCheckerInfoEmpty');
-    codeChecker.appendChild(emptyDiv);
-
-    let noMessages = document.createElement('div');
-    noMessages.classList.add('validation-item');
-    noMessages.id = 'codeCheckerCheckingCode';
-    noMessages.classList.add('noAccidMessagesFound');
-    noMessages.innerHTML = translator.lang.codeCheckerCheckingCode.text;
-    codeChecker.appendChild(noMessages);
+    meiToolbox.startRun('check', title);
   } // initCodeCheckerPanel()
 
   /**
-   * Adds an entry to the code checker panel with a data structure,
-   * containing also the fix callback
-   * @param {Object} data
-   * @returns
+   * Adds an entry to the result list of the current MEI toolbox run
+   * @param {Object} data {xmlId, html, correct}, with optional fix callback correct()
    */
   addCodeCheckerEntry(data) {
-    let codeChecker = document.getElementById('codeChecker');
-    if (!codeChecker) return;
-    let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
-    if (noMessages) noMessages.remove();
-    let codeCheckerInfoCurrent = document.getElementById('codeCheckerInfoCurrent');
-    let codeCheckerInfoTotal = document.getElementById('codeCheckerInfoTotal');
-    let div = document.createElement('div');
-    div.classList.add('validation-item');
-
-    // span for message
-    let span = document.createElement('span');
-    span.classList.add('codeCheckerMessage');
-    span.innerHTML = data.html;
-    span.title = data.html;
-    span.addEventListener('click', () => {
-      utils.setCursorToId(cm, data.xmlId);
-      cm.focus();
-    });
-    div.appendChild(span);
-
-    // function to correct error
-    if (data.correct) {
-      // Correct/Fix Button
-      let correctButton = document.createElement('button');
-      correctButton.innerHTML = translator.lang.codeCheckerFix.text;
-      correctButton.classList.add('btn');
-      correctButton.classList.add('fix');
-      correctButton.addEventListener('click', () => {
-        data.correct();
-        let checked = document.createElement('span');
-        checked.innerHTML = icon.check;
-        div.appendChild(checked);
-        correctButton.disabled = true;
-        correctButton.classList.add('disabled');
-        ignoreButton.disabled = true;
-        ignoreButton.classList.add('disabled');
-        let count = parseInt(codeCheckerInfoCurrent.innerHTML) || 0;
-        let total = parseInt(codeCheckerInfoTotal.innerHTML) || 0;
-        codeCheckerInfoCurrent.innerHTML = ++count;
-        if (count === total) {
-          let checked = document.createElement('span');
-          checked.innerHTML += icon.check;
-          codeCheckerInfoCurrent.parentElement.appendChild(checked);
-        }
-      });
-      div.appendChild(correctButton);
-
-      // Ignore Button
-      let ignoreButton = document.createElement('button');
-      ignoreButton.innerHTML = translator.lang.codeCheckerIgnore.text;
-      ignoreButton.classList.add('btn');
-      ignoreButton.classList.add('ignore');
-      ignoreButton.addEventListener('click', () => {
-        let total = parseInt(codeCheckerInfoTotal.innerHTML);
-        // correctButton.removeEventListener('click', data.correct);
-        if (!span.classList.contains('strikethrough')) {
-          // active, not stroke through
-          correctButton.disabled = true;
-          correctButton.classList.add('disabled');
-          span.disabled = true;
-          span.classList.add('strikethrough');
-          total--;
-        } else {
-          correctButton.disabled = false;
-          correctButton.classList.remove('disabled');
-          span.disabled = false;
-          span.classList.remove('strikethrough');
-          total++;
-        }
-        codeCheckerInfoTotal.innerHTML = total;
-      });
-      div.appendChild(ignoreButton);
-    }
-    codeChecker.appendChild(div);
+    meiToolbox.addEntry(data);
   } // addCodeCheckerEntry()
 
+  /**
+   * Finishes the current MEI toolbox run
+   * @param {string} allGoodString shown when no entries were found
+   */
   finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
-    let nothingFound = document.getElementById('codeCheckerCheckingCode');
-    if (nothingFound) {
-      nothingFound.innerHTML = allGoodString;
-    } else {
-      document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
-      document.getElementById('codeCheckerInfoOf').innerHTML = '/';
-      // decrement the first empty validation-item
-      document.getElementById('codeCheckerInfoTotal').innerHTML =
-        document.querySelectorAll('.validation-item')?.length - 1;
-    }
+    meiToolbox.finishRun(allGoodString);
   } // finalizeCodeCheckerPanel()
 
   hideCodeCheckerPanel() {
-    document.getElementById('codeCheckerResizer').style.display = 'none';
-    document.getElementById('codeChecker').style.display = 'none';
+    meiToolbox.resetToolbox();
   }
 } // class Viewer

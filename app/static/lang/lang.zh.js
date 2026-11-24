@@ -22,7 +22,7 @@ export const lang = {
   splashBody: {
     html: `
       <p>
-        mei-friend 是一个 <a href="https://music-encoding.org">音乐编码</a> 编辑器，托管在
+        mei-friend 是一个 <a href="https://music-encoding.org" target="_blank">音乐编码</a> 编辑器，托管在
         <a href="https://mdw.ac.at" target="_blank">维也纳音乐与表演艺术大学</a>。
         请查阅我们的<a href="https://mei-friend.github.io" target="_blank">详细文档</a>以获取更多信息。
       </p>
@@ -67,8 +67,7 @@ export const lang = {
       <p>
         mei-friend Web 应用程序的开发由
         <a href="https://fwf.ac.at" target="_blank">奥地利科学基金会（FWF）</a> 项目
-        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（维也纳签名声音）</a>
-        和 <a href="https://e-laute.info">I 6019（E-LAUTE）</a> 资助。
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（维也纳签名声音）</a>、<a href="https://e-laute.info" target="_blank">I 6019（E-LAUTE）</a> 和 <a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625（Let's\u00a0Encode!）</a> 资助。
       </p>`,
   },
   splashGotItButtonText: { text: '知道了！' },
@@ -128,6 +127,13 @@ export const lang = {
   replaceMenuText: { text: '替换' },
   replaceAllMenuText: { text: '全部替换' },
   indentSelectionText: { text: '缩进选择' },
+  reformatEncodingText: {
+    text: '通过 XML 解析器重新格式化',
+    description:
+      '通过 XML 解析器重新格式化整个编码：属性排序（xml:id 在前，其余按字母顺序），规范化的 XML 序列化（例如双引号、空元素为自闭合标签、字符引用转为字符），所有行缩进。',
+  },
+  reformatEncodingDone: { text: '已通过 XML 解析器重新格式化编码（{lines} 行）。' },
+  reformatEncodingParseError: { text: '无法重新格式化：编码不是格式良好的 XML。' },
   surroundWithTagsText: { text: '用标签包围' },
   surroundWithLastTagText: { text: '用上一个标签包围' },
   jumpToLineText: { text: '跳到行' },
@@ -144,10 +150,15 @@ export const lang = {
   showAnnotationMenuText: { text: '注释面板' },
   showFacsimileMenuText: { text: '摹本面板' },
   showPlaybackControlsText: { text: '播放控制' },
+  showMeiToolboxMenuText: { text: 'MEI 工具箱' },
   facsimileTop: { text: '摹本顶部' },
   facsimileBottom: { text: '摹本底部' },
   facsimileLeft: { text: '摹本左侧' },
   facsimileRight: { text: '摹本右侧' },
+  meiToolboxTop: { text: 'MEI 工具箱置顶' },
+  meiToolboxBottom: { text: 'MEI 工具箱置底' },
+  meiToolboxLeft: { text: 'MEI 工具箱居左' },
+  meiToolboxRight: { text: 'MEI 工具箱居右' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: '操作' },
@@ -170,11 +181,141 @@ export const lang = {
   meterConformanceText: { text: '检查 @metcon' },
   renumberMeasuresTestText: { text: '重编号小节（测试）' },
   renumberMeasuresExecText: { text: '重编号小节（执行）' },
+  convertAttributesToElementsText: {
+    text: '将属性转换为元素',
+    description:
+      '将也可以用元素表示的属性转换为相应元素，例如音符和和弦上的 @accid、@artic、@syl、@fermata、@tie、@slur、@gliss，或 staffDef 和 scoreDef 上的谱号、调号和拍号属性。',
+  },
+  convertAttributesToElementsSummary: { text: '属性已转换为 {list}。' },
+  convertAttributesToElementsNone: { text: '未找到可转换为元素的属性。' },
+  convertAttributesToElementsProblems: { text: '{count} 个属性无法转换。' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: '检查' },
+  meiToolboxTabConvert: { text: '转换' },
+  meiToolboxTabRenumber: { text: '重新编号' },
+  meiToolboxCheckButton: { text: '检查' },
+  meiToolboxTestButton: { text: '测试', description: '列出将更改的内容，而不更改编码' },
+  meiToolboxRenumberButton: { text: '重新编号' },
+  meiToolboxAttrToElButton: { text: '属性 → 元素' },
+  meiToolboxElToAttrButton: { text: '元素 → 属性', description: '在不丢失信息的情况下将元素转换为属性；其他元素保持不变并列出。' },
+  meiToolboxAll: { text: '全部' },
+  meiToolboxNone: { text: '无' },
+  meiToolboxFilter: { text: '筛选结果' },
+  meiToolboxRunAgain: { text: '重新运行' },
+  meiToolboxHideOptions: { text: '隐藏选项' },
+  meiToolboxOutdated: { text: '（编码此后已更改，结果可能已过时）' },
+  meiToolboxNoResults: { text: '尚无结果。请选择选项并运行。' },
+  meiToolboxGroupsSelected: { text: '{total} 个属性组中的 {n} 个' },
+  meiToolboxCheckAccidGes: { text: '变音记号 (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: '小节时值 (@metcon)' },
+  meiToolboxCheckLinked: { text: '链接元素 (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: '关闭 MEI 工具箱' },
+  meiToolboxTabIds: { text: 'ID' },
+  meiToolboxTabFacsimile: { text: '影印件' },
+  meiToolboxTabReformat: { text: '重新格式化' },
+  meiToolboxIdsAdd: { text: '添加 xml:id（给没有的元素）' },
+  meiToolboxIdsChange: {
+    text: '更改 xml:id（为每个元素生成新 ID）',
+    description: '为每个元素分配新的 xml:id。本编码内部的引用会被更新，但来自其他文件、注释、影印件工具或 URL 的指向旧 xml:id 的链接将失效。',
+  },
+  meiToolboxIdsRemove: { text: '删除 xml:id（被引用的除外）' },
+  meiToolboxIdsButton: { text: '应用' },
+  meiToolboxIdsAdded: { text: '已添加 {n} 个' },
+  meiToolboxIdsChanged: { text: '已更改 {n} 个' },
+  meiToolboxIdsRemoved: { text: '已删除 {n} 个' },
+  meiToolboxIdsKept: { text: '保留 {n} 个' },
+  meiToolboxIdsReferences: { text: '已更新 {n} 处引用' },
+  meiToolboxIdsKeptReason: { text: '在编码内被引用' },
+  meiToolboxIdsNothing: { text: '无需处理：没有添加、更改或删除任何 xml:id。' },
+  meiToolboxIdsCancelled: { text: '已取消，编码未改变。' },
+  meiToolboxFacsimileInfo: { text: '将编码与页面图像关联：从其他文件导入影印件，或添加每个分页一个 surface 的空影印件。' },
+  meiToolboxFacsimileIngest: { text: '导入影印件…' },
+  meiToolboxFacsimileAddMissing: {
+    text: '添加缺少的 surface',
+    description: '只补上缺少的部分：没有影印件时创建一个，为每个尚无 surface 的页面添加带占位 graphic 的 surface，并用 pb@facs 指向它。页面会与已有的 surface 对应，这些 surface 保持不变。',
+  },
+  meiToolboxFacsimileAdded: { text: '新增 surface：{n}' },
+  meiToolboxFacsimileLinked: { text: '关联到已有 surface 的页面：{n}' },
+  meiToolboxFacsimileCreated: { text: '已添加影印件。' },
+  meiToolboxFacsimileUpToDate: { text: '每一页都已有对应的 surface，未添加任何内容。' },
+  meiToolboxFacsimileZones: { text: '{n} 个区域' },
+  meiToolboxFacsimileSummary: { text: '{surfaces} 个 surface，{zones} 个区域' },
+  meiToolboxFacsimileNone: { text: '此编码没有影印件。' },
+  meiToolboxReformatVerovio: { text: '通过 Verovio', description: '让 Verovio 依据其内部表示重新写出编码。' },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio 依据其内部表示写出编码，格式与属性顺序均由 Verovio 决定。',
+  },
+  meiToolboxReformatXml: { text: '通过 XML 解析器', description: '通过 XML 解析器重新格式化编码：内容保持不变，只改变格式与属性顺序。' },
+  meiToolboxReformatUnchanged: { text: '编码未改变。' },
+  meiToolboxReformatDone: { text: '{lines} 行' },
+  meiToolboxAttributeOrder: {
+    text: '属性顺序',
+    description: 'mei-friend 每次写回元素时写出属性所用的顺序。',
+    labels: ['保持编码中的顺序', '按字母顺序', 'xml:id 在前，其余按字母顺序', '自定义…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: '顺序模式',
+    description: '以空格或逗号分隔的属性名，按你希望的顺序排列，例如“xml:id n label *”。以 * 结尾的名称匹配具有该前缀的所有属性（clef.*）。单独的 * 代表所有未列出的属性，按字母顺序排列；没有它时，这些属性保留原有顺序并置于末尾。命名空间声明始终排在最前。',
+  },
+  codeCheckerFixShown: { text: '修复显示的 {n} 项' },
+  codeCheckerIgnoreShown: { text: '忽略显示的 {n} 项' },
+  convertGroupAccid: { text: '记谱变音记号 (@accid)' },
+  convertGroupAccidGes: { text: '实际音高变音记号 (@accid.ges)' },
+  convertGroupArtic: { text: '演奏法记号 (@artic, @artic.ges)' },
+  convertGroupSyl: { text: '歌词 (@syl)' },
+  convertGroupFermata: { text: '延长记号 (@fermata)' },
+  convertGroupTie: { text: '延音线 (@tie)' },
+  convertGroupSlur: { text: '连线 (@slur)' },
+  convertGroupGliss: { text: '滑奏 (@gliss)' },
+  convertGroupDefinitions: { text: '谱号、调号、拍号、定量记号 (staffDef, scoreDef)' },
+  convertGroupLabels: { text: '组记号和标签 (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: '属性将被转换为 {list}。' },
+  convertElementsToAttributesSummary: { text: '元素已转换为属性：{list}。' },
+  convertElementsToAttributesTestSummary: { text: '元素将被转换为属性：{list}。' },
+  convertElementsToAttributesProblems: { text: '{count} 个元素无法转换。' },
+  convertElementsToAttributesNone: { text: '未找到可转换为属性的元素。' },
+  elementsToAttributesConfirmation: { text: '<b>元素 → 属性</b>\n\n警告：此操作可能会破坏外部链接。\n\n要转换的元素中有 {count} 个带有 xml:id，它们会随元素一起被删除。本文件内被引用的元素不会被转换。\n\n来自其他文件、保存在本文件之外的注释、摹本工具或指向这些 xml:id 的 URL 的链接将不再有效。' },
+  elementsToAttributesProceed: { text: '转换' },
+  elementsToAttributesCancel: { text: '取消' },
+  convertScopeAll: { text: '范围：整个编码（在编辑器中选择文本以限制转换）' },
+  convertScopeSelection: { text: '范围：所选内容，第 {from}–{to} 行' },
+  convertSelectionSuffix: { text: '所选内容' },
+  renumberMeasuresStartNumber: { text: '起始编号' },
+  renumberMeasuresUnchanged: { text: '未更改' },
+  renumberMeasuresSummary: { text: '{total} 个小节，{changed} 个已重新编号。' },
+  renumberMeasuresSummaryTest: { text: '{total} 个小节，{changed} 个将被重新编号。' },
+  renumberMeasuresNoMeasures: { text: '未找到小节。' },
   addIdsText: { text: '为 MEI 添加 id' },
   removeIdsText: { text: '从 MEI 中移除 id' },
+  changeIdsText: {
+    text: '更改 MEI 中的 id（会使外部链接失效）',
+    description:
+      '为每个元素（或所选元素）分配新的 xml:id。此文件内的引用会被更新，但来自其他文件、注释、摹本工具或 URL 且指向旧 xml:id 的链接将不再有效。',
+  },
+  changeIdsConfirmation: {
+    text: '<b>更改 MEI 中的 id</b>\n\n警告：此操作会使外部链接失效。\n\n将更改 {changed} 个 xml:id，添加 {added} 个新 xml:id；此文件内的 {references} 个引用将被更新。\n\n来自其他文件、注释、摹本工具或 URL 且指向旧 xml:id 的链接将不再有效。',
+  },
+  changeIdsProceed: { text: '更改 id' },
+  changeIdsCancel: { text: '取消' },
   reRenderMeiVerovio: { text: '通过 Verovio 重新渲染' },
   addFacsimile: { text: '添加摹本元素' },
   ingestFacsimileText: { text: '摄取摹本' },
+  ingestFacsimileTitle: { text: '正在摄取摹本' },
+  ingestFacsimileProgress: { text: '{file}：已处理 {done}/{total} 个区域。' },
+  ingestFacsimileDoneTitle: { text: '摹本已摄取' },
+  ingestFacsimileStoppedTitle: { text: '摹本摄取已停止' },
+  ingestFacsimileSummary: {
+    text: '已将来自 {file} 的摹本（{surfaces} 个 surface，{zones} 个区域）插入到 body 之前；已为 {added} 个元素添加 @facs 属性。',
+  },
+  ingestFacsimileStopped: { text: '在处理 {done}/{total} 个区域后停止。目前的更改可以一步撤销。' },
+  ingestFacsimileProblems: { text: '遇到 {count} 个问题：' },
+  ingestFacsimileNotFound: { text: '未找到 n="{n}" 的 {type}。' },
+  ingestFacsimileNotUnique: { text: 'n="{n}" 的 {type} 不唯一。' },
+  ingestFacsimileNoId: { text: 'n="{n}" 的 {type} 没有 xml:id，未添加 @facs。' },
+  ingestFacsimileNotInEditor: { text: '在编辑器中未找到 n="{n}" 的 {type}，未添加 @facs。' },
+  ingestFacsimileNoFacsimile: { text: '摄取摹本失败：在 {file} 中未找到 facsimile 元素。' },
+  ingestFacsimileNoBody: { text: '摄取摹本失败：在编码中未找到 body 元素。' },
+  ingestFacsimileNoBodyInEditor: { text: '在编辑器中未找到 body 元素，未插入 facsimile 元素。' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: '插入' },
@@ -244,11 +385,11 @@ export const lang = {
   // Footer texts
   leftFooter: {
     html:
-      '托管于 <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      '在 <a href="https://mdw.ac.at">mdw</a>，来自维也纳的 ' +
+      '托管于 <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      '在 <a href="https://mdw.ac.at" target="_blank">mdw</a>，来自维也纳的 ' +
       heart +
       '。 ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">版权声明</a>。',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">版权声明</a>。',
   },
   loadingVerovio: { text: '正在加载 Verovio' },
   verovioLoaded: { text: '已加载' },
@@ -716,10 +857,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: '重新编号小节',
-    description: '重新编号小节的设置',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: '跨不完整小节继续',
     description: '跨不完整小节继续编号（@metcon="false"）',
@@ -790,6 +927,9 @@ export const lang = {
     text: '显示摹本标题',
     description: '在来源摹本上方显示摹本标题',
   },
+  titleMeiToolbox: { text: 'MEI 工具箱', description: '在编辑器旁的面板中对编码进行检查与处理' },
+  showMeiToolbox: { text: '显示 MEI 工具箱', description: '显示带有检查、转换、重新编号、ID、影印件和重新生成标签页的 MEI 工具箱' },
+  selectMeiToolboxOrientation: { text: 'MEI 工具箱位置', description: '选择 MEI 工具箱相对于编辑器的位置', labels: ['左', '右', '上', '下'] },
 
   // Supplied element
   titleSupplied: {
@@ -949,6 +1089,51 @@ export const lang = {
   githubFilepath: { text: '路径' },
   githubCommit: { text: '提交' },
   githubCommitButton: { classes: { commitAsNewFile: { value: '提交为新文件' } }, value: '提交' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p>您从 <strong>Let's\u00a0Encode!</strong> 来到这里，参与一项编码任务。mei-friend 是 “Let's\u00a0Encode!” 为此项工作提供的编辑器之一。工作过程中，请使用 <strong>任务管理</strong> 菜单（左上角）中的 <strong>保存</strong> 随时保存进度；完成后点击 <strong>完成任务</strong>，将您的成果贡献给本次活动。</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: '完成任务' },
+  letsEncodeMenuLabel: { text: '任务管理' },
+  letsEncodeLoggedInAs: { text: '已登录为' },
+  letsEncodeSaveButton: { text: '保存' },
+  letsEncodeSaving: { text: '正在保存您的工作…' },
+  letsEncodeSaveFailed: { text: '无法保存您的工作。' },
+  letsEncodeDismiss: { value: '关闭' },
+  letsEncodeLastSave: { text: '上次保存：' },
+  letsEncodeLastAutosave: { text: '自动保存：' },
+  letsEncodeSavedAt: { text: '保存于' },
+  letsEncodeExpiresAt: { text: '截止于' },
+  letsEncodeTimeRemaining: { text: '后任务到期' },
+  letsEncodeHoursShort: { text: '小时' },
+  letsEncodeMinutesShort: { text: '分钟' },
+  letsEncodeDaysShort: { text: '天' },
+  letsEncodeAgo: { text: '{n}前' },
+  letsEncodeJustNow: { text: '刚刚' },
+  letsEncodeTimeExpired: { text: '完成此任务的时间已到' },
+  letsEncodeAutosaveMinutes: { title: '自动保存间隔（分钟）', description: '编辑时自动保存您工作的频率（分钟）。仅在您做出更改时才会保存；设为 0 可关闭自动保存。' },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "您正在进行的 “Let's\u00a0Encode!” 任务的设置" },
+  letsEncodeAbandonTaskButton: { text: '放弃任务' },
+  letsEncodeKeepWorking: { value: '继续工作' },
+  letsEncodeCompleteAnyway: { value: '仍然完成任务' },
+  letsEncodeAbandonConfirm: { value: '放弃任务' },
+  letsEncodeNoChangesPrompt: { text: '您尚未修改此编码。这同样有意义：完成任务会记录下它无需修改。您也可以继续工作。' },
+  letsEncodeConfirmCompletePrompt: { text: "确定要完成此任务吗？您的工作将被保存并提交给 “Let's\u00a0Encode!”，任务随即结束。" },
+  letsEncodeAbandonPrompt: { text: "确定要放弃此任务吗？您在此任务上的工作将会丢失，包括已保存的内容，并且 “Let's\u00a0Encode!” 将被告知您未完成该任务。" },
+  letsEncodeLoading: { text: "正在从 “Let's\u00a0Encode!” 获取您的任务…" },
+  letsEncodeLogoLinkTitle: { text: "在新标签页中打开您的 “Let's\u00a0Encode!” 活动（您的任务仍在此处保持打开）" },
+  letsEncodeDragOverlayText: { text: "在“Let's\u00a0Encode!”任务期间无法打开其他文件。" },
+  letsEncodeCommitting: { text: '正在完成您的任务…' },
+  letsEncodeCompleted: { text: "任务已完成——正在返回 “Let's\u00a0Encode!”…" },
+  letsEncodeCommitFailed: { text: '无法完成您的任务。' },
+  letsEncodeRetryButton: { value: '重试' },
+  letsEncodeAbandonButton: { value: "返回 “Let's\u00a0Encode!”" },
+  letsEncodeNoCampaignError: { text: "此 “Let's\u00a0Encode!” 链接不完整：未指定任何活动，因此无法报告结果。请返回 “Let's\u00a0Encode!” 并重新打开任务。" },
+  letsEncodeMissingParameterError: { text: "从 “Let's\u00a0Encode!” 转交时缺少必需的参数：" },
+  letsEncodeFileError: { text: '无法在 GitHub 上打开转交的文件。' },
+  letsEncodeCloneError: { text: '无法从 GitHub 加载您的任务。' },
+  letsEncodeRemoteChangedError: { text: '您工作期间该文件在 GitHub 上被修改，因此无法保存您的工作。' },
   commitLog: { text: '提交日志' },
   githubDate: { text: '日期' },
   githubAuthor: { text: '作者' },
@@ -975,11 +1160,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: '重新编号小节' },
-  renumberMeasuresModalTest: { text: '测试' },
-  renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: '将被' },
-  renumberMeasuresChangedTo: { text: '更改为' },
-  renumberMeasureMeasuresRenumbered: { text: '小节重新编号' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '检查 @accid.ges 属性（针对调号、小节内音调和连音）。' },

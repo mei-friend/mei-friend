@@ -21,7 +21,7 @@ export const lang = {
   splashBody: {
     html: `
    <p>
-      mei-friendは、<a href="https://music-encoding.org">Music Encoding Initiative</a>で記述された楽譜ファイルの編集を目的に開発された楽譜データエディタです。現在、<a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストしています。
+      mei-friendは、<a href="https://music-encoding.org" target="_blank">Music Encoding Initiative</a>で記述された楽譜ファイルの編集を目的に開発された楽譜データエディタです。現在、<a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストしています。
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
@@ -65,8 +65,7 @@ export const lang = {
       </p>
       <p>
         mei-friend Webアプリケーションの開発は、<a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>
-        のプロジェクト<a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（Signature Sound Vienna）</a>
-        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>によって資金提供されています。
+        のプロジェクト<a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（Signature Sound Vienna）</a>、<a href="https://e-laute.info" target="_blank">I 6019（E-LAUTE）</a>、および<a href="https://lets-encode.mdw.ac.at" target="_blank">PAT 2277625（Let's\u00a0Encode!）</a>によって資金提供されています。
         </p>
     `,
   },
@@ -127,6 +126,13 @@ export const lang = {
   replaceMenuText: { text: '置換' },
   replaceAllMenuText: { text: 'すべて置換' },
   indentSelectionText: { text: '選択範囲をインデント' },
+  reformatEncodingText: {
+    text: 'XML パーサーで再フォーマット',
+    description:
+      'エンコーディング全体を XML パーサーで再フォーマットします: 属性を並べ替え（xml:id を先頭、その他はアルファベット順）、XML のシリアル化を正規化（例: 二重引用符、空要素を自己終了タグに、文字参照を文字に）、すべての行をインデントします。',
+  },
+  reformatEncodingDone: { text: 'XML パーサーでエンコーディングを再フォーマットしました（{lines} 行）。' },
+  reformatEncodingParseError: { text: '再フォーマットできません: エンコーディングが整形式の XML ではありません。' },
   surroundWithTagsText: { text: 'タグで囲む' },
   surroundWithLastTagText: { text: '前のタグで囲む' },
   jumpToLineText: { text: '行にジャンプ' },
@@ -143,10 +149,15 @@ export const lang = {
   showAnnotationMenuText: { text: 'アノテーションパネル' },
   showFacsimileMenuText: { text: 'ファクシミリパネル' },
   showPlaybackControlsText: { text: '再生コントロール' },
+  showMeiToolboxMenuText: { text: 'MEI ツールボックス' },
   facsimileTop: { text: 'ファクシミリを上に表示' },
   facsimileBottom: { text: 'ファクシミリを下に表示' },
   facsimileLeft: { text: 'ファクシミリを左に表示' },
   facsimileRight: { text: 'ファクシミリを右に表示' },
+  meiToolboxTop: { text: 'MEI ツールボックスを上に' },
+  meiToolboxBottom: { text: 'MEI ツールボックスを下に' },
+  meiToolboxLeft: { text: 'MEI ツールボックスを左に' },
+  meiToolboxRight: { text: 'MEI ツールボックスを右に' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: '操作' },
@@ -169,11 +180,153 @@ export const lang = {
   meterConformanceText: { text: '@metconを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
+  convertAttributesToElementsText: {
+    text: '属性を要素に変換',
+    description:
+      '要素としても表現できる属性をその要素に変換します（例：音符や和音の @accid、@artic、@syl、@fermata、@tie、@slur、@gliss、staffDef や scoreDef の音部記号・調号・拍子の属性）。',
+  },
+  convertAttributesToElementsSummary: { text: '属性を {list} に変換しました。' },
+  convertAttributesToElementsNone: { text: '要素に変換できる属性は見つかりませんでした。' },
+  convertAttributesToElementsProblems: { text: '{count} 個の属性を変換できませんでした。' },
+  // CHECKER PANEL
+  meiToolboxTabCheck: { text: 'チェック' },
+  meiToolboxTabConvert: { text: '変換' },
+  meiToolboxTabRenumber: { text: '番号振り直し' },
+  meiToolboxCheckButton: { text: 'チェック' },
+  meiToolboxTestButton: { text: 'テスト', description: 'エンコーディングを変更せずに、変更される内容を一覧表示します' },
+  meiToolboxRenumberButton: { text: '番号を振り直す' },
+  meiToolboxAttrToElButton: { text: '属性 → 要素' },
+  meiToolboxElToAttrButton: { text: '要素 → 属性', description: '情報が失われない場合に要素を属性に変換します。その他の要素は保持され、一覧表示されます。' },
+  meiToolboxAll: { text: 'すべて' },
+  meiToolboxNone: { text: 'なし' },
+  meiToolboxFilter: { text: '結果を絞り込む' },
+  meiToolboxRunAgain: { text: '再実行' },
+  meiToolboxHideOptions: { text: 'オプションを隠す' },
+  meiToolboxOutdated: { text: '（その後エンコーディングが変更されたため、結果が古い可能性があります）' },
+  meiToolboxNoResults: { text: 'まだ結果はありません。オプションを選んで実行してください。' },
+  meiToolboxGroupsSelected: { text: '{total} 個中 {n} 個の属性グループ' },
+  meiToolboxCheckAccidGes: { text: '臨時記号 (@accid.ges)' },
+  meiToolboxCheckMetcon: { text: '小節の長さ (@metcon)' },
+  meiToolboxCheckLinked: { text: 'リンクされた要素 (@startid, @endid, @plist, …)' },
+  meiToolboxClose: { text: 'MEI ツールボックスを閉じる' },
+  meiToolboxTabIds: { text: 'ID' },
+  meiToolboxTabFacsimile: { text: 'ファクシミリ' },
+  meiToolboxTabReformat: { text: '再フォーマット' },
+  meiToolboxIdsAdd: { text: 'xml:id を追加（持たない要素に）' },
+  meiToolboxIdsChange: {
+    text: 'xml:id を変更（全要素に新しい ID）',
+    description: 'すべての要素に新しい xml:id を割り当てます。このエンコーディング内の参照は更新されますが、他のファイル、注釈、ファクシミリツール、URL から古い xml:id を指しているリンクは機能しなくなります。',
+  },
+  meiToolboxIdsRemove: { text: 'xml:id を削除（参照されているものを除く）' },
+  meiToolboxIdsButton: { text: '実行' },
+  meiToolboxIdsAdded: { text: '{n} 件追加' },
+  meiToolboxIdsChanged: { text: '{n} 件変更' },
+  meiToolboxIdsRemoved: { text: '{n} 件削除' },
+  meiToolboxIdsKept: { text: '{n} 件保持' },
+  meiToolboxIdsReferences: { text: '{n} 件の参照を更新' },
+  meiToolboxIdsKeptReason: { text: 'エンコーディング内で参照されています' },
+  meiToolboxIdsNothing: { text: '処理は不要でした: xml:id の追加・変更・削除はありません。' },
+  meiToolboxIdsCancelled: { text: 'キャンセルしました。エンコーディングは変更されていません。' },
+  meiToolboxFacsimileInfo: {
+    text: 'エンコーディングをページ画像に結び付けます: 他のファイルからファクシミリを取り込むか、まだ足りない surface を改ページごとに 1 つ追加します。',
+  },
+  meiToolboxFacsimileIngest: { text: 'ファクシミリを取り込む…' },
+  meiToolboxFacsimileAddMissing: {
+    text: '不足している surface を追加',
+    description: '足りないものだけを追加します: ファクシミリがなければ作成し、まだ surface のないページごとにプレースホルダーの graphic を持つ surface を追加し、pb@facs でそれを指します。ページは既存の surface に対応付けられ、それらは変更されません。',
+  },
+  meiToolboxFacsimileAdded: { text: '追加した surface: {n}' },
+  meiToolboxFacsimileLinked: { text: '既存の surface に結び付けたページ: {n}' },
+  meiToolboxFacsimileCreated: { text: 'ファクシミリを追加しました。' },
+  meiToolboxFacsimileUpToDate: { text: 'すべてのページに既に surface があります。追加はありません。' },
+  meiToolboxFacsimileZones: { text: 'ゾーン {n} 個' },
+  meiToolboxFacsimileSummary: { text: 'surface {surfaces} 個、ゾーン {zones} 個' },
+  meiToolboxFacsimileNone: { text: 'このエンコーディングにはファクシミリがありません。' },
+  meiToolboxReformatVerovio: { text: 'Verovio 経由', description: 'Verovio が自身の内部表現からエンコーディングを書き直します。' },
+  meiToolboxReformatVerovioNote: {
+    text: 'Verovio は自身の内部表現からエンコーディングを書き出します。書式と属性の順序も Verovio のものになります。',
+  },
+  meiToolboxReformatXml: { text: 'XML パーサー経由', description: 'XML パーサーでエンコーディングを整形し直します: 内容はそのままで、書式と属性の順序だけが変わります。' },
+  meiToolboxReformatUnchanged: { text: 'エンコーディングは変更されていません。' },
+  meiToolboxReformatDone: { text: '{lines} 行' },
+  meiToolboxAttributeOrder: {
+    text: '属性の順序',
+    description: 'mei-friend が要素を書き戻すたびに属性を書き出す順序です。',
+    labels: ['エンコードされたまま', 'アルファベット順', 'xml:id が先、その後アルファベット順', 'カスタム…'],
+  },
+  meiToolboxAttributeOrderPattern: {
+    text: '順序パターン',
+    description: '属性名を空白またはコンマで区切り、希望する順に並べます（例: 「xml:id n label *」）。* で終わる名前はその接頭辞を持つすべての属性に一致します（clef.*）。単独の * は名前を挙げていないすべての属性をアルファベット順で表します。* がない場合、それらは末尾で元の順序を保ちます。名前空間宣言は常に先頭に来ます。',
+  },
+  codeCheckerFixShown: { text: '表示中の {n} 件を修正' },
+  codeCheckerIgnoreShown: { text: '表示中の {n} 件を無視' },
+  convertGroupAccid: { text: '記譜上の臨時記号 (@accid)' },
+  convertGroupAccidGes: { text: '実音の臨時記号 (@accid.ges)' },
+  convertGroupArtic: { text: 'アーティキュレーション (@artic, @artic.ges)' },
+  convertGroupSyl: { text: '歌詞 (@syl)' },
+  convertGroupFermata: { text: 'フェルマータ (@fermata)' },
+  convertGroupTie: { text: 'タイ (@tie)' },
+  convertGroupSlur: { text: 'スラー (@slur)' },
+  convertGroupGliss: { text: 'グリッサンド (@gliss)' },
+  convertGroupDefinitions: { text: '音部記号・調号・拍子・計量記号 (staffDef, scoreDef)' },
+  convertGroupLabels: { text: 'グループ記号とラベル (staffGrp, staffDef)' },
+  convertAttributesToElementsTestSummary: { text: '属性は {list} に変換されます。' },
+  convertElementsToAttributesSummary: { text: '要素を属性に変換しました: {list}。' },
+  convertElementsToAttributesTestSummary: { text: '要素は属性に変換されます: {list}。' },
+  convertElementsToAttributesProblems: { text: '{count} 個の要素を変換できませんでした。' },
+  convertElementsToAttributesNone: { text: '属性に変換できる要素は見つかりませんでした。' },
+  elementsToAttributesConfirmation: { text: '<b>要素 → 属性</b>\n\n注意: この操作により外部リンクが切れる可能性があります。\n\n変換される要素のうち {count} 個に xml:id があり、要素とともに削除されます。このファイル内で参照されている要素は変換されません。\n\n他のファイル、このファイルの外に保存された注釈、ファクシミリツール、またはこれらの xml:id を指す URL からのリンクは機能しなくなります。' },
+  elementsToAttributesProceed: { text: '変換' },
+  elementsToAttributesCancel: { text: 'キャンセル' },
+  convertScopeAll: { text: '範囲: エンコーディング全体（変換を限定するにはエディタでテキストを選択してください）' },
+  convertScopeSelection: { text: '範囲: 選択範囲、{from}–{to} 行' },
+  convertSelectionSuffix: { text: '選択範囲' },
+  renumberMeasuresStartNumber: { text: '開始番号' },
+  renumberMeasuresUnchanged: { text: '変更なし' },
+  renumberMeasuresSummary: { text: '{total} 小節、{changed} 小節の番号を振り直しました。' },
+  renumberMeasuresSummaryTest: { text: '{total} 小節、{changed} 小節の番号が振り直されます。' },
+  renumberMeasuresNoMeasures: { text: '小節が見つかりません。' },
   addIdsText: { text: 'MEIにIDを追加' },
   removeIdsText: { text: 'MEIからIDを削除' },
+  changeIdsText: {
+    text: 'MEIのIDを変更（外部リンクが無効になります）',
+    description:
+      'すべての要素（または選択した要素）に新しいxml:idを割り当てます。このファイル内の参照は更新されますが、古いxml:idを指す他のファイル、注釈、ファクシミリツール、URLからのリンクは機能しなくなります。',
+  },
+  changeIdsConfirmation: {
+    text: '<b>MEIのIDを変更</b>\n\n注意：この操作により外部リンクが無効になります。\n\n{changed}個のxml:idが変更され、{added}個の新しいxml:idが追加されます。このファイル内の{references}個の参照が更新されます。\n\n古いxml:idを指す他のファイル、注釈、ファクシミリツール、URLからのリンクは機能しなくなります。',
+  },
+  changeIdsProceed: { text: 'IDを変更' },
+  changeIdsCancel: { text: 'キャンセル' },
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
   addFacsimile: { text: 'ファクシミリを追加' },
   ingestFacsimileText: { text: 'ファクシミリ取り込み' },
+  ingestFacsimileTitle: { text: 'ファクシミリを取り込み中' },
+  ingestFacsimileProgress: { text: '{file}: {total} 個中 {done} 個のゾーンを処理しました。' },
+  ingestFacsimileDoneTitle: { text: 'ファクシミリを取り込みました' },
+  ingestFacsimileStoppedTitle: { text: 'ファクシミリの取り込みを停止しました' },
+  ingestFacsimileSummary: {
+    text: '{file} のファクシミリ（{surfaces} 個の surface、{zones} 個のゾーン）を body の前に挿入し、{added} 個の要素に @facs 属性を追加しました。',
+  },
+  ingestFacsimileStopped: {
+    text: '{total} 個中 {done} 個のゾーンで停止しました。これまでの変更は一度に元に戻せます。',
+  },
+  ingestFacsimileProblems: { text: '{count} 件の問題が発生しました：' },
+  ingestFacsimileNotFound: { text: 'n="{n}" の {type} が見つかりません。' },
+  ingestFacsimileNotUnique: { text: 'n="{n}" の {type} が一意ではありません。' },
+  ingestFacsimileNoId: { text: 'n="{n}" の {type} に xml:id がないため、@facs を追加しませんでした。' },
+  ingestFacsimileNotInEditor: {
+    text: 'n="{n}" の {type} がエディターで見つからないため、@facs を追加しませんでした。',
+  },
+  ingestFacsimileNoFacsimile: {
+    text: 'ファクシミリの取り込みに失敗しました：{file} に facsimile 要素が見つかりません。',
+  },
+  ingestFacsimileNoBody: {
+    text: 'ファクシミリの取り込みに失敗しました：エンコーディングに body 要素が見つかりません。',
+  },
+  ingestFacsimileNoBodyInEditor: {
+    text: 'エディターに body 要素が見つからないため、facsimile 要素を挿入しませんでした。',
+  },
 
   // INSERT MENU
   insertMenuTitle: { text: '挿入' },
@@ -243,11 +396,11 @@ export const lang = {
   leftFooter: {
     // No translation needed for HTML links, 'heart', and place names
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Hosted by <a href="https://iwk.mdw.ac.at" target="_blank">IWK</a> ' +
+      'at <a href="https://mdw.ac.at" target="_blank">mdw</a>, with ' +
       heart +
       ' from Vienna. ' +
-      '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
+      '<a href="https://iwk.mdw.ac.at/impressum" target="_blank">Imprint</a>.',
   },
   loadingVerovio: { text: 'Verovioを読み込む' },
   verovioLoaded: { text: '読み込み完了' },
@@ -827,10 +980,6 @@ export const lang = {
   },
 
   // Renumber measures
-  renumberMeasuresHeading: {
-    text: '小節番号の振り直し',
-    description: '小節番号の振り直しの設定',
-  },
   renumberMeasureContinueAcrossIncompleteMeasures: {
     text: '不完全な小節を振り直し続ける',
     description: '不完全な小節（@metcon="false"の場合）を振り直し続ける',
@@ -900,6 +1049,13 @@ export const lang = {
   showFacsimileTitles: {
     text: 'ファクシミリのタイトルを表示',
     description: 'ソース画像の上にファクシミリのタイトルを表示',
+  },
+  titleMeiToolbox: { text: 'MEI ツールボックス', description: 'エディターの横のパネルで行うエンコーディングのチェックと操作' },
+  showMeiToolbox: { text: 'MEI ツールボックスを表示', description: 'チェック、変換、番号付け直し、ID、ファクシミリ、再生成の各タブを持つ MEI ツールボックスを表示します' },
+  selectMeiToolboxOrientation: {
+    text: 'MEI ツールボックスの位置',
+    description: 'エディターに対する MEI ツールボックスの位置を選択します',
+    labels: ['左', '右', '上', '下'],
   },
 
   // Supplied element
@@ -1087,6 +1243,56 @@ export const lang = {
   githubFilepath: { text: 'ファイルパス' },
   githubCommit: { text: 'コミット' },
   githubCommitButton: { classes: { commitAsNewFile: { value: '新しいファイルとしてコミット' } }, value: 'コミット' },
+  // Let's Encode! campaign mode (see lib/lets-encode.js)
+  splashLetsEncode: {
+    html:
+      "<p><strong>Let's\u00a0Encode!</strong>からエンコード作業のためにお越しいただきました。mei-friendは、「Let's\u00a0Encode!」がこの作業のために提供しているエディタの一つです。作業中は<strong>タスク管理</strong>メニュー（左上）の<strong>保存</strong>で進捗を随時保存し、終わったら<strong>タスクを完了</strong>を選んで、成果をキャンペーンに提供してください。</p>",
+  },
+  letsEncodeCompleteTaskButton: { text: 'タスクを完了' },
+  letsEncodeMenuLabel: { text: 'タスク管理' },
+  letsEncodeLoggedInAs: { text: 'ログイン中:' },
+  letsEncodeSaveButton: { text: '保存' },
+  letsEncodeSaving: { text: '作業内容を保存しています…' },
+  letsEncodeSaveFailed: { text: '作業内容を保存できませんでした。' },
+  letsEncodeDismiss: { value: '閉じる' },
+  letsEncodeLastSave: { text: '最終保存:' },
+  letsEncodeLastAutosave: { text: '自動保存:' },
+  letsEncodeSavedAt: { text: '保存日時:' },
+  letsEncodeExpiresAt: { text: '期限:' },
+  letsEncodeTimeRemaining: { text: '以内にタスクを完了してください' },
+  letsEncodeHoursShort: { text: '時間' },
+  letsEncodeMinutesShort: { text: '分' },
+  letsEncodeDaysShort: { text: '日' },
+  letsEncodeAgo: { text: '{n}前' },
+  letsEncodeJustNow: { text: 'たった今' },
+  letsEncodeTimeExpired: { text: 'このタスクの期限が過ぎました' },
+  letsEncodeAutosaveMinutes: {
+    title: '自動保存の間隔（分）',
+    description: '編集中に作業内容を自動保存する間隔（分）です。変更がある場合にのみ保存されます。0にすると自動保存はオフになります。',
+  },
+  titleLetsEncode: { title: 'Let\'s\u00a0Encode!', description: "作業中の「Let's\u00a0Encode!」タスクの設定" },
+  letsEncodeAbandonTaskButton: { text: 'タスクを中止' },
+  letsEncodeKeepWorking: { value: '作業を続ける' },
+  letsEncodeCompleteAnyway: { value: 'このままタスクを完了' },
+  letsEncodeAbandonConfirm: { value: 'タスクを中止' },
+  letsEncodeNoChangesPrompt: { text: 'このエンコードは変更されていません。それも貢献になります。タスクを完了すると、変更が不要だったことが記録されます。作業を続けることもできます。' },
+  letsEncodeConfirmCompletePrompt: { text: "このタスクを完了しますか？作業内容は保存されて「Let's\u00a0Encode!」に渡され、タスクは終了します。" },
+  letsEncodeAbandonPrompt: { text: "このタスクを中止しますか？すでに保存した内容も含め、このタスクでの作業は失われます。また、タスクが完了しなかったことが「Let's\u00a0Encode!」に通知されます。" },
+  letsEncodeLoading: { text: "「Let's\u00a0Encode!」からタスクを読み込んでいます…" },
+  letsEncodeLogoLinkTitle: { text: "「Let's\u00a0Encode!」のキャンペーンを新しいタブで開く（タスクはここで開いたままです）" },
+  letsEncodeDragOverlayText: { text: "「Let's\u00a0Encode!」のタスク中は、他のファイルを開くことはできません。" },
+  letsEncodeCommitting: { text: 'タスクを完了しています…' },
+  letsEncodeCompleted: { text: "タスクが完了しました。「Let's\u00a0Encode!」に戻ります…" },
+  letsEncodeCommitFailed: { text: 'タスクを完了できませんでした。' },
+  letsEncodeRetryButton: { value: '再試行' },
+  letsEncodeAbandonButton: { value: "「Let's\u00a0Encode!」に戻る" },
+  letsEncodeNoCampaignError: {
+    text: "この「Let's\u00a0Encode!」のリンクは不完全です。キャンペーンが指定されていないため、結果を報告する先がありません。「Let's\u00a0Encode!」に戻り、もう一度タスクを開いてください。",
+  },
+  letsEncodeMissingParameterError: { text: "「Let's\u00a0Encode!」からの引き渡しに必要なパラメータがありません:" },
+  letsEncodeFileError: { text: '引き渡されたファイルをGitHubで開けませんでした。' },
+  letsEncodeCloneError: { text: 'GitHubからタスクを読み込めませんでした。' },
+  letsEncodeRemoteChangedError: { text: '作業中にGitHub上でファイルが変更されたため、作業内容を保存できませんでした。' },
   commitLog: { text: 'コミットログ' },
   githubDate: { text: '日付' },
   githubAuthor: { text: '著者' },
@@ -1113,11 +1319,6 @@ export const lang = {
 
   // Utils renumber measures
   renumberMeasuresModalText: { text: '小節番号を更新' },
-  renumberMeasuresModalTest: { text: 'テスト' },
-  renumberMeasuresWillBe: { text: 'は次の番号に更新されます。' },
-  renumberMeasuresWouldBe: { text: 'は次の番号に更新されます。' },
-  renumberMeasuresChangedTo: { text: '' },
-  renumberMeasureMeasuresRenumbered: { text: '小節が更新されました' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },

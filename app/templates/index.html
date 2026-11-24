@@ -132,6 +132,12 @@
     <script src="{{ url_for('static', filename='deps/fast-json-patch.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
+    <!-- after default.css: it overrides the flex direction of #encoding set there -->
+    <link
+      rel="stylesheet"
+      id="meiToolboxOrientationCSS"
+      href="{{ url_for('static', filename='css/toolbox-bottom.css') }}"
+    />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
@@ -185,7 +191,7 @@
   <body>
     <div class="header" id="meiFriendHeader">
       <div class="title">
-        <a href="https://mei-friend.mdw.ac.at/"
+        <a href="https://mei-friend.mdw.ac.at/" id="meiFriendLogoLink"
           ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
         /></a>
       </div>
@@ -274,6 +280,10 @@
               <span id="indentSelectionText">Indent selection</span>
               <span class="keyShortCut altKey shiftKey">F</span>
             </a>
+            <a id="reformatEncoding" href="#">
+              <span id="reformatEncodingText" title="Reformats the entire encoding through the XML parser: attributes sorted (xml:id first, then alphabetically), normalized XML serialization, all lines indented.">Reformat via XML parser</span>
+              <span class="keyShortCut shiftKey cmdKey">X</span>
+            </a>
             <a id="surroundWithTags" href="#">
               <span id="surroundWithTagsText">Surround with tag</span>
               <span class="keyShortCut cmdKey">E</span>
@@ -322,11 +332,19 @@
               <span id="showPlaybackControlsText">Playback controls</span>
               <span class="keyShortCut">SPACE</span>
             </a>
+            <a id="showMeiToolboxMenu" href="#">
+              <span id="showMeiToolboxMenuText">MEI toolbox</span>
+            </a>
             <hr class="dropdownLine" />
             <a id="facsimileTop" href="#">Facsimile top</a>
             <a id="facsimileBottom" href="#">Facsimile bottom</a>
             <a id="facsimileLeft" href="#">Facsimile left</a>
             <a id="facsimileRight" href="#">Facsimile right</a>
+            <hr class="dropdownLine" />
+            <a id="meiToolboxTop" href="#">MEI toolbox top</a>
+            <a id="meiToolboxBottom" href="#">MEI toolbox bottom</a>
+            <a id="meiToolboxLeft" href="#">MEI toolbox left</a>
+            <a id="meiToolboxRight" href="#">MEI toolbox right</a>
           </div>
         </div>
         <div class="dropdown">
@@ -405,44 +423,6 @@
             <a id="toggleDots" href="#">
               <span id="toggleDotsText">Toggle dotted note</span>
               <span class="keyShortCut">.</span>
-            </a>
-            <hr class="dropdownLine" />
-            <a id="cleanAccid" href="#">
-              <span id="cleanAccidText">Check @accid.ges</span>
-              <span class="keyShortCut shiftKey ctrlKey">C</span>
-            </a>
-            <a id="meterConformance" href="#">
-              <span id="meterConformanceText">Check @metcon</span>
-              <!-- <span class="keyShortCut shiftKey ctrlKey">C</span> -->
-            </a>
-            <a id="checkLinkedElements" href="#">
-              <span id="checkLinkedElementsText">Check linked elements</span>
-            </a>
-            <a id="renumberMeasuresTest" href="#">
-              <span id="renumberMeasuresTestText">Renumber measures (test)</span>
-              <!-- <span class="keyShortCut shiftKey">R</span> -->
-            </a>
-            <a id="renumberMeasuresExec" href="#">
-              <span id="renumberMeasuresExecText">Renumber measures (exec)</span>
-              <span class="keyShortCut shiftKey cmdKey">R</span>
-            </a>
-            <hr class="dropdownLine" />
-            <a id="addIds" href="#">
-              <span id="addIdsText">Add ids to MEI</span>
-              <span class="keyShortCut cmdKey">M</span>
-            </a>
-            <a id="removeIds" href="#">
-              <span id="removeIdsText">Remove ids from MEI</span>
-              <span class="keyShortCut shiftKey cmdKey">M</span>
-            </a>
-            <hr class="dropdownLine" />
-            <a id="reRenderMeiVerovio" href="#">Rerender via Verovio</a>
-            <!-- <a id="reRenderMeiWithout" href="#">Rerender via Verovio (remove ids)</a> -->
-            <hr class="dropdownLine" />
-            <a id="addFacsimile" href="#">Add facsimile element</a>
-            <a id="ingestFacsimile" href="#">
-              <span id="ingestFacsimileText">Ingest facsimile</span>
-              <span class="keyShortCut cmdKey">I</span>
             </a>
           </div>
         </div>
@@ -669,6 +649,14 @@
             <table></table>
           </div>
         </div>
+        <div id="showMeiToolboxButton" class="settingsButton" title="Toggle MEI Toolbox">
+          <!-- tools octicon, https://github.com/primer/octicons (MIT) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+            <path
+              d="M5.433 2.304A4.492 4.492 0 0 0 3.5 6c0 1.598.832 3.002 2.09 3.802.518.328.929.923.902 1.64v.008l-.164 3.337a.75.75 0 1 1-1.498-.073l.163-3.33c.002-.085-.05-.216-.207-.316A5.996 5.996 0 0 1 2 6a5.993 5.993 0 0 1 2.567-4.92 1.482 1.482 0 0 1 1.673-.04c.462.296.76.827.76 1.423v2.82c0 .082.041.16.11.206l.75.51a.25.25 0 0 0 .28 0l.75-.51A.249.249 0 0 0 9 5.282V2.463c0-.596.298-1.127.76-1.423a1.482 1.482 0 0 1 1.673.04A5.993 5.993 0 0 1 14 6a5.996 5.996 0 0 1-2.786 5.068c-.157.1-.209.23-.207.315l.163 3.33a.752.752 0 0 1-1.094.714.75.75 0 0 1-.404-.64l-.164-3.345c-.027-.717.384-1.312.902-1.64A4.495 4.495 0 0 0 12.5 6a4.492 4.492 0 0 0-1.933-3.696c-.024.017-.067.067-.067.16v2.818a1.75 1.75 0 0 1-.767 1.448l-.75.51a1.75 1.75 0 0 1-1.966 0l-.75-.51A1.75 1.75 0 0 1 5.5 5.282V2.463c0-.092-.043-.142-.067-.159Z"
+            ></path>
+          </svg>
+        </div>
         <div id="showMidiPlaybackControlBarButton" class="settingsButton" title="Toggle MIDI Playback Control Bar">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
             <path
@@ -715,6 +703,7 @@
           <hr class="dropdownLine" />
           <div id="splashBodyContainer">
             <div id="splashUpdateIndicator"></div>
+            <div id="splashLetsEncode"></div>
             <div id="splashBody"></div>
           </div>
           <div id="splashFooter">
@@ -790,6 +779,18 @@
             <script xmlns="" />
           </svg>
           <p id="solidOverlayCancel">Restoring Solid session - press <span>esc</span> or click here to cancel</p>
+        </div>
+      </div>
+      <div id="letsEncodeOverlay">
+        <div id="letsEncodeUI">
+          <div id="letsEncodeFigure">
+            <img id="letsEncodeHandPic" src="" alt="" aria-hidden="true" />
+          </div>
+          <p id="letsEncodeOverlayMessage"></p>
+          <div id="letsEncodeOverlayButtons">
+            <input type="button" id="letsEncodeOverlayButton1" value="Try again" />
+            <input type="button" id="letsEncodeOverlayButton2" value="Return to ‘Let's&nbsp;Encode!’" />
+          </div>
         </div>
       </div>
       <div id="githubActionsOverlay">
@@ -942,6 +943,7 @@
           <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
           <span class="alertCloseButton" onclick="this.parentElement.style.display = 'none'">&times;</span>
         </div>
+        <div id="promptBackdrop" style="display: none"></div>
         <div id="promptOverlay" class="alert" style="display: none">
           <span id="promptIcon" class="alertIcon"></span>
           <div id="promptContent">
@@ -957,8 +959,8 @@
           <span id="validation-status"></span>
           <button id="linkedNavUp" class="btn icon hidden" type="button" title="Jump to previous linked element"></button>
           <button id="linkedNavDown" class="btn icon hidden" type="button" title="Jump to next linked element"></button>
-          <div id="codeCheckerResizer"></div>
-          <div id="codeChecker">Code Checker</div>
+          <div id="meiToolboxResizer"></div>
+          <div id="meiToolbox"></div>
         </div>
       </div>
 

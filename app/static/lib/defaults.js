@@ -383,6 +383,11 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
+supportedVerovioVersions['6.4.1'] = {
+  url: 'https://www.verovio.org/javascript/6.4.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 6.4.1',
+  releaseDate: '3 November 2026',
+};
 supportedVerovioVersions['6.3.0'] = {
   url: 'https://www.verovio.org/javascript/6.3.0/verovio-toolkit-hum.js',
   description: 'Verovio release 6.3.0',
@@ -601,6 +606,25 @@ export const defaultNotationUpdateDelay = 400; // ms, debounce window for editor
  * language pack files in ../lang/lang.XX.js Don't edit texts here.
  */
 export const meiFriendSettingsOptions = {
+  // Shown only in Let's Encode mode (see letsEncodeOnly, honoured by
+  // addMeiFriendOptionsToSettingsPanel), and first, because for a volunteer
+  // handed one task it is the only section that concerns them.
+  titleLetsEncode: {
+    title: "Let's Encode!",
+    description: '',
+    type: 'header',
+    default: true,
+    letsEncodeOnly: true,
+  },
+  letsEncodeAutosaveMinutes: {
+    title: 'Autosave interval (minutes)',
+    description: 'filled in by language packs',
+    type: 'int',
+    min: 0,
+    step: 1,
+    default: 3,
+    letsEncodeOnly: true,
+  },
   titleGeneral: {
     title: 'General',
     description: '',
@@ -848,39 +872,6 @@ export const meiFriendSettingsOptions = {
     description: 'filled in by language packs',
     type: 'button',
   },
-  // renumber measures
-  renumberMeasuresHeading: {
-    title: 'Renumber measures',
-    description: 'filled in by language packs',
-    type: 'header',
-    default: true,
-  },
-  renumberMeasureContinueAcrossIncompleteMeasures: {
-    title: 'Continue across incomplete measures',
-    description: 'filled in by language packs',
-    type: 'bool',
-    default: false,
-  },
-  renumberMeasuresUseSuffixAtMeasures: {
-    title: 'Suffix at incomplete measures',
-    description: 'filled in by language packs',
-    type: 'select',
-    values: ['none', '-cont'],
-    default: false,
-  },
-  renumberMeasuresContinueAcrossEndings: {
-    title: 'Continue across endings',
-    description: 'filled in by language packs',
-    type: 'bool',
-    default: false,
-  },
-  renumberMeasuresUseSuffixAtEndings: {
-    title: 'Suffix at endings',
-    description: 'filled in by language packs',
-    type: 'select',
-    values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-    default: 'a/b/c',
-  },
   // Annotations
   titleAnnotations: {
     title: 'Annotations',
@@ -961,6 +952,28 @@ export const meiFriendSettingsOptions = {
     description: 'filled in by language packs',
     type: 'bool',
     default: true,
+  },
+
+  // MEI toolbox
+  titleMeiToolbox: {
+    title: 'MEI toolbox',
+    description: 'filled in by language packs',
+    type: 'header',
+    open: false,
+    default: false,
+  },
+  showMeiToolbox: {
+    title: 'Show MEI toolbox',
+    description: 'filled in by language packs',
+    type: 'bool',
+    default: false,
+  },
+  selectMeiToolboxOrientation: {
+    title: 'MEI toolbox position',
+    description: 'filled in by language packs',
+    type: 'select',
+    values: ['left', 'right', 'top', 'bottom'],
+    default: 'bottom',
   },
 
   // Supplied element
@@ -1245,5 +1258,8 @@ export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 export const defaultFacsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
 export const defaultFacsimileProportion = 0.5;
-export const defaultCodeCheckerHeight = 175; // px, height of code checker panel
+export const defaultMeiToolboxHeight = 260; // px, height of the MEI toolbox when at top/bottom
+export const defaultMeiToolboxWidth = 360; // px, width of the MEI toolbox when at left/right
+export const defaultMeiToolboxResizerWidth = 6; // px, compare to css toolbox-[left/right/top/bottom].css
+export const defaultMeiToolboxOrientation = 'bottom'; // position of the toolbox relative to the editor
 export const annotationPanelExtent = 250; // px, width/height of annotation panel, taken away from width of friendContainer

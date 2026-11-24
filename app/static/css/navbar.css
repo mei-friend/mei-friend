@@ -176,6 +176,15 @@
   display: block;
 }
 
+/* Menu items only shown while the ALT key is pressed (e.g., dangerous functions) */
+.dropdownContent a.altKeyOnly {
+  display: none;
+}
+
+body.altKeyPressed .dropdownContent a.altKeyOnly {
+  display: block;
+}
+
 /* Show all the whitespace in the github dropdown file names
    - Whitespace in filenames is significant, so users should see it if it's there
    - Since the filenames are stored on the DOM, letting the browser collapse

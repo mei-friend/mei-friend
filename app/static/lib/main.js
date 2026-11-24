@@ -1,7 +1,11 @@
 // mei-friend version and date
-export const version = '1.5.0';
-export const versionDate = '26 Aug 2026'; // use full or 3-character english months, will be translated
-export const splashDate = '9 July 2026'; // date of the splash screen content, same translation rules apply
+export const version = '1.6.3';
+export const versionDate = '24 Nov 2026'; // use full or 3-character english months, will be translated
+export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
+// Date of the Let's Encode paragraph, which only campaign volunteers ever see.
+// Bump this instead of splashDate when only that paragraph changes: volunteers
+// are shown the splash again, regular users who dismissed it are not disturbed.
+export const letsEncodeSplashDate = '24 Sep 2026';
 
 var vrvWorker;
 var spdWorker;
@@ -12,6 +16,11 @@ var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
+let letsEncode = { active: false, error: null }; // Let's Encode hand-off, detected in onLanguageLoaded()
+// Which content date governs this load: the LATER of the two in Let's Encode
+// mode, so an LE-only change reaches volunteers while a change to the shared
+// text still reaches everybody. Set in onLanguageLoaded(), once the mode is known.
+let effectiveSplashDate = splashDate;
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -43,7 +52,7 @@ export const samp = {
 };
 
 import {
-  addCodeCheckerResizerHandlers,
+  addMeiToolboxResizerHandlers,
   addFacsimilerResizerHandlers,
   addNotationResizerHandlers,
   getFacsimileOrientation,
@@ -51,6 +60,7 @@ import {
   getNotationProportion,
   getOrientation,
   setFacsimileProportion,
+  setMeiToolboxExtent,
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
@@ -70,6 +80,7 @@ import {
   createNotationDiv,
   createEncodingPanel,
   generateSectionSelect,
+  getSectionSelectSelector,
   handleSmartBreaksOption,
   manualCurrentPage,
   setBreaksOptions,
@@ -81,7 +92,7 @@ import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
-import * as checker from './mei-checker.js';
+import * as meiToolbox from './mei-toolbox.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -107,10 +118,20 @@ import {
 } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
+  addLetsEncodeParams,
+  handleLetsEncodeShortcut,
+  hideFileMenu,
+  initLetsEncodeMode,
+  isLetsEncodeMode,
+  noteLetsEncodeInitiatedLogin,
+  openLetsEncodeFile,
+  renderLetsEncodeStatus,
+  retargetLogoLink,
+} from './lets-encode.js';
+import {
   addZoneDrawer,
   clearFacsimile,
   drawFacsimile,
-  ingestFacsimile,
   loadFacsimile,
   zoomFacsimile,
 } from './facsimile.js';
@@ -120,6 +141,7 @@ import {
   defaultFacsimileOrientation,
   defaultFacsimileProportion,
   defaultMeiFileURL,
+  defaultMeiToolboxOrientation,
   defaultNotationOrientation,
   defaultNotationProportion,
   defaultVerovioOptions,
@@ -193,7 +215,12 @@ export async function setFileChangedState(fileChangedState) {
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');
   const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
   const commitUI = document.querySelector('#commitUI');
-  if (fileChanged) {
+  if (isLetsEncodeMode()) {
+    // the flag is still tracked, but the indicator is meaningless here: the
+    // volunteer has one file and commits it by completing the task
+    fileStatusElement.classList.remove('changed');
+    fileChangedIndicatorElement.innerText = '';
+  } else if (fileChanged) {
     fileStatusElement.classList.add('changed');
     fileChangedIndicatorElement.innerText = '*';
   } else {
@@ -288,6 +315,11 @@ export function setFileLocationType(t) {
 }
 
 export function updateFileStatusDisplay() {
+  if (isLetsEncodeMode()) {
+    // the status line carries the campaign, task and account instead
+    renderLetsEncodeStatus();
+    return;
+  }
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   // hack: if we're loading the default mei-friend encoding, override the printable location
   if (meiFileLocation === defaultMeiFileURL) {
@@ -308,7 +340,15 @@ export function updateFileStatusDisplay() {
   }
 }
 
-export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
+/**
+ * Loads an encoding into the editor.
+ * @param {string} meiXML
+ * @param {boolean} setFreshlyLoaded
+ * @param {boolean} newDocument whether this is a different encoding (as opposed to
+ *   the current one written anew, e.g. by a Verovio rerender): only then are the
+ *   results in the MEI toolbox about to become meaningless and get cleared
+ */
+export function loadDataInEditor(meiXML, setFreshlyLoaded = true, newDocument = true) {
   if (storage && storage.supported) {
     storage.override = false;
   }
@@ -320,7 +360,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
-  v.hideCodeCheckerPanel();
+  if (newDocument) v.hideCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);
@@ -475,14 +515,33 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
+  // Let's Encode campaign hand-off (?le_campaignname and ?le_taskid, alongside
+  // the usual ?file). Detected here, before the splash decision and before
+  // storage is read, for two reasons: the splash has to know whether to wear
+  // the joint branding, and entering the mode scopes storage to this tab, which
+  // must happen before anything is read or written. An incomplete hand-off also
+  // fails back to the campaign at once, rather than after the volunteer has
+  // dismissed a splash screen they did not need to see.
+  const leSearchParams = new URLSearchParams(window.location.search);
+  letsEncode = initLetsEncodeMode(leSearchParams, leSearchParams.get('file'));
+  if (letsEncode.active) {
+    // done here, not after the splash: the logo is a live link behind the
+    // overlay, and following it would cost the volunteer their work
+    retargetLogoLink();
+    hideFileMenu();
+    if (new Date(letsEncodeSplashDate) > new Date(splashDate)) {
+      effectiveSplashDate = letsEncodeSplashDate;
+    }
+  }
+
   // show splash screen if required, i.e.: if never previously acknowledged; or,
-  // if acknowledged before latest splash screen content update (splashDate), or,
+  // if acknowledged before the latest content update (effectiveSplashDate), or,
   // if splash screen is set to show on every load
   if (storage.supported) {
     storage.read();
     let splashTextUpdatedSinceLastAck;
     try {
-      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(splashDate).getTime();
+      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(effectiveSplashDate).getTime();
     } catch {
       splashTextUpdatedSinceLastAck = false;
     }
@@ -667,8 +726,22 @@ async function completeInitialLoad() {
 
   let urlFileName = searchParams.get('file');
 
-  if (storage.supported && urlFileName) {
+  // Let's Encode campaign hand-off: open the file through the GitHub
+  // integration so the volunteer can commit to the task branch, then report
+  // back to the campaign. Detected up in onLanguageLoaded(), before the splash
+  // screen; used here to keep the ordinary ?file fetch below from running,
+  // which would otherwise clear the GitHub binding we need.
+  const letsEncodeMode = letsEncode.active;
+  if (letsEncode.error === 'noCampaign') {
+    // nowhere to report this back to, so it stays on screen until dismissed
+    v.showAlert(translator.lang.letsEncodeNoCampaignError.text, 'error', 0);
+  }
+
+  if (storage.supported && urlFileName && !letsEncodeMode) {
     // write url filename to storage so we can act upon it later, e.g. on return from solid login
+    // (not in Let's Encode mode: the handed-off file is opened through the GitHub
+    // integration, never fetched as a URL, and recording it as a 'url' location
+    // would send us fetching a raw link we cannot read on a private repository)
     let url = new URL(urlFileName);
     storage.safelySetStorageItem('fileLocation', url.href);
     storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
@@ -697,12 +770,13 @@ async function completeInitialLoad() {
   // ... if we have a fileLocationType 'url' with a fileLocation specified in storage, but NO meiXml
   // ... (=> because storage was disabled, e.g., due to encoding size)...
   // then, fetch and load the URL.
-  if (urlFileName && !(forkParam === 'true')) {
+  if (urlFileName && !(forkParam === 'true') && !letsEncodeMode) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
     urlFetchInProgress = true;
   } else if (
     storage.supported &&
+    !letsEncodeMode &&
     storage.fileLocationType &&
     storage.fileLocation &&
     storage.fileLocationType === 'url' &&
@@ -736,8 +810,12 @@ async function completeInitialLoad() {
     }
     setFileChangedState(storage.fileChanged);
     updateFileStatusDisplay();
-    if (!urlFileName && !urlFetchInProgress) {
+    if (!urlFileName && !urlFetchInProgress && !letsEncodeMode) {
       // no URI param specified - try to restore from storage
+      // (in Let's Encode mode nothing is opened here: the task arrives through
+      // the GitHub integration behind a loading overlay, and putting the default
+      // encoding in the editor first invites the volunteer to edit a document
+      // that is about to be replaced)
       if (storage.content && storage.fileName) {
         // restore file name and content from storage
         // unless a URI param was specified
@@ -773,7 +851,7 @@ async function completeInitialLoad() {
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
-    openFile(undefined, false, false); // default MEI
+    if (!letsEncodeMode) openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
     // regardless of storage availability:
@@ -795,6 +873,20 @@ async function completeInitialLoad() {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
         document.getElementById('githubLoginLink').click();
       }
+    }
+  }
+
+  if (letsEncodeMode) {
+    if (isLoggedIn && gm) {
+      console.log("Opening Let's Encode task file...");
+      openLetsEncodeFile(gm);
+    } else {
+      // initLetsEncodeMode() has already remembered the task, so it survives the
+      // login redirect and is picked up again when we come back here. Note that
+      // the login is ours, not the volunteer's doing: abandoning the task later
+      // signs them out again only in that case.
+      noteLetsEncodeInitiatedLogin();
+      document.getElementById('githubLoginLink').click();
     }
   }
 
@@ -844,16 +936,29 @@ async function completeInitialLoad() {
     fp = defaultFacsimileProportion;
   }
 
+  let to = ''; // MEI toolbox orientation from storage or default
+  if (storage && storage.supported && storage.hasItem('meiToolboxOrientation')) {
+    to = storage.meiToolboxOrientation;
+  } else {
+    to = defaultMeiToolboxOrientation;
+  }
+  if (storage && storage.supported) {
+    setMeiToolboxExtent(storage.meiToolboxWidth, storage.meiToolboxHeight);
+  }
+
   setNotationProportion(np);
   setFacsimileProportion(fp);
   addAnnotationHandlers();
   addMarkupHandlers();
-  setOrientation(cm, o, fo, v, storage);
+  setOrientation(cm, o, fo, v, storage, to);
+  // the attribute order is used whenever an element is written back into the
+  // editor, also before the MEI toolbox that configures it has been opened
+  meiToolbox.applyAttributeOrder();
 
   addEventListeners(v, cm);
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
-  addCodeCheckerResizerHandlers(v, cm);
+  addMeiToolboxResizerHandlers(v, cm);
 
   let doit;
   window.onresize = () => {
@@ -872,6 +977,8 @@ async function completeInitialLoad() {
     shortUrl.searchParams.append('code', solidCodeParam);
     shortUrl.searchParams.append('state', solidStateParam);
   }
+  // keep a Let's Encode task in the URL, so a reload stays in the task
+  addLetsEncodeParams(shortUrl);
   window.history.pushState({}, '', shortUrl.href);
   if (storage.supported && storage.restoreSolidSession) {
     restoreSolidTimeout = setTimeout(function () {
@@ -1062,7 +1169,12 @@ async function vrvWorkerEventsHandler(ev) {
       setChoiceOptions('', 'choiceOrigRegSelect');
       setChoiceOptions('', 'choiceSicCorrSelect');
       setChoiceOptions('', 'substSelect');
-      if (!storage.supported || !meiFileName) {
+      if (isLetsEncodeMode()) {
+        // Let's Encode mode: the task arrives through the GitHub integration,
+        // behind the loading overlay. Opening the default encoding here would
+        // put a document in the editor that is about to be replaced — and
+        // editing it while the clone is in flight breaks the load.
+      } else if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
       } else {
@@ -1087,9 +1199,9 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'updated': // display SVG data on site
       if (ev.data.mei) {
-        // from reRenderMEI
+        // from reRenderMEI: the same encoding, written anew by Verovio
         v.allowCursorActivity = false;
-        loadDataInEditor(ev.data.mei);
+        loadDataInEditor(ev.data.mei, true, false);
         setFileChangedState(false);
         updateLocalStorage(ev.data.mei);
         v.allowCursorActivity = true;
@@ -1102,19 +1214,27 @@ async function vrvWorkerEventsHandler(ev) {
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
+      // the section selector navigates by xml:id, so elements without one get
+      // an xml:id added to the encoding (this re-renders and comes back here)
+      addMissingSectionIds();
+
       // add section selector (or hide it if only one section)
       let sectionSelect = document.getElementById('sectionSelect');
       let previousSectionSelectValue = sectionSelect.value; // preserve selection across the rebuild below
       while (sectionSelect.options.length > 0) sectionSelect.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
-        sections.forEach((opt) => sectionSelect.options.add(new Option(opt[0], opt[1])));
+        sections.forEach((opt) => {
+          let option = new Option(opt[0], opt[1]);
+          option.title = opt[2];
+          sectionSelect.options.add(option);
+        });
         sectionSelect.style.display = 'block';
         sectionSelect.value = previousSectionSelectValue;
       } else {
         sectionSelect.style.display = 'none';
       }
-      
+
       // update page count and page number display
       let bs = document.getElementById('breaksSelect').value;
       if (ev.data.pageCount && !v.speedMode) {
@@ -1584,7 +1704,9 @@ function createSplashScreen() {
 function handleSplashConfirmed(splashInitialLoad, storage) {
   document.getElementById('splashOverlay').style.display = 'none';
   if (storage && storage.supported) {
-    storage.splashAcknowledged = splashDate;
+    // record the date that was actually tested against, so acknowledging the
+    // Let's Encode splash also settles the shared text the volunteer just read
+    storage.splashAcknowledged = effectiveSplashDate;
   }
   if (splashInitialLoad) completeInitialLoad();
 }
@@ -1593,9 +1715,19 @@ function showSplashScreen(showUpdateIndicator = false) {
   const updateIndicator = document.getElementById('splashUpdateIndicator');
   const splashLastUpdated = document.getElementById('splashLastUpdated');
   updateIndicator.innerHTML = translator.lang.splashUpdateIndicator.html;
-  const translatedSplashDate = translator.translateDate(splashDate);
+  const translatedSplashDate = translator.translateDate(effectiveSplashDate);
   splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
   showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
+  if (isLetsEncodeMode()) {
+    // Arriving from a campaign rather than off the street: say where they are
+    // and why, so the splash is not a non-sequitur. The splash keeps the plain
+    // mei-friend logo on purpose — the navbar already wears the joint one, and
+    // this is where the volunteer learns the name of the tool they are in.
+    // (This changes only what the splash says, never whether it appears.)
+    const letsEncodeNote = document.getElementById('splashLetsEncode');
+    letsEncodeNote.innerHTML = translator.lang.splashLetsEncode.html;
+    letsEncodeNote.style.display = 'block';
+  }
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
@@ -1939,17 +2071,27 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  correctAccid: () => checker.checkAccidGes(v, cm),
-  checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
-  checkLinkedElements: () => setTimeout(() => checker.checkLinkedElements(v, cm), 10),
-  renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
-  renumberMeasures: () => e.renumberMeasures(v, cm, true),
-  reRenderMei: () => v.reRenderMei(cm, false),
+  correctAccid: () => meiToolbox.runCheck('accidGes'),
+  checkMeterConformance: () => meiToolbox.runCheck('metcon'),
+  checkLinkedElements: () => meiToolbox.runCheck('linked'),
+  renumberMeasuresTest: () => meiToolbox.runRenumber(false),
+  renumberMeasures: () => meiToolbox.runRenumber(true),
+  reRenderMei: () => meiToolbox.runReformat('verovio'),
   reRenderMeiWithout: () => v.reRenderMei(cm, true),
-  addIds: () => e.manipulateXmlIds(v, cm, false),
-  removeIds: () => e.manipulateXmlIds(v, cm, true),
-  ingestFacsimile: () => ingestFacsimile(),
-  addFacsimile: () => e.addFacsimile(v, cm),
+  reformatEncoding: () => meiToolbox.runReformat('xml'),
+  addIds: () => meiToolbox.runIds('add'),
+  removeIds: () => meiToolbox.runIds('remove'),
+  changeIds: () => meiToolbox.runIds('change'),
+  convertAttributesToElements: () => meiToolbox.openToolbox('convert'),
+  ingestFacsimile: () => meiToolbox.runFacsimile('ingest'),
+  addFacsimile: () => meiToolbox.runFacsimile('empty'),
+  showMeiToolbox: () => meiToolbox.openToolbox(),
+  hideMeiToolbox: () => meiToolbox.closeToolbox(),
+  toggleMeiToolbox: () => meiToolbox.toggleToolbox(),
+  meiToolboxTop: () => setOrientation(cm, '', '', v, storage, 'top'),
+  meiToolboxBottom: () => setOrientation(cm, '', '', v, storage, 'bottom'),
+  meiToolboxLeft: () => setOrientation(cm, '', '', v, storage, 'left'),
+  meiToolboxRight: () => setOrientation(cm, '', '', v, storage, 'right'),
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
@@ -2077,6 +2219,10 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileBottom').addEventListener('click', cmd.facsimileBottom);
   document.getElementById('facsimileLeft').addEventListener('click', cmd.facsimileLeft);
   document.getElementById('facsimileRight').addEventListener('click', cmd.facsimileRight);
+  document.getElementById('meiToolboxTop').addEventListener('click', cmd.meiToolboxTop);
+  document.getElementById('meiToolboxBottom').addEventListener('click', cmd.meiToolboxBottom);
+  document.getElementById('meiToolboxLeft').addEventListener('click', cmd.meiToolboxLeft);
+  document.getElementById('meiToolboxRight').addEventListener('click', cmd.meiToolboxRight);
 
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
@@ -2120,6 +2266,8 @@ function addEventListeners(v, cm) {
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   //  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
+  document.getElementById('showMeiToolboxMenu').addEventListener('click', cmd.toggleMeiToolbox);
+  document.getElementById('showMeiToolboxButton').addEventListener('click', cmd.toggleMeiToolbox);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
   document.querySelectorAll('#settingsPanel .tablink').forEach((t) => t.addEventListener('click', cmd.filterSettings));
@@ -2147,6 +2295,7 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', indentSelection);
+  document.getElementById('reformatEncoding').addEventListener('click', cmd.reformatEncoding);
   document.getElementById('surroundWithTags').addEventListener('click', cmd.encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', cmd.encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
@@ -2300,21 +2449,14 @@ function addEventListeners(v, cm) {
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
-  // Manipulate encoding methods
-  document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
-  document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
-  document.getElementById('checkLinkedElements').addEventListener('click', cmd.checkLinkedElements);
-  document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
-  document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
-  // rerender through Verovio
-  document.getElementById('reRenderMeiVerovio').addEventListener('click', cmd.reRenderMei);
-  // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
-  // add/remove ids
-  document.getElementById('addIds').addEventListener('click', cmd.addIds);
-  document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  // ingest facsimile skeleton into currently loaded MEI file
-  document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
-  document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // menu items with class 'altKeyOnly' are only shown while the ALT key is pressed
+  // (no menu item uses it at the moment: 'Change ids' moved into the MEI toolbox)
+  const toggleAltKeyOnly = (pressed) => document.body.classList.toggle('altKeyPressed', pressed);
+  window.addEventListener('keydown', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('keyup', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('mousemove', (ev) => toggleAltKeyOnly(ev.altKey), true);
+  window.addEventListener('blur', () => toggleAltKeyOnly(false));
+
   // add note
   document.getElementById('addNote').addEventListener('click', cmd.addNote);
   document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
@@ -2662,6 +2804,24 @@ export function setStandoffAnnotationEnabledStatus() {
 }
 
 // handles any changes in CodeMirror
+/**
+ * Adds xml:ids to the elements listed in the section selector (mdiv, section,
+ * ending, lem, rdg) that have none, so that they can be navigated to. Writes
+ * the ids into the encoding (as a single undo step, marking the file as
+ * changed), which triggers a re-render. Does nothing if all have an xml:id.
+ */
+function addMissingSectionIds() {
+  if (!v.xmlDoc) return;
+  const nodeNames = new Set();
+  v.xmlDoc.querySelectorAll(getSectionSelectSelector(v.xmlDoc)).forEach((el) => {
+    if (!el.hasAttribute('xml:id')) nodeNames.add(el.nodeName);
+  });
+  if (nodeNames.size > 0) {
+    console.log('addMissingSectionIds(): adding xml:ids to ' + Array.from(nodeNames).join(', '));
+    e.manipulateXmlIds(v, cm, 'add', Array.from(nodeNames), false);
+  }
+} // addMissingSectionIds()
+
 export async function handleEditorChanges() {
   v.notationUpdated(cm);
   // fileChanged flag may have been set from storage
@@ -2817,6 +2977,9 @@ function setKeyMap() {
         if (methodName !== undefined) {
           ev.stopPropagation();
           ev.preventDefault();
+          // swallowed rather than passed on, or the browser would open its own
+          // save, print, or open-file dialog (the last navigates the tab away)
+          if (handleLetsEncodeShortcut(methodName)) return;
           console.log('keyMap method ' + methodName + '.', cmd[methodName]);
           cmd[methodName](); // execute the function
         }
@@ -2824,6 +2987,47 @@ function setKeyMap() {
     });
   }
 } // setKeyMap()
+
+/**
+ * Looks up the keyboard shortcut a command is bound to in the keymap, so that the
+ * GUI can show the shortcut where the command is offered without repeating it in
+ * the markup. The modifier class names are the ones the menu bar uses, so that
+ * addModifyerKeys() renders them with the same symbols: 'cmdKey' (CMD on Mac, CTRL
+ * elsewhere), 'ctrlKey' (CTRL on all platforms), 'shiftKey', 'altKey'. Whether a
+ * modifier is cmdKey or ctrlKey is decided by the Mac binding, where the two are
+ * distinct; the key itself is taken from the binding of the current platform.
+ * @param {string} commandName name of a method of `cmd`, e.g. 'addIds'
+ * @returns {{classes: string[], key: string} | null} null if not bound
+ */
+export function shortcutForCommand(commandName) {
+  const platformToken = platform.startsWith('mac') ? 'darwin' : platform.startsWith('win') ? 'win32' : 'linux';
+  // the sections of the keymap that apply here: those without a platform, and those of this platform
+  const applies = (selectors, token) =>
+    !selectors.includes('platform-') || selectors.includes('platform-' + token + '-');
+  const findBinding = (token) => {
+    for (const [selectors, bindings] of Object.entries(keymap)) {
+      if (!applies(selectors, token)) continue;
+      for (const [keyPress, method] of Object.entries(bindings)) {
+        if (method === commandName) return keyPress;
+      }
+    }
+    return null;
+  };
+
+  const here = findBinding(platformToken);
+  if (!here) return null;
+  const onMac = findBinding('darwin') || here;
+  const parts = here.split('-');
+  const key = parts.pop();
+  const macModifiers = onMac.split('-').slice(0, -1);
+  const classes = parts.map((modifier) => {
+    if (modifier === 'shift') return 'shiftKey';
+    if (modifier === 'alt') return 'altKey';
+    // cmd/ctrl: CMD on the Mac means the cmdKey of the menu bar, CTRL there means ctrlKey
+    return macModifiers.includes('cmd') ? 'cmdKey' : 'ctrlKey';
+  });
+  return { classes, key: key.length === 1 ? key.toUpperCase() : key };
+} // shortcutForCommand()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {

@@ -1,5 +1,6 @@
 import { calcSizeOfContainer } from './resizer.js';
-import { openFile } from './main.js';
+import { openFile, translator } from './main.js';
+import { isLetsEncodeMode } from './lets-encode.js';
 
 // Returns true only when the drag originates from the filesystem (i.e. the user is
 // dragging a file from outside the browser).  Internal element drags (menu items,
@@ -11,6 +12,13 @@ function isFileDrag(ev) {
 export function dropHandler(ev) {
   ev.stopPropagation();
   ev.preventDefault();
+  // In Let's Encode mode the editor is bound to the task's file, so nothing
+  // dropped may replace it. The drop is still consumed: left to the browser, it
+  // would open the file in this tab, and the task with it.
+  if (isLetsEncodeMode()) {
+    off();
+    return;
+  }
   // Use DataTransferItemList interface to access the file(s)
   if (ev.dataTransfer.items) {
     let l = ev.dataTransfer.items.length;
@@ -44,6 +52,7 @@ export function dragOverHandler(ev) {
   if (!isFileDrag(ev)) return;
   ev.stopPropagation();
   ev.preventDefault();
+  refuseInLetsEncodeMode(ev);
   on();
 }
 
@@ -51,7 +60,13 @@ export function dragEnter(ev) {
   if (!isFileDrag(ev)) return;
   ev.stopPropagation();
   ev.preventDefault();
+  refuseInLetsEncodeMode(ev);
   on();
+}
+
+// the no-drop cursor, while the overlay says why
+function refuseInLetsEncodeMode(ev) {
+  if (isLetsEncodeMode()) ev.dataTransfer.dropEffect = 'none';
 }
 
 export function dragLeave(ev) {
@@ -67,6 +82,11 @@ function on() {
   let fc = document.querySelector('.dragOverlay');
   fc.width = sz.width;
   fc.height = sz.height;
+  // set on every drag rather than once, so it follows a change of language
+  fc.classList.toggle('refused', isLetsEncodeMode());
+  document.getElementById('dragOverlayText').textContent = isLetsEncodeMode()
+    ? translator.lang.letsEncodeDragOverlayText.text
+    : translator.lang.dragOverlayText.text;
   fc.style.display = 'block';
 }
 
