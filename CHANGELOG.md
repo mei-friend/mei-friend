@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.6.4 patch: Speed mode with mdiv support
+* Speed mode now supports `mdiv` elements, with the section selector showing the `@label`, `@n` or `@source` of each mdiv, section, ending, lem and rdg element instead of only the `xml:id`.
+* Several existing bugs (including scoreDef, keySig and meterSig) in speed mode fixed, and the speed mode codebase refactored to be more maintainable.
+
 ### 1.6.3 patch: MEI toolbox
 * The checker panel becomes the **MEI toolbox**, with three further tabs beside `Check`, `Convert` and `Renumber`:
   * **Ids**: add, change or remove `xml:id`s (restricted to the editor selection when text is selected), with the `xml:id` style of the settings panel mirrored in the tab. The result line reports what happened (added, changed, removed, kept, references updated); removing lists the `xml:id`s kept because they are pointed to from within the encoding, each clickable to jump to it.
@@ -12,6 +16,7 @@
 * Results in the MEI toolbox are cleared as soon as the options they were produced with are touched, so that what is shown always belongs to the options beside it.
 * Linking element highlighting bug fixed that prevented up/down arrows bindings to work in the editor.
 * Facsimile source image loading bug with Safari fixed.
+* Validation now works also under Safari WebKit. 
 
 ### 1.6.2 patch: Code checker optimizations and new functionality
 * Substantial speed improvements for accid.ges, metcon, and linking checker functions
