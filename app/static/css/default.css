@@ -1879,8 +1879,10 @@ input.urlResolves {
   width: 3.5em;
   margin-right: -3.5em;
   height: 1.2em;
-  left: 3px;
-  top: 3px;
+  /* top-left corner of the editor; the offsets skip the MEI toolbox when it sits
+     at the top or left of the editor (set in resizer.sizeEncodingPanel()) */
+  left: calc(3px + var(--editorOffsetLeft, 0px));
+  top: calc(3px + var(--editorOffsetTop, 0px));
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -1934,12 +1936,16 @@ input.urlResolves {
   height: 26px;
 }
 
+/* positioned relative to the editor, skipping the MEI toolbox (--editorOffset*
+   set in resizer.sizeEncodingPanel()); right/bottom are overridden in JS */
 #linkedNavUp {
-  top: 3px;
+  top: calc(3px + var(--editorOffsetTop, 0px));
+  right: calc(6px + var(--editorOffsetRight, 0px));
 }
 
 #linkedNavDown {
-  bottom: 6px;
+  bottom: calc(6px + var(--editorOffsetBottom, 0px));
+  right: calc(6px + var(--editorOffsetRight, 0px));
 }
 
 .validation-report {
@@ -1947,10 +1953,14 @@ input.urlResolves {
   display: block;
   position: absolute;
   z-index: 12;
-  left: 72px;
-  top: 3px;
+  /* next to #validation-status within the editor, skipping the MEI toolbox
+     (--editorOffset* set in resizer.sizeEncodingPanel()) */
+  left: calc(72px + var(--editorOffsetLeft, 0px));
+  top: calc(3px + var(--editorOffsetTop, 0px));
   width: 560px;
   margin-right: -560px;
+  /* do not extend over a toolbox at the right (8px: padding + border) */
+  max-width: calc(100% - 72px - 3px - 8px - var(--editorOffsetLeft, 0px) - var(--editorOffsetRight, 0px));
   max-height: 10.5em;
   padding: 2px;
   overflow-x: auto;

@@ -2,12 +2,10 @@
  * Applies language packs to GUI elements
  * Language packs need to be listed in supportedLanguages in defaults.js
  */
-import { isSafari } from './defaults.js';
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
 import { drawRightFooter, pageInfoToStatusBar } from './main.js';
 import { refreshAnnotationsList } from './enrichment-panel.js';
-import Viewer from './viewer.js';
 
 /**
  * Translator class
@@ -96,8 +94,6 @@ export default class Translator {
     refreshAnnotationsList();
 
     this.handleLanguageExceptions();
-
-    if (isSafari) this.handleBrowserExceptions('Safari');
 
     // Notify listeners that the UI strings are now in a (possibly) new language,
     // so they can refresh any text they own outside the id-based auto-translate
@@ -197,41 +193,4 @@ export default class Translator {
       document.querySelector('body').classList.remove('lang_ja');
     }
   } // handleLanguageExceptions()
-
-  /**
-   * @param {Viewer} v
-   * @param {string} browserName
-   */
-  handleBrowserExceptions(browserName = '') {
-    if (browserName === 'Safari') {
-      // tell at multiple place that Safari is not a browser for mei-friend!
-      let alert = document.getElementById('alertOverlay');
-      if (alert && alert.style.display !== 'none') {
-        document.getElementById('alertMessage').innerHTML = this.lang.isSafariWarning.text;
-      }
-      let vs = document.getElementById('validation-status');
-      if (vs) {
-        vs.title = this.lang.isSafariWarning.text;
-      }
-      Viewer.updateSchemaStatusDisplay('error', '', this.lang.isSafariWarning.text);
-      let mv = document.getElementById('manualValidate');
-      if (mv) {
-        mv.disabled = true;
-        mv.classList.add('disabled');
-        mv.title = this.lang.isSafariWarning.text;
-      }
-      let av = document.getElementById('autoValidate')?.parentElement;
-      if (av) {
-        av.classList.add('disabled');
-        av.disabled = true;
-        av.title = this.lang.isSafariWarning.text;
-      }
-      let asvr = document.getElementById('autoShowValidationReport')?.parentElement;
-      if (asvr) {
-        asvr.classList.add('disabled');
-        asvr.disabled = true;
-        asvr.title = this.lang.isSafariWarning.text;
-      }
-    }
-  } // handleBrowserExceptions()
 } // class Translator()

@@ -1307,11 +1307,13 @@ export const lang = {
   },
 
   // main.js alert messages
-  isSafariWarning: {
+  safariAutoValidateWarning: {
     text:
-      'It seems that you are using Safari as your browser, on which ' +
-      'mei-friend unfortunately does not support schema validation. ' +
-      'Please use another browser for full validation support.',
+      'On Safari, mei-friend has to validate in the browser window itself, ' +
+      'because validation does not run in a worker there. With automatic validation ' +
+      'switched on, the interface therefore pauses briefly after each change, the ' +
+      'longer the larger the encoding. Switch it off to validate on demand, by ' +
+      'clicking the validation status icon.',
   },
   githubLoggedOutWarning: {
     text: `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!

@@ -4,11 +4,13 @@ import { join } from 'path';
 import { setupPage, openLocalMei } from './setup';
 
 // The code checkers (accid.ges conformance, meter conformance, linked elements)
-// report into the panel below the encoding. Each one works through the document
-// in time slices and ends by hiding the panel's Stop button, which is what these
-// tests wait for. Message wording follows the browser language, so the assertions
-// read the xml:ids and attribute values carried inside a message, and check what
-// a Fix button actually does to the encoding, rather than the prose around it.
+// report into the Check tab of the MEI toolbox (mei-toolbox.js). Each one works
+// through the document in time slices: the run writes its title into .mtRunTitle,
+// marks its pane .running while it goes, and drops that class when it is done,
+// which is what these tests wait for. Message wording follows the browser language,
+// so the assertions read the xml:ids and attribute values carried inside a message,
+// and check what a Fix button actually does to the encoding, rather than the prose
+// around it.
 
 const fixture = (name: string) => readFileSync(join(__dirname, 'fixtures', name), 'utf-8');
 
@@ -19,40 +21,64 @@ async function loadFixture(page: Page, name: string, noteId: string) {
   await expect(page.locator('#' + noteId)).toBeVisible({ timeout: 30000 });
 }
 
+/** The pane of the Check tab, where the checkers report. */
+const checkPane = (page: Page) => page.locator('.mtPane[data-tab="check"]');
+
+/** Opens the MEI toolbox at its Check tab, with the options unfolded. */
+async function openCheckTab(page: Page) {
+  // loading an encoding hides the toolbox (resetToolbox()), so open it per run;
+  // the button toggles, hence only when it is not already showing
+  if (!(await page.locator('#meiToolbox').isVisible())) {
+    await page.locator('#showMeiToolboxButton').click();
+  }
+  await expect(page.locator('#meiToolbox')).toBeVisible();
+  await page.locator('.mtTab[data-tab="check"]').click();
+  await expect(checkPane(page)).toBeVisible();
+  // a previous run folds the options away, which hides the check type and the button
+  await page.evaluate(() =>
+    document.querySelector('.mtPane[data-tab="check"] .mtOptions')!.classList.remove('collapsed')
+  );
+}
+
 /** Runs one code checker and returns its messages, without the leading number. */
-async function runChecker(page: Page, menuItemId: string): Promise<string[]> {
-  // empty the panel first, so that the Stop button of the previous run cannot be
-  // mistaken for the one this run ends with
+async function runChecker(page: Page, type: 'accidGes' | 'metcon' | 'linked'): Promise<string[]> {
+  await openCheckTab(page);
+  await checkPane(page).locator(`input[name="mtCheckType"][value="${type}"]`).check();
+  // clear the title and the entries of a previous run, so that neither it nor the
+  // placeholder can be mistaken for the run started below (metcon and linked only
+  // begin after a timeout, so a pane that is not .running yet means nothing)
   await page.evaluate(() => {
-    const panel = document.getElementById('codeChecker');
-    if (panel) panel.innerHTML = '';
+    const pane = document.querySelector('.mtPane[data-tab="check"]')!;
+    pane.querySelector('.mtRunTitle')!.innerHTML = '';
+    pane.querySelectorAll('.mtEntry').forEach((e) => e.remove());
   });
-  await page.evaluate((id) => (document.getElementById(id) as HTMLElement).click(), menuItemId);
+  await checkPane(page).locator('.mtActions button').click();
   await expect
     .poll(
       () =>
         page.evaluate(() => {
-          const stop = document.getElementById('codeCheckerStopButton') as HTMLElement | null;
-          return !!stop && stop.style.display === 'none';
+          const pane = document.querySelector('.mtPane[data-tab="check"]')!;
+          const started = (pane.querySelector('.mtRunTitle')!.innerHTML || '') !== '';
+          return started && !pane.classList.contains('running');
         }),
       { timeout: 60000 }
     )
     .toBe(true);
-  return page.$$eval('#codeChecker .validation-item .codeCheckerMessage', (els) =>
+  return page.$$eval('.mtPane[data-tab="check"] .mtEntry .codeCheckerMessage', (els) =>
     els.map((el) => (el.textContent || '').replace(/^\d+\s/, '').trim())
   );
 }
 
 /** Clicks "Fix all" and waits until every fix has been applied. */
 async function fixAll(page: Page) {
-  await page.evaluate(() => (document.getElementById('codeCheckerFixAllButton') as HTMLElement).click());
+  await checkPane(page).locator('.mtFixAll').click();
   await expect
     .poll(
       () =>
         page.evaluate(() => {
-          const stop = document.getElementById('codeCheckerStopButton') as HTMLElement | null;
-          const open = document.querySelectorAll('#codeChecker button.fix:not(.disabled)').length;
-          return !!stop && stop.style.display === 'none' && open === 0;
+          const pane = document.querySelector('.mtPane[data-tab="check"]')!;
+          const open = pane.querySelectorAll('button.fix:not(.disabled)').length;
+          return !pane.classList.contains('running') && open === 0;
         }),
       { timeout: 60000 }
     )
@@ -87,7 +113,7 @@ test.describe('accid.ges code checker', () => {
     await loadFixture(page, 'checker-keysig.mei', 'n1');
     // every note of the fixture agrees with the signature in force, including the
     // notes after a keySig without @sig, which cancels the three sharps
-    expect(await runChecker(page, 'cleanAccid')).toEqual([]);
+    expect(await runChecker(page, 'accidGes')).toEqual([]);
   });
 
   test('Verovio renders a keySig without @sig as a cancellation', async ({ page }) => {
@@ -107,7 +133,7 @@ test.describe('accid.ges code checker', () => {
 
   test('a tie ending is not asked to drop an accid.ges its starting note sounds with', async ({ page }) => {
     await loadFixture(page, 'checker-ties.mei', 'a1');
-    const messages = await runChecker(page, 'cleanAccid');
+    const messages = await runChecker(page, 'accidGes');
     // a3 and c3 are tied from a note sounding sharp through an accidental earlier in
     // its measure, b3 and d3 from one sounding sharp through the key signature
     for (const id of ['a3', 'b3', 'c3', 'd3']) {
@@ -117,7 +143,7 @@ test.describe('accid.ges code checker', () => {
 
   test('tie endings that disagree with their starting note are reported and fixed', async ({ page }) => {
     await loadFixture(page, 'checker-ties.mei', 'a1');
-    const messages = await runChecker(page, 'cleanAccid');
+    const messages = await runChecker(page, 'accidGes');
     for (const id of ['e3', 'f3', 'g3', 'h3']) {
       expect(naming(messages, id).length, `messages naming ${id}`).toBeGreaterThan(0);
     }
@@ -133,7 +159,7 @@ test.describe('accid.ges code checker', () => {
 
   test('notes carrying both a notated and a gestural accidental are reported', async ({ page }) => {
     await loadFixture(page, 'checker-accid-contradiction.mei', 'c1');
-    const messages = await runChecker(page, 'cleanAccid');
+    const messages = await runChecker(page, 'accidGes');
     // c1/c2 keep both at the note, c3 the gestural one at a child accid element,
     // c4 both at the same child
     for (const id of ['c1', 'c2', 'c3', 'c4']) {
@@ -145,7 +171,7 @@ test.describe('accid.ges code checker', () => {
 
   test('fixing a contradiction removes the gestural accidental wherever it is encoded', async ({ page }) => {
     await loadFixture(page, 'checker-accid-contradiction.mei', 'c1');
-    await runChecker(page, 'cleanAccid');
+    await runChecker(page, 'accidGes');
     await fixAll(page);
 
     const mei = await editorValue(page);
@@ -162,14 +188,14 @@ test.describe('accid.ges code checker', () => {
     expect(element(mei, 'a5')).toContain('accid="f"');
 
     // a fix that did not reach the encoding would show up again here
-    expect(await runChecker(page, 'cleanAccid')).toEqual([]);
+    expect(await runChecker(page, 'accidGes')).toEqual([]);
   });
 });
 
 test.describe('meter conformance code checker', () => {
   test('measures that do not fill their meter are reported and marked', async ({ page }) => {
     await loadFixture(page, 'checker-metcon.mei', 'p1n1');
-    const messages = await runChecker(page, 'meterConformance');
+    const messages = await runChecker(page, 'metcon');
     // measure 2 is a beat short and measure 4 two beats, measure 3 holds an mRest
     expect(messages.length).toBe(2);
 
@@ -183,14 +209,14 @@ test.describe('meter conformance code checker', () => {
     // the fix writes the attribute only: the notes of a marked measure stay as they were
     expect(element(mei, 'p2n2')).toBe(element(before, 'p2n2'));
     // the marked measures are accepted on a second run
-    expect(await runChecker(page, 'meterConformance')).toEqual([]);
+    expect(await runChecker(page, 'metcon')).toEqual([]);
   });
 });
 
 test.describe('linked elements code checker', () => {
   test('references without a target in the encoding are reported', async ({ page }) => {
     await loadFixture(page, 'checker-linking.mei', 'ln1');
-    const messages = await runChecker(page, 'checkLinkedElements');
+    const messages = await runChecker(page, 'linked');
     const all = messages.join('\n');
     expect(all, 'tie pointing at an id that does not exist').toContain('nowhere');
     expect(all, 'dir with an empty startid').toContain('ld1');

@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.6.3';
-export const versionDate = '23 Nov 2026'; // use full or 3-character english months, will be translated
+export const versionDate = '24 Nov 2026'; // use full or 3-character english months, will be translated
 export const splashDate = '24 Sep 2026'; // date of the splash screen content, same translation rules apply
 // Date of the Let's Encode paragraph, which only campaign volunteers ever see.
 // Bump this instead of splashDate when only that paragraph changes: volunteers
@@ -13,7 +13,6 @@ var tkAvailableOptions;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
 let letsEncode = { active: false, error: null }; // Let's Encode hand-off, detected in onLanguageLoaded()
@@ -136,6 +135,7 @@ import {
   zoomFacsimile,
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
+import { MainThreadValidator } from './validator-main.js';
 import { RNGLoader } from './rng-loader.js';
 import {
   defaultFacsimileOrientation,
@@ -151,6 +151,7 @@ import {
   isSafari,
   supportedLanguages,
   supportedVerovioVersions,
+  validatorUrl,
 } from './defaults.js';
 import Translator from './translator.js';
 import { luteconv } from './luteconv.js';
@@ -377,10 +378,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true, newDocument = 
   v.setRespSelectOptions();
   v.setMidiExpansionOptions();
   v.setMenuColors();
-  if (!isSafari) {
-    // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
-    v.checkSchema(meiXML);
-  }
+  v.checkSchema(meiXML);
   clearListItems();
   readListItemsFromXML(true); // readAnnots(true); from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -636,8 +634,11 @@ async function completeInitialLoad() {
     ...defaultVerovioOptions,
   };
 
-  const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
-  validator = new WorkerProxy(validatorWorker);
+  // Safari validates in the page: in a worker, reading the schema overflows the stack
+  // of JavaScriptCore (see validator-main.js)
+  validator = isSafari
+    ? new MainThreadValidator(validatorUrl)
+    : new WorkerProxy(new Worker(`${root}lib/validator-worker.js`));
   rngLoader = new RNGLoader();
 
   validator.onRuntimeInitialized().then(async () => {
@@ -664,7 +665,10 @@ async function completeInitialLoad() {
   if (autoValidateParam !== null && av) {
     av.checked = autoValidateParam === 'true';
   }
-  if (isSafari) {
+  if (isSafari && autoValidateParam === null) {
+    // validating blocks the interface on Safari (see validator-main.js), so it is not
+    // done after every change unless the user asks for it (in the settings panel, which
+    // warns about the pauses, or through the URL parameter)
     av.checked = false;
   }
   // add event listener to validation status icon, if no autoValidation
@@ -1207,11 +1211,6 @@ async function vrvWorkerEventsHandler(ev) {
         v.allowCursorActivity = true;
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
-      }
-
-      if (isSafari && Object.keys(translator.lang).length > 0 && !safariWarningShown) {
-        safariWarningShown = true;
-        v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
       // the section selector navigates by xml:id, so elements without one get

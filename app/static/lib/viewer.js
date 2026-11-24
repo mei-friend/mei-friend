@@ -794,7 +794,7 @@ export default class Viewer {
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
     const mei = cm.getValue();
-    if (!isSafari) this.checkSchema(mei);
+    this.checkSchema(mei);
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       // For non-forced renders, cheaply check XML well-formedness first.
@@ -1191,8 +1191,12 @@ export default class Viewer {
 
     if (!show) {
       if (this._linkedNavKeyMap) {
-        cm?.removeKeyMap(this._linkedNavKeyMap);
+        // remove it from the editor it was added to: callers may pass no cm here
+        // (e.g. updateHighlight() from the notation's drag selector), and dropping
+        // the reference without removing it left Up/Down captured for good
+        this._linkedNavKeyMapCm?.removeKeyMap(this._linkedNavKeyMap);
         this._linkedNavKeyMap = null;
+        this._linkedNavKeyMapCm = null;
       }
       if (this._linkedNavCurrentMark) {
         this._linkedNavCurrentMark.clear();
@@ -1212,14 +1216,22 @@ export default class Viewer {
     const hScrollbar = wrapper.querySelector('.CodeMirror-hscrollbar');
     const vWidth = vScrollbar && vScrollbar.offsetWidth > 0 ? vScrollbar.offsetWidth : 0;
     const hHeight = hScrollbar && hScrollbar.offsetHeight > 0 ? hScrollbar.offsetHeight : 0;
-    up.style.right = down.style.right = `${6 + vWidth}px`;
-    down.style.bottom = `${6 + hHeight}px`;
+    // the --editorOffset* variables skip the MEI toolbox (cf. resizer.sizeEncodingPanel())
+    up.style.right = down.style.right = `calc(${6 + vWidth}px + var(--editorOffsetRight, 0px))`;
+    down.style.bottom = `calc(${6 + hHeight}px + var(--editorOffsetBottom, 0px))`;
 
     if (!this._linkedNavKeyMap) {
-      this._linkedNavKeyMap = {
-        Up: () => this.jumpToLinkedMark(cm, -1),
-        Down: () => this.jumpToLinkedMark(cm, 1),
+      // pass the keys on to normal cursor movement whenever there is nothing to
+      // jump to, so that a stale key map can never swallow Up/Down
+      const jump = (direction) => {
+        if (this.getNavigableItems().length < 2) return CodeMirror.Pass;
+        this.jumpToLinkedMark(cm, direction);
       };
+      this._linkedNavKeyMap = {
+        Up: () => jump(-1),
+        Down: () => jump(1),
+      };
+      this._linkedNavKeyMapCm = cm;
       cm.addKeyMap(this._linkedNavKeyMap);
     }
     // Esc deactivating this navigation is handled centrally in
@@ -2432,6 +2444,10 @@ export default class Viewer {
         if (option === 'autoValidate') {
           // validate if auto validation is switched on again
           if (value) {
+            if (isSafari) {
+              // on Safari, each validation blocks the interface (see validator-main.js)
+              this.showAlert(translator.lang.safariAutoValidateWarning.text, 'warning');
+            }
             validate(cm.getValue(), this.updateLinting, {
               forceValidate: true,
             });
@@ -3526,18 +3542,12 @@ export default class Viewer {
 
   /**
    * Switch validation-status icon to manual mode and add click event handlers.
-   * Handle Safari exception: disable menu item, set warning messages to validation status
-   * and schema status
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = icons.unverified;
     vs.style.cursor = 'pointer';
-    if (isSafari) {
-      translator.handleBrowserExceptions('Safari');
-    } else {
-      vs.setAttribute('title', translator.lang.notValidated.text);
-    }
+    vs.setAttribute('title', translator.lang.notValidated.text);
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);

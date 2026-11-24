@@ -3,6 +3,7 @@
  * (author: Laurent Pugin)
  */
 
+// the same URL as validatorUrl in defaults.js, which a classic worker cannot import
 importScripts('https://www.verovio.org/javascript/validator/xml-validator.js');
 // importScripts('./deferred.js');
 // import {

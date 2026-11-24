@@ -302,6 +302,10 @@ export const platform = (navigator?.userAgentData?.platform || navigator?.platfo
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 export const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
+// XML validator (Verovio); validator-worker.js names the same URL again, because a
+// classic worker cannot import it from here
+export const validatorUrl = 'https://www.verovio.org/javascript/validator/xml-validator.js';
+
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
 export const guidelinesBase = 'https://music-encoding.org/guidelines/v5/';
