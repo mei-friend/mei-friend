@@ -20,6 +20,8 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.
  */
 /** @typedef {'computedBreaks' | 'encodedBreaks' | 'firstPage'} CountingMode */
 /** @typedef {'sb' | 'pb'} Break */
+/** @typedef {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean,
+ *   earlierContent: boolean, courtesy: Element[], lookaheadDone: boolean}} SectionState */
 /** @typedef {'none' | 'auto' | 'line' | 'encoded' | 'smart'} BreaksOption */
 
 /**
@@ -82,7 +84,19 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   // page/measure counters, threaded across all scores below so counting
   // continues correctly across an mdiv boundary instead of restarting at
   // page 1 for every mdiv
-  let state = { p: 1, mNo: 1, done: false, matched: false, countNow: false, earlierContent: false };
+  /** @type {SectionState} */
+  let state = {
+    p: 1,
+    mNo: 1,
+    done: false,
+    matched: false,
+    countNow: false,
+    earlierContent: false,
+    courtesy: [],
+    lookaheadDone: false,
+  };
+  /** @type {Element[]} */
+  let courtesy = []; // `<section>`s with the `<scoreDef>`s following the end of pageNo, see readSection()
   let anyDest = false; // has any mdiv contributed pageNo's content yet?
   /** @type {Element | null} */
   let lastScoreDef = null; // `<scoreDef>` of the last mdiv contributing to pageNo
@@ -124,6 +138,8 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
 
     state.matched = false; // reset: does THIS mdiv actually contain pageNo?
     state.earlierContent = false; // reset: does THIS mdiv have content before pageNo?
+    state.courtesy = []; // courtesy scoreDefs come from the mdiv pageNo ends in only
+    state.lookaheadDone = false;
     let digger = readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion);
     xmlScore.childNodes.forEach((item) => {
       if (item.nodeName === 'section') {
@@ -157,6 +173,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     anyDest = true;
     lastScoreDef = scoreDef;
     lastBaseSection = baseSection;
+    courtesy = state.courtesy;
     // no `break` here: pageNo may continue into a further mdiv (rendered as
     // one page containing content from more than one mdiv, matching how
     // normal/full mode's Verovio-driven layout can mix mdivs onto one page).
@@ -175,6 +192,10 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     let m = dummyMeasure(xmlDoc, countStaves(lastScoreDef));
     m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
     lastBaseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
+    // scoreDefs encoded right after the end of pageNo (each in a copy of its
+    // section): placed after its <pb>, as in the encoding, so that Verovio
+    // draws their courtesy signatures at the end of pageNo
+    courtesy.forEach((section) => lastBaseSection?.appendChild(section));
     lastBaseSection.appendChild(m);
   }
 
@@ -219,8 +240,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * closure takes as argument.
  * @param {Breaks} breaks
  * @param {string} countingMode
- * @param {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean,
- *   earlierContent: boolean}} state
+ * @param {SectionState} state
  * Page/measure counters shared across every `readSection()` call made for
  * one `getPageFromDom()` invocation (one call per candidate `<mdiv>`), so
  * counting continues correctly across an mdiv boundary instead of
@@ -237,7 +257,12 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
  * rule for every mdiv. `state.earlierContent` records whether the mdiv
  * currently being walked has measures on a page before `pageNo`; the caller
  * resets it per mdiv and uses it to tell a page that *opens* an mdiv from one
- * that continues it.
+ * that continues it. `state.courtesy` collects copies of the `<scoreDef>`s
+ * that follow the end of `pageNo` before the next measure (Verovio draws
+ * courtesy signatures for them at the end of the page), each inside a copy of
+ * the `<section>` it is encoded in (without `@xml:id`);
+ * `state.lookaheadDone` is set once that next measure has been reached. The
+ * caller resets both per mdiv.
  * @param {string} meiVersion  MEI version of the source document, deciding
  * whether key signatures are written as `@keysig` (MEI >= 5) or `@key.sig`.
  * @returns {function(Element): Element}  Recursive closure that takes an
@@ -250,7 +275,19 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
   let breaksSelector = '';
   // For 'encodedBreaks', `breaks` will always be an Array of 'sb' and 'pb'
   if (countingMode === 'encodedBreaks') breaksSelector = /** @type {string[]} */ (breaks).join(', ');
-  let staffDefs = spdScore.querySelectorAll('staffDef');
+  const staffDefs = spdScore.querySelectorAll('staffDef');
+
+  // `<scoreDef>`s met on page `pageNo - 1` after its last measure. They are
+  // not folded into the excerpt's starting `<scoreDef>` (where Verovio would
+  // treat them as the initial state and draw no change at all), but placed at
+  // the start of `pageNo`, where Verovio draws the change as normal mode does.
+  // Folded after all if another measure follows on `pageNo - 1`.
+  /** @type {Element[]} */
+  let tail = [];
+  /** @type {WeakMap<Element, Element>} courtesy wrapper section -> section it copies */
+  const courtesySource = new WeakMap();
+  const fold = (/** @type {Element} */ node) =>
+    foldIntoScoreDef(node, spdScore, staffDefs, breaksSelector, pageNo - state.p, meiVersion);
 
   // recursive closure to dig through hierarchically stacked sections and append
   // only those elements within the requested pageNo
@@ -270,12 +307,37 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
         state.done = true;
         return newSection;
       }
-      if (state.p > pageNo) break; // only until requested pageNo is processed
+      if (state.p > pageNo && (countingMode === 'firstPage' || state.lookaheadDone)) break;
       if (children[i].nodeType !== Node.ELEMENT_NODE) continue;
       let currentNode = /** @type {Element} */ (children[i]);
-      // console.info('digDeeper(' + pageNo + '): p: ' + state.p +
-      //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
+
+      if (state.p > pageNo) {
+        // pageNo is complete: look ahead to the next measure for <scoreDef>s,
+        // whose courtesy signatures Verovio draws at the end of pageNo
+        if (currentNodeName === 'section') {
+          digDeeper(currentNode);
+          if (state.lookaheadDone) break;
+        } else if (currentNodeName === 'scoreDef') {
+          // keep it inside a copy of its section: Verovio draws no courtesy
+          // signatures before a section@restart, for instance
+          let wrapper = state.courtesy[state.courtesy.length - 1];
+          if (!wrapper || courtesySource.get(wrapper) !== section) {
+            wrapper = document.createElementNS(meiNameSpace, 'section');
+            section.getAttributeNames().forEach((a) => {
+              if (a !== 'xml:id') wrapper.setAttribute(a, section.getAttribute(a) || '');
+            });
+            state.courtesy.push(wrapper);
+            courtesySource.set(wrapper, section);
+          }
+          wrapper.appendChild(currentNode.cloneNode(true));
+        } else if (currentNodeName === 'measure' || currentNode.querySelector('measure')) {
+          state.lookaheadDone = true;
+          break;
+        }
+        continue;
+      }
+
       // remember whether this mdiv already had measures on an earlier page
       // (checked only until the first one is found, so at most a handful of
       // lookups per mdiv)
@@ -287,27 +349,21 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
         newSection.appendChild(currentNode.cloneNode(true));
         continue;
       }
-      // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
-      // + currentNode.getAttribute('xml:id'));
       if (currentNodeName === 'section') {
         let returnSection = digDeeper(currentNode);
         newSection.appendChild(returnSection);
-        // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
       if (currentNodeName === 'measure') {
         // shared across mdivs: once the first measure of the whole document
         // has been seen, a later mdiv's own leading break is a real break,
         // not a "before the first measure" break to be ignored
-        state.countNow = true; // increment m when counting measures for a quick first page
+        state.countNow = true;
       }
 
       if (countingMode === 'firstPage') {
         if (currentNodeName === 'measure') state.mNo++;
         else currentNode.querySelectorAll('measure').forEach(() => state.mNo++);
-        // } else if (countingMode === 'measure') {
-        //   if (currentNodeName === 'measure') state.p++;
-        //   else currentNode.querySelectorAll('measure').forEach(() => state.p++);
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
         // For 'encodedBreaks', `breaks` is an Array
@@ -320,130 +376,71 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
               (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
         ) {
-          if (dutils.countAsBreak(sb ? sb : currentNode)) state.p++;
+          if (dutils.countAsBreak(sb ? sb : currentNode)) {
+            state.p++;
+            if (state.p === pageNo) {
+              // scoreDefs between the last measure of the previous page and
+              // this break open pageNo
+              tail.forEach((sd) => newSection.appendChild(sd.cloneNode(true)));
+              tail = [];
+            }
+          }
           continue;
         }
         // ignore system/page breaks in other countingModes
       } else if (currentNodeName === 'sb' || currentNodeName === 'pb') continue;
 
-      // update scoreDef @key.sig attribute or keySig@sig and
-      // for @meter@count/@unit attr or meterSig@count/unit.
-      if (currentNodeName === 'scoreDef' && state.p < pageNo) {
-        const scoreDef = /** @type {Element} */ (currentNode);
-        const keySig =
-          scoreDef.getAttribute('key.sig') ||
-          scoreDef.getAttribute('keysig') ||
-          scoreDef.querySelector('keySig')?.getAttribute('sig');
-        if (keySig) {
-          addKeySigElement(staffDefs, keySig, meiVersion);
-        }
-        const { count, unit } = getMeter(scoreDef);
-        if (count && unit) {
-          addMeterSigElement(staffDefs, count, unit);
-        }
-        copyTempoInfo(scoreDef, spdScore);
-      }
-
-      // remember tempo@midi.bpm, mm, mm.unit, mm.dots and save it in global scoreDef
+      // fold clef, key, meter and tempo changes of earlier pages into the
+      // excerpt's starting <scoreDef>
       if (state.p < pageNo) {
-        currentNode.querySelectorAll('tempo').forEach((t) => {
-          copyTempoInfo(t, spdScore);
-        });
-      }
-
-      // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
-      let staffDefList = currentNode.querySelectorAll(breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
-      if (staffDefList && staffDefList.length > 0 && state.p < pageNo) {
-        // console.info('staffDef: ', staffDefList);
-        for (let st of staffDefList) {
-          if (countingMode === 'encodedBreaks' && /** @type {string[]} */ (breaks).includes(st.nodeName)) break;
-          const keysigValue =
-            st.getAttribute('key.sig') || st.getAttribute('keysig') || st.querySelector('keySig')?.getAttribute('sig');
-          if (keysigValue) {
-            // console.info('staffDef update: keysig: ' + keysigValue);
-            for (let staffDef of staffDefs) {
-              if (st.getAttribute('n') === staffDef.getAttribute('n')) {
-                setKeySig(staffDef, keysigValue, meiVersion);
-              }
-            }
-          } else {
-            // console.info('No key.sig information in ', st);
+        if (state.p === pageNo - 1 && currentNodeName === 'scoreDef') {
+          tail.push(currentNode);
+        } else {
+          if (tail.length > 0 && (currentNodeName === 'measure' || currentNode.querySelector('measure'))) {
+            tail.forEach((sd) => fold(sd));
+            tail = [];
           }
-          const { count, unit } = getMeter(st);
-          if (count && unit) {
-            // console.info('staffDef update: meterSig: ' +
-            //   meterCountValue + '/' + meterUnitValue);
-            for (let staffDef of staffDefs) {
-              if (st.getAttribute('n') === staffDef.getAttribute('n')) {
-                let el = document.createElementNS(meiNameSpace, 'meterSig');
-                el.setAttribute('count', count);
-                el.setAttribute('unit', unit);
-                // console.info('Updating scoreDef(' + st.getAttribute('n') + '): ', el);
-                let k = staffDef.querySelector('meterSig');
-                if (k) {
-                  k.setAttribute('count', count);
-                  k.setAttribute('unit', unit);
-                } else {
-                  staffDef.appendChild(el);
-                }
-              }
-            }
-          } else {
-            // console.info('No meter.count/unit information in ', st);
-          }
-        }
-      }
-      // update scoreDef with clef elements inside layers (and breaks to stop updating)
-      let clefList = currentNode.querySelectorAll(breaksSelector ? breaksSelector + ', clef' : 'clef');
-      if (clefList && clefList.length > 0 && state.p < pageNo) {
-        // console.info('clefList: ', clefList);
-        for (let clef of clefList) {
-          // check clefs of measure, ignore @sameas
-          if (clef.getAttribute('sameas')) continue;
-          const staffNo = getStaffNumber(clef);
-          if (!staffNo) continue;
-          // console.info('clefList stffNo: ' + stffNo);
-          let staffDef = spdScore.querySelector(`staffDef[n="${staffNo}"]`);
-          if (!staffDef) {
-            console.info('digDeeper(): no staffDef for staff ' + staffNo);
-            continue;
-          }
-          // console.info('staffDef: ', staffDef);
-          if (clef.hasAttribute('line')) staffDef.setAttribute('clef.line', clef.getAttribute('line') || '');
-          if (clef.hasAttribute('shape')) staffDef.setAttribute('clef.shape', clef.getAttribute('shape') || '');
-          if (clef.hasAttribute('dis')) staffDef.setAttribute('clef.dis', clef.getAttribute('dis') || '');
-          if (clef.hasAttribute('dis.place'))
-            staffDef.setAttribute('clef.dis.place', clef.getAttribute('dis.place') || '');
-          // console.info('scoreDef: ', spdScore.querySelector('scoreDef'));
+          fold(currentNode);
         }
       }
 
       // special treatment for endings that contain breaks
-      if (currentNodeName === 'ending' && breaksSelector && currentNode.querySelector(breaksSelector)) {
-        // copy elements containing breaks
-        let endingNode = /** @type {Element} */ (currentNode.cloneNode(true));
-        let breakNode = endingNode.querySelector(breaksSelector);
-        if (state.p === pageNo && breakNode) {
-          breakNode.parentNode?.replaceChild(document.createElementNS(meiNameSpace, 'pb'), breakNode);
-          newSection.appendChild(endingNode);
-          state.matched = true;
-        } else if (state.p === pageNo - 1 && breakNode) {
-          // remove elements until first break
-          // remove starting pb (in case of a pb inside endingNode)
-          // or replace existing sb inside endingNode with startingPb
-          let startingPd = spdScore.querySelector('[*|id="startingPb"]');
-          if (startingPd && breakNode.nodeName === 'sb') {
-            endingNode.replaceChild(startingPd, breakNode);
-          } else {
-            startingPd?.remove();
+      if (currentNodeName === 'ending' && breaksSelector) {
+        // breaks inside the ending that count (as in viewer.js)
+        const isCounted = Array.from(currentNode.querySelectorAll(breaksSelector)).map((b) =>
+          dutils.countAsBreak(b)
+        );
+        const nBreaks = isCounted.filter(Boolean).length;
+        if (nBreaks > 0) {
+          // the ending spans pages state.p ... state.p + nBreaks
+          const idx = pageNo - state.p; // part of the ending that is on pageNo
+          if (idx >= 0 && idx <= nBreaks) {
+            const endingNode = /** @type {Element} */ (currentNode.cloneNode(true));
+            const copies = Array.from(endingNode.querySelectorAll(breaksSelector)).filter((b, j) => isCounted[j]);
+            if (idx > 0) {
+              // drop breaks before the one opening pageNo, so that everything
+              // before it ends up on the context page in front
+              copies.slice(0, idx - 1).forEach((b) => b.remove());
+              // the break opening pageNo replaces the context page's <pb>
+              // (an encoded <pb> does that job itself)
+              const opening = copies[idx - 1];
+              const startingPb = spdScore.querySelector('[*|id="startingPb"]');
+              if (startingPb && opening.nodeName !== 'pb') {
+                opening.replaceWith(startingPb);
+              } else {
+                startingPb?.remove();
+              }
+            }
+            if (idx < nBreaks) {
+              // the break closing pageNo has to be a page break
+              copies[idx].replaceWith(document.createElementNS(meiNameSpace, 'pb'));
+            }
+            newSection.appendChild(endingNode);
+            state.matched = true;
           }
-          // ...and add endingNode (its part after the break belongs to pageNo)
-          newSection.appendChild(endingNode);
-          state.matched = true;
+          state.p += nBreaks;
+          continue;
         }
-        // console.info('Ending with break inside: ', endingNode);
-        state.p++;
-        continue;
       }
 
       // append children
@@ -455,7 +452,6 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
         }
         newSection.appendChild(nodeCopy);
         state.matched = true;
-        // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
       // increment in countingMode computedBreaks
@@ -475,6 +471,79 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
     return newSection;
   }; // digDeeper()
 } // readSection()
+
+/**
+ * Helper to `readSection()`: folds the clef, key signature, meter signature
+ * and tempo changes that `node` (from a page before the requested one)
+ * makes into the `<staffDef>`s (and tempo into the `<scoreDef>`) of the
+ * excerpt Verovio renders, in document order.
+ *
+ * Changes are copied as the elements they are encoded as (`<keySig>`,
+ * `<meterSig>`, `<clef>`), or as the attributes they are encoded as, so that
+ * nothing about them is lost (a `<keySig>` without `@sig`, `@sym`, `@visible`
+ * and so on). A `<scoreDef>`'s own key or meter goes to every staff, a
+ * `<staffDef>`'s and an in-layer element's only to its own.
+ *
+ * @param {Element} node
+ * @param {Element} spdScore
+ * @param {NodeListOf<Element>} staffDefs  The excerpt's `<staffDef>`s
+ * @param {string} breaksSelector  Breaks counted ('' if none are encoded)
+ * @param {number} breaksToPass  Stop at the `breaksToPass`th break inside
+ * `node` (only an `<ending>` can contain one here): it opens the requested page
+ * @param {string} meiVersion
+ */
+function foldIntoScoreDef(node, spdScore, staffDefs, breaksSelector, breaksToPass, meiVersion) {
+  const selector =
+    'scoreDef, staffDef, clef, keySig, meterSig, meterSigGrp, tempo' + (breaksSelector ? ', ' + breaksSelector : '');
+  const breakNames = breaksSelector ? breaksSelector.split(/\s*,\s*/) : [];
+  const elements = Array.from(node.querySelectorAll(selector));
+  if (node.matches(selector)) elements.unshift(node);
+  const staffDefsFor = (/** @type {string} */ n) => Array.from(staffDefs).filter((sd) => sd.getAttribute('n') === n);
+  let passed = 0;
+  for (const el of elements) {
+    const name = el.nodeName;
+    if (breakNames.includes(name)) {
+      if (dutils.countAsBreak(el) && ++passed >= breaksToPass) break;
+      continue;
+    }
+    switch (name) {
+      case 'scoreDef': {
+        const keySig = ownKeySig(el);
+        if (keySig !== null) staffDefs.forEach((sd) => setKeySig(sd, keySig, meiVersion));
+        if (hasOwnMeter(el)) staffDefs.forEach((sd) => setMeterSig(sd, el));
+        copyTempoInfo(el, spdScore);
+        break;
+      }
+      case 'staffDef': {
+        const targets = staffDefsFor(el.getAttribute('n') || '');
+        const keySig = ownKeySig(el);
+        if (keySig !== null) targets.forEach((sd) => setKeySig(sd, keySig, meiVersion));
+        if (hasOwnMeter(el)) targets.forEach((sd) => setMeterSig(sd, el));
+        if (el.getAttributeNames().some((a) => a.startsWith('clef.'))) targets.forEach((sd) => setClef(sd, el));
+        break; // its <clef> child, if any, comes next in document order
+      }
+      case 'clef': {
+        if (el.hasAttribute('sameas')) break;
+        staffDefsFor(getStaffNumber(el)).forEach((sd) => setClef(sd, el));
+        break;
+      }
+      case 'keySig':
+      case 'meterSig':
+      case 'meterSigGrp': {
+        // those inside a scoreDef/staffDef are dealt with by their parent,
+        // a meterSig inside a meterSigGrp with its group
+        if (el.parentElement?.closest('scoreDef, staffDef, meterSigGrp')) break;
+        const targets = staffDefsFor(getStaffNumber(el));
+        if (name === 'keySig') targets.forEach((sd) => setKeySig(sd, el, meiVersion));
+        else targets.forEach((sd) => setMeterSig(sd, el));
+        break;
+      }
+      case 'tempo':
+        copyTempoInfo(el, spdScore);
+        break;
+    }
+  }
+} // foldIntoScoreDef()
 
 // /**
 //  * List all notes/chords to check whether they are pointed to from outside the
@@ -1177,56 +1246,117 @@ function addPageSpanningElements(xmlDoc, spdNode, pageSpanners, pageNo, breaks) 
 } // addPageSpanningElements()
 
 /**
- * Helper function to `readSection()`; sets the key signature of every
- * `<staffDef>` in `staffDefs`.
- * @param {NodeListOf<Element>} staffDefs
- * @param {string} keysigValue  A data.KEYFIFTHS value, such as '3f' or '0'.
- * @param {string} meiVersion  MEI version of the source document.
+ * Key signature a `<scoreDef>` or `<staffDef>` states itself: the value of
+ * `@keysig` (MEI >= 5) or `@key.sig` (MEI <= 4.0.1), or its own `<keySig>`
+ * child (which means no accidentals if it has no `@sig`), or `null`.
+ * A `<keySig>` further down (in a `<staffDef>` of a `<scoreDef>`) belongs to
+ * that staff only and is not returned.
+ * @param {Element} def
+ * @returns {string | Element | null}
  */
-function addKeySigElement(staffDefs, keysigValue, meiVersion = defaultMeiVersion) {
-  for (let staffDef of staffDefs) {
-    setKeySig(staffDef, keysigValue, meiVersion);
-  }
-} // addKeySigElement()
+function ownKeySig(def) {
+  const value = def.getAttribute('keysig') || def.getAttribute('key.sig');
+  if (value) return value;
+  return def.querySelector(':scope > keySig');
+} // ownKeySig()
 
 /**
- * Writes `keysigValue` to a single `<staffDef>`, using the attribute spelling
- * of the document's MEI version (`@keysig` since MEI 5.0, `@key.sig` before)
- * and clearing every other way the key signature could be stated on it, so no
- * two conflicting statements survive on the same `<staffDef>`.
+ * @param {Element} def  `<scoreDef>` or `<staffDef>`
+ * @returns {boolean} whether `def` itself states a meter (`@meter.*` or its
+ * own `<meterSig>`/`<meterSigGrp>`)
+ */
+function hasOwnMeter(def) {
+  return (
+    def.getAttributeNames().some((a) => a.startsWith('meter.')) ||
+    def.querySelector(':scope > meterSig, :scope > meterSigGrp') !== null
+  );
+} // hasOwnMeter()
+
+/**
+ * Deep copy of `el` without `@xml:id`s (the original may be rendered, too)
+ * and without attributes that only make sense at the original's position.
+ * @param {Element} el
+ * @returns {Element}
+ */
+function stateCopy(el) {
+  const copy = /** @type {Element} */ (el.cloneNode(true));
+  for (const e of [copy, ...copy.querySelectorAll('*')]) {
+    e.removeAttributeNS(xmlNameSpace, 'id');
+    ['facs', 'sameas', 'tstamp', 'staff', 'layer', 'cautionary'].forEach((a) => e.removeAttribute(a));
+  }
+  return copy;
+} // stateCopy()
+
+/**
+ * Removes every statement of a key signature from `staffDef`, then states
+ * `keySig` there: a value as `@keysig` (MEI >= 5) or `@key.sig` (before), or
+ * a copy of a `<keySig>` element.
  * @param {Element} staffDef
- * @param {string} keysigValue  A data.KEYFIFTHS value, such as '3f' or '0'.
+ * @param {string | Element} keySig  A data.KEYFIFTHS value, such as '3f', or
+ * a `<keySig>` element
  * @param {string} meiVersion  MEI version of the source document.
  */
-function setKeySig(staffDef, keysigValue, meiVersion = defaultMeiVersion) {
-  staffDef.querySelector('keySig')?.remove();
-  staffDef.removeAttribute('key.sig');
-  staffDef.removeAttribute('keysig');
-  staffDef.setAttribute(parseFloat(meiVersion) >= 5.0 ? 'keysig' : 'key.sig', keysigValue);
+function setKeySig(staffDef, keySig, meiVersion = defaultMeiVersion) {
+  staffDef.querySelectorAll(':scope > keySig').forEach((k) => k.remove());
+  staffDef
+    .getAttributeNames()
+    .filter((a) => a === 'keysig' || a.startsWith('keysig.') || a.startsWith('key.sig'))
+    .forEach((a) => staffDef.removeAttribute(a));
+  if (typeof keySig === 'string') {
+    staffDef.setAttribute(parseFloat(meiVersion) >= 5.0 ? 'keysig' : 'key.sig', keySig);
+  } else {
+    staffDef.appendChild(stateCopy(keySig));
+  }
 } // setKeySig()
 
 /**
- * Helper function to `readSection()`; adds `@meter.sig` to `spdScore`.
- * @param {NodeListOf<Element>} staffDefs
- * @param {string} meterCountValue
- * @param {string} meterUnitValue
+ * Removes every statement of a meter from `staffDef`, then copies the one of
+ * `source` there: a `<meterSig>`/`<meterSigGrp>` itself, or the `@meter.*`
+ * attributes and `<meterSig>`/`<meterSigGrp>` child of a `<scoreDef>` or
+ * `<staffDef>`.
+ * @param {Element} staffDef
+ * @param {Element} source
  */
-function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
-  for (let staffDef of staffDefs) {
-    staffDef.removeAttribute('meter.count');
-    staffDef.removeAttribute('meter.unit');
-    var k = staffDef.querySelector('meterSig');
-    if (k) {
-      k.setAttribute('count', meterCountValue);
-      k.setAttribute('unit', meterUnitValue);
-    } else {
-      let meterSigElement = staffDef.ownerDocument.createElementNS(meiNameSpace, 'meterSig');
-      meterSigElement.setAttribute('count', meterCountValue);
-      meterSigElement.setAttribute('unit', meterUnitValue);
-      staffDef.appendChild(meterSigElement);
-    }
+function setMeterSig(staffDef, source) {
+  staffDef.querySelectorAll(':scope > meterSig, :scope > meterSigGrp').forEach((m) => m.remove());
+  staffDef
+    .getAttributeNames()
+    .filter((a) => a.startsWith('meter.'))
+    .forEach((a) => staffDef.removeAttribute(a));
+  if (source.nodeName === 'meterSig' || source.nodeName === 'meterSigGrp') {
+    staffDef.appendChild(stateCopy(source));
+    return;
   }
-} // addMeterSigElement()
+  source
+    .getAttributeNames()
+    .filter((a) => a.startsWith('meter.'))
+    .forEach((a) => staffDef.setAttribute(a, source.getAttribute(a) || ''));
+  const meterSig = source.querySelector(':scope > meterSigGrp, :scope > meterSig');
+  if (meterSig) staffDef.appendChild(stateCopy(meterSig));
+} // setMeterSig()
+
+/**
+ * Removes every statement of a clef from `staffDef`, then copies the one of
+ * `source` there: a `<clef>` itself, or the `@clef.*` attributes of a
+ * `<staffDef>`.
+ * @param {Element} staffDef
+ * @param {Element} source
+ */
+function setClef(staffDef, source) {
+  staffDef.querySelectorAll(':scope > clef').forEach((c) => c.remove());
+  staffDef
+    .getAttributeNames()
+    .filter((a) => a.startsWith('clef.'))
+    .forEach((a) => staffDef.removeAttribute(a));
+  if (source.nodeName === 'clef') {
+    staffDef.appendChild(stateCopy(source));
+  } else {
+    source
+      .getAttributeNames()
+      .filter((a) => a.startsWith('clef.'))
+      .forEach((a) => staffDef.setAttribute(a, source.getAttribute(a) || ''));
+  }
+} // setClef()
 
 /**
  * Retrieve page number of element with `@xml:id` `id`

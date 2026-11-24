@@ -146,9 +146,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * @param {Object} noteTable
    * @param {array} idList
    * @param {boolean} childOfMeasure
+   * @param {boolean} breaksCount  whether breaks in nodeArray count (as in
+   * dom-utils.countAsBreak(): inside an <app> only those in its <lem>, or in
+   * its first <rdg>)
+   * @param {{firstRdg: object, hasRdg: boolean} | null} appCtx  innermost <app>
    * @returns
    */
-  function getPageNumberForElements(nodeArray, noteTable, idList, childOfMeasure = false) {
+  function getPageNumberForElements(nodeArray, noteTable, idList, childOfMeasure = false, breaksCount = true, appCtx = null) {
     if (breaksOption === 'line' || breaksOption === 'encoded') {
       nodeArray.forEach((el) => {
         // el obj w/ tagName, children, attributes
@@ -164,7 +168,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
               }
             }
           }
-          if (count && breaks.includes(el.tagName)) p++;
+          if (count && breaksCount && breaks.includes(el.tagName)) p++;
           const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);
@@ -180,7 +184,19 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
             }
           }
           if (el.children) {
-            noteTable = getPageNumberForElements(el.children, noteTable, idList);
+            let childBreaksCount = breaksCount;
+            let childAppCtx = appCtx;
+            if (el.tagName === 'app') {
+              const rdgs = [];
+              getElementsByTagName(el.children, 'rdg', rdgs);
+              childAppCtx = { firstRdg: rdgs[0], hasRdg: rdgs.length > 0 };
+              childBreaksCount = false;
+            } else if (el.tagName === 'lem' && appCtx) {
+              childBreaksCount = appCtx.hasRdg;
+            } else if (el.tagName === 'rdg' && appCtx) {
+              childBreaksCount = el === appCtx.firstRdg;
+            }
+            noteTable = getPageNumberForElements(el.children, noteTable, idList, false, childBreaksCount, childAppCtx);
           }
         }
       });

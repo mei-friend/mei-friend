@@ -152,13 +152,13 @@ export async function setSpeedMode(page: Page, speed: boolean, breaks?: 'none' |
  * Waits until Verovio is idle again (the toolkit icon stops spinning) and at
  * least one measure is rendered.
  */
-export async function waitForNotation(page: Page) {
-  await expect(page.locator('#verovio-panel g.measure').first()).toBeVisible({ timeout: 30000 });
+export async function waitForNotation(page: Page, timeout = 30000) {
+  await expect(page.locator('#verovio-panel g.measure').first()).toBeVisible({ timeout });
   // the icon carries 'clockwise' while Verovio works and 'anticlockwise' while
   // the speed worker does; /clockwise/ matches both, so this waits for both
-  await expect(page.locator('#verovioIcon')).not.toHaveClass(/clockwise/, { timeout: 30000 });
+  await expect(page.locator('#verovioIcon')).not.toHaveClass(/clockwise/, { timeout });
   // 'auto' breaks need a full-score pass before the page count is known
-  await expect(page.locator('#pagination4')).toHaveText(/\d/, { timeout: 30000 });
+  await expect(page.locator('#pagination4')).toHaveText(/\d/, { timeout });
 }
 
 /**
@@ -180,25 +180,91 @@ export async function measureIdsOnPage(page: Page): Promise<string[]> {
  * before reading a page, so no page is read twice or read half-rendered.
  */
 export async function measureIdsPerPage(page: Page): Promise<string[][]> {
+  return collectPerPage(page, measureIdsOnPage);
+}
+
+/**
+ * Pages through the whole encoding from page 1 and returns what `collect`
+ * reads from each page. Waits for the notation to actually change before
+ * reading a page (judged by its measure `@xml:id`s), so no page is read twice
+ * or read half-rendered.
+ *
+ * With `stable`, it additionally waits until the displayed page, the page
+ * total and the rendered measures stay the same for `stable` ms before reading
+ * a page, re-clicks a page turn that a late re-render swallowed, and re-reads
+ * the page total on every page. Needed for large encodings in normal mode,
+ * where Verovio's full-score layout can finish (and reset the view to page 1,
+ * or update the page total) after the notation first appears.
+ */
+export async function collectPerPage<T>(
+  page: Page,
+  collect: (page: Page) => Promise<T>,
+  { timeout = 30000, stable = 0 } = {}
+): Promise<T[]> {
   await page.locator('#firstPageButton').click();
-  await expect.poll(() => currentPage(page), { timeout: 30000 }).toBe(1);
-  await waitForNotation(page);
-  const total = await pageCount(page);
-  const pages: string[][] = [];
+  await expect.poll(() => currentPage(page), { timeout }).toBe(1);
+  await waitForNotation(page, timeout);
+  if (stable) await waitForStableNotation(page, stable, timeout);
+  const pages: T[] = [];
+  let previous = '';
+  let total = await pageCount(page);
   for (let p = 1; p <= total; p++) {
     if (p > 1) {
-      const previous = pages[pages.length - 1].join(',');
-      await page.locator('#nextPageButton').click();
-      await expect.poll(() => currentPage(page), { timeout: 30000 }).toBe(p);
-      await waitForNotation(page);
-      // the re-render is asynchronous: wait until the notation really changed
-      await expect
-        .poll(async () => (await measureIdsOnPage(page)).join(','), { timeout: 30000 })
-        .not.toBe(previous);
+      for (let attempt = 1; ; attempt++) {
+        await page.locator('#nextPageButton').click();
+        try {
+          await expect.poll(() => currentPage(page), { timeout: stable ? 10000 : timeout }).toBe(p);
+          await waitForNotation(page, timeout);
+          // the re-render is asynchronous: wait until the notation really changed
+          await expect
+            .poll(async () => (await measureIdsOnPage(page)).join(','), { timeout: stable ? 10000 : timeout })
+            .not.toBe(previous);
+          if (stable) await waitForStableNotation(page, stable, timeout);
+          if (!stable || (await currentPage(page)) === p) break;
+        } catch (e) {
+          if (!stable || attempt >= 3) throw e;
+        }
+        // a late re-render moved the view: go back to the page before, retry
+        if ((await currentPage(page)) !== p - 1) {
+          await gotoPage(page, p - 1, timeout);
+        }
+      }
+      if (stable) total = await pageCount(page);
     }
-    pages.push(await measureIdsOnPage(page));
+    previous = (await measureIdsOnPage(page)).join(',');
+    pages.push(await collect(page));
   }
   return pages;
+}
+
+/**
+ * Waits until current page, page total and rendered measures have not changed
+ * for `quiet` ms, and Verovio is idle.
+ */
+export async function waitForStableNotation(page: Page, quiet = 1000, timeout = 60000) {
+  const state = async () =>
+    [await currentPage(page), await pageCount(page), (await measureIdsOnPage(page)).join(',')].join('|');
+  const deadline = Date.now() + timeout;
+  let last = await state();
+  while (Date.now() < deadline) {
+    await page.waitForTimeout(quiet);
+    await waitForNotation(page, timeout);
+    const now = await state();
+    if (now === last) return;
+    last = now;
+  }
+  throw new Error('Notation did not settle within ' + timeout + ' ms');
+}
+
+/** Turns forward from page 1 to page `target` (there is no direct page input). */
+async function gotoPage(page: Page, target: number, timeout: number) {
+  await page.locator('#firstPageButton').click();
+  await expect.poll(() => currentPage(page), { timeout }).toBe(1);
+  for (let p = 2; p <= target; p++) {
+    await page.locator('#nextPageButton').click();
+    await expect.poll(() => currentPage(page), { timeout }).toBe(p);
+  }
+  await waitForStableNotation(page, 1000, timeout);
 }
 
 /** `@xml:id`s of all `<measure>` elements of an MEI string, in document order. */

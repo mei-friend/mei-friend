@@ -9,6 +9,7 @@ import {
   measureIdsOnPage,
   measureIdsPerPage,
   measureIdsInEncoding,
+  collectPerPage,
 } from './setup';
 
 // Two aspects of speed mode that are independent of <mdiv>s, but that speed
@@ -29,6 +30,9 @@ import {
 const fixtureDir = join(__dirname, 'fixtures');
 const endings = readFileSync(join(fixtureDir, 'ending-with-break.mei'), 'utf-8');
 const keySigs = readFileSync(join(fixtureDir, 'keysig-changes-mei5.mei'), 'utf-8');
+// mT1, <pb>, ending[mT2, <sb>, mT3 (bass clef), <sb>, mT4], mT5: an ending
+// spanning three pages under 'line' breaks
+const twoBreaks = readFileSync(join(fixtureDir, 'ending-two-breaks.mei'), 'utf-8');
 
 /** Number of key signature accidentals rendered on the current page. */
 function keyAccidentals(page: Page) {
@@ -97,6 +101,31 @@ test.describe('2 Speed mode pages endings that contain breaks.', () => {
     expect(speed).toEqual(normal);
     expect(speed.flat()).toEqual(measureIdsInEncoding(endings));
   });
+
+  test("2.5 Breaks mode 'line': an ending split by two breaks spans three pages", async ({ page }) => {
+    await loadFixture(page, 'ending-two-breaks.mei', twoBreaks, 'note-mT1');
+    // clef glyphs (SMuFL code points) drawn on a page, in order
+    const clefs = (p: Page) =>
+      p
+        .locator('#verovio-panel g.clef use')
+        .evaluateAll((els) => els.map((u) => (u.getAttribute('xlink:href') || u.getAttribute('href') || '').slice(1, 5)));
+    const read = async (p: Page) => ({ measures: await measureIdsOnPage(p), clefs: await clefs(p) });
+
+    await setSpeedMode(page, false, 'line');
+    const normal = await collectPerPage(page, read, { stable: 800 });
+    await setSpeedMode(page, true, 'line');
+    expect(await pageCount(page)).toBe(4);
+    const speed = await collectPerPage(page, read, { stable: 400 });
+
+    expect(speed.map((p) => p.measures)).toEqual([['mT1'], ['mT2'], ['mT3'], ['mT4', 'mT5']]);
+    // mT3's page starts in the treble clef and changes to the bass clef inside
+    // mT3 (small F clef); mT4's page starts in the bass clef
+    expect(speed.map((p) => p.clefs)).toEqual([['E050'], ['E050'], ['E050', 'E07C'], ['E062']]);
+    // normal mode fits several of these short systems on one page, so the
+    // two modes are compared system start by system start, not page by page
+    expect(speed.flatMap((p) => p.measures)).toEqual(normal.flatMap((p) => p.measures));
+    expect(speed.flatMap((p) => p.clefs)).toEqual(normal.flatMap((p) => p.clefs));
+  });
 });
 
 test.describe('3 Speed mode carries MEI 5 key and meter changes into its excerpts.', () => {
@@ -109,11 +138,13 @@ test.describe('3 Speed mode carries MEI 5 key and meter changes into its excerpt
       // Every break in this fixture is a <pb>, so 'line' and 'encoded' agree:
       // 5 pages, one measure each. Accidental counts are per page over both
       // staves: no key (0), E flat major from scoreDef@keysig (2 x 3 flats),
-      // then D major from staffDef@keysig (2 x 2 sharps).
+      // then D major from staffDef@keysig (2 x 2 sharps). As in normal mode,
+      // a page followed by a change also shows its courtesy signatures at the
+      // end: page 1 those of E flat major and 3/4, page 3 those of D major.
       const expected = [
-        { measures: ['mK1'], keyAccidentals: 0, meterSigs: 2 },
+        { measures: ['mK1'], keyAccidentals: 6, meterSigs: 4 },
         { measures: ['mK2'], keyAccidentals: 6, meterSigs: 2 },
-        { measures: ['mK3'], keyAccidentals: 6, meterSigs: 0 },
+        { measures: ['mK3'], keyAccidentals: 10, meterSigs: 0 },
         { measures: ['mK4'], keyAccidentals: 4, meterSigs: 0 },
         { measures: ['mK5'], keyAccidentals: 4, meterSigs: 0 },
       ];
