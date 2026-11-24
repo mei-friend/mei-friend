@@ -794,7 +794,7 @@ export default class Viewer {
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
     const mei = cm.getValue();
-    if (!isSafari) this.checkSchema(mei);
+    this.checkSchema(mei);
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       // For non-forced renders, cheaply check XML well-formedness first.
@@ -2444,6 +2444,10 @@ export default class Viewer {
         if (option === 'autoValidate') {
           // validate if auto validation is switched on again
           if (value) {
+            if (isSafari) {
+              // on Safari, each validation blocks the interface (see validator-main.js)
+              this.showAlert(translator.lang.safariAutoValidateWarning.text, 'warning');
+            }
             validate(cm.getValue(), this.updateLinting, {
               forceValidate: true,
             });
@@ -3538,18 +3542,12 @@ export default class Viewer {
 
   /**
    * Switch validation-status icon to manual mode and add click event handlers.
-   * Handle Safari exception: disable menu item, set warning messages to validation status
-   * and schema status
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = icons.unverified;
     vs.style.cursor = 'pointer';
-    if (isSafari) {
-      translator.handleBrowserExceptions('Safari');
-    } else {
-      vs.setAttribute('title', translator.lang.notValidated.text);
-    }
+    vs.setAttribute('title', translator.lang.notValidated.text);
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);

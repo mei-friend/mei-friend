@@ -17,7 +17,6 @@
  */
 
 import { cm, storage, translator, v, validator, version } from './main.js';
-import { isSafari } from './defaults.js';
 import { checkAndClone } from './github-menu.js';
 import { parseRawGithubUrl } from './fork-repository.js';
 
@@ -1011,11 +1010,11 @@ export async function openLetsEncodeFile(gm, url = letsEncodeTask.file) {
  * updated at all with auto-validation off. A schema that failed to load earlier
  * is retried here, since the failure may well have been passing.
  * @returns {Promise<Array|null>} the validator's messages (empty when valid), or
- * null when the encoding could not be checked: no schema, the schema or the
- * validator unavailable, or Safari, where validation is switched off
+ * null when the encoding could not be checked: no schema, or the schema or the
+ * validator unavailable
  */
 async function validateLetsEncodeTask() {
-  if (isSafari || !v || !validator || !v.validatorInitialized) return null;
+  if (!v || !validator || !v.validatorInitialized) return null;
   if (!v.validatorWithSchema && v.currentSchema) await v.replaceSchema(v.currentSchema);
   if (!v.validatorWithSchema) return null;
   try {
