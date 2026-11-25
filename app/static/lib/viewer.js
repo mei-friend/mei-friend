@@ -302,18 +302,28 @@ export default class Viewer {
       else return '';
       // count pages
       this.pageCount = 1; // pages are one-based
-      let countBreaks = false;
+      // A break only ends a page when a measure has come since the last one that
+      // did: a run of breaks with nothing between them (<sb/><pb/> opening a
+      // section, say) is one break, as Verovio also engraves it. Same rule in
+      // speed.js (readSection(), getPageWithElement()) and in speed-worker.js
+      // (getPageNumberForElements()); the four counts have to agree.
+      let measureSinceBreak = false;
       for (let e of elements) {
-        if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
-        if (countBreaks && breaks.includes(e.nodeName)) {
-          // if within app, increment only if inside lem or 1st rdg
-          if (dutils.countAsBreak(e)) this.pageCount++;
+        if (e.nodeName === 'measure') {
+          measureSinceBreak = true; // leading breaks are skipped: none has come yet
+        } else if (measureSinceBreak && breaks.includes(e.nodeName) && dutils.countAsBreak(e)) {
+          // within an app, count only breaks inside lem or 1st rdg
+          this.pageCount++;
+          measureSinceBreak = false;
         }
       }
+      // breaks after the last measure open no page of their own, and count as one
       for (let e of Array.from(elements).reverse()) {
-        // skip trailing breaks
         if (e.nodeName === 'measure') break;
-        if (countBreaks && breaks.includes(e.nodeName)) this.pageCount--;
+        if (breaks.includes(e.nodeName) && dutils.countAsBreak(e)) {
+          this.pageCount--;
+          break;
+        }
       }
     }
     if (this.pageCount > 0 && (this.currentPage < 1 || this.currentPage > this.pageCount)) this.currentPage = 1;
@@ -342,7 +352,16 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    let excerpt = speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    if (!excerpt && this.currentPage !== 1) {
+      // The page count above and getPageFromDom() count pages the same way, so
+      // this should not happen; fall back to the first page rather than hand
+      // Verovio nothing to load ("Cannot load MEI data").
+      console.warn('speedFilter(): no excerpt for page ' + this.currentPage + ', falling back to page 1');
+      this.currentPage = 1;
+      excerpt = speed.getPageFromDom(speedMeiDoc, 1, breaks, this.pageSpanners, includeDummyMeasures);
+    }
+    return excerpt;
   } // speedFilter()
 
   loadXml(mei, forceReload = false) {

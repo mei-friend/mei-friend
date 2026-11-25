@@ -72,13 +72,15 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   // determine page number for list of ids
   noteTable = {};
   let count = false;
+  let measureSinceBreak = false;
   let p = 1;
   let measureCount = 0;
   let tmp = {}; // list of unpaged tstamp2 elements (with xml:id as keys and endMeasure as value)
   let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page
 
-  // `count`, `p` and `measureCount` are shared across the scores below, so
-  // counting continues across an mdiv boundary instead of restarting at page 1
+  // `count`, `measureSinceBreak`, `p` and `measureCount` are shared across the
+  // scores below, so counting continues across an mdiv boundary instead of
+  // restarting at page 1
   for (const score of scores) {
     noteTable = getPageNumberForElements(score.children, noteTable, idList);
   }
@@ -159,6 +161,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
         if (el.hasOwnProperty('tagName')) {
           if (el.tagName === 'measure') {
             count = true;
+            measureSinceBreak = true;
             measureCount++;
             // Check whether one of the timeStamp2Pages exceeded measureCount
             for (let id in tmp) {
@@ -168,7 +171,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
               }
             }
           }
-          if (count && breaksCount && breaks.includes(el.tagName)) p++;
+          // a run of breaks with no measure between them (<sb/><pb/> opening a
+          // section, say) ends one page, not one page each, as in
+          // viewer.speedFilter() and speed.js (readSection(), getPageWithElement())
+          if (count && measureSinceBreak && breaksCount && breaks.includes(el.tagName)) {
+            p++;
+            measureSinceBreak = false;
+          }
           const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);

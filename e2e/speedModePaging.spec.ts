@@ -5,6 +5,7 @@ import {
   setupPage,
   openLocalMei,
   setSpeedMode,
+  currentPage,
   pageCount,
   measureIdsOnPage,
   measureIdsPerPage,
@@ -33,6 +34,10 @@ const keySigs = readFileSync(join(fixtureDir, 'keysig-changes-mei5.mei'), 'utf-8
 // mT1, <pb>, ending[mT2, <sb>, mT3 (bass clef), <sb>, mT4], mT5: an ending
 // spanning three pages under 'line' breaks
 const twoBreaks = readFileSync(join(fixtureDir, 'ending-two-breaks.mei'), 'utf-8');
+// mB1, <sb>, mB2, <pb>, mB3, then a second section opening with <sb><pb>:
+//   mB4, <pb><pb>, mB5, <sb><pb>
+// Runs of breaks with no measure between them end one page, not one page each.
+const adjacentBreaks = readFileSync(join(fixtureDir, 'adjacent-breaks.mei'), 'utf-8');
 
 /** Number of key signature accidentals rendered on the current page. */
 function keyAccidentals(page: Page) {
@@ -174,5 +179,93 @@ test.describe('3 Speed mode carries MEI 5 key and meter changes into its excerpt
 
     expect(speed).toEqual(normal);
     expect(speed.flat()).toEqual(measureIdsInEncoding(keySigs));
+  });
+});
+
+/**
+ * Measures per page of the whole encoding, for a rendering that may contain
+ * pages with no measure at all (collectPerPage() waits for each page to show
+ * measures, which such a page never does).
+ */
+async function pagesWithoutWaitingForContent(page: Page): Promise<string[][]> {
+  const pages: string[][] = [];
+  await page.locator('#firstPageButton').click();
+  await expect.poll(() => currentPage(page)).toBe(1);
+  const total = await pageCount(page);
+  for (let p = 1; p <= total; p++) {
+    if (p > 1) {
+      await page.locator('#nextPageButton').click();
+      await expect.poll(() => currentPage(page)).toBe(p);
+    }
+    await expect(page.locator('#verovioIcon')).not.toHaveClass(/clockwise/);
+    await page.waitForTimeout(400); // the re-render follows the page number
+    pages.push(await measureIdsOnPage(page));
+  }
+  return pages;
+} // pagesWithoutWaitingForContent()
+
+// 3) runs of breaks with nothing between them (e2e/fixtures/adjacent-breaks.mei).
+// A <sb/><pb/> opening a section is correct MEI, and Verovio engraves such a run
+// as a single break; counting it as two left speed mode with a page holding no
+// measure at all, which it could then not build ("Cannot load MEI data").
+test.describe('5 Speed mode collapses runs of breaks.', () => {
+  test("5.1 Breaks mode 'line': <sb><pb> and <pb><pb> each end one page", async ({ page }) => {
+    await loadFixture(page, 'adjacent-breaks.mei', adjacentBreaks, 'noteB1');
+    await setSpeedMode(page, true, 'line');
+
+    expect(await pageCount(page)).toBe(5);
+    expect(await measureIdsPerPage(page)).toEqual([['mB1'], ['mB2'], ['mB3'], ['mB4'], ['mB5']]);
+  });
+
+  test("5.2 Breaks mode 'encoded': <pb><pb> ends one page, the <sb>s do not count", async ({ page }) => {
+    await loadFixture(page, 'adjacent-breaks.mei', adjacentBreaks, 'noteB1');
+    await setSpeedMode(page, true, 'encoded');
+
+    expect(await pageCount(page)).toBe(4);
+    expect(await measureIdsPerPage(page)).toEqual([['mB1', 'mB2'], ['mB3'], ['mB4'], ['mB5']]);
+  });
+
+  test('5.3 Speed mode pages the runs of breaks like normal mode, minus its empty pages', async ({ page }) => {
+    await loadFixture(page, 'adjacent-breaks.mei', adjacentBreaks, 'noteB1');
+
+    // 'encoded' only: there, pages follow from the encoding in both modes. Under
+    // 'line' breaks, normal mode puts as many systems on a page as the notation
+    // panel has room for, while speed mode always shows one -- so the two cannot
+    // be compared page by page without pinning panel size and scale.
+    await setSpeedMode(page, false, 'encoded');
+    const normal = await pagesWithoutWaitingForContent(page);
+
+    await setSpeedMode(page, true, 'encoded');
+    const speed = await measureIdsPerPage(page);
+
+    // Normal mode draws a page for every <pb>, so a second <pb> in a row (and the
+    // trailing one) gives it a page with no measure on it. Speed mode cannot build
+    // a page without measures -- that is the bug this fixture is about -- and
+    // collapses such runs; apart from those empty pages, the two agree.
+    expect(normal.filter((measures) => measures.length === 0).length).toBe(2);
+    expect(speed).toEqual(normal.filter((measures) => measures.length > 0));
+    expect(speed.flat()).toEqual(measureIdsInEncoding(adjacentBreaks));
+  });
+
+  test('5.4 Page navigation finds every element on the page it is shown on', async ({ page }) => {
+    await loadFixture(page, 'adjacent-breaks.mei', adjacentBreaks, 'noteB1');
+    await setSpeedMode(page, true, 'line');
+
+    // speed.getPageWithElement() counts pages of its own, and has to arrive at
+    // the page the element is really shown on
+    const pageOf = (id: string) =>
+      page.evaluate(async (id) => {
+        const main = await import('/static/lib/main.js');
+        const speed = await import('/static/lib/speed.js');
+        return speed.getPageWithElement(main.v.xmlDoc, ['sb', 'pb'], id, 'line');
+      }, id);
+
+    const perPage = await measureIdsPerPage(page);
+    for (const [index, measures] of perPage.entries()) {
+      for (const id of measures) expect(await pageOf(id), 'page of ' + id).toBe(index + 1);
+    }
+    // the <pb> of the collapsed pair opens page 4, the <sb> still ends page 3
+    expect(await pageOf('sbOpeningTwo'), 'page of the <sb> opening section two').toBe(3);
+    expect(await pageOf('pbOpeningTwo'), 'page of the <pb> opening section two').toBe(4);
   });
 });

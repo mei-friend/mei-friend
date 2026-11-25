@@ -21,7 +21,8 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.
 /** @typedef {'computedBreaks' | 'encodedBreaks' | 'firstPage'} CountingMode */
 /** @typedef {'sb' | 'pb'} Break */
 /** @typedef {{p: number, mNo: number, done: boolean, matched: boolean, countNow: boolean,
- *   earlierContent: boolean, courtesy: Element[], lookaheadDone: boolean}} SectionState */
+ *   measureSinceBreak: boolean, earlierContent: boolean, courtesy: Element[],
+ *   lookaheadDone: boolean}} SectionState */
 /** @typedef {'none' | 'auto' | 'line' | 'encoded' | 'smart'} BreaksOption */
 
 /**
@@ -91,6 +92,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
     done: false,
     matched: false,
     countNow: false,
+    measureSinceBreak: false,
     earlierContent: false,
     courtesy: [],
     lookaheadDone: false,
@@ -359,6 +361,16 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
         // has been seen, a later mdiv's own leading break is a real break,
         // not a "before the first measure" break to be ignored
         state.countNow = true;
+        state.measureSinceBreak = true;
+      } else if (
+        !state.measureSinceBreak &&
+        currentNodeName !== 'sb' &&
+        currentNodeName !== 'pb' &&
+        currentNode.querySelector('measure')
+      ) {
+        // measures inside an <ending>, <app>, ... are content as well (looked up
+        // only between a counted break and the next measure, a handful of nodes)
+        state.measureSinceBreak = true;
       }
 
       if (countingMode === 'firstPage') {
@@ -376,8 +388,13 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
               (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
         ) {
-          if (dutils.countAsBreak(sb ? sb : currentNode)) {
+          // A run of breaks with no measure between them (<sb/><pb/> opening a
+          // section, say) ends one page, not one page each -- as Verovio also
+          // engraves it. Same rule in viewer.speedFilter(), getPageWithElement()
+          // and speed-worker.getPageNumberForElements(); the counts have to agree.
+          if (state.measureSinceBreak && dutils.countAsBreak(sb ? sb : currentNode)) {
             state.p++;
+            state.measureSinceBreak = false;
             if (state.p === pageNo) {
               // scoreDefs between the last measure of the previous page and
               // this break open pageNo
@@ -439,6 +456,8 @@ function readSection(pageNo, spdScore, breaks, countingMode, state, meiVersion =
             state.matched = true;
           }
           state.p += nBreaks;
+          // an ending ends with a measure of its own, so the next break counts
+          state.measureSinceBreak = true;
           continue;
         }
       }
@@ -1380,6 +1399,29 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   const firstMeasureId = targetEl?.querySelector('measure')?.getAttribute('xml:id');
   if (firstMeasureId) id = firstMeasureId;
 
+  // 'music body' (not 'music score') so ids in any mdiv can be found, not just the first
+  const music = xmlDoc.querySelector('music body') || xmlDoc.documentElement;
+  if (!music) return page;
+
+  if (breaksOption === 'line' || breaksOption === 'encoded') {
+    // Walk measures and breaks in document order and count pages exactly as
+    // viewer.speedFilter() does: breaks before the first measure open no page,
+    // and a break only ends a page when a measure has come since the last one
+    // that did (so <sb/><pb/> opening a section ends one page, not two).
+    const breakNames = breaksOption === 'line' ? 'sb,pb' : 'pb';
+    let measureSinceBreak = false;
+    for (const el of music.querySelectorAll('measure,' + breakNames + ',[*|id="' + id + '"]')) {
+      if (el.getAttribute('xml:id') === id) return page; // the page it sits on
+      if (el.nodeName === 'measure') measureSinceBreak = true;
+      else if (measureSinceBreak && dutils.countAsBreak(el)) {
+        // within an app, count only breaks inside lem or 1st rdg
+        page++;
+        measureSinceBreak = false;
+      }
+    }
+    return 1; // id is not in the music body
+  }
+
   switch (breaksOption) {
     case 'none':
       return page;
@@ -1392,37 +1434,19 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
         sel += '[*|id="' + id + '"]';
       } else return page;
       break;
-    case 'line':
-      sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
-      break;
-    case 'encoded':
-      sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
-      break;
     default:
       return page;
   }
   if (sel === '') return page;
-  // 'music body' (not 'music score') so ids in any mdiv can be found, not just the first
-  const music = xmlDoc.querySelector('music body') || xmlDoc.documentElement;
-  if (!music) return page;
   let els = Array.from(music.querySelectorAll(sel));
   for (let i = els.length - 1; i >= 0; i--) {
     if (!dutils.countAsBreak(els[i])) els.splice(i, 1);
-  } // getPageWithElement()
+  }
 
   page = els.findIndex((el) => el.getAttribute('xml:id') === id) + 1;
   // if element is within last measure, ...
   if (page > 1 && els[page - 1].closest('measure') === els[page - 2]) page--; // ...undo increment
 
-  // remove leading pb in MEI file
-  if (breaksOption === 'line' || breaksOption === 'encoded') {
-    let j = 0;
-    for (const el of music.querySelectorAll('pb,measure')) {
-      if (el.nodeName !== 'pb') break;
-      if (dutils.countAsBreak(el)) j++;
-    }
-    page -= j;
-  }
   return Math.max(page, 1);
 } // getPageWithElement()
 
