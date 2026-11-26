@@ -236,6 +236,11 @@ export const lang = {
     description:
       'Verovio または XML パーサーを使ってエンコーディング全体を書き直し、mei-friend が要素を書き戻す際の属性の順序を設定します。',
   },
+  meiToolboxTabTranspose: {
+    text: '移調',
+    description:
+      '楽譜を別の調へ、または音程の分だけ移調します。移調されるのは楽譜だけで、エンコーディングはそのままです。',
+  },
   meiToolboxIdsAdd: { text: 'xml:id を追加（持たない要素に）' },
   meiToolboxIdsChange: {
     text: 'xml:id を変更（全要素に新しい ID）',
@@ -282,6 +287,19 @@ export const lang = {
     text: '順序パターン',
     description: '属性名を空白またはコンマで区切り、希望する順に並べます（例: 「xml:id n label *」）。* で終わる名前はその接頭辞を持つすべての属性に一致します（clef.*）。単独の * は名前を挙げていないすべての属性をアルファベット順で表します。* がない場合、それらは末尾で元の順序を保ちます。名前空間宣言は常に先頭に来ます。',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: '移調されるのは楽譜だけで、エンコーディングはそのままです。エンコーディング自体も移調するには、ここで移調してから「再フォーマット」タブの「Verovio 経由」で書き直してください。',
+  },
+  meiToolboxTransposeReset: {
+    text: 'リセット',
+    description: '移調を取り消し、楽譜を再びエンコードされた音高で表示します。',
+  },
+  meiToolboxTransposeDone: { text: '楽譜を移調しました（{what}）。エンコーディングは変更されていません。' },
+  meiToolboxTransposeRemoved: { text: '移調を取り消しました。' },
+  meiToolboxTransposeNone: { text: '何もすることはありません。移調は適用されていません。' },
+
   codeCheckerFixShown: { text: '表示中の {n} 件を修正' },
   codeCheckerIgnoreShown: { text: '表示中の {n} 件を無視' },
   convertGroupAccid: { text: '記譜上の臨時記号 (@accid)' },
@@ -938,15 +956,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: '移調',
-    description: '楽譜情報を移調',
-  },
-  enableTransposition: {
-    text: '移調を有効にする',
-    description:
-      '移調設定を有効にし、下の移調ボタンをクリックして適用します。移調は楽譜にのみ適用され、エンコードは変更されません。"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"をクリックしない限り。',
-  },
   transposeInterval: {
     text: '音程で移調',
     description: '最も一般的な音程（Verovioはベース40システムをサポート）による音程でエンコードを移調',
@@ -1008,8 +1017,7 @@ export const lang = {
   },
   transposeButton: {
     text: '移調',
-    description:
-      '上記の設定で楽譜に移調を適用します。ただし、MEIエンコーディングは変更されず、現在の設定でMEIエンコーディングも移調するには、"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"を使用してください。',
+    description: '移調を楽譜に適用します。エンコーディングは変更されません。',
   },
 
   // Renumber measures

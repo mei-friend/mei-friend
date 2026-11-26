@@ -246,6 +246,11 @@ export const lang = {
     description:
       'Skriver hele kodningen på ny, via Verovio eller XML-parseren, og fastlægger den attributrækkefølge, mei-friend bruger, når elementer skrives tilbage.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponer',
+    description:
+      'Transponerer notationen til en anden toneart eller med et interval. Kun notationen transponeres; kodningen forbliver, som den er.',
+  },
   meiToolboxIdsAdd: { text: 'Tilføj xml:id (til elementer uden)' },
   meiToolboxIdsChange: {
     text: 'Skift xml:id (et nyt til hvert element)',
@@ -298,6 +303,19 @@ export const lang = {
     text: 'Rækkefølgemønster',
     description: 'Attributnavne adskilt af mellemrum eller kommaer, i den ønskede rækkefølge, f.eks. “xml:id n label *”. Et navn, der ender på *, matcher alle attributter med det præfiks (clef.*). Et enkelt * står for alle ikke-nævnte attributter i alfabetisk orden; uden det bevarer de deres rækkefølge til sidst. Namespace-erklæringer kommer altid først.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponerer kun notationen; kodningen forbliver, som den er. For også at transponere kodningen skal du transponere her og derefter skrive den på ny med “Via Verovio” i fanen Reformatér.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Nulstil',
+    description: 'Fjerner transpositionen, så notationen igen vises i den kodede tonehøjde.',
+  },
+  meiToolboxTransposeDone: { text: 'Notationen er transponeret ({what}); kodningen er uændret.' },
+  meiToolboxTransposeRemoved: { text: 'Transpositionen er fjernet.' },
+  meiToolboxTransposeNone: { text: 'Intet at gøre: ingen transposition er anvendt.' },
+
   codeCheckerFixShown: { text: 'Ret {n} viste' },
   codeCheckerIgnoreShown: { text: 'Ignorer {n} viste' },
   convertGroupAccid: { text: 'Noterede fortegn (@accid)' },
@@ -866,15 +884,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transponer',
-    description: 'Transponer noder',
-  },
-  enableTransposition: {
-    text: 'Aktiver transponering',
-    description:
-      'Aktiver transponering indstillinger, der skal anvendes gennem transponer knappen nedenfor. Transponeringen vil blive anvendt på notationen kun, kodningen forbliver uændret, medmindre du klikker på elementet "Genrender via Verovio" i "Manipuler" dropdown-menuen.',
-  },
   transposeInterval: {
     text: 'Transponer ved interval',
     description:
@@ -936,8 +945,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponer',
-    description:
-      'Anvend transponering med ovenstående indstillinger på notationen, mens MEI-kodningen forbliver uændret. For også at transponere MEI-kodningen med de nuværende indstillinger, brug "Genrender via Verovio" i "Manipuler" dropdown-menuen.',
+    description: 'Anvender transpositionen på notationen; kodningen forbliver uændret.',
   },
 
   // Renumber measures

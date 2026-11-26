@@ -241,6 +241,11 @@ export const lang = {
     description:
       'Ispisuje cijelo kodiranje iznova, putem Verovija ili XML parsera, i određuje redoslijed atributa koji mei-friend koristi pri ponovnom upisivanju elemenata.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponiraj',
+    description:
+      'Transponira notni slog u drugi tonalitet ili za interval. Transponira se samo notni slog; kodiranje ostaje kakvo jest.',
+  },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (elementima bez njega)' },
   meiToolboxIdsChange: {
     text: 'Promijeni xml:id (novi za svaki element)',
@@ -293,6 +298,19 @@ export const lang = {
     text: 'Uzorak redoslijeda',
     description: 'Imena atributa odvojena razmacima ili zarezima, redoslijedom kojim ih želite, npr. „xml:id n label *“. Ime koje završava s * odgovara svim atributima s tim prefiksom (clef.*). Jedan * označava sve neimenovane atribute, abecedno; bez njega zadržavaju svoj redoslijed na kraju. Deklaracije imenskih prostora uvijek dolaze prve.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponira samo notni slog; kodiranje ostaje kakvo jest. Da biste transponirali i kodiranje, transponirajte ovdje i zatim ga ispišite iznova pomoću „Preko Verovija” u kartici Preoblikuj.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Poništi',
+    description: 'Uklanja transpoziciju, tako da se notni slog ponovno prikazuje u kodiranoj visini.',
+  },
+  meiToolboxTransposeDone: { text: 'Notni slog je transponiran ({what}); kodiranje je nepromijenjeno.' },
+  meiToolboxTransposeRemoved: { text: 'Transpozicija je uklonjena.' },
+  meiToolboxTransposeNone: { text: 'Nema se što učiniti: nijedna transpozicija nije primijenjena.' },
+
   codeCheckerFixShown: { text: 'Popravi {n} prikazanih' },
   codeCheckerIgnoreShown: { text: 'Zanemari {n} prikazanih' },
   convertGroupAccid: { text: 'Pisani predznaci (@accid)' },
@@ -857,15 +875,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transponiraj',
-    description: 'Transponiraj informacije o notama',
-  },
-  enableTransposition: {
-    text: 'Omogući transponiranje',
-    description:
-      'Omogućuje postavke transponiranja koje će se primijeniti klikom na gumb za transponiranje ispod. Transponiranje će se primijeniti samo na notaciju, kodiranje ostaje nepromijenjeno, osim ako ne kliknete stavku "Ponovno izmijenite putem Verovija" u izborniku "Manipuliraj".',
-  },
   transposeInterval: {
     text: 'Transponiraj po intervalu',
     description:
@@ -927,8 +936,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponiraj',
-    description:
-      'Primijeni transponiranje s postavkama iznad na notaciju, dok kodiranje ostaje nepromijenjeno. Da biste također transponirali kodiranje MEI sa trenutnim postavkama, koristite "Ponovno izmijenite putem Verovija" u izborniku "Manipuliraj".',
+    description: 'Primjenjuje transpoziciju na notni slog; kodiranje ostaje nepromijenjeno.',
   },
 
   // Renumeracija takta

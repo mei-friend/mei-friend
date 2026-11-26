@@ -249,6 +249,11 @@ export const lang = {
     description:
       'Riscrive l’intera codifica, tramite Verovio o il parser XML, e stabilisce l’ordine degli attributi che mei-friend usa quando riscrive gli elementi.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Trasponi',
+    description:
+      'Traspone la notazione in un’altra tonalità o di un intervallo. Viene trasposta solo la notazione; la codifica resta com’è.',
+  },
   meiToolboxIdsAdd: { text: 'Aggiungi xml:id (agli elementi che non ne hanno)' },
   meiToolboxIdsChange: {
     text: 'Cambia gli xml:id (uno nuovo per ogni elemento)',
@@ -301,6 +306,19 @@ export const lang = {
     text: 'Schema dell’ordine',
     description: 'Nomi di attributo separati da spazi o virgole, nell’ordine desiderato, ad es. «xml:id n label *». Un nome che termina con * corrisponde a tutti gli attributi con quel prefisso (clef.*). Un singolo * rappresenta tutti gli attributi non nominati, in ordine alfabetico; senza di esso mantengono il loro ordine alla fine. Le dichiarazioni di namespace vengono sempre per prime.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Traspone solo la notazione; la codifica resta com’è. Per trasporre anche la codifica, trasponi qui e poi riscrivila con «Tramite Verovio» nella scheda Riformatta.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Reimposta',
+    description: 'Rimuove la trasposizione, così che la notazione torni all’altezza codificata.',
+  },
+  meiToolboxTransposeDone: { text: 'La notazione è trasposta ({what}); la codifica è invariata.' },
+  meiToolboxTransposeRemoved: { text: 'La trasposizione è stata rimossa.' },
+  meiToolboxTransposeNone: { text: 'Nulla da fare: nessuna trasposizione è applicata.' },
+
   codeCheckerFixShown: { text: 'Correggi {n} mostrati' },
   codeCheckerIgnoreShown: { text: 'Ignora {n} mostrati' },
   convertGroupAccid: { text: 'Alterazioni scritte (@accid)' },
@@ -982,15 +1000,6 @@ export const lang = {
   },
 
   // Transposition // Trasposizione
-  titleTransposition: {
-    text: 'Trasposizione',
-    description: 'Trasponi informazioni di punteggio',
-  },
-  enableTransposition: {
-    text: 'Abilita la trasposizione',
-    description:
-      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo allo spartito, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
-  },
   transposeInterval: {
     text: 'Trasponi per intervallo',
     description:
@@ -1052,8 +1061,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Trasponi',
-    description:
-      'Applica la trasposizione con le impostazioni sopra indicate allo spartito, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
+    description: 'Applica la trasposizione alla notazione; la codifica resta invariata.',
   },
 
   // Renumber measures / Rinumerazione misure

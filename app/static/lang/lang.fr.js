@@ -248,6 +248,11 @@ export const lang = {
     description:
       'Réécrit tout l’encodage, via Verovio ou l’analyseur XML, et définit l’ordre des attributs que mei-friend utilise lorsqu’il réécrit des éléments.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transposer',
+    description:
+      'Transpose la notation vers une autre tonalité ou d’un intervalle. Seule la notation est transposée ; l’encodage reste tel quel.',
+  },
   meiToolboxIdsAdd: { text: 'Ajouter des xml:id (aux éléments qui n’en ont pas)' },
   meiToolboxIdsChange: {
     text: 'Changer les xml:id (un nouveau pour chaque élément)',
@@ -300,6 +305,19 @@ export const lang = {
     text: 'Motif d’ordre',
     description: 'Noms d’attributs séparés par des espaces ou des virgules, dans l’ordre souhaité, p. ex. « xml:id n label * ». Un nom se terminant par * correspond à tous les attributs ayant ce préfixe (clef.*). Un * seul représente tous les attributs non nommés, par ordre alphabétique ; sans lui, ils conservent leur ordre à la fin. Les déclarations d’espaces de noms viennent toujours en premier.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transpose uniquement la notation ; l’encodage reste tel quel. Pour transposer aussi l’encodage, transposez ici puis réécrivez-le avec « Via Verovio » dans l’onglet Reformater.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Réinitialiser',
+    description: 'Supprime la transposition, de sorte que la notation réapparaisse à la hauteur encodée.',
+  },
+  meiToolboxTransposeDone: { text: 'La notation est transposée ({what}) ; l’encodage est inchangé.' },
+  meiToolboxTransposeRemoved: { text: 'La transposition a été supprimée.' },
+  meiToolboxTransposeNone: { text: 'Rien à faire : aucune transposition n’est appliquée.' },
+
   codeCheckerFixShown: { text: 'Corriger les {n} affichés' },
   codeCheckerIgnoreShown: { text: 'Ignorer les {n} affichés' },
   convertGroupAccid: { text: 'Altérations écrites (@accid)' },
@@ -979,15 +997,6 @@ export const lang = {
   },
 
   // Transposition // Transposition
-  titleTransposition: {
-    text: 'Transposition',
-    description: 'Transposer les informations de partition',
-  },
-  enableTransposition: {
-    text: 'Activer la transposition',
-    description:
-      "Activer les réglages de transposition, qui seront appliqués grâce au bouton de transposition ci-dessous. La transposition sera appliquée uniquement à la notation, l'encodage restera inchangé, à moins que vous ne cliquiez sur l'option 'Rerender via Verovio' dans le menu déroulant 'Manipuler'.",
-  },
   transposeInterval: {
     text: 'Transposer par intervalle',
     description:
@@ -1049,7 +1058,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transposer',
-    description: `Appliquer la transposition avec les réglages ci-dessus à la notation, tandis que l'encodage MEI reste inchangé. Pour transposer également l'encodage MEI avec les réglages actuels, utilisez "Rendre via Verovio" dans le menu déroulant "Manipuler".`,
+    description: 'Applique la transposition à la notation ; l’encodage reste inchangé.',
   },
 
   // Renumber measures / Renommer les mesures

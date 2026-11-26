@@ -245,6 +245,11 @@ export const lang = {
     description:
       'Reescribe toda la codificación, mediante Verovio o el analizador XML, y establece el orden de atributos que mei-friend usa al reescribir elementos.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponer',
+    description:
+      'Transpone la notación a otra tonalidad o por un intervalo. Solo se transpone la notación; la codificación queda tal como está.',
+  },
   meiToolboxIdsAdd: { text: 'Añadir xml:id (a los elementos que no lo tienen)' },
   meiToolboxIdsChange: {
     text: 'Cambiar los xml:id (uno nuevo para cada elemento)',
@@ -297,6 +302,19 @@ export const lang = {
     text: 'Patrón de orden',
     description: 'Nombres de atributo separados por espacios o comas, en el orden deseado, p. ej. «xml:id n label *». Un nombre terminado en * coincide con todos los atributos con ese prefijo (clef.*). Un solo * representa todos los atributos no nombrados, en orden alfabético; sin él conservan su orden al final. Las declaraciones de espacios de nombres van siempre primero.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Solo transpone la notación; la codificación queda tal como está. Para transponer también la codificación, transponga aquí y luego reescríbala con «Con Verovio» en la pestaña Reformatear.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restablecer',
+    description: 'Elimina la transposición, de modo que la notación vuelve a mostrarse en la altura codificada.',
+  },
+  meiToolboxTransposeDone: { text: 'La notación está transpuesta ({what}); la codificación no ha cambiado.' },
+  meiToolboxTransposeRemoved: { text: 'Se ha eliminado la transposición.' },
+  meiToolboxTransposeNone: { text: 'Nada que hacer: no hay ninguna transposición aplicada.' },
+
   codeCheckerFixShown: { text: 'Corregir {n} mostrados' },
   codeCheckerIgnoreShown: { text: 'Ignorar {n} mostrados' },
   convertGroupAccid: { text: 'Alteraciones escritas (@accid)' },
@@ -974,17 +992,6 @@ export const lang = {
   },
 
   // Transposition / Transposición
-  titleTransposition: {
-    text: 'Transposición',
-    description: 'Transponer la notación',
-  },
-  enableTransposition: {
-    text: 'Activar transposición',
-    description:
-      'Activar la transposición que se aplicará mediante el botón "Transponer" debajo. ' +
-      'La transposición solo se aplicará a la notación, la codificación permanecerá sin cambios, ' +
-      'a menos que haga clic en la opción "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
-  },
   transposeInterval: {
     text: 'Por intervalos',
     description:
@@ -1047,10 +1054,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponer',
-    description:
-      'Aplicar la transposición con las configuraciones anteriores a la notación, ' +
-      'la codificación MEI permanecerá sin cambios. Para transponer también la codificación MEI ' +
-      'con las configuraciones actuales, utilice "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
+    description: 'Aplica la transposición a la notación; la codificación queda sin cambios.',
   },
 
   // Renumber measures / Renumerar compases

@@ -247,6 +247,11 @@ export const lang = {
     description:
       'Schreibt die gesamte Kodierung neu, über Verovio oder den XML-Parser, und legt die Attributreihenfolge fest, die mei-friend beim Zurückschreiben von Elementen verwendet.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponieren',
+    description:
+      'Transponiert die Notation in eine andere Tonart oder um ein Intervall. Nur die Notation wird transponiert; die Kodierung bleibt, wie sie ist.',
+  },
   meiToolboxIdsAdd: { text: 'xml:ids hinzufügen (zu Elementen ohne)' },
   meiToolboxIdsChange: {
     text: 'xml:ids ändern (neue für jedes Element)',
@@ -299,6 +304,19 @@ export const lang = {
     text: 'Reihenfolgemuster',
     description: 'Attributnamen, getrennt durch Leerzeichen oder Kommata, in der gewünschten Reihenfolge, z. B. „xml:id n label *“. Ein Name mit * am Ende passt auf alle Attribute mit diesem Präfix (clef.*). Ein einzelner * steht für alle nicht genannten Attribute in alphabetischer Reihenfolge; ohne ihn behalten sie am Ende ihre Reihenfolge. Namensraum-Deklarationen stehen immer zuerst.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponiert nur die Notation; die Kodierung bleibt, wie sie ist. Um auch die Kodierung zu transponieren, hier transponieren und sie dann mit „Über Verovio“ im Reiter „Neu formatieren“ neu schreiben lassen.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Zurücksetzen',
+    description: 'Nimmt die Transposition zurück, sodass die Notation wieder in der kodierten Tonhöhe erscheint.',
+  },
+  meiToolboxTransposeDone: { text: 'Die Notation ist transponiert ({what}); die Kodierung ist unverändert.' },
+  meiToolboxTransposeRemoved: { text: 'Die Transposition wurde zurückgenommen.' },
+  meiToolboxTransposeNone: { text: 'Nichts zu tun: Es ist keine Transposition angewandt.' },
+
   codeCheckerFixShown: { text: '{n} angezeigte beheben' },
   codeCheckerIgnoreShown: { text: '{n} angezeigte ignorieren' },
   convertGroupAccid: { text: 'Notierte Vorzeichen (@accid)' },
@@ -976,19 +994,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transposition',
-    description: 'Notation transponieren',
-  },
-  enableTransposition: {
-    text: 'Transposition aktivieren',
-    description:
-      'Transposition aktivieren, die über die Schaltfläche ' +
-      '"Transponieren" weiter unten angewendet werden soll. ' +
-      'Die Transposition wird nur auf die Notation angewendet, ' +
-      'die Kodierung bleibt unverändert, es sei denn, Sie klicken ' +
-      'im Dropdown-Menü "Manipulieren" auf den Eintrag "Mit Verovio neu rendern".',
-  },
   transposeInterval: {
     text: 'Nach Intervallen',
     description:
@@ -1051,11 +1056,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponieren',
-    description:
-      'Transposition mit obigen Einstellungen auf die Notation anwenden, ' +
-      'die MEI-Kodierung bleibt unverändert. Um auch die MEI-Kodierung ' +
-      'mit den aktuellen Einstellungen zu transponieren, verwenden Sie ' +
-      '"Mit Verovio neu rendern" im Dropdown-Menü "Manipulieren".',
+    description: 'Wendet die Transposition auf die Notation an; die Kodierung bleibt unverändert.',
   },
   // Renumber measures
   renumberMeasureContinueAcrossIncompleteMeasures: {

@@ -1366,7 +1366,7 @@ input.urlResolves {
 }
 
 /* MEI toolbox beside the encoding (mei-toolbox.js): tabs Check, Convert, Renumber,
-   Ids, Facsimile, Rerender.
+   Ids, Facsimile, Reformat, Transpose.
    Narrow panel: options above the results, folded away after a run;
    wide panel (container query below): options beside the results. */
 #meiToolbox {
@@ -1407,7 +1407,7 @@ input.urlResolves {
 }
 
 /* The tab row wraps into further rows when the toolbox is narrow (docked left or
-   right), so that all six tab labels stay readable instead of being cut off. */
+   right), so that all tab labels stay readable instead of being cut off. */
 .mtHeader {
   display: flex;
   flex-wrap: wrap;
@@ -1638,6 +1638,17 @@ input.urlResolves {
 
 .mtDetail-inline {
   margin-left: 0.4em;
+}
+
+/* Transpose tab: a mode row is a choice row whose select sits at the right edge;
+   the select of the mode not chosen is disabled rather than hidden */
+#meiToolbox .mtChoice select {
+  margin-left: auto;
+  align-self: center;
+}
+
+#meiToolbox select:disabled {
+  opacity: 0.5;
 }
 
 /* label left, control right (renumber options) */

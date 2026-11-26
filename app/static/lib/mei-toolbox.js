@@ -1,5 +1,5 @@
 /**
- * MEI toolbox panel beside the encoding, with six tabs:
+ * MEI toolbox panel beside the encoding, with seven tabs:
  *   Check:     accid.ges, metcon and linked-element checks (mei-checker.js)
  *   Convert:   attributes to elements (attribute-conversion.js)
  *   Renumber:  renumbering measures (utils.renumberMeasures())
@@ -7,6 +7,7 @@
  *   Facsimile: ingesting a facsimile, or adding an empty facsimile skeleton
  *   Reformat:  writing the encoding anew through Verovio or the XML parser, with
  *              the attribute order used when writing elements back
+ *   Transpose: transposing the notation through the Verovio transpose option
  * Each tab has an options section with the buttons running its action, and a
  * result list with a text filter. Each tab keeps its results; results are marked
  * as outdated when the encoding changes afterwards. In a narrow panel, the
@@ -23,13 +24,13 @@ import * as dutils from './dom-utils.js';
 import * as e from './editor.js';
 import { ingestFacsimile } from './facsimile.js';
 import { addModifyerKeys } from './control-menu.js';
-import { cm, handleEditorChanges, shortcutForCommand, translator, v } from './main.js';
+import { cm, cmd, handleEditorChanges, shortcutForCommand, translator, v } from './main.js';
 import * as checker from './mei-checker.js';
 import { meiToolboxVisible, setOrientation } from './resizer.js';
 import * as utils from './utils.js';
 import * as icon from '../css/icons.js';
 
-const tabs = ['check', 'convert', 'renumber', 'ids', 'facsimile', 'reformat'];
+const tabs = ['check', 'convert', 'renumber', 'ids', 'facsimile', 'reformat', 'transpose'];
 
 // check types and the language keys of their labels
 const checkTypes = {
@@ -55,6 +56,24 @@ const groupLabels = {
 // values of the renumber suffix selects
 const suffixAtMeasuresValues = ['none', '-cont'];
 const suffixAtEndingsValues = ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'];
+
+// values of the Transpose tab selects, in the order of the labels of the language
+// packs; they are the Verovio transpose option (keys as pitch names, intervals in
+// the base-40 system, direction prefixed)
+const transposeKeyValues = ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'];
+// prettier-ignore
+const transposeIntervalValues = [
+  'P1', 'A1', 'd2', 'm2', 'M2', 'A2', 'd3', 'm3', 'M3', 'A3', 'd4', 'P4', 'A4',
+  'd5', 'P5', 'A5', 'd6', 'm6', 'M6', 'A6', 'd7', 'm7', 'M7', 'A7', 'd8', 'P8',
+];
+const transposeDirectionValues = ['+', '-', ''];
+
+// the two modes of the Transpose tab: the name in `storageKey` under which the
+// select of a mode is stored, its values, and the value used when nothing is stored
+const transposeModes = {
+  key: { store: 'transposeKey', values: transposeKeyValues, fallback: 'c' },
+  interval: { store: 'transposeInterval', values: transposeIntervalValues, fallback: 'P1' },
+};
 
 // modes of the Ids tab and the language keys of their labels
 const idModes = {
@@ -93,6 +112,11 @@ const storageKey = {
   idMode: 'mf-meiToolboxIdMode',
   attributeOrderPreset: 'mf-meiToolboxAttributeOrderPreset',
   attributeOrderPattern: 'mf-meiToolboxAttributeOrderPattern',
+  transposeMode: 'mf-meiToolboxTransposeMode',
+  // transpose keys as formerly used by the settings panel
+  transposeKey: 'mf-transposeKey',
+  transposeInterval: 'mf-transposeInterval',
+  transposeDirection: 'mf-transposeDirection',
 };
 
 const BUDGET_MS = 30; // work per time slice before yielding to the GUI
@@ -517,6 +541,37 @@ export function runReformat(mode = 'xml') {
 } // runReformat()
 
 /**
+ * Transposes the notation with the options of the Transpose tab, or removes a
+ * transposition again. Only the notation is transposed: Verovio renders the encoding
+ * with its transpose option, the encoding itself stays as it is until it is written
+ * anew with "Via Verovio" in the Reformat tab.
+ * @param {boolean} reset remove the transposition instead of applying one
+ */
+export function runTranspose(reset = false) {
+  openToolbox('transpose');
+  panes.transpose.lastAction = () => runTranspose(reset);
+  startRun('transpose', t(reset ? 'meiToolboxTransposeReset' : 'transposeButton'));
+  if (reset && !v.vrvOptions.transpose) {
+    finishRun(t('meiToolboxTransposeNone', 'No transposition is applied.'), '');
+    return;
+  }
+  const option = reset ? '' : transposeOption();
+  v.vrvOptions.transpose = option;
+  v.updateAll(cm);
+  // the rendered MIDI is no longer the notation shown, so the playback bar is closed
+  if (document.getElementById('showMidiPlaybackControlBar')?.checked) cmd.toggleMidiPlaybackControlBar();
+  finishRun(
+    reset
+      ? t('meiToolboxTransposeRemoved', 'The transposition has been removed.')
+      : t('meiToolboxTransposeDone', 'The notation is transposed ({what}); the encoding is unchanged.').replace(
+          '{what}',
+          transposeSummary()
+        ),
+    option ? '<code>' + esc(option) + '</code>' : ''
+  );
+} // runTranspose()
+
+/**
  * Lists the facsimile of the encoding (surfaces with their graphic and zones, and
  * the page break pointing to each surface) as the result of the Facsimile tab.
  * @param {string} summaryPrefix put before the summary, e.g. what an ingestion did
@@ -658,6 +713,7 @@ function build() {
   buildPane('ids', buildIdsOptions);
   buildPane('facsimile', buildFacsimileOptions);
   buildPane('reformat', buildReformatOptions);
+  buildPane('transpose', buildTransposeOptions);
   applyAttributeOrder();
 
   applyTexts();
@@ -1108,6 +1164,88 @@ function buildReformatOptions(content, p) {
   );
 } // buildReformatOptions()
 
+function buildTransposeOptions(content, p) {
+  const info = el('div', 'mtMethodNote');
+  info.dataset.lang = 'meiToolboxTransposeInfo';
+  content.appendChild(info);
+
+  // one row per mode, the radio choosing it and its select at the right edge; the
+  // select of the mode not chosen is disabled, so that it is visible what applies
+  const storedMode = load(storageKey.transposeMode, 'key');
+  const group = el('div', 'mtOptionGroup');
+  const selects = {};
+  const radios = {};
+  const updateMode = () => {
+    for (const mode of Object.keys(transposeModes)) selects[mode].disabled = !radios[mode].checked;
+  };
+  for (const [mode, { store, values, fallback }] of Object.entries(transposeModes)) {
+    const langKey = langKeyOf(storageKey[store]);
+    const label = el('label', 'mtOption mtChoice');
+    const radio = el('input');
+    radio.type = 'radio';
+    radio.name = 'mtTransposeMode';
+    radio.value = mode;
+    radio.checked = mode === storedMode;
+    const text = el('span');
+    text.dataset.lang = langKey;
+    const select = el('select');
+    select.id = 'mtTranspose-' + mode;
+    select.dataset.langLabels = langKey;
+    values.forEach((value) => {
+      const option = el('option', '', value);
+      option.value = value;
+      select.appendChild(option);
+    });
+    const storedValue = load(storageKey[store], fallback);
+    select.value = values.includes(storedValue) ? storedValue : fallback;
+    select.addEventListener('change', () => {
+      save(storageKey[store], select.value);
+      updateOptionsSummary('transpose');
+    });
+    radio.addEventListener('change', () => {
+      save(storageKey.transposeMode, mode);
+      updateMode();
+      updateOptionsSummary('transpose');
+    });
+    label.append(radio, text, select);
+    group.appendChild(label);
+    selects[mode] = select;
+    radios[mode] = radio;
+  }
+  updateMode();
+  content.appendChild(group);
+
+  // pitch direction, applying to both modes
+  const directionGroup = el('div', 'mtOptionGroup mtStriped');
+  const directionRow = el('label', 'mtOption mtRow');
+  const directionText = el('span');
+  directionText.dataset.lang = langKeyOf(storageKey.transposeDirection);
+  const direction = el('select');
+  direction.id = 'mtTransposeDirection';
+  direction.dataset.langLabels = langKeyOf(storageKey.transposeDirection);
+  transposeDirectionValues.forEach((value) => {
+    const option = el('option', '', value);
+    option.value = value;
+    direction.appendChild(option);
+  });
+  const storedDirection = load(storageKey.transposeDirection, '+');
+  direction.value = transposeDirectionValues.includes(storedDirection) ? storedDirection : '+';
+  direction.addEventListener('change', () => {
+    save(storageKey.transposeDirection, direction.value);
+    updateOptionsSummary('transpose');
+  });
+  directionRow.append(directionText, direction);
+  directionGroup.appendChild(directionRow);
+  content.appendChild(directionGroup);
+
+  content.appendChild(
+    actions([
+      { lang: 'meiToolboxTransposeReset', action: () => runTranspose(true) },
+      { lang: 'transposeButton', action: () => runTranspose(false) },
+    ])
+  );
+} // buildTransposeOptions()
+
 /**
  * Adds a titled block to the options of a tab, for options that apply to one
  * method only. Returns the block and its body, to be filled by the caller.
@@ -1438,6 +1576,9 @@ function updateOptionsSummary(tab) {
     case 'facsimile':
       text = t('meiToolboxFacsimileInfo', '');
       break;
+    case 'transpose':
+      text = transposeSummary();
+      break;
     case 'reformat': {
       const preset = document.getElementById('mtAttributeOrderPreset');
       const labels = translator?.lang?.meiToolboxAttributeOrder?.labels;
@@ -1456,6 +1597,32 @@ function selectedGroups() {
   return Array.from(panes.convert.content.querySelectorAll('input[name="mtConvertGroup"]:checked')).map(
     (c) => c.value
   );
+}
+
+/**
+ * The Verovio transpose option built from the Transpose tab: the pitch direction
+ * followed by the key or the interval of the mode chosen, e.g. '+c' or '-P5'.
+ * @returns {string}
+ */
+function transposeOption() {
+  const mode = transposeMode();
+  return (document.getElementById('mtTransposeDirection')?.value ?? '') + (transposeSelect(mode)?.value || '');
+}
+
+// what the Transpose tab is set to, in words: the key or interval, and the direction
+function transposeSummary() {
+  const label = (select) => select?.selectedOptions[0]?.textContent || '';
+  return [label(transposeSelect(transposeMode())), label(document.getElementById('mtTransposeDirection'))]
+    .filter(Boolean)
+    .join(' \u00b7 ');
+}
+
+function transposeMode() {
+  return panes.transpose?.content.querySelector('input[name="mtTransposeMode"]:checked')?.value || 'key';
+}
+
+function transposeSelect(mode) {
+  return document.getElementById('mtTranspose-' + mode);
 }
 
 function renumberOptions() {

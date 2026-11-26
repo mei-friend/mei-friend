@@ -242,6 +242,11 @@ export const lang = {
     description:
       'Schrijft de hele codering opnieuw, via Verovio of de XML-parser, en legt de attribuutvolgorde vast die mei-friend gebruikt bij het terugschrijven van elementen.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponeren',
+    description:
+      'Transponeert de notatie naar een andere toonsoort of met een interval. Alleen de notatie wordt getransponeerd; de codering blijft zoals ze is.',
+  },
   meiToolboxIdsAdd: { text: 'xml:id\'s toevoegen (aan elementen zonder)' },
   meiToolboxIdsChange: {
     text: 'xml:id\'s wijzigen (een nieuwe voor elk element)',
@@ -294,6 +299,19 @@ export const lang = {
     text: 'Volgordepatroon',
     description: 'Attribuutnamen gescheiden door spaties of komma’s, in de gewenste volgorde, bijv. “xml:id n label *”. Een naam die op * eindigt, komt overeen met alle attributen met dat voorvoegsel (clef.*). Eén enkele * staat voor alle niet-genoemde attributen, alfabetisch; zonder * behouden ze hun volgorde aan het eind. Namespace-declaraties komen altijd eerst.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponeert alleen de notatie; de codering blijft zoals ze is. Om ook de codering te transponeren, transponeer hier en schrijf ze daarna opnieuw met “Via Verovio” op het tabblad Herformatteren.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Herstellen',
+    description: 'Verwijdert de transpositie, zodat de notatie weer op de gecodeerde toonhoogte verschijnt.',
+  },
+  meiToolboxTransposeDone: { text: 'De notatie is getransponeerd ({what}); de codering is ongewijzigd.' },
+  meiToolboxTransposeRemoved: { text: 'De transpositie is verwijderd.' },
+  meiToolboxTransposeNone: { text: 'Niets te doen: er is geen transpositie toegepast.' },
+
   codeCheckerFixShown: { text: '{n} getoonde herstellen' },
   codeCheckerIgnoreShown: { text: '{n} getoonde negeren' },
   convertGroupAccid: { text: 'Genoteerde voortekens (@accid)' },
@@ -868,15 +886,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transponeren',
-    description: 'Transponeer partituurinformatie',
-  },
-  enableTransposition: {
-    text: 'Transponeren inschakelen',
-    description:
-      'Schakel transpositie-instellingen in, om toe te passen via de transpose-knop hieronder. De transpositie wordt alleen op de notatie toegepast, de codering blijft ongewijzigd, tenzij u op het item "Opnieuw renderen via Verovio" klikt in het "Manipuleren" dropdownmenu.',
-  },
   transposeInterval: {
     text: 'Transponeren op interval',
     description:
@@ -938,8 +947,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponeren',
-    description:
-      'Pas transponeren toe met bovenstaande instellingen op de notatie, terwijl de MEI-codering ongewijzigd blijft. Om ook de MEI-codering met de huidige instellingen te transponeren, gebruikt u "Opnieuw renderen via Verovio" in het "Manipuleren" dropdownmenu.',
+    description: 'Past de transpositie toe op de notatie; de codering blijft ongewijzigd.',
   },
 
   // Renumber measures

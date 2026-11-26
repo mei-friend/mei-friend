@@ -244,6 +244,11 @@ export const lang = {
     description:
       'Reskribas la tutan kodadon, per Verovio aŭ la XML-analizilo, kaj difinas la ordon de atributoj, kiun mei-friend uzas, kiam ĝi reskribas elementojn.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transponi',
+    description:
+      'Transponas la notacion al alia tonalo aŭ je intervalo. Nur la notacio estas transponata; la kodigo restas kia ĝi estas.',
+  },
   meiToolboxIdsAdd: { text: 'Aldoni xml:id-ojn (al elementoj sen tia)' },
   meiToolboxIdsChange: {
     text: 'Ŝanĝi xml:id-ojn (novan por ĉiu elemento)',
@@ -296,6 +301,19 @@ export const lang = {
     text: 'Ordoŝablono',
     description: 'Atributnomoj disigitaj per spacoj aŭ komoj, en la dezirata ordo, ekz. „xml:id n label *“. Nomo finiĝanta per * kongruas kun ĉiuj atributoj kun tiu prefikso (clef.*). Unuopa * reprezentas ĉiujn ne nomitajn atributojn, alfabete; sen ĝi ili konservas sian ordon ĉe la fino. Nomspacaj deklaroj ĉiam venas unue.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponas nur la notacion; la kodigo restas kia ĝi estas. Por transponi ankaŭ la kodigon, transponu ĉi tie kaj poste reskribu ĝin per „Per Verovio“ en la langeto Reformati.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restarigi',
+    description: 'Forigas la transponon, tiel ke la notacio denove aperas en la kodigita alteco.',
+  },
+  meiToolboxTransposeDone: { text: 'La notacio estas transponita ({what}); la kodigo estas neŝanĝita.' },
+  meiToolboxTransposeRemoved: { text: 'La transpono estis forigita.' },
+  meiToolboxTransposeNone: { text: 'Nenio farenda: neniu transpono estas aplikata.' },
+
   codeCheckerFixShown: { text: 'Korekti {n} montritajn' },
   codeCheckerIgnoreShown: { text: 'Ignori {n} montritajn' },
   convertGroupAccid: { text: 'Skribitaj akcidencoj (@accid)' },
@@ -956,15 +974,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transpozicio',
-    description: 'Transpozicio de muzika notado',
-  },
-  enableTransposition: {
-    text: 'Ebligi transpozicion',
-    description:
-      'Ebligi agordojn de transpozicio, kiuj estos aplikitaj per la transpozicia butono sube. La transpozicio estos aplikita nur al la muzika notado, la kodado restas sen ŝanĝo, se vi ne klakas la elementon "Rekrei per Verovio" en la menuo "Manipuli".',
-  },
   transposeInterval: {
     text: 'Transpozi per intervalo',
     description:
@@ -1026,8 +1035,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transpozi',
-    description:
-      'Apliku transpozicion kun supraj agordoj al la muzika notado, dum la MEI kodado restas sen ŝanĝo. Por ankaŭ transpozi la MEI kodadon per la nuna agordo, uzu "Rekrei per Verovio" en la menuo "Manipuli".',
+    description: 'Aplikas la transponon al la notacio; la kodigo restas neŝanĝita.',
   },
 
   // Renombri taktojn

@@ -247,6 +247,11 @@ export const lang = {
     description:
       'Writes the whole encoding anew, through Verovio or the XML parser, and sets the attribute order mei-friend uses when it writes elements back.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transpose',
+    description:
+      'Transposes the notation to another key or by an interval. Only the notation is transposed; the encoding stays as it is.',
+  },
   meiToolboxCheckButton: { text: 'Check' },
   meiToolboxTestButton: { text: 'Test', description: 'List what would be changed, without changing the encoding' },
   meiToolboxRenumberButton: { text: 'Renumber' },
@@ -325,6 +330,19 @@ export const lang = {
     description:
       'Attribute names separated by spaces or commas, in the order you want them, e.g. “xml:id n label *”. A name ending in * matches all attributes with that prefix (clef.*). A single * stands for all attributes not named, in alphabetical order; without it they keep their order at the end. Namespace declarations always come first.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transposes the notation only; the encoding stays as it is. To transpose the encoding too, transpose here and then write it anew with “Via Verovio” in the Reformat tab.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Reset',
+    description: 'Removes the transposition, so that the notation is shown at its encoded pitch again.',
+  },
+  meiToolboxTransposeDone: { text: 'The notation is transposed ({what}); the encoding is unchanged.' },
+  meiToolboxTransposeRemoved: { text: 'The transposition has been removed.' },
+  meiToolboxTransposeNone: { text: 'Nothing to do: no transposition is applied.' },
+
   codeCheckerFixShown: { text: 'Fix {n} shown' },
   codeCheckerIgnoreShown: { text: 'Ignore {n} shown' },
   convertGroupAccid: { text: 'Written accidentals (@accid)' },
@@ -1033,15 +1051,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transpose',
-    description: 'Transpose score information',
-  },
-  enableTransposition: {
-    text: 'Enable transposition',
-    description:
-      'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
-  },
   transposeInterval: {
     text: 'Transpose by interval',
     description:
@@ -1103,8 +1112,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transpose',
-    description:
-      'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+    description: 'Applies the transposition to the notation; the encoding stays unchanged.',
   },
 
   // Renumber measures

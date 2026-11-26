@@ -237,6 +237,11 @@ export const lang = {
     description:
       '通过 Verovio 或 XML 解析器重写整个编码，并设置 mei-friend 写回元素时使用的属性顺序。',
   },
+  meiToolboxTabTranspose: {
+    text: '移调',
+    description:
+      '将乐谱移调到另一个调，或按音程移调。只有乐谱被移调，编码保持不变。',
+  },
   meiToolboxIdsAdd: { text: '添加 xml:id（给没有的元素）' },
   meiToolboxIdsChange: {
     text: '更改 xml:id（为每个元素生成新 ID）',
@@ -281,6 +286,19 @@ export const lang = {
     text: '顺序模式',
     description: '以空格或逗号分隔的属性名，按你希望的顺序排列，例如“xml:id n label *”。以 * 结尾的名称匹配具有该前缀的所有属性（clef.*）。单独的 * 代表所有未列出的属性，按字母顺序排列；没有它时，这些属性保留原有顺序并置于末尾。命名空间声明始终排在最前。',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: '只移调乐谱，编码保持不变。若要同时移调编码，请在此移调，然后在“重新格式化”选项卡中用“通过 Verovio”重新写出编码。',
+  },
+  meiToolboxTransposeReset: {
+    text: '重置',
+    description: '取消移调，使乐谱重新按编码中的音高显示。',
+  },
+  meiToolboxTransposeDone: { text: '乐谱已移调（{what}）；编码未更改。' },
+  meiToolboxTransposeRemoved: { text: '移调已取消。' },
+  meiToolboxTransposeNone: { text: '无需操作：未应用任何移调。' },
+
   codeCheckerFixShown: { text: '修复显示的 {n} 项' },
   codeCheckerIgnoreShown: { text: '忽略显示的 {n} 项' },
   convertGroupAccid: { text: '记谱变音记号 (@accid)' },
@@ -816,15 +834,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: '移调',
-    description: '移调乐谱信息',
-  },
-  enableTransposition: {
-    text: '启用移调',
-    description:
-      '启用移调设置，通过下面的移调按钮应用。移调将仅应用于乐谱，编码保持不变，除非您在“操作”下拉菜单中点击“通过 Verovio 重新渲染”。',
-  },
   transposeInterval: {
     text: '按音程移调',
     description: '按最常见的音程移调编码（Verovio 支持 base-40 系统）',
@@ -885,8 +894,7 @@ export const lang = {
   },
   transposeButton: {
     text: '移调',
-    description:
-      '将上述设置应用于乐谱，MEI 编码保持不变。要将当前设置应用于 MEI 编码，请在“操作”下拉菜单中使用“通过 Verovio 重新渲染”。',
+    description: '将移调应用到乐谱；编码保持不变。',
   },
 
   // Renumber measures

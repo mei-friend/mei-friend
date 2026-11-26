@@ -248,6 +248,11 @@ export const lang = {
     description:
       'Torna a escriure tota la codificació, mitjançant Verovio o l’analitzador XML, i estableix l’ordre d’atributs que mei-friend fa servir en reescriure elements.',
   },
+  meiToolboxTabTranspose: {
+    text: 'Transposa',
+    description:
+      'Transposa la notació a una altra tonalitat o per un interval. Només es transposa la notació; la codificació queda tal com és.',
+  },
   meiToolboxIdsAdd: { text: 'Afegeix xml:id (als elements que no en tenen)' },
   meiToolboxIdsChange: {
     text: 'Canvia els xml:id (un de nou per a cada element)',
@@ -300,6 +305,19 @@ export const lang = {
     text: 'Patró d’ordre',
     description: 'Noms d’atribut separats per espais o comes, en l’ordre que vulgueu, p. ex. «xml:id n label *». Un nom acabat en * concorda amb tots els atributs amb aquest prefix (clef.*). Un sol * representa tots els atributs no anomenats, per ordre alfabètic; sense ell conserven el seu ordre al final. Les declaracions d’espais de noms sempre van primer.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Només transposa la notació; la codificació queda tal com és. Per transposar també la codificació, transposeu aquí i després reescriviu-la amb «Amb Verovio» a la pestanya Reformata.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restableix',
+    description: 'Elimina la transposició, de manera que la notació es torna a mostrar a l’altura codificada.',
+  },
+  meiToolboxTransposeDone: { text: 'La notació s’ha transposat ({what}); la codificació no ha canviat.' },
+  meiToolboxTransposeRemoved: { text: 'S’ha eliminat la transposició.' },
+  meiToolboxTransposeNone: { text: 'Res a fer: no hi ha cap transposició aplicada.' },
+
   codeCheckerFixShown: { text: 'Corregeix els {n} mostrats' },
   codeCheckerIgnoreShown: { text: 'Ignora els {n} mostrats' },
   convertGroupAccid: { text: 'Alteracions escrites (@accid)' },
@@ -980,15 +998,6 @@ export const lang = {
   },
 
   // Transposition / Transposició
-  titleTransposition: {
-    text: 'Transposició',
-    description: 'Transposa la informació de la partitura',
-  },
-  enableTransposition: {
-    text: 'Activa la transposició',
-    description:
-      "Activa la configuració de transposició, per aplicar-la a través del botó de transposició que hi ha a sota. La transposició només s'aplica a la notació, l'encodatge es manté sense canvis, llevat que facis clic a l'element 'Torna a renderitzar via Verovio' al menú desplegable 'Manipular'.",
-  },
   transposeInterval: {
     text: 'Transposa per interval',
     description:
@@ -1050,8 +1059,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transposar',
-    description:
-      "Aplicar transposició amb les opcions anteriors a la notació, mentre que l'encodatge MEI roman inalterat. Per transposar també l'encodatge MEI amb les opcions actuals, utilitzeu 'Tornar a renderitzar via Verovio' al menú desplegable 'Manipular'.",
+    description: 'Aplica la transposició a la notació; la codificació queda sense canvis.',
   },
 
   // Renumber measures / Renumber measures

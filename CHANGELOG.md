@@ -5,6 +5,7 @@
 * Several existing bugs (including scoreDef, keySig and meterSig) in speed mode fixed, and the speed mode codebase refactored to be more maintainable.
 * New option to restart renumbering measures at each mdiv (in MEI toolbox).
 * Fixed the editor being drawn only partially (rest of the panel white) when the MEI toolbox was moved between the sides of the encoding panel for the first time.
+* The transposition moves from the settings panel into the MEI toolbox as a new **Transpose** tab. The `Enable transposition` checkbox is replaced by a `Reset` button beside `Transpose`, which removes a transposition again; the key, interval and pitch direction settings (and their stored values) are unchanged.
 
 ### 1.6.3 patch: MEI toolbox
 * The checker panel becomes the **MEI toolbox**, with three further tabs beside `Check`, `Convert` and `Renumber`:
