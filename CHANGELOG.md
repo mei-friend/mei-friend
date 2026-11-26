@@ -3,6 +3,8 @@
 ### 1.6.4 patch: Speed mode with mdiv support
 * Speed mode now supports `mdiv` elements, with the section selector showing the `@label`, `@n` or `@source` of each mdiv, section, ending, lem and rdg element instead of only the `xml:id`.
 * Several existing bugs (including scoreDef, keySig and meterSig) in speed mode fixed, and the speed mode codebase refactored to be more maintainable.
+* New option to restart renumbering measures at each mdiv (in MEI toolbox).
+* Fixed the editor being drawn only partially (rest of the panel white) when the MEI toolbox was moved between the sides of the encoding panel for the first time.
 
 ### 1.6.3 patch: MEI toolbox
 * The checker panel becomes the **MEI toolbox**, with three further tabs beside `Check`, `Convert` and `Renumber`:
