@@ -58,6 +58,7 @@ import {
   getFacsimileProportion,
   getNotationProportion,
   getOrientation,
+  meiToolboxVisible,
   setFacsimileProportion,
   setMeiToolboxExtent,
   setNotationProportion,
@@ -1827,6 +1828,26 @@ function encloseSelectionWithLastTag() {
   }
 }
 
+/**
+ * Sets the orientation of the facsimile panel; shows the panel, when it is hidden,
+ * so that the chosen orientation becomes visible right away.
+ * @param {string} orientation one of 'top', 'bottom', 'left', 'right'
+ */
+function setFacsimileOrientation(orientation) {
+  document.getElementById('showFacsimilePanel').checked = true;
+  setOrientation(cm, '', orientation, v, storage);
+} // setFacsimileOrientation()
+
+/**
+ * Sets the orientation of the MEI toolbox; shows the toolbox, when it is hidden,
+ * so that the chosen orientation becomes visible right away.
+ * @param {string} orientation one of 'top', 'bottom', 'left', 'right'
+ */
+function setMeiToolboxOrientation(orientation) {
+  setOrientation(cm, '', '', v, storage, orientation);
+  if (!meiToolboxVisible()) meiToolbox.openToolbox(); // lays the encoding panel out again
+} // setMeiToolboxOrientation()
+
 // object of interface command functions for buttons and key bindings
 export let cmd = {
   fileNameChange: () => {
@@ -1854,10 +1875,10 @@ export let cmd = {
   notationBottom: () => setOrientation(cm, 'bottom', '', v, storage),
   notationLeft: () => setOrientation(cm, 'left', '', v, storage),
   notationRight: () => setOrientation(cm, 'right', '', v, storage),
-  facsimileTop: () => setOrientation(cm, '', 'top', v, storage),
-  facsimileBottom: () => setOrientation(cm, '', 'bottom', v, storage),
-  facsimileLeft: () => setOrientation(cm, '', 'left', v, storage),
-  facsimileRight: () => setOrientation(cm, '', 'right', v, storage),
+  facsimileTop: () => setFacsimileOrientation('top'),
+  facsimileBottom: () => setFacsimileOrientation('bottom'),
+  facsimileLeft: () => setFacsimileOrientation('left'),
+  facsimileRight: () => setFacsimileOrientation('right'),
   showFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = true;
     setOrientation(cm, '', '', v);
@@ -2087,10 +2108,10 @@ export let cmd = {
   showMeiToolbox: () => meiToolbox.openToolbox(),
   hideMeiToolbox: () => meiToolbox.closeToolbox(),
   toggleMeiToolbox: () => meiToolbox.toggleToolbox(),
-  meiToolboxTop: () => setOrientation(cm, '', '', v, storage, 'top'),
-  meiToolboxBottom: () => setOrientation(cm, '', '', v, storage, 'bottom'),
-  meiToolboxLeft: () => setOrientation(cm, '', '', v, storage, 'left'),
-  meiToolboxRight: () => setOrientation(cm, '', '', v, storage, 'right'),
+  meiToolboxTop: () => setMeiToolboxOrientation('top'),
+  meiToolboxBottom: () => setMeiToolboxOrientation('bottom'),
+  meiToolboxLeft: () => setMeiToolboxOrientation('left'),
+  meiToolboxRight: () => setMeiToolboxOrientation('right'),
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
@@ -2209,7 +2230,7 @@ function addEventListeners(v, cm) {
   document.getElementById('notationLeft').addEventListener('click', cmd.notationLeft);
   document.getElementById('notationRight').addEventListener('click', cmd.notationRight);
   // VIEW show settings panel
-  document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
+  document.getElementById('showSettingsMenu').addEventListener('click', () => cmd.toggleSettingsPanel());
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
@@ -2253,7 +2274,7 @@ function addEventListeners(v, cm) {
       document.querySelectorAll('.currently-playing').forEach((el) => el.classList.remove('currently-playing'));
     }
   });
-  document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
+  document.getElementById('showAnnotationMenu').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showLanguageSelectionButton').addEventListener('mouseenter', () => {
     cmd.showLanguageSelection();
   });
@@ -2264,7 +2285,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   //  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
-  document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
+  document.getElementById('showFacsimileMenu').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('showMeiToolboxMenu').addEventListener('click', cmd.toggleMeiToolbox);
   document.getElementById('showMeiToolboxButton').addEventListener('click', cmd.toggleMeiToolbox);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
