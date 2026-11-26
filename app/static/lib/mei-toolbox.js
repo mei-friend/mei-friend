@@ -146,10 +146,11 @@ function showPanel(show) {
 } // showPanel()
 
 /**
- * Hides the MEI toolbox and clears all results (e.g., when a new encoding is loaded)
+ * Clears all results, e.g. when a new encoding is loaded: they belong to the one
+ * before. The panel itself stays as it is, open or closed, as the settings and the
+ * annotation panel do.
  */
 export function resetToolbox() {
-  showPanel(false);
   if (!panel) return;
   if (v) v.toolboxAbort = true; // stop a check in progress
   tabs.forEach((tab) => {
