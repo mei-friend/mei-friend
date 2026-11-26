@@ -248,6 +248,32 @@ test.describe('meter conformance code checker', () => {
   });
 });
 
+test.describe('MEI toolbox', () => {
+  test('the panel stays open when another encoding is loaded, and keeps no stale results', async ({ page }) => {
+    await loadFixture(page, 'checker-metcon.mei', 'p1n1');
+    expect((await runChecker(page, 'metcon')).length, 'messages about the first encoding').toBeGreaterThan(0);
+
+    await loadFixture(page, 'checker-ties.mei', 'a1');
+    await expect(page.locator('#meiToolbox'), 'toolbox after loading another encoding').toBeVisible();
+    // the results belong to the encoding before and are gone
+    expect(await checkPane(page).locator('.mtEntry').count(), 'entries after the load').toBe(0);
+    expect(await checkPane(page).locator('.mtRunTitle').textContent(), 'run title after the load').toBe('');
+
+    // and the toolbox works on the encoding just loaded
+    expect((await runChecker(page, 'accidGes')).length, 'messages about the second encoding').toBeGreaterThan(0);
+  });
+
+  test('a panel the user closed stays closed when another encoding is loaded', async ({ page }) => {
+    await loadFixture(page, 'checker-metcon.mei', 'p1n1');
+    await runChecker(page, 'metcon'); // opens the toolbox
+    await page.locator('#showMeiToolboxButton').click();
+    await expect(page.locator('#meiToolbox')).not.toBeVisible();
+
+    await loadFixture(page, 'checker-ties.mei', 'a1');
+    await expect(page.locator('#meiToolbox'), 'toolbox after loading another encoding').not.toBeVisible();
+  });
+});
+
 test.describe('linked elements code checker', () => {
   test('references without a target in the encoding are reported', async ({ page }) => {
     await loadFixture(page, 'checker-linking.mei', 'ln1');

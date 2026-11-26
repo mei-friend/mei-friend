@@ -3765,7 +3765,10 @@ export default class Viewer {
     meiToolbox.finishRun(allGoodString);
   } // finalizeCodeCheckerPanel()
 
-  hideCodeCheckerPanel() {
+  /**
+   * Clears the results in the MEI toolbox; the panel itself stays open or closed
+   */
+  resetCodeCheckerPanel() {
     meiToolbox.resetToolbox();
-  }
+  } // resetCodeCheckerPanel()
 } // class Viewer
