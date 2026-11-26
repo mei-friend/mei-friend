@@ -157,6 +157,41 @@ test.describe('accid.ges code checker', () => {
     expect(element(mei, 'g3'), 'missing accidental added').toContain('accid.ges="s"');
   });
 
+  test('a tie between notes without pitch is left alone', async ({ page }) => {
+    await loadFixture(page, 'checker-ties.mei', 'a1');
+    const messages = await runChecker(page, 'accidGes');
+    // i2 and i3 are unpitched (percussion): they carry no pname, oct or accidental
+    // that could disagree with one another
+    for (const id of ['i2', 'i3']) {
+      expect(naming(messages, id), `messages naming ${id}`).toEqual([]);
+    }
+  });
+
+  test('a gestural accidental may be spelled differently from the notated one it sounds', async ({ page }) => {
+    await loadFixture(page, 'checker-accid-spellings.mei', 's1');
+    const messages = await runChecker(page, 'accidGes');
+    // s2/t2/u2 carry what the nf, ns and x earlier in their measure sound: f, s, ss
+    for (const id of ['s2', 't2', 'u2']) {
+      expect(naming(messages, id), `messages naming ${id}`).toEqual([]);
+    }
+    // s3/t3/u3 carry no gestural accidental at all, and are asked for the sounding
+    // one rather than for the notated spelling
+    expect(naming(messages, 's3').join(' '), 'accid.ges asked of s3').toContain('accid.ges="f"');
+    expect(naming(messages, 't3').join(' '), 'accid.ges asked of t3').toContain('accid.ges="s"');
+    expect(naming(messages, 'u3').join(' '), 'accid.ges asked of u3').toContain('accid.ges="ss"');
+
+    await fixAll(page);
+    const mei = await editorValue(page);
+    expect(element(mei, 's3'), 'sounding flat added').toContain('accid.ges="f"');
+    expect(element(mei, 't3'), 'sounding sharp added').toContain('accid.ges="s"');
+    expect(element(mei, 'u3'), 'sounding double sharp added').toContain('accid.ges="ss"');
+    // and the notes that were already right are untouched
+    expect(element(mei, 's2')).toContain('accid.ges="f"');
+    expect(element(mei, 'u2')).toContain('accid.ges="ss"');
+    // a second run finds nothing left to report
+    expect(await runChecker(page, 'accidGes')).toEqual([]);
+  });
+
   test('notes carrying both a notated and a gestural accidental are reported', async ({ page }) => {
     await loadFixture(page, 'checker-accid-contradiction.mei', 'c1');
     const messages = await runChecker(page, 'accidGes');
