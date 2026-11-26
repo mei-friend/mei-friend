@@ -328,6 +328,11 @@ export const lang = {
     description:
       'Numéro de la première mesure complète ; toutes les mesures suivantes sont numérotées à partir de lui. Une première mesure incomplète (@metcon="false", p. ex. une anacrouse) reçoit un numéro de moins : avec le numéro de départ 1, elle reçoit donc 0 (sauf si ‘Continuer à travers les mesures incomplètes’ est activé).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Recommencer à chaque mdiv',
+    description:
+      'Recommence la numérotation à partir du numéro de départ à chaque mdiv (mouvement), au lieu de poursuivre le décompte sur tout l’encodage.',
+  },
   renumberMeasuresUnchanged: { text: 'inchangé' },
   renumberMeasuresSummary: { text: '{total} mesures, {changed} renumérotées.' },
   renumberMeasuresSummaryTest: { text: '{total} mesures, {changed} seraient renumérotées.' },

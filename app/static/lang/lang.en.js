@@ -353,6 +353,11 @@ export const lang = {
     description:
       'Number given to the first complete measure; all following measures are numbered from it. An incomplete first measure (@metcon="false", e.g. an upbeat) gets one less, so a start number of 1 numbers it 0 (unless ‘Continue across incomplete measures’ is on).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Restart at each mdiv',
+    description:
+      'Start numbering anew from the start number at each mdiv (movement), instead of counting on across the whole encoding.',
+  },
   renumberMeasuresUnchanged: { text: 'unchanged' },
   renumberMeasuresSummary: { text: '{total} measures, {changed} renumbered.' },
   renumberMeasuresSummaryTest: { text: '{total} measures, {changed} would be renumbered.' },

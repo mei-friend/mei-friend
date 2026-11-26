@@ -327,6 +327,11 @@ export const lang = {
     description:
       'Nummer des ersten vollständigen Takts; alle folgenden Takte werden von ihr aus nummeriert. Ein unvollständiger erster Takt (@metcon="false", etwa ein Auftakt) erhält eine Nummer weniger, bei Startnummer 1 also 0 (außer ‘Weiter bei unvollständigen Takten’ ist aktiviert).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Bei jedem mdiv neu beginnen',
+    description:
+      'Beginnt die Nummerierung bei jedem mdiv (Satz) neu mit der Startnummer, statt über die gesamte Kodierung weiterzuzählen.',
+  },
   renumberMeasuresUnchanged: { text: 'unverändert' },
   renumberMeasuresSummary: { text: '{total} Takte, {changed} neu nummeriert.' },
   renumberMeasuresSummaryTest: { text: '{total} Takte, {changed} würden neu nummeriert.' },

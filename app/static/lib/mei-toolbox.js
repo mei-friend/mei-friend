@@ -89,6 +89,7 @@ const storageKey = {
   suffixAtMeasures: 'mf-renumberMeasuresUseSuffixAtMeasures',
   continueAcrossEndings: 'mf-renumberMeasuresContinueAcrossEndings',
   suffixAtEndings: 'mf-renumberMeasuresUseSuffixAtEndings',
+  restartAtMdiv: 'mf-renumberMeasuresRestartAtMdiv',
   idMode: 'mf-meiToolboxIdMode',
   attributeOrderPreset: 'mf-meiToolboxAttributeOrderPreset',
   attributeOrderPattern: 'mf-meiToolboxAttributeOrderPattern',
@@ -904,6 +905,18 @@ function buildRenumberOptions(content, p) {
   startLabel.append(startText, start);
   group.appendChild(startLabel);
 
+  // restart at each mdiv
+  const restartLabel = el('label', 'mtOption mtRow');
+  const restartText = el('span');
+  restartText.dataset.lang = langKeyOf(storageKey.restartAtMdiv);
+  const restart = el('input');
+  restart.type = 'checkbox';
+  restart.id = 'mtRenumber-restartAtMdiv';
+  restart.checked = load(storageKey.restartAtMdiv, 'false') === 'true';
+  restart.addEventListener('change', () => save(storageKey.restartAtMdiv, restart.checked));
+  restartLabel.append(restartText, restart);
+  group.appendChild(restartLabel);
+
   // incomplete measures and endings: checkbox "continue across" and suffix select (when not continuing)
   for (const [checkboxKey, selectKey, values] of [
     ['continueAcrossIncompleteMeasures', 'suffixAtMeasures', suffixAtMeasuresValues],
@@ -1452,6 +1465,7 @@ function renumberOptions() {
     suffixAtMeasures: value('suffixAtMeasures').value,
     continueAcrossEndings: value('continueAcrossEndings').checked,
     suffixAtEndings: value('suffixAtEndings').value,
+    restartAtMdiv: value('restartAtMdiv').checked,
   };
 } // renumberOptions()
 

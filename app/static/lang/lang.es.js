@@ -325,6 +325,11 @@ export const lang = {
     description:
       'Número del primer compás completo; todos los compases siguientes se numeran a partir de él. Un primer compás incompleto (@metcon="false", p. ej. una anacrusa) recibe un número menos, así que con el número inicial 1 recibe el 0 (salvo que ‘Continuar en compases incompletas’ esté activado).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Reiniciar en cada mdiv',
+    description:
+      'Vuelve a numerar desde el número inicial en cada mdiv (movimiento), en lugar de seguir contando a lo largo de toda la codificación.',
+  },
   renumberMeasuresUnchanged: { text: 'sin cambios' },
   renumberMeasuresSummary: { text: '{total} compases, {changed} renumerados.' },
   renumberMeasuresSummaryTest: { text: '{total} compases, {changed} se renumerarían.' },

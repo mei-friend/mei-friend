@@ -324,6 +324,11 @@ export const lang = {
     description:
       'Numero de la unua kompleta takto; ĉiuj sekvaj taktoj estas numerataj ekde ĝi. Nekompleta unua takto (@metcon="false", ekz. antaŭtakto) ricevas numeron je unu malpli, do kun komenca numero 1 ĝi ricevas 0 (krom se ‘Daŭrigi trans nekompletajn taktojn’ estas ŝaltita).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Rekomenci ĉe ĉiu mdiv',
+    description:
+      'Rekomencas la numeradon de la komenca numero ĉe ĉiu mdiv (movimento), anstataŭ daŭre kalkuli tra la tuta kodado.',
+  },
   renumberMeasuresUnchanged: { text: 'neŝanĝita' },
   renumberMeasuresSummary: { text: '{total} taktoj, {changed} renumeritaj.' },
   renumberMeasuresSummaryTest: { text: '{total} taktoj, {changed} estus renumeritaj.' },

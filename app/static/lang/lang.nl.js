@@ -322,6 +322,11 @@ export const lang = {
     description:
       'Nummer van de eerste volledige maat; alle volgende maten worden vanaf dit nummer genummerd. Een onvolledige eerste maat (@metcon="false", bijv. een opmaat) krijgt één nummer minder, dus bij startnummer 1 wordt dat 0 (tenzij ‘Doorgaan bij onvolledige maten’ aan staat).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Bij elke mdiv opnieuw beginnen',
+    description:
+      'Begint de nummering bij elke mdiv (deel) opnieuw vanaf het startnummer, in plaats van door te tellen over de hele codering.',
+  },
   renumberMeasuresUnchanged: { text: 'ongewijzigd' },
   renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
   renumberMeasuresSummaryTest: { text: '{total} maten, {changed} zouden worden hernummerd.' },

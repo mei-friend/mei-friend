@@ -320,6 +320,11 @@ export const lang = {
     description:
       'Број првог потпуног такта; сви следећи тактови нумеришу се од њега. Непотпун први такт (@metcon="false", нпр. предтакт) добија број мање, па уз почетни број 1 добија 0 (осим ако је укључено ‘Настави преко непотпуних тактова’).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Почни испочетка код сваког mdiv',
+    description:
+      'Нумерација почиње испочетка од почетног броја код сваког mdiv (става), уместо да се наставља кроз цело кодирање.',
+  },
   renumberMeasuresUnchanged: { text: 'непромењено' },
   renumberMeasuresSummary: { text: '{total} тактова, {changed} ренумерисано.' },
   renumberMeasuresSummaryTest: { text: '{total} тактова, {changed} би било ренумерисано.' },

@@ -326,6 +326,11 @@ export const lang = {
     description:
       'Nummeret på den første fuldstændige takt; alle følgende takter nummereres ud fra det. En ufuldstændig første takt (@metcon="false", f.eks. en optakt) får ét nummer mindre, så med startnummer 1 får den 0 (medmindre ‘Fortsæt på tværs af ufuldstændige mål’ er slået til).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Start forfra ved hver mdiv',
+    description:
+      'Begynder nummereringen forfra fra startnummeret ved hver mdiv (sats) i stedet for at tælle videre gennem hele kodningen.',
+  },
   renumberMeasuresUnchanged: { text: 'uændret' },
   renumberMeasuresSummary: { text: '{total} takter, {changed} omnummereret.' },
   renumberMeasuresSummaryTest: { text: '{total} takter, {changed} ville blive omnummereret.' },

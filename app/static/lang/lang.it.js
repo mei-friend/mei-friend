@@ -329,6 +329,11 @@ export const lang = {
     description:
       'Numero della prima battuta completa; tutte le battute successive sono numerate a partire da esso. Una prima battuta incompleta (@metcon="false", ad es. un’anacrusi) riceve un numero in meno, quindi con numero iniziale 1 riceve 0 (a meno che ‘Continua tra le misure incomplete’ sia attivo).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Ricomincia a ogni mdiv',
+    description:
+      'Ricomincia la numerazione dal numero iniziale a ogni mdiv (movimento), invece di proseguire il conteggio in tutta la codifica.',
+  },
   renumberMeasuresUnchanged: { text: 'invariato' },
   renumberMeasuresSummary: { text: '{total} misure, {changed} rinumerate.' },
   renumberMeasuresSummaryTest: { text: '{total} misure, {changed} verrebbero rinumerate.' },

@@ -328,6 +328,11 @@ export const lang = {
     description:
       'Número del primer compàs complet; tots els compassos següents es numeren a partir d’aquest. Un primer compàs incomplet (@metcon="false", p. ex. una anacrusi) rep un número menys, de manera que amb el número inicial 1 rep el 0 (tret que ‘Continuar a través de compassos incomplets’ estigui activat).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Reinicia a cada mdiv',
+    description:
+      'Torna a numerar des del número inicial a cada mdiv (moviment), en lloc de continuar comptant al llarg de tota la codificació.',
+  },
   renumberMeasuresUnchanged: { text: 'sense canvis' },
   renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
   renumberMeasuresSummaryTest: { text: '{total} compassos, {changed} es renumerarien.' },

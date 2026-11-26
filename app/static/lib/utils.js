@@ -547,6 +547,8 @@ export function cleanAccid(xmlDoc, cm) {
  * @param {boolean} options.continueAcrossEndings continue numbers across endings
  * @param {string} options.suffixAtEndings suffix for measures in endings
  *   ('none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C')
+ * @param {boolean} options.restartAtMdiv start numbering anew from startNumber
+ *   at each mdiv
  * @param {boolean} change whether to write the new numbers into the encoding
  * @returns {Array<Object>} one entry per measure: {measure, oldN, newN, notes},
  *   with notes listing the reasons for the numbering (e.g., '@metcon="false"')
@@ -555,6 +557,7 @@ export function renumberMeasures(v, cm, options = {}, change = false) {
   const startNum = parseInt(options.startNumber ?? 1, 10);
   const continueAcrossIncomplete = !!options.continueAcrossIncompleteMeasures;
   const continueAcrossEndings = !!options.continueAcrossEndings;
+  const restartAtMdiv = !!options.restartAtMdiv;
   const result = [];
   let measureList = v.xmlDoc.querySelectorAll('measure');
   let i;
@@ -567,10 +570,24 @@ export function renumberMeasures(v, cm, options = {}, change = false) {
   let endingCount = 0;
   let endingN = '';
   let isFirstMeasure = true;
+  let mdiv = null; // (innermost) mdiv of the previous measure
   for (i = 0; i < lgt; i++) {
     let suffix = '';
     const notes = [];
     if (measureList[i].closest('incip')) continue; // ignore incipit
+    // 0) start anew at each mdiv, as if it were the first measure of the encoding
+    const measureMdiv = measureList[i].closest('mdiv');
+    if (restartAtMdiv && mdiv && measureMdiv !== mdiv) {
+      n = isNaN(startNum) ? 1 : startNum;
+      isFirstMeasure = true;
+      metcons = 0;
+      endingStart = -1;
+      endingEnd = -1;
+      endingCount = 0;
+      endingN = '';
+      notes.push('mdiv' + (measureMdiv?.hasAttribute('n') ? ' n="' + measureMdiv.getAttribute('n') + '"' : ''));
+    }
+    mdiv = measureMdiv;
     if (measureList[i].hasAttribute('metcon')) {
       metcon = measureList[i].getAttribute('metcon');
     }

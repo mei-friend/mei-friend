@@ -320,6 +320,11 @@ export const lang = {
     description:
       'Номер першого повного такту; усі наступні такти нумеруються від нього. Неповний перший такт (@metcon="false", напр. затакт) отримує номер на один менший, тож за початкового номера 1 він отримує 0 (якщо не ввімкнено ‘Продовжити через неповні такти’).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Починати знову з кожного mdiv',
+    description:
+      'Починає нумерацію заново з початкового номера в кожному mdiv (частині), замість наскрізної нумерації по всьому кодуванню.',
+  },
   renumberMeasuresUnchanged: { text: 'без змін' },
   renumberMeasuresSummary: { text: '{total} тактів, {changed} перенумеровано.' },
   renumberMeasuresSummaryTest: { text: '{total} тактів, {changed} було б перенумеровано.' },

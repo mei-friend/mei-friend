@@ -310,6 +310,11 @@ export const lang = {
     description:
       '最初の完全な小節に付ける番号で、以降の小節はこの番号から順に振られます。最初の小節が不完全な場合（@metcon="false"、例：弱起）はそれより 1 少ない番号となり、開始番号が 1 なら 0 になります（「不完全な小節を振り直し続ける」がオンの場合を除く）。',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'mdiv ごとに振り直す',
+    description:
+      'mdiv（楽章）ごとに開始番号から番号を振り直します。オフの場合はエンコーディング全体で通し番号になります。',
+  },
   renumberMeasuresUnchanged: { text: '変更なし' },
   renumberMeasuresSummary: { text: '{total} 小節、{changed} 小節の番号を振り直しました。' },
   renumberMeasuresSummaryTest: { text: '{total} 小節、{changed} 小節の番号が振り直されます。' },

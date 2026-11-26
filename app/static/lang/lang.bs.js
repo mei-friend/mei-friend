@@ -321,6 +321,11 @@ export const lang = {
     description:
       'Broj prvog potpunog takta; svi sljedeći taktovi numerišu se od njega. Nepotpun prvi takt (@metcon="false", npr. predtakt) dobija broj manje, pa uz početni broj 1 dobija 0 (osim ako je uključeno ‘Nastavi preko nepotpunih taktova’).',
   },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Počni ispočetka kod svakog mdiv',
+    description:
+      'Numeracija počinje ispočetka od početnog broja kod svakog mdiv (stava), umjesto da se nastavlja kroz cijelo kodiranje.',
+  },
   renumberMeasuresUnchanged: { text: 'nepromijenjeno' },
   renumberMeasuresSummary: { text: '{total} taktova, {changed} renumerisano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktova, {changed} bi bilo renumerisano.' },
