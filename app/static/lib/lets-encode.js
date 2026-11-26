@@ -17,6 +17,7 @@
  */
 
 import { cm, storage, translator, v, validator, version } from './main.js';
+import { isSafari } from './defaults.js';
 import { checkAndClone } from './github-menu.js';
 import { parseRawGithubUrl } from './fork-repository.js';
 
@@ -1173,7 +1174,15 @@ export function showLetsEncodeOverlay({ message, state = 'busy', layout = 'stack
   const logoSrc = document.getElementById('mei-friend-logo').getAttribute('src');
   const handName = letsEncodeHands[state] || letsEncodeHands.busy;
   const night = logoSrc.includes('-dark') && letsEncodeHandsWithNightVariant.includes(handName);
-  hand.setAttribute('src', logoSrc.substring(0, logoSrc.lastIndexOf('/') + 1) + 'hands/' + handName + (night ? '-dark' : '') + '.svg');
+  // as the logos: the pixel version on Safari, which does not render the SVGs correctly
+  hand.setAttribute(
+    'src',
+    logoSrc.substring(0, logoSrc.lastIndexOf('/') + 1) +
+      'hands/' +
+      handName +
+      (night ? '-dark' : '') +
+      (isSafari ? '.png' : '.svg')
+  );
   // Drop every state first, with a reflow between, so a gesture restarts
   // from its rest pose when the state changes.
   figure.classList.remove('le-busy', 'le-done', 'le-failed', 'le-confirm', 'le-farewell', 'le-completing');

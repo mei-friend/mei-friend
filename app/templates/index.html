@@ -46,6 +46,11 @@
       let isLoggedIn;
       let gitEnabled = true;
       let root = "{{ url_for('static', filename='') }}";
+      // Safari does not render the owl SVGs correctly, so the pixel versions are shown
+      // there. Decided here, before the body is parsed, so that no logo is ever shown
+      // in the wrong format - neither in the header nor on the splash screen, which
+      // both set their source from it below. Same check as isSafari in lib/defaults.js.
+      let logoExtension = /Version\/[\d.]+.*Safari/.test(navigator.userAgent) ? '.png' : '.svg';
     </script>
     <!-- disable GitHub integration if server configuration not available -->
     {% if not gitEnabled %}
@@ -192,8 +197,11 @@
     <div class="header" id="meiFriendHeader">
       <div class="title">
         <a href="https://mei-friend.mdw.ac.at/" id="meiFriendLogoLink"
-          ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
+          ><img alt="mei-friend" id="mei-friend-logo"
         /></a>
+        <script>
+          document.getElementById('mei-friend-logo').src = root + 'owl/menu-logo' + logoExtension;
+        </script>
       </div>
       <div class="navbar" id="menuBar">
         <div class="dropdown">
@@ -698,7 +706,10 @@
       <div id="splashOverlay">
         <div id="splash">
           <div id="splashHeader">
-            <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
+            <img alt="mei-friend" id="splashLogo" />
+            <script>
+              document.getElementById('splashLogo').src = root + 'owl/menu-logo' + logoExtension;
+            </script>
           </div>
           <hr class="dropdownLine" />
           <div id="splashBodyContainer">

@@ -1566,9 +1566,10 @@ export default class Viewer {
     if (isLetsEncodeMode()) {
       // In Let's Encode mode Eulise keeps her perch but wears the joint logo.
       // Only a light and a dark variant exist, so this deliberately bypasses the
-      // environment prefix, the asleep state, and the Safari PNG fallback.
+      // environment prefix and the asleep state; the Safari pixel fallback applies
+      // as everywhere else.
       const owlDir = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
-      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + '.svg';
+      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + (isSafari ? '.png' : '.svg');
     }
     owl.setAttribute('src', owlSrc);
     splashOwl.setAttribute('src', splashOwlSrc);
@@ -2036,20 +2037,6 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
-        case 'enableTransposition':
-          // switch on
-          if (value) {
-            let onList = ['transposeDirection', 'transposeButton'];
-            if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
-            if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
-            this.setDisablednessInOptionsItem(onList, ['']);
-          } else {
-            this.setDisablednessInOptionsItem(
-              [''],
-              ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
-            );
-          }
-          break;
       }
       let div = this.createOptionsItem(opt, o, value);
       if (div) {
@@ -2061,36 +2048,6 @@ export default class Viewer {
         } else {
           mfs.appendChild(div);
         }
-      }
-      switch (opt) {
-        case 'transposeKey':
-          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeKey'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeKey']);
-          }
-          break;
-        case 'transposeInterval':
-          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeInterval'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeInterval']);
-          }
-          break;
-        case 'transposeDirection':
-          if (document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeDirection'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeDirection']);
-          }
-          break;
-        case 'transposeButton':
-          if (document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeButton'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeButton']);
-          }
-          break;
       }
     });
     mfs.innerHTML +=
@@ -2154,39 +2111,6 @@ export default class Viewer {
             break;
           case 'enableGithubActions':
             this.setGithubActionsDisplay();
-            break;
-          case 'enableTransposition':
-            // switch on
-            if (value) {
-              let onList = ['transposeDirection', 'transposeButton'];
-              if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
-              if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
-              this.setDisablednessInOptionsItem(onList, ['']);
-            } else {
-              this.setDisablednessInOptionsItem(
-                [''],
-                ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
-              );
-              this.vrvOptions.transpose = '';
-              this.updateAll(cm);
-            }
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              cmd.toggleMidiPlaybackControlBar();
-            }
-            break;
-          case 'toKey':
-            if (document.getElementById('enableTransposition').checked) {
-              this.setDisablednessInOptionsItem(['transposeKey'], ['transposeInterval']);
-            }
-            break;
-          case 'byInterval':
-            if (document.getElementById('enableTransposition').checked) {
-              this.setDisablednessInOptionsItem(['transposeInterval'], ['transposeKey']);
-            }
-            break;
-          case 'transposeKey':
-          case 'transposeInterval':
-          case 'transposeDirection':
             break;
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
@@ -2335,16 +2259,6 @@ export default class Viewer {
           case 'mfReset':
             this.addMeiFriendOptionsToSettingsPanel(false);
             this.applySettingsFilter();
-            break;
-          case 'transposeButton':
-            let msg = this.getTranspositionOption();
-            console.log('Transpose: ' + msg);
-            this.vrvOptions.transpose = msg;
-            // this.updateOption({ transpose: msg });
-            this.updateAll(cm);
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              cmd.toggleMidiPlaybackControlBar();
-            }
             break;
         }
       });
@@ -2786,8 +2700,7 @@ export default class Viewer {
         div.appendChild(line);
         break;
       case 'button':
-        label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
-
+        label.textContent = '';
         label.setAttribute('title', '');
         input = document.createElement('input');
         input.setAttribute('type', 'button');
@@ -2853,23 +2766,12 @@ export default class Viewer {
     }
   } // setRespSelectOptions()
 
-  getTranspositionOption() {
-    let dir = document.getElementById('transposeDirection');
-    let key = document.getElementById('transposeKey');
-    let int = document.getElementById('transposeInterval');
-    if (!dir || !key || !int) return;
-    let optionString = dir.value;
-    if (!key.disabled) optionString += key.value;
-    if (!int.disabled) optionString += int.value;
-    return optionString;
-  } // setRespSelectOptions()
-
   // add MIDI playback expansion to select input
   setMidiExpansionOptions() {
     let expandSelect = document.getElementById('selectMidiExpansion');
     if (expandSelect) {
       while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
-    } // getTranspositionOption()
+    }
     // add options to midi controlbar expansion selector
     let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
     if (vrvOption) {
