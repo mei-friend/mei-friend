@@ -321,7 +321,11 @@ export const lang = {
   convertScopeAll: { text: 'Omfang: hele kodningen (markér tekst i editoren for at begrænse konverteringen)' },
   convertScopeSelection: { text: 'Omfang: markering, linje {from}–{to}' },
   convertSelectionSuffix: { text: 'markering' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummeret på den første fuldstændige takt; alle følgende takter nummereres ud fra det. En ufuldstændig første takt (@metcon="false", f.eks. en optakt) får ét nummer mindre, så med startnummer 1 får den 0 (medmindre ‘Fortsæt på tværs af ufuldstændige mål’ er slået til).',
+  },
   renumberMeasuresUnchanged: { text: 'uændret' },
   renumberMeasuresSummary: { text: '{total} takter, {changed} omnummereret.' },
   renumberMeasuresSummaryTest: { text: '{total} takter, {changed} ville blive omnummereret.' },

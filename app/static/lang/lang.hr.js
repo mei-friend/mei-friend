@@ -316,7 +316,11 @@ export const lang = {
   convertScopeAll: { text: 'Opseg: cijelo kodiranje (označite tekst u uređivaču da ograničite pretvaranje)' },
   convertScopeSelection: { text: 'Opseg: odabir, retci {from}–{to}' },
   convertSelectionSuffix: { text: 'odabir' },
-  renumberMeasuresStartNumber: { text: 'Početni broj' },
+  renumberMeasuresStartNumber: {
+    text: 'Početni broj',
+    description:
+      'Broj prvog potpunog takta; svi sljedeći taktovi numeriraju se od njega. Nepotpun prvi takt (@metcon="false", npr. predtakt) dobiva broj manje, pa uz početni broj 1 dobiva 0 (osim ako je uključeno ‘Nastavi preko nepotpunih taktova’).',
+  },
   renumberMeasuresUnchanged: { text: 'nepromijenjeno' },
   renumberMeasuresSummary: { text: '{total} taktova, {changed} renumerirano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktova, {changed} bi bilo renumerirano.' },

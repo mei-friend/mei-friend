@@ -322,7 +322,11 @@ export const lang = {
   convertScopeAll: { text: 'Bereich: gesamte Kodierung (Text im Editor markieren, um die Umwandlung einzuschränken)' },
   convertScopeSelection: { text: 'Bereich: Auswahl, Zeilen {from}–{to}' },
   convertSelectionSuffix: { text: 'Auswahl' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummer des ersten vollständigen Takts; alle folgenden Takte werden von ihr aus nummeriert. Ein unvollständiger erster Takt (@metcon="false", etwa ein Auftakt) erhält eine Nummer weniger, bei Startnummer 1 also 0 (außer ‘Weiter bei unvollständigen Takten’ ist aktiviert).',
+  },
   renumberMeasuresUnchanged: { text: 'unverändert' },
   renumberMeasuresSummary: { text: '{total} Takte, {changed} neu nummeriert.' },
   renumberMeasuresSummaryTest: { text: '{total} Takte, {changed} würden neu nummeriert.' },

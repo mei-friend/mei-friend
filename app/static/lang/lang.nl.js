@@ -317,7 +317,11 @@ export const lang = {
   convertScopeAll: { text: 'Bereik: volledige codering (selecteer tekst in de editor om de omzetting te beperken)' },
   convertScopeSelection: { text: 'Bereik: selectie, regels {from}–{to}' },
   convertSelectionSuffix: { text: 'selectie' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummer van de eerste volledige maat; alle volgende maten worden vanaf dit nummer genummerd. Een onvolledige eerste maat (@metcon="false", bijv. een opmaat) krijgt één nummer minder, dus bij startnummer 1 wordt dat 0 (tenzij ‘Doorgaan bij onvolledige maten’ aan staat).',
+  },
   renumberMeasuresUnchanged: { text: 'ongewijzigd' },
   renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
   renumberMeasuresSummaryTest: { text: '{total} maten, {changed} zouden worden hernummerd.' },

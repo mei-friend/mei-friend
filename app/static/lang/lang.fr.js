@@ -323,7 +323,11 @@ export const lang = {
   convertScopeAll: { text: 'Portée : tout l\'encodage (sélectionnez du texte dans l\'éditeur pour restreindre la conversion)' },
   convertScopeSelection: { text: 'Portée : sélection, lignes {from}–{to}' },
   convertSelectionSuffix: { text: 'sélection' },
-  renumberMeasuresStartNumber: { text: 'Numéro de départ' },
+  renumberMeasuresStartNumber: {
+    text: 'Numéro de départ',
+    description:
+      'Numéro de la première mesure complète ; toutes les mesures suivantes sont numérotées à partir de lui. Une première mesure incomplète (@metcon="false", p. ex. une anacrouse) reçoit un numéro de moins : avec le numéro de départ 1, elle reçoit donc 0 (sauf si ‘Continuer à travers les mesures incomplètes’ est activé).',
+  },
   renumberMeasuresUnchanged: { text: 'inchangé' },
   renumberMeasuresSummary: { text: '{total} mesures, {changed} renumérotées.' },
   renumberMeasuresSummaryTest: { text: '{total} mesures, {changed} seraient renumérotées.' },

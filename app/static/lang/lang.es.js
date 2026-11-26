@@ -320,7 +320,11 @@ export const lang = {
   convertScopeAll: { text: 'Alcance: toda la codificación (seleccione texto en el editor para restringir la conversión)' },
   convertScopeSelection: { text: 'Alcance: selección, líneas {from}–{to}' },
   convertSelectionSuffix: { text: 'selección' },
-  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresStartNumber: {
+    text: 'Número inicial',
+    description:
+      'Número del primer compás completo; todos los compases siguientes se numeran a partir de él. Un primer compás incompleto (@metcon="false", p. ej. una anacrusa) recibe un número menos, así que con el número inicial 1 recibe el 0 (salvo que ‘Continuar en compases incompletas’ esté activado).',
+  },
   renumberMeasuresUnchanged: { text: 'sin cambios' },
   renumberMeasuresSummary: { text: '{total} compases, {changed} renumerados.' },
   renumberMeasuresSummaryTest: { text: '{total} compases, {changed} se renumerarían.' },

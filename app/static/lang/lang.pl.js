@@ -324,7 +324,11 @@ export const lang = {
   convertScopeAll: { text: 'Zakres: całe kodowanie (zaznacz tekst w edytorze, aby ograniczyć konwersję)' },
   convertScopeSelection: { text: 'Zakres: zaznaczenie, wiersze {from}–{to}' },
   convertSelectionSuffix: { text: 'zaznaczenie' },
-  renumberMeasuresStartNumber: { text: 'Numer początkowy' },
+  renumberMeasuresStartNumber: {
+    text: 'Numer początkowy',
+    description:
+      'Numer pierwszego pełnego taktu; wszystkie kolejne takty są numerowane od niego. Niepełny pierwszy takt (@metcon="false", np. przedtakt) otrzymuje numer o jeden mniejszy, więc przy numerze początkowym 1 otrzymuje 0 (chyba że włączono ‘Kontynuuj przez niedokończone taktowania’).',
+  },
   renumberMeasuresUnchanged: { text: 'bez zmian' },
   renumberMeasuresSummary: { text: '{total} taktów, {changed} przenumerowano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktów, {changed} zostałoby przenumerowanych.' },

@@ -315,7 +315,11 @@ export const lang = {
   convertScopeAll: { text: 'Обсяг: усе кодування (виділіть текст у редакторі, щоб обмежити перетворення)' },
   convertScopeSelection: { text: 'Обсяг: виділення, рядки {from}–{to}' },
   convertSelectionSuffix: { text: 'виділення' },
-  renumberMeasuresStartNumber: { text: 'Початковий номер' },
+  renumberMeasuresStartNumber: {
+    text: 'Початковий номер',
+    description:
+      'Номер першого повного такту; усі наступні такти нумеруються від нього. Неповний перший такт (@metcon="false", напр. затакт) отримує номер на один менший, тож за початкового номера 1 він отримує 0 (якщо не ввімкнено ‘Продовжити через неповні такти’).',
+  },
   renumberMeasuresUnchanged: { text: 'без змін' },
   renumberMeasuresSummary: { text: '{total} тактів, {changed} перенумеровано.' },
   renumberMeasuresSummaryTest: { text: '{total} тактів, {changed} було б перенумеровано.' },

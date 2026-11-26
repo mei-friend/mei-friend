@@ -304,7 +304,11 @@ export const lang = {
   convertScopeAll: { text: '范围：整个编码（在编辑器中选择文本以限制转换）' },
   convertScopeSelection: { text: '范围：所选内容，第 {from}–{to} 行' },
   convertSelectionSuffix: { text: '所选内容' },
-  renumberMeasuresStartNumber: { text: '起始编号' },
+  renumberMeasuresStartNumber: {
+    text: '起始编号',
+    description:
+      '第一个完整小节的编号，其后的小节均从此编号开始依次编号。不完整的第一小节（@metcon="false"，例如弱起小节）的编号比它少 1，因此起始编号为 1 时该小节编号为 0（除非开启了“跨不完整小节继续”）。',
+  },
   renumberMeasuresUnchanged: { text: '未更改' },
   renumberMeasuresSummary: { text: '{total} 个小节，{changed} 个已重新编号。' },
   renumberMeasuresSummaryTest: { text: '{total} 个小节，{changed} 个将被重新编号。' },

@@ -323,7 +323,11 @@ export const lang = {
   convertScopeAll: { text: 'Abast: tota la codificació (seleccioneu text a l\'editor per restringir la conversió)' },
   convertScopeSelection: { text: 'Abast: selecció, línies {from}–{to}' },
   convertSelectionSuffix: { text: 'selecció' },
-  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresStartNumber: {
+    text: 'Número inicial',
+    description:
+      'Número del primer compàs complet; tots els compassos següents es numeren a partir d’aquest. Un primer compàs incomplet (@metcon="false", p. ex. una anacrusi) rep un número menys, de manera que amb el número inicial 1 rep el 0 (tret que ‘Continuar a través de compassos incomplets’ estigui activat).',
+  },
   renumberMeasuresUnchanged: { text: 'sense canvis' },
   renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
   renumberMeasuresSummaryTest: { text: '{total} compassos, {changed} es renumerarien.' },

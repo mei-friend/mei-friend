@@ -319,7 +319,11 @@ export const lang = {
   convertScopeAll: { text: 'Amplekso: tuta kodado (elektu tekston en la redaktilo por limigi la konverton)' },
   convertScopeSelection: { text: 'Amplekso: elekto, linioj {from}–{to}' },
   convertSelectionSuffix: { text: 'elekto' },
-  renumberMeasuresStartNumber: { text: 'Komenca numero' },
+  renumberMeasuresStartNumber: {
+    text: 'Komenca numero',
+    description:
+      'Numero de la unua kompleta takto; ĉiuj sekvaj taktoj estas numerataj ekde ĝi. Nekompleta unua takto (@metcon="false", ekz. antaŭtakto) ricevas numeron je unu malpli, do kun komenca numero 1 ĝi ricevas 0 (krom se ‘Daŭrigi trans nekompletajn taktojn’ estas ŝaltita).',
+  },
   renumberMeasuresUnchanged: { text: 'neŝanĝita' },
   renumberMeasuresSummary: { text: '{total} taktoj, {changed} renumeritaj.' },
   renumberMeasuresSummaryTest: { text: '{total} taktoj, {changed} estus renumeritaj.' },

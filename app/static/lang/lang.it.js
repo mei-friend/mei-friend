@@ -324,7 +324,11 @@ export const lang = {
   convertScopeAll: { text: 'Ambito: intera codifica (seleziona del testo nell\'editor per limitare la conversione)' },
   convertScopeSelection: { text: 'Ambito: selezione, righe {from}–{to}' },
   convertSelectionSuffix: { text: 'selezione' },
-  renumberMeasuresStartNumber: { text: 'Numero iniziale' },
+  renumberMeasuresStartNumber: {
+    text: 'Numero iniziale',
+    description:
+      'Numero della prima battuta completa; tutte le battute successive sono numerate a partire da esso. Una prima battuta incompleta (@metcon="false", ad es. un’anacrusi) riceve un numero in meno, quindi con numero iniziale 1 riceve 0 (a meno che ‘Continua tra le misure incomplete’ sia attivo).',
+  },
   renumberMeasuresUnchanged: { text: 'invariato' },
   renumberMeasuresSummary: { text: '{total} misure, {changed} rinumerate.' },
   renumberMeasuresSummaryTest: { text: '{total} misure, {changed} verrebbero rinumerate.' },
