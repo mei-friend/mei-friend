@@ -193,9 +193,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Не знайдено атрибутів, які можна перетворити на елементи.' },
   convertAttributesToElementsProblems: { text: 'Не вдалося перетворити {count} атрибутів.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Перевірка' },
-  meiToolboxTabConvert: { text: 'Перетворення' },
-  meiToolboxTabRenumber: { text: 'Перенумерація' },
+  meiToolboxTabCheck: {
+    text: 'Перевірка',
+    description:
+      'Перевіряє в кодуванні звукові знаки альтерації (@accid.ges), тривалості тактів (@metcon) і зв’язки між елементами (@startid, @endid, @plist, …). Показує кожну знайдену проблему, де можливо — з виправленням.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Перетворення',
+    description:
+      'Перетворює вибрані атрибути на рівнозначні елементи (наприклад, @accid на <accid>) або елементи назад на атрибути, якщо інформація не втрачається.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Перенумерація',
+    description:
+      'Послідовно перенумеровує такти (@n), з налаштовуваними суфіксами для тактів, що продовжують попередній, і для тактів у вольтах.',
+  },
   meiToolboxCheckButton: { text: 'Перевірити' },
   meiToolboxTestButton: { text: 'Тест', description: 'Показати, що буде змінено, не змінюючи кодування' },
   meiToolboxRenumberButton: { text: 'Перенумерувати' },
@@ -213,9 +225,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Тривалості тактів (@metcon)' },
   meiToolboxCheckLinked: { text: 'Пов\'язані елементи (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Закрити набір інструментів MEI' },
-  meiToolboxTabIds: { text: 'Ід' },
-  meiToolboxTabFacsimile: { text: 'Факсиміле' },
-  meiToolboxTabReformat: { text: 'Переформатувати' },
+  meiToolboxTabIds: {
+    text: 'Ід',
+    description:
+      'Додає xml:id елементам, які його не мають, надає кожному елементу новий або видаляє їх, крім тих, на які є посилання. Посилання в кодуванні оновлюються.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Факсиміле',
+    description:
+      'Пов’язує кодування із зображеннями сторінок: імпортує факсиміле з іншого файлу або додає відсутні surfaces, по одному на кожен розрив сторінки.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Переформатувати',
+    description:
+      'Записує все кодування наново, через Verovio або XML-парсер, і задає порядок атрибутів, який mei-friend використовує під час запису елементів.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Транспонувати',
+    description:
+      'Транспонує нотний текст в іншу тональність або на інтервал. Транспонується лише нотний текст; кодування залишається незмінним.',
+  },
   meiToolboxIdsAdd: { text: 'Додати xml:id (до елементів без нього)' },
   meiToolboxIdsChange: {
     text: 'Змінити xml:id (новий для кожного елемента)',
@@ -268,6 +297,28 @@ export const lang = {
     text: 'Шаблон порядку',
     description: 'Імена атрибутів, розділені пробілами або комами, у потрібному порядку, напр. «xml:id n label *». Ім’я, що закінчується на *, відповідає всім атрибутам із цим префіксом (clef.*). Одинарна * позначає всі неназвані атрибути за абеткою; без неї вони зберігають свій порядок у кінці. Оголошення просторів імен завжди йдуть першими.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Транспонує лише нотний текст; кодування залишається незмінним, окрім примітки нижче. Щоб транспонувати й саме кодування, транспонуйте тут, а потім перезапишіть його через «Через Verovio» на вкладці Переформатувати.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Скинути',
+    description: 'Знімає транспонування, тож нотний текст знову показується в закодованій висоті.',
+  },
+  meiToolboxTransposeDone: { text: 'Нотний текст транспоновано ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'Транспонування знято.' },
+  meiToolboxTransposeNone: { text: 'Нічого робити: транспонування не застосовано.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Додати примітку про транспонування',
+    description:
+      'Записує до pgHead партитури рядок із тональністю транспонування та тональністю кодування. Під час скидання транспонування його буде вилучено.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Транспоновано до {new}\nоригінал: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Транспоновано: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Примітку про транспонування записано до pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Примітку про транспонування вилучено з pgHead.' },
+
   codeCheckerFixShown: { text: 'Виправити {n} показаних' },
   codeCheckerIgnoreShown: { text: 'Ігнорувати {n} показаних' },
   convertGroupAccid: { text: 'Записані знаки альтерації (@accid)' },
@@ -291,7 +342,16 @@ export const lang = {
   convertScopeAll: { text: 'Обсяг: усе кодування (виділіть текст у редакторі, щоб обмежити перетворення)' },
   convertScopeSelection: { text: 'Обсяг: виділення, рядки {from}–{to}' },
   convertSelectionSuffix: { text: 'виділення' },
-  renumberMeasuresStartNumber: { text: 'Початковий номер' },
+  renumberMeasuresStartNumber: {
+    text: 'Початковий номер',
+    description:
+      'Номер першого повного такту; усі наступні такти нумеруються від нього. Неповний перший такт (@metcon="false", напр. затакт) отримує номер на один менший, тож за початкового номера 1 він отримує 0 (якщо не ввімкнено ‘Продовжити через неповні такти’).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Починати знову з кожного mdiv',
+    description:
+      'Починає нумерацію заново з початкового номера в кожному mdiv (частині), замість наскрізної нумерації по всьому кодуванню.',
+  },
   renumberMeasuresUnchanged: { text: 'без змін' },
   renumberMeasuresSummary: { text: '{total} тактів, {changed} перенумеровано.' },
   renumberMeasuresSummaryTest: { text: '{total} тактів, {changed} було б перенумеровано.' },
@@ -917,15 +977,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Транспонування',
-    description: 'Інформація про транспонування нотації',
-  },
-  enableTransposition: {
-    text: 'Увімкнути транспонування',
-    description:
-      'Увімкнути налаштування транспонування, які застосовуватимуться за допомогою кнопки транспонування нижче. Транспонування буде застосовано лише до нотації, кодування залишається без змін, якщо ви не натиснете елемент "Перерендерити через Verovio" в меню "Маніпулювати".',
-  },
   transposeInterval: {
     text: 'Транспонувати за інтервалом',
     description:
@@ -987,8 +1038,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Транспонувати',
-    description:
-      'Застосувати транспонування з налаштуваннями вище до нотації, при цьому MEI кодування залишається без змін. Для транспонування MEI кодування з поточними налаштуваннями використовуйте "Перерендерити через Verovio" у меню "Маніпулювати".',
+    description: 'Застосовує транспонування до нотного тексту; кодування лишається незмінним.',
   },
 
   // Renumber measures

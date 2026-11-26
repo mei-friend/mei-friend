@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <!-- Written accidentals that sound as a differently spelled gestural one, for the
+       accid.ges code checker: 'nf' (a natural cancelling an earlier accidental,
+       followed by a flat) sounds as 'f', 'ns' as 's', and the double sharp 'x' as
+       'ss' ('x' is no gestural accidental in MEI).
+       Measure 1: s2 carries the accid.ges the nf of s1 sounds, s3 carries none and
+       must be reported, with 'f' offered as the fix.
+       Measure 2: the same for ns/s, measure 3 for x/ss. -->
+  <meiHead><fileDesc><titleStmt><title>accidental spellings</title></titleStmt><pubStmt/></fileDesc></meiHead>
+  <music><body><mdiv><score>
+    <scoreDef meter.count="4" meter.unit="4">
+      <staffGrp><staffDef n="1" lines="5" clef.shape="G" clef.line="2"/></staffGrp>
+    </scoreDef>
+    <section>
+      <measure n="1" xml:id="ms1">
+        <staff n="1" xml:id="ms1s1"><layer n="1">
+          <note xml:id="s1" pname="e" oct="5" dur="4"><accid xml:id="s1a" accid="nf"/></note>
+          <note xml:id="s2" pname="e" oct="5" dur="4" accid.ges="f"/>
+          <note xml:id="s3" pname="e" oct="5" dur="4"/>
+          <note xml:id="s4" pname="c" oct="5" dur="4"/>
+        </layer></staff>
+      </measure>
+      <measure n="2" xml:id="ms2">
+        <staff n="1" xml:id="ms2s1"><layer n="1">
+          <note xml:id="t1" pname="f" oct="5" dur="4" accid="ns"/>
+          <note xml:id="t2" pname="f" oct="5" dur="4" accid.ges="s"/>
+          <note xml:id="t3" pname="f" oct="5" dur="4"/>
+          <note xml:id="t4" pname="c" oct="5" dur="4"/>
+        </layer></staff>
+      </measure>
+      <measure n="3" xml:id="ms3">
+        <staff n="1" xml:id="ms3s1"><layer n="1">
+          <note xml:id="u1" pname="g" oct="5" dur="4" accid="x"/>
+          <note xml:id="u2" pname="g" oct="5" dur="4" accid.ges="ss"/>
+          <note xml:id="u3" pname="g" oct="5" dur="4"/>
+          <note xml:id="u4" pname="c" oct="5" dur="4"/>
+        </layer></staff>
+      </measure>
+    </section>
+  </score></mdiv></body></music>
+</mei>

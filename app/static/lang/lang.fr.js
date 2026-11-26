@@ -201,9 +201,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Aucun attribut convertible en élément trouvé.' },
   convertAttributesToElementsProblems: { text: '{count} attributs n\'ont pas pu être convertis.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Vérifier' },
-  meiToolboxTabConvert: { text: 'Convertir' },
-  meiToolboxTabRenumber: { text: 'Renuméroter' },
+  meiToolboxTabCheck: {
+    text: 'Vérifier',
+    description:
+      'Vérifie dans l’encodage les altérations sonores (@accid.ges), les durées des mesures (@metcon) et les liens entre éléments (@startid, @endid, @plist, …). Liste chaque problème trouvé, avec une correction lorsque c’est possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convertir',
+    description:
+      'Convertit les attributs sélectionnés en éléments équivalents (par exemple @accid en <accid>), ou les éléments à nouveau en attributs lorsqu’aucune information n’est perdue.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renuméroter',
+    description:
+      'Renumérote les mesures (@n) de façon consécutive, avec des suffixes configurables pour les mesures qui en prolongent une précédente et pour les mesures dans les fins de reprise.',
+  },
   meiToolboxCheckButton: { text: 'Vérifier' },
   meiToolboxTestButton: { text: 'Tester', description: 'Lister ce qui serait modifié, sans modifier l\'encodage' },
   meiToolboxRenumberButton: { text: 'Renuméroter' },
@@ -221,9 +233,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Durées des mesures (@metcon)' },
   meiToolboxCheckLinked: { text: 'Éléments liés (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Fermer la boîte à outils MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Fac-similé' },
-  meiToolboxTabReformat: { text: 'Reformater' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Ajoute des xml:ids aux éléments qui n’en ont pas, en attribue un nouveau à chaque élément ou les supprime, sauf ceux qui sont référencés. Les références dans l’encodage sont mises à jour.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Fac-similé',
+    description:
+      'Relie l’encodage aux images de pages : importe un fac-similé depuis un autre fichier, ou ajoute les surfaces manquantes, une par saut de page.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformater',
+    description:
+      'Réécrit tout l’encodage, via Verovio ou l’analyseur XML, et définit l’ordre des attributs que mei-friend utilise lorsqu’il réécrit des éléments.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transposer',
+    description:
+      'Transpose la notation vers une autre tonalité ou d’un intervalle. Seule la notation est transposée ; l’encodage reste tel quel.',
+  },
   meiToolboxIdsAdd: { text: 'Ajouter des xml:id (aux éléments qui n’en ont pas)' },
   meiToolboxIdsChange: {
     text: 'Changer les xml:id (un nouveau pour chaque élément)',
@@ -276,6 +305,28 @@ export const lang = {
     text: 'Motif d’ordre',
     description: 'Noms d’attributs séparés par des espaces ou des virgules, dans l’ordre souhaité, p. ex. « xml:id n label * ». Un nom se terminant par * correspond à tous les attributs ayant ce préfixe (clef.*). Un * seul représente tous les attributs non nommés, par ordre alphabétique ; sans lui, ils conservent leur ordre à la fin. Les déclarations d’espaces de noms viennent toujours en premier.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transpose uniquement la notation ; l’encodage reste tel quel, hormis l’indication ci-dessous. Pour transposer aussi l’encodage, transposez ici puis réécrivez-le avec « Via Verovio » dans l’onglet Reformater.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Réinitialiser',
+    description: 'Supprime la transposition, de sorte que la notation réapparaisse à la hauteur encodée.',
+  },
+  meiToolboxTransposeDone: { text: 'La notation est transposée ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'La transposition a été supprimée.' },
+  meiToolboxTransposeNone: { text: 'Rien à faire : aucune transposition n’est appliquée.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Ajouter une indication de transposition',
+    description:
+      'Écrit dans le pgHead de la partition une ligne indiquant la tonalité de la transposition et celle de l’encodage. Elle est supprimée lors de la réinitialisation de la transposition.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposé en {new}\nOriginal : {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposé : {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'L’indication de transposition a été écrite dans le pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'L’indication de transposition a été supprimée du pgHead.' },
+
   codeCheckerFixShown: { text: 'Corriger les {n} affichés' },
   codeCheckerIgnoreShown: { text: 'Ignorer les {n} affichés' },
   convertGroupAccid: { text: 'Altérations écrites (@accid)' },
@@ -299,7 +350,16 @@ export const lang = {
   convertScopeAll: { text: 'Portée : tout l\'encodage (sélectionnez du texte dans l\'éditeur pour restreindre la conversion)' },
   convertScopeSelection: { text: 'Portée : sélection, lignes {from}–{to}' },
   convertSelectionSuffix: { text: 'sélection' },
-  renumberMeasuresStartNumber: { text: 'Numéro de départ' },
+  renumberMeasuresStartNumber: {
+    text: 'Numéro de départ',
+    description:
+      'Numéro de la première mesure complète ; toutes les mesures suivantes sont numérotées à partir de lui. Une première mesure incomplète (@metcon="false", p. ex. une anacrouse) reçoit un numéro de moins : avec le numéro de départ 1, elle reçoit donc 0 (sauf si ‘Continuer à travers les mesures incomplètes’ est activé).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Recommencer à chaque mdiv',
+    description:
+      'Recommence la numérotation à partir du numéro de départ à chaque mdiv (mouvement), au lieu de poursuivre le décompte sur tout l’encodage.',
+  },
   renumberMeasuresUnchanged: { text: 'inchangé' },
   renumberMeasuresSummary: { text: '{total} mesures, {changed} renumérotées.' },
   renumberMeasuresSummaryTest: { text: '{total} mesures, {changed} seraient renumérotées.' },
@@ -946,15 +1006,6 @@ export const lang = {
   },
 
   // Transposition // Transposition
-  titleTransposition: {
-    text: 'Transposition',
-    description: 'Transposer les informations de partition',
-  },
-  enableTransposition: {
-    text: 'Activer la transposition',
-    description:
-      "Activer les réglages de transposition, qui seront appliqués grâce au bouton de transposition ci-dessous. La transposition sera appliquée uniquement à la notation, l'encodage restera inchangé, à moins que vous ne cliquiez sur l'option 'Rerender via Verovio' dans le menu déroulant 'Manipuler'.",
-  },
   transposeInterval: {
     text: 'Transposer par intervalle',
     description:
@@ -1016,7 +1067,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transposer',
-    description: `Appliquer la transposition avec les réglages ci-dessus à la notation, tandis que l'encodage MEI reste inchangé. Pour transposer également l'encodage MEI avec les réglages actuels, utilisez "Rendre via Verovio" dans le menu déroulant "Manipuler".`,
+    description: 'Applique la transposition à la notation ; l’encodage reste inchangé.',
   },
 
   // Renumber measures / Renommer les mesures

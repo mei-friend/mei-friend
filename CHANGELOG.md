@@ -3,6 +3,10 @@
 ### 1.6.4 patch: Speed mode with mdiv support
 * Speed mode now supports `mdiv` elements, with the section selector showing the `@label`, `@n` or `@source` of each mdiv, section, ending, lem and rdg element instead of only the `xml:id`.
 * Several existing bugs (including scoreDef, keySig and meterSig) in speed mode fixed, and the speed mode codebase refactored to be more maintainable.
+* New option to restart renumbering measures at each mdiv (in MEI toolbox).
+* Fixed the editor being drawn only partially (rest of the panel white) when the MEI toolbox was moved between the sides of the encoding panel for the first time.
+* The transposition moves from the settings panel into the MEI toolbox as a new **Transpose** tab. The `Enable transposition` checkbox is replaced by a `Reset` button beside `Transpose`, which removes a transposition again; the key, interval and pitch direction settings (and their stored values) are unchanged.
+* New `Add transposition directive` option in the Transpose tab: writes a line into the `pgHead` of the first `scoreDef` stating the key transposed to and the key of the encoding, on two lines (`Transposed to F major` / `original: G major`), as a `rend` marked `@type="transposition"`. For a transposition by interval the resulting key is worked out from the key signature of the encoding; when it falls outside the fifteen key signatures, the interval is stated instead. Major or minor is taken from `@key.mode` (`keySig@mode` from MEI 5.0) where the encoding states it, and otherwise from the bass note the music ends on; where neither tells, both keys are named (`F major / D minor`). The directive takes a side of the page head to itself: the right, or the left when the title block writes anything down the right; only when both sides are used does it share one, in a band (top, middle, bottom) that is still free there. It is replaced on each run, removed when the option is off, and removed together with the transposition by `Reset`; a `pgHead` is created when the `scoreDef` has none, and removed again with the directive.
 
 ### 1.6.3 patch: MEI toolbox
 * The checker panel becomes the **MEI toolbox**, with three further tabs beside `Check`, `Convert` and `Renumber`:
@@ -54,7 +58,11 @@
 * Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
 * Insert `encodingDesc` (including `applicationInfo`) and if absent `fileDesc` in correct element order of `meiHead`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198) thx @fernandoherreradelasheras. 
 * mei-friend insert and manipulate actions (including annotations and markup) stored as one undoable action in the CodeMirror editor history (fixes [#179](https://github.com/mei-friend/mei-friend/issues/179)).
-* Support for `mdiv`s in section select menu (mdiv still not supported in SpeedMode), current position in score is reflected in selected option of section select menu.
+* Support for `mdiv`s in section select menu, current position in score is reflected in selected option of section select menu.
+* Speed mode support for multiple mdivs, including pages that mix content from more than one mdiv, and time-spanning elements crossing a page boundary in any mdiv (not just the first one).
+* Speed mode keeps pages that start inside an `<ending>` containing a system or page break separate from the preceding page.
+* Speed mode shows `<staffGrp><label>` (such as movement titles) on the page that opens an `mdiv`, as normal mode does; previously the label was drawn on the invisible context page speed mode puts in front of the requested page.
+* Full speed mode support of `@keysig` attribute starting with MEI 5.0 (as opposed to `@key.sig` used up to MEI 4.0.1)
 * Add Verovio version 6.3.0 to toolkit list
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)

@@ -199,9 +199,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Ingen attributter fundet, der kan konverteres til elementer.' },
   convertAttributesToElementsProblems: { text: '{count} attributter kunne ikke konverteres.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Kontrol' },
-  meiToolboxTabConvert: { text: 'Konverter' },
-  meiToolboxTabRenumber: { text: 'Omnummerer' },
+  meiToolboxTabCheck: {
+    text: 'Kontrol',
+    description:
+      'Kontrollerer kodningen for klingende fortegn (@accid.ges), taktvarigheder (@metcon) og links mellem elementer (@startid, @endid, @plist, …). Viser hvert fundet problem, med en rettelse hvor det er muligt.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konverter',
+    description:
+      'Konverterer valgte attributter til tilsvarende elementer (f.eks. @accid til <accid>), eller elementer tilbage til attributter, hvor ingen information går tabt.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Omnummerer',
+    description:
+      'Omnummererer takterne (@n) fortløbende, med indstillelige suffikser for takter, der fortsætter en tidligere takt, og for takter i volter.',
+  },
   meiToolboxCheckButton: { text: 'Kontroller' },
   meiToolboxTestButton: { text: 'Test', description: 'Vis hvad der ville blive ændret, uden at ændre kodningen' },
   meiToolboxRenumberButton: { text: 'Omnummerer' },
@@ -219,9 +231,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Taktvarigheder (@metcon)' },
   meiToolboxCheckLinked: { text: 'Forbundne elementer (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Luk MEI-værktøjskassen' },
-  meiToolboxTabIds: { text: 'Id’er' },
-  meiToolboxTabFacsimile: { text: 'Faksimile' },
-  meiToolboxTabReformat: { text: 'Reformatér' },
+  meiToolboxTabIds: {
+    text: 'Id’er',
+    description:
+      'Tilføjer xml:id’er til elementer uden en, giver hvert element en ny eller fjerner dem, undtagen dem der henvises til. Henvisninger i kodningen opdateres.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimile',
+    description:
+      'Forbinder kodningen med sidebilleder: indlæser et faksimile fra en anden fil eller tilføjer de manglende surfaces, én pr. sideskift.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformatér',
+    description:
+      'Skriver hele kodningen på ny, via Verovio eller XML-parseren, og fastlægger den attributrækkefølge, mei-friend bruger, når elementer skrives tilbage.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transponer',
+    description:
+      'Transponerer notationen til en anden toneart eller med et interval. Kun notationen transponeres; kodningen forbliver, som den er.',
+  },
   meiToolboxIdsAdd: { text: 'Tilføj xml:id (til elementer uden)' },
   meiToolboxIdsChange: {
     text: 'Skift xml:id (et nyt til hvert element)',
@@ -274,6 +303,28 @@ export const lang = {
     text: 'Rækkefølgemønster',
     description: 'Attributnavne adskilt af mellemrum eller kommaer, i den ønskede rækkefølge, f.eks. “xml:id n label *”. Et navn, der ender på *, matcher alle attributter med det præfiks (clef.*). Et enkelt * står for alle ikke-nævnte attributter i alfabetisk orden; uden det bevarer de deres rækkefølge til sidst. Namespace-erklæringer kommer altid først.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponerer kun notationen; kodningen forbliver, som den er, bortset fra angivelsen nedenfor. For også at transponere kodningen skal du transponere her og derefter skrive den på ny med “Via Verovio” i fanen Reformatér.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Nulstil',
+    description: 'Fjerner transpositionen, så notationen igen vises i den kodede tonehøjde.',
+  },
+  meiToolboxTransposeDone: { text: 'Notationen er transponeret ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'Transpositionen er fjernet.' },
+  meiToolboxTransposeNone: { text: 'Intet at gøre: ingen transposition er anvendt.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Tilføj transpositionsangivelse',
+    description:
+      'Skriver en linje i partiturets pgHead, som angiver den toneart, der transponeres til, og kodningens toneart. Den fjernes igen, når transpositionen nulstilles.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponeret til {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponeret: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Transpositionsangivelsen blev skrevet i pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Transpositionsangivelsen blev fjernet fra pgHead.' },
+
   codeCheckerFixShown: { text: 'Ret {n} viste' },
   codeCheckerIgnoreShown: { text: 'Ignorer {n} viste' },
   convertGroupAccid: { text: 'Noterede fortegn (@accid)' },
@@ -297,7 +348,16 @@ export const lang = {
   convertScopeAll: { text: 'Omfang: hele kodningen (markér tekst i editoren for at begrænse konverteringen)' },
   convertScopeSelection: { text: 'Omfang: markering, linje {from}–{to}' },
   convertSelectionSuffix: { text: 'markering' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummeret på den første fuldstændige takt; alle følgende takter nummereres ud fra det. En ufuldstændig første takt (@metcon="false", f.eks. en optakt) får ét nummer mindre, så med startnummer 1 får den 0 (medmindre ‘Fortsæt på tværs af ufuldstændige mål’ er slået til).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Start forfra ved hver mdiv',
+    description:
+      'Begynder nummereringen forfra fra startnummeret ved hver mdiv (sats) i stedet for at tælle videre gennem hele kodningen.',
+  },
   renumberMeasuresUnchanged: { text: 'uændret' },
   renumberMeasuresSummary: { text: '{total} takter, {changed} omnummereret.' },
   renumberMeasuresSummaryTest: { text: '{total} takter, {changed} ville blive omnummereret.' },
@@ -833,15 +893,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transponer',
-    description: 'Transponer noder',
-  },
-  enableTransposition: {
-    text: 'Aktiver transponering',
-    description:
-      'Aktiver transponering indstillinger, der skal anvendes gennem transponer knappen nedenfor. Transponeringen vil blive anvendt på notationen kun, kodningen forbliver uændret, medmindre du klikker på elementet "Genrender via Verovio" i "Manipuler" dropdown-menuen.',
-  },
   transposeInterval: {
     text: 'Transponer ved interval',
     description:
@@ -903,8 +954,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponer',
-    description:
-      'Anvend transponering med ovenstående indstillinger på notationen, mens MEI-kodningen forbliver uændret. For også at transponere MEI-kodningen med de nuværende indstillinger, brug "Genrender via Verovio" i "Manipuler" dropdown-menuen.',
+    description: 'Anvender transpositionen på notationen; kodningen forbliver uændret.',
   },
 
   // Renumber measures

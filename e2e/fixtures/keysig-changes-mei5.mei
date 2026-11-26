@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>MEI 5 key and meter changes (speed-mode fixture)</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <!-- MEI 5 states key signatures as @keysig (MEI <= 4.0.1 used @key.sig).
+           Speed mode has to carry a key/meter change that happened on an
+           earlier page over into the excerpt it hands to Verovio, in both the
+           scoreDef@keysig and the scoreDef/staffGrp/staffDef@keysig spelling. -->
+      <mdiv xml:id="mdivKeys">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+              <staffDef n="2" lines="5" clef.shape="F" clef.line="4" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionKeys">
+            <measure xml:id="mK1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mK1-s1" dur="1" oct="4" pname="c"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mK1-s2" dur="1" oct="3" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMK1"/>
+            <!-- key and meter change stated on scoreDef itself -->
+            <scoreDef xml:id="scoreDefEflat" keysig="3f" meter.count="3" meter.unit="4"/>
+            <measure xml:id="mK2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mK2-s1" dur="2" oct="4" pname="d"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mK2-s2" dur="2" oct="3" pname="d"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMK2"/>
+            <measure xml:id="mK3" n="3">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mK3-s1" dur="2" oct="4" pname="e"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mK3-s2" dur="2" oct="3" pname="e"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMK3"/>
+            <!-- second key change, this time stated per staffDef -->
+            <scoreDef xml:id="scoreDefDmajor">
+              <staffGrp>
+                <staffDef n="1" lines="5" keysig="2s"/>
+                <staffDef n="2" lines="5" keysig="2s"/>
+              </staffGrp>
+            </scoreDef>
+            <measure xml:id="mK4" n="4">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mK4-s1" dur="2" oct="4" pname="f"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mK4-s2" dur="2" oct="3" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMK4"/>
+            <measure xml:id="mK5" n="5">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mK5-s1" dur="2" oct="4" pname="g"/>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <note xml:id="note-mK5-s2" dur="2" oct="3" pname="g"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

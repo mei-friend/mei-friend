@@ -193,9 +193,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Нису пронађени атрибути који се могу претворити у елементе.' },
   convertAttributesToElementsProblems: { text: '{count} атрибута није могуће претворити.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Провера' },
-  meiToolboxTabConvert: { text: 'Претварање' },
-  meiToolboxTabRenumber: { text: 'Ренумерисање' },
+  meiToolboxTabCheck: {
+    text: 'Провера',
+    description:
+      'Проверава у кодирању гестуалне предзнаке (@accid.ges), трајања тактова (@metcon) и везе између елемената (@startid, @endid, @plist, …). Наводи сваки пронађени проблем, са исправком где је то могуће.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Претварање',
+    description:
+      'Претвара изабране атрибуте у еквивалентне елементе (нпр. @accid у <accid>) или елементе назад у атрибуте, ако се притом не губи никаква информација.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Ренумерисање',
+    description:
+      'Узастопно ренумерише тактове (@n), са подесивим суфиксима за тактове који настављају претходни и за тактове у завршецима (волтама).',
+  },
   meiToolboxCheckButton: { text: 'Провери' },
   meiToolboxTestButton: { text: 'Тестирај', description: 'Прикажи шта би било промењено, без мењања кодирања' },
   meiToolboxRenumberButton: { text: 'Ренумериши' },
@@ -213,9 +225,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Трајања тактова (@metcon)' },
   meiToolboxCheckLinked: { text: 'Повезани елементи (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Затвори MEI алатницу' },
-  meiToolboxTabIds: { text: 'Ид-ови' },
-  meiToolboxTabFacsimile: { text: 'Факсимил' },
-  meiToolboxTabReformat: { text: 'Преобликуј' },
+  meiToolboxTabIds: {
+    text: 'Ид-ови',
+    description:
+      'Додаје xml:id елементима који га немају, даје сваком елементу нови или их уклања, осим оних на које се упућује. Референце унутар кодирања се ажурирају.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Факсимил',
+    description:
+      'Повезује кодирање са сликама страница: преузима факсимил из друге датотеке или додаје недостајуће surfaces, по један за сваки прелом странице.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Преобликуј',
+    description:
+      'Исписује цело кодирање изнова, путем Веровиа или XML парсера, и одређује редослед атрибута који mei-friend користи при поновном уписивању елемената.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Транспонуј',
+    description:
+      'Транспонује нотни текст у други тоналитет или за интервал. Транспонује се само нотни текст; кодирање остаје какво јесте.',
+  },
   meiToolboxIdsAdd: { text: 'Додај xml:id (елементима без њега)' },
   meiToolboxIdsChange: {
     text: 'Промени xml:id (нови за сваки елемент)',
@@ -268,6 +297,28 @@ export const lang = {
     text: 'Образац редоследа',
     description: 'Имена атрибута раздвојена размацима или зарезима, редоследом који желите, нпр. „xml:id n label *”. Име које се завршава са * одговара свим атрибутима с тим префиксом (clef.*). Једна * означава све неименоване атрибуте, абецедно; без ње задржавају свој редослед на крају. Декларације именских простора увек долазе прве.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Транспонује само нотни текст; кодирање остаје какво јесте, осим напомене испод. Да бисте транспоновали и кодирање, транспонујте овде, а затим га испишите изнова помоћу „Преко Verovija“ у картици Преобликуј.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Поништи',
+    description: 'Уклања транспозицију, тако да се нотни текст поново приказује у кодираној висини.',
+  },
+  meiToolboxTransposeDone: { text: 'Нотни текст је транспонован ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'Транспозиција је уклоњена.' },
+  meiToolboxTransposeNone: { text: 'Нема шта да се уради: ниједна транспозиција није примењена.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Додај напомену о транспозицији',
+    description:
+      'Уписује у pgHead партитуре ред који наводи тоналитет у који се транспонује и тоналитет кодирања. Уклања се при поништавању транспозиције.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Транспоновано у {new}\nоригинал: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Транспоновано: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Напомена о транспозицији уписана је у pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Напомена о транспозицији уклоњена је из pgHead.' },
+
   codeCheckerFixShown: { text: 'Поправи {n} приказаних' },
   codeCheckerIgnoreShown: { text: 'Занемари {n} приказаних' },
   convertGroupAccid: { text: 'Писани предзнаци (@accid)' },
@@ -291,7 +342,16 @@ export const lang = {
   convertScopeAll: { text: 'Опсег: цело кодирање (означите текст у едитору да ограничите претварање)' },
   convertScopeSelection: { text: 'Опсег: избор, редови {from}–{to}' },
   convertSelectionSuffix: { text: 'избор' },
-  renumberMeasuresStartNumber: { text: 'Почетни број' },
+  renumberMeasuresStartNumber: {
+    text: 'Почетни број',
+    description:
+      'Број првог потпуног такта; сви следећи тактови нумеришу се од њега. Непотпун први такт (@metcon="false", нпр. предтакт) добија број мање, па уз почетни број 1 добија 0 (осим ако је укључено ‘Настави преко непотпуних тактова’).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Почни испочетка код сваког mdiv',
+    description:
+      'Нумерација почиње испочетка од почетног броја код сваког mdiv (става), уместо да се наставља кроз цело кодирање.',
+  },
   renumberMeasuresUnchanged: { text: 'непромењено' },
   renumberMeasuresSummary: { text: '{total} тактова, {changed} ренумерисано.' },
   renumberMeasuresSummaryTest: { text: '{total} тактова, {changed} би било ренумерисано.' },
@@ -823,15 +883,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Транспоновање',
-    description: 'Транспоновање информација о нотама',
-  },
-  enableTransposition: {
-    text: 'Омогућите транспоновање',
-    description:
-      'Омогућите поставке транспоновања, које ће се применити кликом на дугме за транспоновање испод. Транспоновање ће се применити само на нотацију, кодирање остане непромењено, осим ако не кликнете на ставку "Поново рендерујте помоћу Веровио" у менију "Манипулиши".',
-  },
   transposeInterval: {
     text: 'Транспонујте по интервалу',
     description:
@@ -893,8 +944,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Транспонујте',
-    description:
-      'Примените транспоновање са поставкама изнад на нотацију, док кодирање остане непромењено. Да бисте такође транспоновали кодирање MEI са тренутним поставкама, користите "Поново рендерујте помоћу Веровио" у менију "Манипулиши".',
+    description: 'Примењује транспозицију на нотни текст; кодирање остаје непромењено.',
   },
 
   // Ренумерација такта

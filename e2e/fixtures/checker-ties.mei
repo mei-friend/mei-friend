@@ -7,7 +7,8 @@
 
      Measures 1-8 are encoded correctly as far as the tie endings are concerned:
      no message may name a3, b3, c3 or d3. Measures 9-16 are encoded wrongly and
-     every tie ending there must be reported. -->
+     every tie ending there must be reported. Measures 17-18 tie two notes without
+     pitch, which carry nothing that could be compared: i3 must not be reported. -->
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
   <meiHead><fileDesc><titleStmt><title>tie accidentals</title></titleStmt><pubStmt/></fileDesc></meiHead>
   <music><body><mdiv><score>
@@ -110,6 +111,18 @@
       <measure n="16" xml:id="mh2"><staff n="1" xml:id="mh2s1"><layer n="1">
         <note xml:id="h3" pname="c" oct="4" dur="2" accid.ges="f"/>
         <note xml:id="h4" pname="e" oct="4" dur="2"/>
+      </layer></staff></measure>
+      <!-- i: unpitched notes (percussion), tied without @pname and @oct -->
+      <measure n="17" xml:id="mi1">
+        <staff n="1" xml:id="mi1s1"><layer n="1">
+          <note xml:id="i1" oct="4" pname="e" dur="2"/>
+          <note xml:id="i2" dur="2"/>
+        </layer></staff>
+        <tie xml:id="ti" startid="#i2" endid="#i3"/>
+      </measure>
+      <measure n="18" xml:id="mi2"><staff n="1" xml:id="mi2s1"><layer n="1">
+        <note xml:id="i3" dur="2"/>
+        <note xml:id="i4" pname="e" oct="4" dur="2"/>
       </layer></staff></measure>
     </section>
   </score></mdiv></body></music>

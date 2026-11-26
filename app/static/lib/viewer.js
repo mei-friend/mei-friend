@@ -295,24 +295,35 @@ export default class Viewer {
 
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
-      let music = speedMeiDoc.querySelector('music score');
+      // 'music body' (not 'music score') so breaks in any mdiv are counted, not just the first
+      let music = speedMeiDoc.querySelector('music body');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';
       // count pages
       this.pageCount = 1; // pages are one-based
-      let countBreaks = false;
+      // A break only ends a page when a measure has come since the last one that
+      // did: a run of breaks with nothing between them (<sb/><pb/> opening a
+      // section, say) is one break, as Verovio also engraves it. Same rule in
+      // speed.js (readSection(), getPageWithElement()) and in speed-worker.js
+      // (getPageNumberForElements()); the four counts have to agree.
+      let measureSinceBreak = false;
       for (let e of elements) {
-        if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
-        if (countBreaks && breaks.includes(e.nodeName)) {
-          // if within app, increment only if inside lem or 1st rdg
-          if (dutils.countAsBreak(e)) this.pageCount++;
+        if (e.nodeName === 'measure') {
+          measureSinceBreak = true; // leading breaks are skipped: none has come yet
+        } else if (measureSinceBreak && breaks.includes(e.nodeName) && dutils.countAsBreak(e)) {
+          // within an app, count only breaks inside lem or 1st rdg
+          this.pageCount++;
+          measureSinceBreak = false;
         }
       }
+      // breaks after the last measure open no page of their own, and count as one
       for (let e of Array.from(elements).reverse()) {
-        // skip trailing breaks
         if (e.nodeName === 'measure') break;
-        if (countBreaks && breaks.includes(e.nodeName)) this.pageCount--;
+        if (breaks.includes(e.nodeName) && dutils.countAsBreak(e)) {
+          this.pageCount--;
+          break;
+        }
       }
     }
     if (this.pageCount > 0 && (this.currentPage < 1 || this.currentPage > this.pageCount)) this.currentPage = 1;
@@ -341,7 +352,16 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    let excerpt = speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    if (!excerpt && this.currentPage !== 1) {
+      // The page count above and getPageFromDom() count pages the same way, so
+      // this should not happen; fall back to the first page rather than hand
+      // Verovio nothing to load ("Cannot load MEI data").
+      console.warn('speedFilter(): no excerpt for page ' + this.currentPage + ', falling back to page 1');
+      this.currentPage = 1;
+      excerpt = speed.getPageFromDom(speedMeiDoc, 1, breaks, this.pageSpanners, includeDummyMeasures);
+    }
+    return excerpt;
   } // speedFilter()
 
   loadXml(mei, forceReload = false) {
@@ -1546,9 +1566,10 @@ export default class Viewer {
     if (isLetsEncodeMode()) {
       // In Let's Encode mode Eulise keeps her perch but wears the joint logo.
       // Only a light and a dark variant exist, so this deliberately bypasses the
-      // environment prefix, the asleep state, and the Safari PNG fallback.
+      // environment prefix and the asleep state; the Safari pixel fallback applies
+      // as everywhere else.
       const owlDir = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
-      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + '.svg';
+      owlSrc = owlDir + 'mei-friend-lets-encode' + (j < 128 ? '-dark' : '') + (isSafari ? '.png' : '.svg');
     }
     owl.setAttribute('src', owlSrc);
     splashOwl.setAttribute('src', splashOwlSrc);
@@ -2016,20 +2037,6 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
-        case 'enableTransposition':
-          // switch on
-          if (value) {
-            let onList = ['transposeDirection', 'transposeButton'];
-            if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
-            if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
-            this.setDisablednessInOptionsItem(onList, ['']);
-          } else {
-            this.setDisablednessInOptionsItem(
-              [''],
-              ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
-            );
-          }
-          break;
       }
       let div = this.createOptionsItem(opt, o, value);
       if (div) {
@@ -2041,36 +2048,6 @@ export default class Viewer {
         } else {
           mfs.appendChild(div);
         }
-      }
-      switch (opt) {
-        case 'transposeKey':
-          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeKey'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeKey']);
-          }
-          break;
-        case 'transposeInterval':
-          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeInterval'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeInterval']);
-          }
-          break;
-        case 'transposeDirection':
-          if (document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeDirection'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeDirection']);
-          }
-          break;
-        case 'transposeButton':
-          if (document.getElementById('enableTransposition').checked) {
-            this.setDisablednessInOptionsItem(['transposeButton'], ['']);
-          } else {
-            this.setDisablednessInOptionsItem([''], ['transposeButton']);
-          }
-          break;
       }
     });
     mfs.innerHTML +=
@@ -2134,39 +2111,6 @@ export default class Viewer {
             break;
           case 'enableGithubActions':
             this.setGithubActionsDisplay();
-            break;
-          case 'enableTransposition':
-            // switch on
-            if (value) {
-              let onList = ['transposeDirection', 'transposeButton'];
-              if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
-              if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
-              this.setDisablednessInOptionsItem(onList, ['']);
-            } else {
-              this.setDisablednessInOptionsItem(
-                [''],
-                ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
-              );
-              this.vrvOptions.transpose = '';
-              this.updateAll(cm);
-            }
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              cmd.toggleMidiPlaybackControlBar();
-            }
-            break;
-          case 'toKey':
-            if (document.getElementById('enableTransposition').checked) {
-              this.setDisablednessInOptionsItem(['transposeKey'], ['transposeInterval']);
-            }
-            break;
-          case 'byInterval':
-            if (document.getElementById('enableTransposition').checked) {
-              this.setDisablednessInOptionsItem(['transposeInterval'], ['transposeKey']);
-            }
-            break;
-          case 'transposeKey':
-          case 'transposeInterval':
-          case 'transposeDirection':
             break;
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
@@ -2315,16 +2259,6 @@ export default class Viewer {
           case 'mfReset':
             this.addMeiFriendOptionsToSettingsPanel(false);
             this.applySettingsFilter();
-            break;
-          case 'transposeButton':
-            let msg = this.getTranspositionOption();
-            console.log('Transpose: ' + msg);
-            this.vrvOptions.transpose = msg;
-            // this.updateOption({ transpose: msg });
-            this.updateAll(cm);
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              cmd.toggleMidiPlaybackControlBar();
-            }
             break;
         }
       });
@@ -2766,8 +2700,7 @@ export default class Viewer {
         div.appendChild(line);
         break;
       case 'button':
-        label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
-
+        label.textContent = '';
         label.setAttribute('title', '');
         input = document.createElement('input');
         input.setAttribute('type', 'button');
@@ -2833,23 +2766,12 @@ export default class Viewer {
     }
   } // setRespSelectOptions()
 
-  getTranspositionOption() {
-    let dir = document.getElementById('transposeDirection');
-    let key = document.getElementById('transposeKey');
-    let int = document.getElementById('transposeInterval');
-    if (!dir || !key || !int) return;
-    let optionString = dir.value;
-    if (!key.disabled) optionString += key.value;
-    if (!int.disabled) optionString += int.value;
-    return optionString;
-  } // setRespSelectOptions()
-
   // add MIDI playback expansion to select input
   setMidiExpansionOptions() {
     let expandSelect = document.getElementById('selectMidiExpansion');
     if (expandSelect) {
       while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
-    } // getTranspositionOption()
+    }
     // add options to midi controlbar expansion selector
     let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
     if (vrvOption) {
@@ -3743,7 +3665,10 @@ export default class Viewer {
     meiToolbox.finishRun(allGoodString);
   } // finalizeCodeCheckerPanel()
 
-  hideCodeCheckerPanel() {
+  /**
+   * Clears the results in the MEI toolbox; the panel itself stays open or closed
+   */
+  resetCodeCheckerPanel() {
     meiToolbox.resetToolbox();
-  }
+  } // resetCodeCheckerPanel()
 } // class Viewer

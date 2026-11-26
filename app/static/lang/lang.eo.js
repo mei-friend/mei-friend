@@ -197,9 +197,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Neniuj atributoj troviĝis, kiuj konverteblas al elementoj.' },
   convertAttributesToElementsProblems: { text: '{count} atributoj ne konverteblis.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Kontroli' },
-  meiToolboxTabConvert: { text: 'Konverti' },
-  meiToolboxTabRenumber: { text: 'Renumeri' },
+  meiToolboxTabCheck: {
+    text: 'Kontroli',
+    description:
+      'Kontrolas en la kodado sonantajn akcidencojn (@accid.ges), taktodaŭrojn (@metcon) kaj ligojn inter elementoj (@startid, @endid, @plist, …). Listigas ĉiun trovitan problemon, kun korekto kie eblas.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konverti',
+    description:
+      'Konvertas elektitajn atributojn en ekvivalentajn elementojn (ekz. @accid en <accid>), aŭ elementojn reen en atributojn, kiam neniu informo perdiĝas.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumeri',
+    description:
+      'Renumeras la taktojn (@n) sinsekve, kun agordeblaj sufiksoj por taktoj, kiuj daŭrigas antaŭan takton, kaj por taktoj en finaĵoj.',
+  },
   meiToolboxCheckButton: { text: 'Kontroli' },
   meiToolboxTestButton: { text: 'Testi', description: 'Listigi, kio estus ŝanĝita, sen ŝanĝi la kodadon' },
   meiToolboxRenumberButton: { text: 'Renumeri' },
@@ -217,9 +229,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Taktodaŭroj (@metcon)' },
   meiToolboxCheckLinked: { text: 'Ligitaj elementoj (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Fermi la MEI-ilarkeston' },
-  meiToolboxTabIds: { text: 'Id-oj' },
-  meiToolboxTabFacsimile: { text: 'Faksimilo' },
-  meiToolboxTabReformat: { text: 'Reformati' },
+  meiToolboxTabIds: {
+    text: 'Id-oj',
+    description:
+      'Aldonas xml:id-ojn al elementoj sen ili, donas novan al ĉiu elemento aŭ forigas ilin, krom tiuj, al kiuj oni referencas. Referencoj ene de la kodado estas ĝisdatigitaj.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimilo',
+    description:
+      'Ligas la kodadon al paĝobildoj: enprenas faksimilon el alia dosiero aŭ aldonas la mankantajn surfaces, po unu por ĉiu paĝosalto.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformati',
+    description:
+      'Reskribas la tutan kodadon, per Verovio aŭ la XML-analizilo, kaj difinas la ordon de atributoj, kiun mei-friend uzas, kiam ĝi reskribas elementojn.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transponi',
+    description:
+      'Transponas la notacion al alia tonalo aŭ je intervalo. Nur la notacio estas transponata; la kodigo restas kia ĝi estas.',
+  },
   meiToolboxIdsAdd: { text: 'Aldoni xml:id-ojn (al elementoj sen tia)' },
   meiToolboxIdsChange: {
     text: 'Ŝanĝi xml:id-ojn (novan por ĉiu elemento)',
@@ -272,6 +301,28 @@ export const lang = {
     text: 'Ordoŝablono',
     description: 'Atributnomoj disigitaj per spacoj aŭ komoj, en la dezirata ordo, ekz. „xml:id n label *“. Nomo finiĝanta per * kongruas kun ĉiuj atributoj kun tiu prefikso (clef.*). Unuopa * reprezentas ĉiujn ne nomitajn atributojn, alfabete; sen ĝi ili konservas sian ordon ĉe la fino. Nomspacaj deklaroj ĉiam venas unue.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponas nur la notacion; la kodigo restas kia ĝi estas, krom la noto sube. Por transponi ankaŭ la kodigon, transponu ĉi tie kaj poste reskribu ĝin per „Per Verovio“ en la langeto Reformati.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restarigi',
+    description: 'Forigas la transponon, tiel ke la notacio denove aperas en la kodigita alteco.',
+  },
+  meiToolboxTransposeDone: { text: 'La notacio estas transponita ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'La transpono estis forigita.' },
+  meiToolboxTransposeNone: { text: 'Nenio farenda: neniu transpono estas aplikata.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Aldoni transponan noton',
+    description:
+      'Skribas en la pgHead de la partituro linion, kiu nomas la tonalon de la transpono kaj la tonalon de la kodigo. Ĝi estas forigita, kiam la transpono estas restarigita.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponita al {new}\noriginalo: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponita: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'La transpona noto estis skribita en la pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'La transpona noto estis forigita el la pgHead.' },
+
   codeCheckerFixShown: { text: 'Korekti {n} montritajn' },
   codeCheckerIgnoreShown: { text: 'Ignori {n} montritajn' },
   convertGroupAccid: { text: 'Skribitaj akcidencoj (@accid)' },
@@ -295,7 +346,16 @@ export const lang = {
   convertScopeAll: { text: 'Amplekso: tuta kodado (elektu tekston en la redaktilo por limigi la konverton)' },
   convertScopeSelection: { text: 'Amplekso: elekto, linioj {from}–{to}' },
   convertSelectionSuffix: { text: 'elekto' },
-  renumberMeasuresStartNumber: { text: 'Komenca numero' },
+  renumberMeasuresStartNumber: {
+    text: 'Komenca numero',
+    description:
+      'Numero de la unua kompleta takto; ĉiuj sekvaj taktoj estas numerataj ekde ĝi. Nekompleta unua takto (@metcon="false", ekz. antaŭtakto) ricevas numeron je unu malpli, do kun komenca numero 1 ĝi ricevas 0 (krom se ‘Daŭrigi trans nekompletajn taktojn’ estas ŝaltita).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Rekomenci ĉe ĉiu mdiv',
+    description:
+      'Rekomencas la numeradon de la komenca numero ĉe ĉiu mdiv (movimento), anstataŭ daŭre kalkuli tra la tuta kodado.',
+  },
   renumberMeasuresUnchanged: { text: 'neŝanĝita' },
   renumberMeasuresSummary: { text: '{total} taktoj, {changed} renumeritaj.' },
   renumberMeasuresSummaryTest: { text: '{total} taktoj, {changed} estus renumeritaj.' },
@@ -923,15 +983,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transpozicio',
-    description: 'Transpozicio de muzika notado',
-  },
-  enableTransposition: {
-    text: 'Ebligi transpozicion',
-    description:
-      'Ebligi agordojn de transpozicio, kiuj estos aplikitaj per la transpozicia butono sube. La transpozicio estos aplikita nur al la muzika notado, la kodado restas sen ŝanĝo, se vi ne klakas la elementon "Rekrei per Verovio" en la menuo "Manipuli".',
-  },
   transposeInterval: {
     text: 'Transpozi per intervalo',
     description:
@@ -993,8 +1044,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transpozi',
-    description:
-      'Apliku transpozicion kun supraj agordoj al la muzika notado, dum la MEI kodado restas sen ŝanĝo. Por ankaŭ transpozi la MEI kodadon per la nuna agordo, uzu "Rekrei per Verovio" en la menuo "Manipuli".',
+    description: 'Aplikas la transponon al la notacio; la kodigo restas neŝanĝita.',
   },
 
   // Renombri taktojn

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Cross-page slur in a later mdiv (speed-mode fixture)</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <!-- The cross-page slur lives in the SECOND mdiv. Speed mode has to
+           locate it while counting pages continuously across both mdivs;
+           otherwise it is anchored to the wrong page and Verovio drops it
+           from the page it actually starts on. -->
+      <mdiv xml:id="mdivFirst">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionFirst">
+            <measure xml:id="mS1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mS1" dur="1" oct="4" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMS1"/>
+            <measure xml:id="mS2" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mS2" dur="1" oct="4" pname="d"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+      <mdiv xml:id="mdivSecond">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionSecond">
+            <measure xml:id="mS3" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mS3" dur="1" oct="5" pname="e"/>
+                </layer>
+              </staff>
+              <slur xml:id="slurAcrossPages" startid="#note-mS3" endid="#note-mS4" curvedir="above"/>
+            </measure>
+            <pb xml:id="pbAfterMS3"/>
+            <measure xml:id="mS4" n="2">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mS4" dur="1" oct="5" pname="f"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

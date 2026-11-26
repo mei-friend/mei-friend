@@ -103,6 +103,36 @@ function sizeToolbox(toolbox, visible, encodingWidth, encodingHeight) {
   }
 } // sizeToolbox()
 
+// size of the encoding panel at the last call of sizeEncodingPanel(), so that the
+// panel can be laid out again once the toolbox orientation CSS has arrived
+let lastEncodingWidth = 0;
+let lastEncodingHeight = 0;
+
+/**
+ * Points the toolbox orientation stylesheet at the current orientation. The stylesheet
+ * is fetched asynchronously, so until it has been applied, #encoding still lays its
+ * children out along the old axis: switching the toolbox from top/bottom to left/right
+ * (or back) leaves the editor squeezed to almost nothing by the toolbox, and CodeMirror
+ * measures that and keeps a viewport far too short for the panel it ends up in (only
+ * part of the encoding is drawn, the rest of the panel stays white). The panel is
+ * therefore sized again as soon as the new orientation is in effect.
+ * @param {CodeMirror} cm
+ */
+function setMeiToolboxOrientationCSS(cm) {
+  const toolboxCss = document.getElementById('meiToolboxOrientationCSS');
+  if (!toolboxCss) return;
+  const href = root + 'css/toolbox-' + meiToolboxOrientation + '.css';
+  if (toolboxCss.getAttribute('href') === href) return; // already in effect
+  toolboxCss.addEventListener(
+    'load',
+    () => {
+      if (lastEncodingWidth > 0) sizeEncodingPanel(cm, lastEncodingWidth, lastEncodingHeight);
+    },
+    { once: true }
+  );
+  toolboxCss.setAttribute('href', href);
+} // setMeiToolboxOrientationCSS()
+
 /**
  * Sizes the editor and, if shown, the MEI toolbox within the space available to the
  * encoding panel; the editor loses the toolbox extent (and its resizer) on the side
@@ -112,6 +142,8 @@ function sizeToolbox(toolbox, visible, encodingWidth, encodingHeight) {
  * @param {number} encodingHeight px available to the encoding panel
  */
 function sizeEncodingPanel(cm, encodingWidth, encodingHeight) {
+  lastEncodingWidth = encodingWidth; // remembered for setMeiToolboxOrientationCSS()
+  lastEncodingHeight = encodingHeight;
   const toolbox = document.getElementById('meiToolbox');
   const visible = !!toolbox && meiToolboxVisible();
   sizeToolbox(toolbox, visible, encodingWidth, encodingHeight); // clamps the toolbox extent first
@@ -187,8 +219,7 @@ export function setOrientation(
   // change CSS for MEI toolbox orientation
   const toolboxSelect = document.getElementById('selectMeiToolboxOrientation');
   if (toolboxSelect) meiToolboxOrientation = toolboxSelect.value;
-  const toolboxCss = document.getElementById('meiToolboxOrientationCSS');
-  if (toolboxCss) toolboxCss.setAttribute('href', root + 'css/toolbox-' + meiToolboxOrientation + '.css');
+  setMeiToolboxOrientationCSS(cm);
 
   const friendSz = document.getElementById('friendContainer');
   const notationDiv = document.getElementById('notation');

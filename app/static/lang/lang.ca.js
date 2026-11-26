@@ -201,9 +201,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'No s\'han trobat atributs que es puguin convertir en elements.' },
   convertAttributesToElementsProblems: { text: '{count} atributs no s\'han pogut convertir.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Comprova' },
-  meiToolboxTabConvert: { text: 'Converteix' },
-  meiToolboxTabRenumber: { text: 'Renumera' },
+  meiToolboxTabCheck: {
+    text: 'Comprova',
+    description:
+      'Comprova a la codificació les alteracions sonores (@accid.ges), les durades dels compassos (@metcon) i els enllaços entre elements (@startid, @endid, @plist, …). Llista cada problema trobat, amb una correcció quan és possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Converteix',
+    description:
+      'Converteix els atributs seleccionats en elements equivalents (com @accid en <accid>), o els elements de nou en atributs quan no es perd cap informació.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumera',
+    description:
+      'Renumera els compassos (@n) de manera consecutiva, amb sufixos configurables per als compassos que en continuen un d’anterior i per als compassos de les caselles de repetició.',
+  },
   meiToolboxCheckButton: { text: 'Comprova' },
   meiToolboxTestButton: { text: 'Prova', description: 'Llista què es canviaria, sense canviar la codificació' },
   meiToolboxRenumberButton: { text: 'Renumera' },
@@ -221,9 +233,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Durades dels compassos (@metcon)' },
   meiToolboxCheckLinked: { text: 'Elements enllaçats (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Tanca la caixa d’eines MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsímil' },
-  meiToolboxTabReformat: { text: 'Reformata' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Afegeix xml:ids als elements que no en tenen, en dona un de nou a cada element o els elimina, excepte els que són referenciats. Les referències dins la codificació s’actualitzen.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsímil',
+    description:
+      'Enllaça la codificació amb imatges de pàgina: importa un facsímil d’un altre fitxer o afegeix les surfaces que falten, una per salt de pàgina.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformata',
+    description:
+      'Torna a escriure tota la codificació, mitjançant Verovio o l’analitzador XML, i estableix l’ordre d’atributs que mei-friend fa servir en reescriure elements.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transposa',
+    description:
+      'Transposa la notació a una altra tonalitat o per un interval. Només es transposa la notació; la codificació queda tal com és.',
+  },
   meiToolboxIdsAdd: { text: 'Afegeix xml:id (als elements que no en tenen)' },
   meiToolboxIdsChange: {
     text: 'Canvia els xml:id (un de nou per a cada element)',
@@ -276,6 +305,28 @@ export const lang = {
     text: 'Patró d’ordre',
     description: 'Noms d’atribut separats per espais o comes, en l’ordre que vulgueu, p. ex. «xml:id n label *». Un nom acabat en * concorda amb tots els atributs amb aquest prefix (clef.*). Un sol * representa tots els atributs no anomenats, per ordre alfabètic; sense ell conserven el seu ordre al final. Les declaracions d’espais de noms sempre van primer.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Només transposa la notació; la codificació queda tal com és, llevat de la indicació de sota. Per transposar també la codificació, transposeu aquí i després reescriviu-la amb «Amb Verovio» a la pestanya Reformata.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restableix',
+    description: 'Elimina la transposició, de manera que la notació es torna a mostrar a l’altura codificada.',
+  },
+  meiToolboxTransposeDone: { text: 'La notació s’ha transposat ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'S’ha eliminat la transposició.' },
+  meiToolboxTransposeNone: { text: 'Res a fer: no hi ha cap transposició aplicada.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Afegeix una indicació de transposició',
+    description:
+      'Escriu al pgHead de la partitura una línia que indica la tonalitat a què es transposa i la tonalitat de la codificació. S’elimina quan es restableix la transposició.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposat a {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposat: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'La indicació de transposició s’ha escrit al pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'La indicació de transposició s’ha eliminat del pgHead.' },
+
   codeCheckerFixShown: { text: 'Corregeix els {n} mostrats' },
   codeCheckerIgnoreShown: { text: 'Ignora els {n} mostrats' },
   convertGroupAccid: { text: 'Alteracions escrites (@accid)' },
@@ -299,7 +350,16 @@ export const lang = {
   convertScopeAll: { text: 'Abast: tota la codificació (seleccioneu text a l\'editor per restringir la conversió)' },
   convertScopeSelection: { text: 'Abast: selecció, línies {from}–{to}' },
   convertSelectionSuffix: { text: 'selecció' },
-  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresStartNumber: {
+    text: 'Número inicial',
+    description:
+      'Número del primer compàs complet; tots els compassos següents es numeren a partir d’aquest. Un primer compàs incomplet (@metcon="false", p. ex. una anacrusi) rep un número menys, de manera que amb el número inicial 1 rep el 0 (tret que ‘Continuar a través de compassos incomplets’ estigui activat).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Reinicia a cada mdiv',
+    description:
+      'Torna a numerar des del número inicial a cada mdiv (moviment), en lloc de continuar comptant al llarg de tota la codificació.',
+  },
   renumberMeasuresUnchanged: { text: 'sense canvis' },
   renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
   renumberMeasuresSummaryTest: { text: '{total} compassos, {changed} es renumerarien.' },
@@ -947,15 +1007,6 @@ export const lang = {
   },
 
   // Transposition / Transposició
-  titleTransposition: {
-    text: 'Transposició',
-    description: 'Transposa la informació de la partitura',
-  },
-  enableTransposition: {
-    text: 'Activa la transposició',
-    description:
-      "Activa la configuració de transposició, per aplicar-la a través del botó de transposició que hi ha a sota. La transposició només s'aplica a la notació, l'encodatge es manté sense canvis, llevat que facis clic a l'element 'Torna a renderitzar via Verovio' al menú desplegable 'Manipular'.",
-  },
   transposeInterval: {
     text: 'Transposa per interval',
     description:
@@ -1017,8 +1068,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transposar',
-    description:
-      "Aplicar transposició amb les opcions anteriors a la notació, mentre que l'encodatge MEI roman inalterat. Per transposar també l'encodatge MEI amb les opcions actuals, utilitzeu 'Tornar a renderitzar via Verovio' al menú desplegable 'Manipular'.",
+    description: 'Aplica la transposició a la notació; la codificació queda sense canvis.',
   },
 
   // Renumber measures / Renumber measures

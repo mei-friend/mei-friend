@@ -195,9 +195,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Geen attributen gevonden die naar elementen kunnen worden omgezet.' },
   convertAttributesToElementsProblems: { text: '{count} attributen konden niet worden omgezet.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Controleren' },
-  meiToolboxTabConvert: { text: 'Omzetten' },
-  meiToolboxTabRenumber: { text: 'Hernummeren' },
+  meiToolboxTabCheck: {
+    text: 'Controleren',
+    description:
+      'Controleert in de codering klinkende voortekens (@accid.ges), maatduren (@metcon) en koppelingen tussen elementen (@startid, @endid, @plist, …). Toont elk gevonden probleem, waar mogelijk met een correctie.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Omzetten',
+    description:
+      'Zet geselecteerde attributen om in gelijkwaardige elementen (zoals @accid in <accid>), of elementen terug in attributen wanneer er geen informatie verloren gaat.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Hernummeren',
+    description:
+      'Hernummert de maten (@n) doorlopend, met instelbare achtervoegsels voor maten die een vorige maat voortzetten en voor maten in herhalingsslotten (volta’s).',
+  },
   meiToolboxCheckButton: { text: 'Controleren' },
   meiToolboxTestButton: { text: 'Testen', description: 'Weergeven wat er zou veranderen, zonder de codering te wijzigen' },
   meiToolboxRenumberButton: { text: 'Hernummeren' },
@@ -215,9 +227,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Maatduren (@metcon)' },
   meiToolboxCheckLinked: { text: 'Gekoppelde elementen (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'MEI-gereedschapskist sluiten' },
-  meiToolboxTabIds: { text: 'Id\'s' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Herformatteren' },
+  meiToolboxTabIds: {
+    text: 'Id\'s',
+    description:
+      'Voegt xml:id’s toe aan elementen zonder, geeft elk element een nieuwe of verwijdert ze, behalve die waarnaar verwezen wordt. Verwijzingen binnen de codering worden bijgewerkt.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Koppelt de codering aan paginabeelden: neemt een facsimile over uit een ander bestand of voegt de ontbrekende surfaces toe, één per paginaovergang.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Herformatteren',
+    description:
+      'Schrijft de hele codering opnieuw, via Verovio of de XML-parser, en legt de attribuutvolgorde vast die mei-friend gebruikt bij het terugschrijven van elementen.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transponeren',
+    description:
+      'Transponeert de notatie naar een andere toonsoort of met een interval. Alleen de notatie wordt getransponeerd; de codering blijft zoals ze is.',
+  },
   meiToolboxIdsAdd: { text: 'xml:id\'s toevoegen (aan elementen zonder)' },
   meiToolboxIdsChange: {
     text: 'xml:id\'s wijzigen (een nieuwe voor elk element)',
@@ -270,6 +299,28 @@ export const lang = {
     text: 'Volgordepatroon',
     description: 'Attribuutnamen gescheiden door spaties of komma’s, in de gewenste volgorde, bijv. “xml:id n label *”. Een naam die op * eindigt, komt overeen met alle attributen met dat voorvoegsel (clef.*). Eén enkele * staat voor alle niet-genoemde attributen, alfabetisch; zonder * behouden ze hun volgorde aan het eind. Namespace-declaraties komen altijd eerst.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponeert alleen de notatie; de codering blijft zoals ze is, afgezien van de aanduiding hieronder. Om ook de codering te transponeren, transponeer hier en schrijf ze daarna opnieuw met “Via Verovio” op het tabblad Herformatteren.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Herstellen',
+    description: 'Verwijdert de transpositie, zodat de notatie weer op de gecodeerde toonhoogte verschijnt.',
+  },
+  meiToolboxTransposeDone: { text: 'De notatie is getransponeerd ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'De transpositie is verwijderd.' },
+  meiToolboxTransposeNone: { text: 'Niets te doen: er is geen transpositie toegepast.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Transpositieaanduiding toevoegen',
+    description:
+      'Schrijft in de pgHead van de partituur een regel die de toonsoort van de transpositie en die van de codering noemt. Ze wordt verwijderd wanneer de transpositie wordt hersteld.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Getransponeerd naar {new}\nOrigineel: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Getransponeerd: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'De transpositieaanduiding is in de pgHead geschreven.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'De transpositieaanduiding is uit de pgHead verwijderd.' },
+
   codeCheckerFixShown: { text: '{n} getoonde herstellen' },
   codeCheckerIgnoreShown: { text: '{n} getoonde negeren' },
   convertGroupAccid: { text: 'Genoteerde voortekens (@accid)' },
@@ -293,7 +344,16 @@ export const lang = {
   convertScopeAll: { text: 'Bereik: volledige codering (selecteer tekst in de editor om de omzetting te beperken)' },
   convertScopeSelection: { text: 'Bereik: selectie, regels {from}–{to}' },
   convertSelectionSuffix: { text: 'selectie' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummer van de eerste volledige maat; alle volgende maten worden vanaf dit nummer genummerd. Een onvolledige eerste maat (@metcon="false", bijv. een opmaat) krijgt één nummer minder, dus bij startnummer 1 wordt dat 0 (tenzij ‘Doorgaan bij onvolledige maten’ aan staat).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Bij elke mdiv opnieuw beginnen',
+    description:
+      'Begint de nummering bij elke mdiv (deel) opnieuw vanaf het startnummer, in plaats van door te tellen over de hele codering.',
+  },
   renumberMeasuresUnchanged: { text: 'ongewijzigd' },
   renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
   renumberMeasuresSummaryTest: { text: '{total} maten, {changed} zouden worden hernummerd.' },
@@ -835,15 +895,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transponeren',
-    description: 'Transponeer partituurinformatie',
-  },
-  enableTransposition: {
-    text: 'Transponeren inschakelen',
-    description:
-      'Schakel transpositie-instellingen in, om toe te passen via de transpose-knop hieronder. De transpositie wordt alleen op de notatie toegepast, de codering blijft ongewijzigd, tenzij u op het item "Opnieuw renderen via Verovio" klikt in het "Manipuleren" dropdownmenu.',
-  },
   transposeInterval: {
     text: 'Transponeren op interval',
     description:
@@ -905,8 +956,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponeren',
-    description:
-      'Pas transponeren toe met bovenstaande instellingen op de notatie, terwijl de MEI-codering ongewijzigd blijft. Om ook de MEI-codering met de huidige instellingen te transponeren, gebruikt u "Opnieuw renderen via Verovio" in het "Manipuleren" dropdownmenu.',
+    description: 'Past de transpositie toe op de notatie; de codering blijft ongewijzigd.',
   },
 
   // Renumber measures

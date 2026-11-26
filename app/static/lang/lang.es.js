@@ -198,9 +198,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'No se encontraron atributos que puedan convertirse en elementos.' },
   convertAttributesToElementsProblems: { text: 'No se pudieron convertir {count} atributos.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Comprobar' },
-  meiToolboxTabConvert: { text: 'Convertir' },
-  meiToolboxTabRenumber: { text: 'Renumerar' },
+  meiToolboxTabCheck: {
+    text: 'Comprobar',
+    description:
+      'Comprueba en la codificación las alteraciones sonoras (@accid.ges), las duraciones de los compases (@metcon) y los enlaces entre elementos (@startid, @endid, @plist, …). Enumera cada problema encontrado, con una corrección cuando es posible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convertir',
+    description:
+      'Convierte los atributos seleccionados en elementos equivalentes (como @accid en <accid>), o los elementos de nuevo en atributos cuando no se pierde información.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumerar',
+    description:
+      'Renumera los compases (@n) de forma consecutiva, con sufijos configurables para los compases que continúan uno anterior y para los compases en finales de repetición.',
+  },
   meiToolboxCheckButton: { text: 'Comprobar' },
   meiToolboxTestButton: { text: 'Probar', description: 'Listar lo que se cambiaría, sin cambiar la codificación' },
   meiToolboxRenumberButton: { text: 'Renumerar' },
@@ -218,9 +230,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Duraciones de compases (@metcon)' },
   meiToolboxCheckLinked: { text: 'Elementos enlazados (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Cerrar la caja de herramientas MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsímil' },
-  meiToolboxTabReformat: { text: 'Reformatear' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Añade xml:ids a los elementos que no tienen, asigna uno nuevo a cada elemento o los elimina, salvo los que están referenciados. Las referencias dentro de la codificación se actualizan.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsímil',
+    description:
+      'Vincula la codificación con imágenes de página: importa un facsímil de otro archivo o añade las surfaces que faltan, una por salto de página.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformatear',
+    description:
+      'Reescribe toda la codificación, mediante Verovio o el analizador XML, y establece el orden de atributos que mei-friend usa al reescribir elementos.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transponer',
+    description:
+      'Transpone la notación a otra tonalidad o por un intervalo. Solo se transpone la notación; la codificación queda tal como está.',
+  },
   meiToolboxIdsAdd: { text: 'Añadir xml:id (a los elementos que no lo tienen)' },
   meiToolboxIdsChange: {
     text: 'Cambiar los xml:id (uno nuevo para cada elemento)',
@@ -273,6 +302,28 @@ export const lang = {
     text: 'Patrón de orden',
     description: 'Nombres de atributo separados por espacios o comas, en el orden deseado, p. ej. «xml:id n label *». Un nombre terminado en * coincide con todos los atributos con ese prefijo (clef.*). Un solo * representa todos los atributos no nombrados, en orden alfabético; sin él conservan su orden al final. Las declaraciones de espacios de nombres van siempre primero.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Solo transpone la notación; la codificación queda tal como está, salvo la indicación de abajo. Para transponer también la codificación, transponga aquí y luego reescríbala con «Con Verovio» en la pestaña Reformatear.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Restablecer',
+    description: 'Elimina la transposición, de modo que la notación vuelve a mostrarse en la altura codificada.',
+  },
+  meiToolboxTransposeDone: { text: 'La notación está transpuesta ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'Se ha eliminado la transposición.' },
+  meiToolboxTransposeNone: { text: 'Nada que hacer: no hay ninguna transposición aplicada.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Añadir indicación de transposición',
+    description:
+      'Escribe en el pgHead de la partitura una línea que indica la tonalidad a la que se transpone y la tonalidad de la codificación. Se elimina al restablecer la transposición.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transpuesto a {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transpuesto: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'La indicación de transposición se escribió en el pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'La indicación de transposición se eliminó del pgHead.' },
+
   codeCheckerFixShown: { text: 'Corregir {n} mostrados' },
   codeCheckerIgnoreShown: { text: 'Ignorar {n} mostrados' },
   convertGroupAccid: { text: 'Alteraciones escritas (@accid)' },
@@ -296,7 +347,16 @@ export const lang = {
   convertScopeAll: { text: 'Alcance: toda la codificación (seleccione texto en el editor para restringir la conversión)' },
   convertScopeSelection: { text: 'Alcance: selección, líneas {from}–{to}' },
   convertSelectionSuffix: { text: 'selección' },
-  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresStartNumber: {
+    text: 'Número inicial',
+    description:
+      'Número del primer compás completo; todos los compases siguientes se numeran a partir de él. Un primer compás incompleto (@metcon="false", p. ej. una anacrusa) recibe un número menos, así que con el número inicial 1 recibe el 0 (salvo que ‘Continuar en compases incompletas’ esté activado).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Reiniciar en cada mdiv',
+    description:
+      'Vuelve a numerar desde el número inicial en cada mdiv (movimiento), en lugar de seguir contando a lo largo de toda la codificación.',
+  },
   renumberMeasuresUnchanged: { text: 'sin cambios' },
   renumberMeasuresSummary: { text: '{total} compases, {changed} renumerados.' },
   renumberMeasuresSummaryTest: { text: '{total} compases, {changed} se renumerarían.' },
@@ -941,17 +1001,6 @@ export const lang = {
   },
 
   // Transposition / Transposición
-  titleTransposition: {
-    text: 'Transposición',
-    description: 'Transponer la notación',
-  },
-  enableTransposition: {
-    text: 'Activar transposición',
-    description:
-      'Activar la transposición que se aplicará mediante el botón "Transponer" debajo. ' +
-      'La transposición solo se aplicará a la notación, la codificación permanecerá sin cambios, ' +
-      'a menos que haga clic en la opción "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
-  },
   transposeInterval: {
     text: 'Por intervalos',
     description:
@@ -1014,10 +1063,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponer',
-    description:
-      'Aplicar la transposición con las configuraciones anteriores a la notación, ' +
-      'la codificación MEI permanecerá sin cambios. Para transponer también la codificación MEI ' +
-      'con las configuraciones actuales, utilice "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
+    description: 'Aplica la transposición a la notación; la codificación queda sin cambios.',
   },
 
   // Renumber measures / Renumerar compases

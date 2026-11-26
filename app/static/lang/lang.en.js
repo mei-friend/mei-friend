@@ -217,12 +217,41 @@ export const lang = {
   convertAttributesToElementsProblems: { text: '{count} attributes could not be converted.' },
   // MEI TOOLBOX
   meiToolboxClose: { text: 'Close MEI toolbox' },
-  meiToolboxTabCheck: { text: 'Check' },
-  meiToolboxTabConvert: { text: 'Convert' },
-  meiToolboxTabRenumber: { text: 'Renumber' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Reformat' },
+  meiToolboxTabCheck: {
+    text: 'Check',
+    description:
+      'Checks the encoding for gestural accidentals (@accid.ges), measure durations (@metcon) and links between elements (@startid, @endid, @plist, …). Lists each issue found, with a fix where one is possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convert',
+    description:
+      'Converts selected attributes into equivalent elements (such as @accid into <accid>), or elements back into attributes where no information is lost.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumber',
+    description:
+      'Renumbers the measures (@n) consecutively, with configurable suffixes for measures that continue a previous one and for measures in endings.',
+  },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Adds xml:ids to elements that have none, gives every element a new one, or removes them, keeping those that are pointed to. References within the encoding are updated.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Links the encoding to page images: ingests a facsimile from another file, or adds the missing surfaces, one per page break.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformat',
+    description:
+      'Writes the whole encoding anew, through Verovio or the XML parser, and sets the attribute order mei-friend uses when it writes elements back.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transpose',
+    description:
+      'Transposes the notation to another key or by an interval. Only the notation is transposed; the encoding stays as it is.',
+  },
   meiToolboxCheckButton: { text: 'Check' },
   meiToolboxTestButton: { text: 'Test', description: 'List what would be changed, without changing the encoding' },
   meiToolboxRenumberButton: { text: 'Renumber' },
@@ -301,6 +330,28 @@ export const lang = {
     description:
       'Attribute names separated by spaces or commas, in the order you want them, e.g. “xml:id n label *”. A name ending in * matches all attributes with that prefix (clef.*). A single * stands for all attributes not named, in alphabetical order; without it they keep their order at the end. Namespace declarations always come first.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transposes the notation only; the encoding stays as it is, apart from the directive below. To transpose the encoding too, transpose here and then write it anew with “Via Verovio” in the Reformat tab.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Reset',
+    description: 'Removes the transposition, so that the notation is shown at its encoded pitch again.',
+  },
+  meiToolboxTransposeDone: { text: 'The notation is transposed ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'The transposition has been removed.' },
+  meiToolboxTransposeNone: { text: 'Nothing to do: no transposition is applied.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Add transposition directive',
+    description:
+      'Writes a line into the pgHead of the score naming the key it is transposed to and the key of the encoding. It is removed again when the transposition is reset.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposed to {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposed: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'The transposition directive was written into the pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'The transposition directive was removed from the pgHead.' },
+
   codeCheckerFixShown: { text: 'Fix {n} shown' },
   codeCheckerIgnoreShown: { text: 'Ignore {n} shown' },
   convertGroupAccid: { text: 'Written accidentals (@accid)' },
@@ -324,7 +375,16 @@ export const lang = {
   convertScopeAll: { text: 'Scope: entire encoding (select text in the editor to restrict the conversion)' },
   convertScopeSelection: { text: 'Scope: selection, lines {from}–{to}' },
   convertSelectionSuffix: { text: 'selection' },
-  renumberMeasuresStartNumber: { text: 'Start number' },
+  renumberMeasuresStartNumber: {
+    text: 'Start number',
+    description:
+      'Number given to the first complete measure; all following measures are numbered from it. An incomplete first measure (@metcon="false", e.g. an upbeat) gets one less, so a start number of 1 numbers it 0 (unless ‘Continue across incomplete measures’ is on).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Restart at each mdiv',
+    description:
+      'Start numbering anew from the start number at each mdiv (movement), instead of counting on across the whole encoding.',
+  },
   renumberMeasuresUnchanged: { text: 'unchanged' },
   renumberMeasuresSummary: { text: '{total} measures, {changed} renumbered.' },
   renumberMeasuresSummaryTest: { text: '{total} measures, {changed} would be renumbered.' },
@@ -1000,15 +1060,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transpose',
-    description: 'Transpose score information',
-  },
-  enableTransposition: {
-    text: 'Enable transposition',
-    description:
-      'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
-  },
   transposeInterval: {
     text: 'Transpose by interval',
     description:
@@ -1070,8 +1121,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transpose',
-    description:
-      'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+    description: 'Applies the transposition to the notation; the encoding stays unchanged.',
   },
 
   // Renumber measures

@@ -202,9 +202,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Nie znaleziono atrybutów, które można przekonwertować na elementy.' },
   convertAttributesToElementsProblems: { text: 'Nie udało się przekonwertować {count} atrybutów.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Sprawdź' },
-  meiToolboxTabConvert: { text: 'Konwertuj' },
-  meiToolboxTabRenumber: { text: 'Przenumeruj' },
+  meiToolboxTabCheck: {
+    text: 'Sprawdź',
+    description:
+      'Sprawdza w kodowaniu znaki chromatyczne brzmieniowe (@accid.ges), długości taktów (@metcon) oraz powiązania między elementami (@startid, @endid, @plist, …). Wyświetla każdy znaleziony problem, w miarę możliwości z poprawką.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konwertuj',
+    description:
+      'Zamienia wybrane atrybuty na równoważne elementy (np. @accid na <accid>) lub elementy z powrotem na atrybuty, jeśli nie powoduje to utraty informacji.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Przenumeruj',
+    description:
+      'Numeruje takty (@n) kolejno od nowa, z konfigurowalnymi przyrostkami dla taktów kontynuujących poprzedni takt oraz dla taktów w woltach.',
+  },
   meiToolboxCheckButton: { text: 'Sprawdź' },
   meiToolboxTestButton: { text: 'Testuj', description: 'Wyświetl, co zostałoby zmienione, bez zmiany kodowania' },
   meiToolboxRenumberButton: { text: 'Przenumeruj' },
@@ -222,9 +234,26 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Długości taktów (@metcon)' },
   meiToolboxCheckLinked: { text: 'Powiązane elementy (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Zamknij przybornik MEI' },
-  meiToolboxTabIds: { text: 'Id' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Formatuj' },
+  meiToolboxTabIds: {
+    text: 'Id',
+    description:
+      'Dodaje xml:id elementom, które go nie mają, nadaje każdemu elementowi nowy lub je usuwa, z wyjątkiem tych, do których istnieją odwołania. Odwołania w kodowaniu są aktualizowane.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Łączy kodowanie z obrazami stron: importuje faksymile z innego pliku lub dodaje brakujące surfaces, po jednym na każdy podział strony.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Formatuj',
+    description:
+      'Zapisuje całe kodowanie od nowa, za pomocą Verovio lub parsera XML, i ustala kolejność atrybutów, której mei-friend używa przy zapisywaniu elementów.',
+  },
+  meiToolboxTabTranspose: {
+    text: 'Transponuj',
+    description:
+      'Transponuje notację do innej tonacji lub o interwał. Transponowana jest tylko notacja; kodowanie pozostaje bez zmian.',
+  },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (do elementów bez niego)' },
   meiToolboxIdsChange: {
     text: 'Zmień xml:id (nowy dla każdego elementu)',
@@ -277,6 +306,28 @@ export const lang = {
     text: 'Wzorzec kolejności',
     description: 'Nazwy atrybutów rozdzielone spacjami lub przecinkami, w żądanej kolejności, np. „xml:id n label *”. Nazwa zakończona znakiem * pasuje do wszystkich atrybutów z tym przedrostkiem (clef.*). Pojedyncza * oznacza wszystkie niewymienione atrybuty w kolejności alfabetycznej; bez niej zachowują swoją kolejność na końcu. Deklaracje przestrzeni nazw są zawsze pierwsze.',
   },
+
+  // MEI TOOLBOX: Transpose tab
+  meiToolboxTransposeInfo: {
+    text: 'Transponuje tylko notację; kodowanie pozostaje bez zmian, poza adnotacją poniżej. Aby transponować także kodowanie, transponuj tutaj, a następnie zapisz je na nowo przez „Przez Verovio” w zakładce Formatuj.',
+  },
+  meiToolboxTransposeReset: {
+    text: 'Resetuj',
+    description: 'Usuwa transpozycję, tak że notacja znów pojawia się w zakodowanej wysokości.',
+  },
+  meiToolboxTransposeDone: { text: 'Notacja została transponowana ({what}).' },
+  meiToolboxTransposeRemoved: { text: 'Transpozycja została usunięta.' },
+  meiToolboxTransposeNone: { text: 'Nie ma nic do zrobienia: żadna transpozycja nie jest zastosowana.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Dodaj adnotację o transpozycji',
+    description:
+      'Wpisuje do pgHead partytury wiersz podający tonację transpozycji oraz tonację kodowania. Przy resetowaniu transpozycji zostaje usunięty.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponowano do {new}\nOryginał: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponowano: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Adnotacja o transpozycji została wpisana do pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Adnotacja o transpozycji została usunięta z pgHead.' },
+
   codeCheckerFixShown: { text: 'Popraw {n} wyświetlonych' },
   codeCheckerIgnoreShown: { text: 'Zignoruj {n} wyświetlonych' },
   convertGroupAccid: { text: 'Zapisane znaki chromatyczne (@accid)' },
@@ -300,7 +351,16 @@ export const lang = {
   convertScopeAll: { text: 'Zakres: całe kodowanie (zaznacz tekst w edytorze, aby ograniczyć konwersję)' },
   convertScopeSelection: { text: 'Zakres: zaznaczenie, wiersze {from}–{to}' },
   convertSelectionSuffix: { text: 'zaznaczenie' },
-  renumberMeasuresStartNumber: { text: 'Numer początkowy' },
+  renumberMeasuresStartNumber: {
+    text: 'Numer początkowy',
+    description:
+      'Numer pierwszego pełnego taktu; wszystkie kolejne takty są numerowane od niego. Niepełny pierwszy takt (@metcon="false", np. przedtakt) otrzymuje numer o jeden mniejszy, więc przy numerze początkowym 1 otrzymuje 0 (chyba że włączono ‘Kontynuuj przez niedokończone taktowania’).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Zacznij od nowa przy każdym mdiv',
+    description:
+      'Rozpoczyna numerację od numeru początkowego przy każdym mdiv (części), zamiast liczyć dalej przez całe kodowanie.',
+  },
   renumberMeasuresUnchanged: { text: 'bez zmian' },
   renumberMeasuresSummary: { text: '{total} taktów, {changed} przenumerowano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktów, {changed} zostałoby przenumerowanych.' },
@@ -941,16 +1001,6 @@ export const lang = {
   },
 
   // Transposition
-  titleTransposition: {
-    text: 'Transpozycja',
-    description: 'Ustawienia transpozycji',
-  },
-  enableTransposition: {
-    text: 'Włącz transpozycję',
-    description:
-      'Włącz ustawienia transpozycji, aby je zastosować za pomocą przycisku transpozycji poniżej. Transpozycja będzie stosowana tylko do notacji, kodowanie pozostaje niezmienione, chyba że klikniesz element "Rerender via Verovio" w menu rozwijanym "Manipulate".',
-  },
-  // Transposition
   transposeInterval: {
     text: 'Transponuj o interwał',
     description:
@@ -1012,8 +1062,7 @@ export const lang = {
   },
   transposeButton: {
     text: 'Transponuj',
-    description:
-      'Zastosuj transpozycję z powyższymi ustawieniami do notacji, zachowując kodowanie MEI bez zmian. Aby również dokonać transpozycji kodowania MEI z bieżącymi ustawieniami, użyj "Rerender via Verovio" w menu rozwijanym "Manipulate".',
+    description: 'Stosuje transpozycję do notacji; kodowanie pozostaje niezmienione.',
   },
 
   // Renumber measures
