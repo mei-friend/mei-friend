@@ -194,9 +194,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Nisu pronađeni atributi koji se mogu pretvoriti u elemente.' },
   convertAttributesToElementsProblems: { text: '{count} atributa nije moguće pretvoriti.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Provjera' },
-  meiToolboxTabConvert: { text: 'Pretvaranje' },
-  meiToolboxTabRenumber: { text: 'Renumeracija' },
+  meiToolboxTabCheck: {
+    text: 'Provjera',
+    description:
+      'Provjerava u kodiranju gestualne predznake (@accid.ges), trajanja taktova (@metcon) i veze između elemenata (@startid, @endid, @plist, …). Navodi svaki pronađeni problem, s ispravkom gdje je to moguće.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Pretvaranje',
+    description:
+      'Pretvara odabrane atribute u ekvivalentne elemente (npr. @accid u <accid>) ili elemente nazad u atribute, ako se pritom ne gubi nikakva informacija.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumeracija',
+    description:
+      'Uzastopno renumeriše taktove (@n), s podesivim sufiksima za taktove koji nastavljaju prethodni i za taktove u završecima (volte).',
+  },
   meiToolboxCheckButton: { text: 'Provjeri' },
   meiToolboxTestButton: { text: 'Testiraj', description: 'Prikaži šta bi bilo promijenjeno, bez mijenjanja kodiranja' },
   meiToolboxRenumberButton: { text: 'Renumeriraj' },
@@ -214,9 +226,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Trajanja taktova (@metcon)' },
   meiToolboxCheckLinked: { text: 'Povezani elementi (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Zatvori MEI alatnicu' },
-  meiToolboxTabIds: { text: 'Id-ovi' },
-  meiToolboxTabFacsimile: { text: 'Faksimil' },
-  meiToolboxTabReformat: { text: 'Preoblikuj' },
+  meiToolboxTabIds: {
+    text: 'Id-ovi',
+    description:
+      'Dodaje xml:id elementima koji ga nemaju, daje svakom elementu novi ili ih uklanja, osim onih na koje se upućuje. Reference unutar kodiranja se ažuriraju.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimil',
+    description:
+      'Povezuje kodiranje sa slikama stranica: preuzima faksimil iz druge datoteke ili dodaje nedostajuće surfaces, po jedan za svaki prijelom stranice.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Preoblikuj',
+    description:
+      'Ispisuje cijelo kodiranje iznova, putem Verovija ili XML parsera, i određuje redoslijed atributa koji mei-friend koristi pri ponovnom upisivanju elemenata.',
+  },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (elementima bez njega)' },
   meiToolboxIdsChange: {
     text: 'Promijeni xml:id (novi za svaki element)',
@@ -292,7 +316,16 @@ export const lang = {
   convertScopeAll: { text: 'Opseg: cijelo kodiranje (označite tekst u editoru da ograničite pretvaranje)' },
   convertScopeSelection: { text: 'Opseg: odabir, redovi {from}–{to}' },
   convertSelectionSuffix: { text: 'odabir' },
-  renumberMeasuresStartNumber: { text: 'Početni broj' },
+  renumberMeasuresStartNumber: {
+    text: 'Početni broj',
+    description:
+      'Broj prvog potpunog takta; svi sljedeći taktovi numerišu se od njega. Nepotpun prvi takt (@metcon="false", npr. predtakt) dobija broj manje, pa uz početni broj 1 dobija 0 (osim ako je uključeno ‘Nastavi preko nepotpunih taktova’).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Počni ispočetka kod svakog mdiv',
+    description:
+      'Numeracija počinje ispočetka od početnog broja kod svakog mdiv (stava), umjesto da se nastavlja kroz cijelo kodiranje.',
+  },
   renumberMeasuresUnchanged: { text: 'nepromijenjeno' },
   renumberMeasuresSummary: { text: '{total} taktova, {changed} renumerisano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktova, {changed} bi bilo renumerisano.' },

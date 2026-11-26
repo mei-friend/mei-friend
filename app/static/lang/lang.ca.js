@@ -201,9 +201,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'No s\'han trobat atributs que es puguin convertir en elements.' },
   convertAttributesToElementsProblems: { text: '{count} atributs no s\'han pogut convertir.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Comprova' },
-  meiToolboxTabConvert: { text: 'Converteix' },
-  meiToolboxTabRenumber: { text: 'Renumera' },
+  meiToolboxTabCheck: {
+    text: 'Comprova',
+    description:
+      'Comprova a la codificació les alteracions sonores (@accid.ges), les durades dels compassos (@metcon) i els enllaços entre elements (@startid, @endid, @plist, …). Llista cada problema trobat, amb una correcció quan és possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Converteix',
+    description:
+      'Converteix els atributs seleccionats en elements equivalents (com @accid en <accid>), o els elements de nou en atributs quan no es perd cap informació.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumera',
+    description:
+      'Renumera els compassos (@n) de manera consecutiva, amb sufixos configurables per als compassos que en continuen un d’anterior i per als compassos de les caselles de repetició.',
+  },
   meiToolboxCheckButton: { text: 'Comprova' },
   meiToolboxTestButton: { text: 'Prova', description: 'Llista què es canviaria, sense canviar la codificació' },
   meiToolboxRenumberButton: { text: 'Renumera' },
@@ -221,9 +233,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Durades dels compassos (@metcon)' },
   meiToolboxCheckLinked: { text: 'Elements enllaçats (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Tanca la caixa d’eines MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsímil' },
-  meiToolboxTabReformat: { text: 'Reformata' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Afegeix xml:ids als elements que no en tenen, en dona un de nou a cada element o els elimina, excepte els que són referenciats. Les referències dins la codificació s’actualitzen.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsímil',
+    description:
+      'Enllaça la codificació amb imatges de pàgina: importa un facsímil d’un altre fitxer o afegeix les surfaces que falten, una per salt de pàgina.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformata',
+    description:
+      'Torna a escriure tota la codificació, mitjançant Verovio o l’analitzador XML, i estableix l’ordre d’atributs que mei-friend fa servir en reescriure elements.',
+  },
   meiToolboxIdsAdd: { text: 'Afegeix xml:id (als elements que no en tenen)' },
   meiToolboxIdsChange: {
     text: 'Canvia els xml:id (un de nou per a cada element)',
@@ -299,7 +323,16 @@ export const lang = {
   convertScopeAll: { text: 'Abast: tota la codificació (seleccioneu text a l\'editor per restringir la conversió)' },
   convertScopeSelection: { text: 'Abast: selecció, línies {from}–{to}' },
   convertSelectionSuffix: { text: 'selecció' },
-  renumberMeasuresStartNumber: { text: 'Número inicial' },
+  renumberMeasuresStartNumber: {
+    text: 'Número inicial',
+    description:
+      'Número del primer compàs complet; tots els compassos següents es numeren a partir d’aquest. Un primer compàs incomplet (@metcon="false", p. ex. una anacrusi) rep un número menys, de manera que amb el número inicial 1 rep el 0 (tret que ‘Continuar a través de compassos incomplets’ estigui activat).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Reinicia a cada mdiv',
+    description:
+      'Torna a numerar des del número inicial a cada mdiv (moviment), en lloc de continuar comptant al llarg de tota la codificació.',
+  },
   renumberMeasuresUnchanged: { text: 'sense canvis' },
   renumberMeasuresSummary: { text: '{total} compassos, {changed} renumerats.' },
   renumberMeasuresSummaryTest: { text: '{total} compassos, {changed} es renumerarien.' },

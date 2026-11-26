@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.0/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Ending containing two breaks (speed-mode fixture)</title>
+      </titleStmt>
+      <pubStmt>
+        <availability>
+          <useRestrict>Created for mei-friend e2e tests; public domain.</useRestrict>
+        </availability>
+      </pubStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <!-- An <ending> split by two system breaks, so under 'line' breaks it
+           spans three pages: mT2 | mT3 | mT4 (+ mT5 after the ending). mT3
+           changes to the bass clef, which must reach mT4's page, but not mT3's
+           own start (it is encoded after the break opening that page). -->
+      <mdiv xml:id="mdivTwoBreaks">
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" keysig="0"/>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="sectionTwoBreaks">
+            <measure xml:id="mT1" n="1">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mT1" dur="1" oct="4" pname="c"/>
+                </layer>
+              </staff>
+            </measure>
+            <pb xml:id="pbAfterMT1"/>
+            <ending xml:id="endingTwoBreaks" n="1">
+              <measure xml:id="mT2" n="2">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mT2" dur="1" oct="4" pname="d"/>
+                  </layer>
+                </staff>
+              </measure>
+              <sb xml:id="sb1InEnding"/>
+              <measure xml:id="mT3" n="3">
+                <staff n="1">
+                  <layer n="1">
+                    <clef xml:id="clefF" shape="F" line="4"/>
+                    <note xml:id="note-mT3" dur="1" oct="4" pname="e"/>
+                  </layer>
+                </staff>
+              </measure>
+              <sb xml:id="sb2InEnding"/>
+              <measure xml:id="mT4" n="4">
+                <staff n="1">
+                  <layer n="1">
+                    <note xml:id="note-mT4" dur="1" oct="4" pname="f"/>
+                  </layer>
+                </staff>
+              </measure>
+            </ending>
+            <measure xml:id="mT5" n="5">
+              <staff n="1">
+                <layer n="1">
+                  <note xml:id="note-mT5" dur="1" oct="4" pname="g"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

@@ -202,9 +202,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Nie znaleziono atrybutów, które można przekonwertować na elementy.' },
   convertAttributesToElementsProblems: { text: 'Nie udało się przekonwertować {count} atrybutów.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Sprawdź' },
-  meiToolboxTabConvert: { text: 'Konwertuj' },
-  meiToolboxTabRenumber: { text: 'Przenumeruj' },
+  meiToolboxTabCheck: {
+    text: 'Sprawdź',
+    description:
+      'Sprawdza w kodowaniu znaki chromatyczne brzmieniowe (@accid.ges), długości taktów (@metcon) oraz powiązania między elementami (@startid, @endid, @plist, …). Wyświetla każdy znaleziony problem, w miarę możliwości z poprawką.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konwertuj',
+    description:
+      'Zamienia wybrane atrybuty na równoważne elementy (np. @accid na <accid>) lub elementy z powrotem na atrybuty, jeśli nie powoduje to utraty informacji.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Przenumeruj',
+    description:
+      'Numeruje takty (@n) kolejno od nowa, z konfigurowalnymi przyrostkami dla taktów kontynuujących poprzedni takt oraz dla taktów w woltach.',
+  },
   meiToolboxCheckButton: { text: 'Sprawdź' },
   meiToolboxTestButton: { text: 'Testuj', description: 'Wyświetl, co zostałoby zmienione, bez zmiany kodowania' },
   meiToolboxRenumberButton: { text: 'Przenumeruj' },
@@ -222,9 +234,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Długości taktów (@metcon)' },
   meiToolboxCheckLinked: { text: 'Powiązane elementy (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Zamknij przybornik MEI' },
-  meiToolboxTabIds: { text: 'Id' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Formatuj' },
+  meiToolboxTabIds: {
+    text: 'Id',
+    description:
+      'Dodaje xml:id elementom, które go nie mają, nadaje każdemu elementowi nowy lub je usuwa, z wyjątkiem tych, do których istnieją odwołania. Odwołania w kodowaniu są aktualizowane.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Łączy kodowanie z obrazami stron: importuje faksymile z innego pliku lub dodaje brakujące surfaces, po jednym na każdy podział strony.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Formatuj',
+    description:
+      'Zapisuje całe kodowanie od nowa, za pomocą Verovio lub parsera XML, i ustala kolejność atrybutów, której mei-friend używa przy zapisywaniu elementów.',
+  },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (do elementów bez niego)' },
   meiToolboxIdsChange: {
     text: 'Zmień xml:id (nowy dla każdego elementu)',
@@ -300,7 +324,16 @@ export const lang = {
   convertScopeAll: { text: 'Zakres: całe kodowanie (zaznacz tekst w edytorze, aby ograniczyć konwersję)' },
   convertScopeSelection: { text: 'Zakres: zaznaczenie, wiersze {from}–{to}' },
   convertSelectionSuffix: { text: 'zaznaczenie' },
-  renumberMeasuresStartNumber: { text: 'Numer początkowy' },
+  renumberMeasuresStartNumber: {
+    text: 'Numer początkowy',
+    description:
+      'Numer pierwszego pełnego taktu; wszystkie kolejne takty są numerowane od niego. Niepełny pierwszy takt (@metcon="false", np. przedtakt) otrzymuje numer o jeden mniejszy, więc przy numerze początkowym 1 otrzymuje 0 (chyba że włączono ‘Kontynuuj przez niedokończone taktowania’).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Zacznij od nowa przy każdym mdiv',
+    description:
+      'Rozpoczyna numerację od numeru początkowego przy każdym mdiv (części), zamiast liczyć dalej przez całe kodowanie.',
+  },
   renumberMeasuresUnchanged: { text: 'bez zmian' },
   renumberMeasuresSummary: { text: '{total} taktów, {changed} przenumerowano.' },
   renumberMeasuresSummaryTest: { text: '{total} taktów, {changed} zostałoby przenumerowanych.' },

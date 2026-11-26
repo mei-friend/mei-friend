@@ -54,7 +54,11 @@
 * Provide speedy access to Verovio version selection with new select menu at right footer next to Verovio version number.
 * Insert `encodingDesc` (including `applicationInfo`) and if absent `fileDesc` in correct element order of `meiHead`; fixing [#198](https://github.com/mei-friend/mei-friend/issues/198) thx @fernandoherreradelasheras. 
 * mei-friend insert and manipulate actions (including annotations and markup) stored as one undoable action in the CodeMirror editor history (fixes [#179](https://github.com/mei-friend/mei-friend/issues/179)).
-* Support for `mdiv`s in section select menu (mdiv still not supported in SpeedMode), current position in score is reflected in selected option of section select menu.
+* Support for `mdiv`s in section select menu, current position in score is reflected in selected option of section select menu.
+* Speed mode support for multiple mdivs, including pages that mix content from more than one mdiv, and time-spanning elements crossing a page boundary in any mdiv (not just the first one).
+* Speed mode keeps pages that start inside an `<ending>` containing a system or page break separate from the preceding page.
+* Speed mode shows `<staffGrp><label>` (such as movement titles) on the page that opens an `mdiv`, as normal mode does; previously the label was drawn on the invisible context page speed mode puts in front of the requested page.
+* Full speed mode support of `@keysig` attribute starting with MEI 5.0 (as opposed to `@key.sig` used up to MEI 4.0.1)
 * Add Verovio version 6.3.0 to toolkit list
 
 ### 1.4.2 Improved security for GitHub login (released on 9 July 2026)

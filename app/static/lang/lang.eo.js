@@ -197,9 +197,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Neniuj atributoj troviĝis, kiuj konverteblas al elementoj.' },
   convertAttributesToElementsProblems: { text: '{count} atributoj ne konverteblis.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Kontroli' },
-  meiToolboxTabConvert: { text: 'Konverti' },
-  meiToolboxTabRenumber: { text: 'Renumeri' },
+  meiToolboxTabCheck: {
+    text: 'Kontroli',
+    description:
+      'Kontrolas en la kodado sonantajn akcidencojn (@accid.ges), taktodaŭrojn (@metcon) kaj ligojn inter elementoj (@startid, @endid, @plist, …). Listigas ĉiun trovitan problemon, kun korekto kie eblas.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konverti',
+    description:
+      'Konvertas elektitajn atributojn en ekvivalentajn elementojn (ekz. @accid en <accid>), aŭ elementojn reen en atributojn, kiam neniu informo perdiĝas.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumeri',
+    description:
+      'Renumeras la taktojn (@n) sinsekve, kun agordeblaj sufiksoj por taktoj, kiuj daŭrigas antaŭan takton, kaj por taktoj en finaĵoj.',
+  },
   meiToolboxCheckButton: { text: 'Kontroli' },
   meiToolboxTestButton: { text: 'Testi', description: 'Listigi, kio estus ŝanĝita, sen ŝanĝi la kodadon' },
   meiToolboxRenumberButton: { text: 'Renumeri' },
@@ -217,9 +229,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Taktodaŭroj (@metcon)' },
   meiToolboxCheckLinked: { text: 'Ligitaj elementoj (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Fermi la MEI-ilarkeston' },
-  meiToolboxTabIds: { text: 'Id-oj' },
-  meiToolboxTabFacsimile: { text: 'Faksimilo' },
-  meiToolboxTabReformat: { text: 'Reformati' },
+  meiToolboxTabIds: {
+    text: 'Id-oj',
+    description:
+      'Aldonas xml:id-ojn al elementoj sen ili, donas novan al ĉiu elemento aŭ forigas ilin, krom tiuj, al kiuj oni referencas. Referencoj ene de la kodado estas ĝisdatigitaj.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimilo',
+    description:
+      'Ligas la kodadon al paĝobildoj: enprenas faksimilon el alia dosiero aŭ aldonas la mankantajn surfaces, po unu por ĉiu paĝosalto.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformati',
+    description:
+      'Reskribas la tutan kodadon, per Verovio aŭ la XML-analizilo, kaj difinas la ordon de atributoj, kiun mei-friend uzas, kiam ĝi reskribas elementojn.',
+  },
   meiToolboxIdsAdd: { text: 'Aldoni xml:id-ojn (al elementoj sen tia)' },
   meiToolboxIdsChange: {
     text: 'Ŝanĝi xml:id-ojn (novan por ĉiu elemento)',
@@ -295,7 +319,16 @@ export const lang = {
   convertScopeAll: { text: 'Amplekso: tuta kodado (elektu tekston en la redaktilo por limigi la konverton)' },
   convertScopeSelection: { text: 'Amplekso: elekto, linioj {from}–{to}' },
   convertSelectionSuffix: { text: 'elekto' },
-  renumberMeasuresStartNumber: { text: 'Komenca numero' },
+  renumberMeasuresStartNumber: {
+    text: 'Komenca numero',
+    description:
+      'Numero de la unua kompleta takto; ĉiuj sekvaj taktoj estas numerataj ekde ĝi. Nekompleta unua takto (@metcon="false", ekz. antaŭtakto) ricevas numeron je unu malpli, do kun komenca numero 1 ĝi ricevas 0 (krom se ‘Daŭrigi trans nekompletajn taktojn’ estas ŝaltita).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Rekomenci ĉe ĉiu mdiv',
+    description:
+      'Rekomencas la numeradon de la komenca numero ĉe ĉiu mdiv (movimento), anstataŭ daŭre kalkuli tra la tuta kodado.',
+  },
   renumberMeasuresUnchanged: { text: 'neŝanĝita' },
   renumberMeasuresSummary: { text: '{total} taktoj, {changed} renumeritaj.' },
   renumberMeasuresSummaryTest: { text: '{total} taktoj, {changed} estus renumeritaj.' },

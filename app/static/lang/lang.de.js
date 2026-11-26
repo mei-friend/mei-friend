@@ -200,9 +200,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Keine Attribute gefunden, die in Elemente umgewandelt werden können.' },
   convertAttributesToElementsProblems: { text: '{count} Attribute konnten nicht umgewandelt werden.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Prüfen' },
-  meiToolboxTabConvert: { text: 'Umwandeln' },
-  meiToolboxTabRenumber: { text: 'Neu nummerieren' },
+  meiToolboxTabCheck: {
+    text: 'Prüfen',
+    description:
+      'Prüft in der Kodierung klingende Vorzeichen (@accid.ges), Taktdauern (@metcon) und Verknüpfungen zwischen Elementen (@startid, @endid, @plist, …). Listet jedes gefundene Problem auf, wo möglich mit Korrektur.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Umwandeln',
+    description:
+      'Wandelt ausgewählte Attribute in gleichwertige Elemente um (etwa @accid in <accid>) oder Elemente zurück in Attribute, sofern dabei keine Information verloren geht.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Neu nummerieren',
+    description:
+      'Nummeriert die Takte (@n) fortlaufend neu, mit einstellbaren Suffixen für fortgesetzte Takte und für Takte in Wiederholungsenden.',
+  },
   meiToolboxCheckButton: { text: 'Prüfen' },
   meiToolboxTestButton: { text: 'Testen', description: 'Auflisten, was geändert würde, ohne die Kodierung zu ändern' },
   meiToolboxRenumberButton: { text: 'Neu nummerieren' },
@@ -220,9 +232,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Taktdauern (@metcon)' },
   meiToolboxCheckLinked: { text: 'Verknüpfte Elemente (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'MEI-Werkzeugkasten schließen' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Faksimile' },
-  meiToolboxTabReformat: { text: 'Neu formatieren' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Fügt Elementen ohne xml:id eine hinzu, vergibt neue an alle Elemente oder entfernt sie, außer jenen, auf die verwiesen wird. Verweise innerhalb der Kodierung werden angepasst.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimile',
+    description:
+      'Verbindet die Kodierung mit Seitenbildern: übernimmt ein Faksimile aus einer anderen Datei oder legt die fehlenden surfaces an, eine je Seitenumbruch.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Neu formatieren',
+    description:
+      'Schreibt die gesamte Kodierung neu, über Verovio oder den XML-Parser, und legt die Attributreihenfolge fest, die mei-friend beim Zurückschreiben von Elementen verwendet.',
+  },
   meiToolboxIdsAdd: { text: 'xml:ids hinzufügen (zu Elementen ohne)' },
   meiToolboxIdsChange: {
     text: 'xml:ids ändern (neue für jedes Element)',
@@ -298,7 +322,16 @@ export const lang = {
   convertScopeAll: { text: 'Bereich: gesamte Kodierung (Text im Editor markieren, um die Umwandlung einzuschränken)' },
   convertScopeSelection: { text: 'Bereich: Auswahl, Zeilen {from}–{to}' },
   convertSelectionSuffix: { text: 'Auswahl' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummer des ersten vollständigen Takts; alle folgenden Takte werden von ihr aus nummeriert. Ein unvollständiger erster Takt (@metcon="false", etwa ein Auftakt) erhält eine Nummer weniger, bei Startnummer 1 also 0 (außer ‘Weiter bei unvollständigen Takten’ ist aktiviert).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Bei jedem mdiv neu beginnen',
+    description:
+      'Beginnt die Nummerierung bei jedem mdiv (Satz) neu mit der Startnummer, statt über die gesamte Kodierung weiterzuzählen.',
+  },
   renumberMeasuresUnchanged: { text: 'unverändert' },
   renumberMeasuresSummary: { text: '{total} Takte, {changed} neu nummeriert.' },
   renumberMeasuresSummaryTest: { text: '{total} Takte, {changed} würden neu nummeriert.' },

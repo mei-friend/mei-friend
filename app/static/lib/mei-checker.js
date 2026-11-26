@@ -137,6 +137,25 @@ function accidKey(note) {
   return staff && oct && pname ? staff + '/' + oct + '/' + pname : '';
 } // accidKey()
 
+/** Written accidentals whose sounding value is spelled differently (@accid -> @accid.ges) */
+const soundingAccids = {
+  nf: 'f', // a natural cancelling an earlier accidental, followed by a flat
+  ns: 's', // ... followed by a sharp
+  x: 'ss', // the double sharp sign, which is not a gestural accidental in MEI
+};
+
+/**
+ * The accidental a note sounds with, for comparing a written accidental with a
+ * gestural one: 'nf' and 'ns' sound as a plain flat or sharp, 'x' as 'ss'.
+ * Gestural values pass through unchanged, so both sides of a comparison can be
+ * taken through this.
+ * @param {string} accid written or gestural accidental
+ * @returns {string} its gestural equivalent
+ */
+function soundingAccid(accid) {
+  return soundingAccids[accid] || accid;
+} // soundingAccid()
+
 /**
  * Collects all @accid attributes in a measure.
  * @param {Element} measure
@@ -371,7 +390,9 @@ export function checkAccidGes(v, cm) {
       const tiedFrom = tieStartAccids.get(ties[data.xmlId]);
       tieStartAccids.set(
         data.xmlId,
-        accid || accidGesEncoded || tiedFrom || mAccid || (affectedNotes.includes(pName) ? keySigAccid : 'n')
+        soundingAccid(
+          accid || accidGesEncoded || tiedFrom || mAccid || (affectedNotes.includes(pName) ? keySigAccid : 'n')
+        )
       );
     }
 
@@ -396,7 +417,7 @@ export function checkAccidGes(v, cm) {
         ' accid.ges="' +
         accidGesEncoded +
         '"';
-      if (accidGesEncoded !== accid) {
+      if (soundingAccid(accidGesEncoded) !== soundingAccid(accid)) {
         data.html += ' ' + translator.lang.codeCheckerWithContradictingContent.text;
       }
       data.html += '. ' + translator.lang.codeCheckerRemove.text + ' accid.ges';
@@ -412,7 +433,10 @@ export function checkAccidGes(v, cm) {
       // Check whether note tied by starting note
       const startId = ties[data.xmlId];
       let startingNote = notesById.get(startId) || v.xmlDoc.querySelector('[*|id="' + startId + '"]');
-      if (startingNote) {
+      // Notes without @pname (percussion, for instance) carry no pitch, octave or
+      // accidental that could be compared, so a tie between two of them is left alone.
+      const unpitchedTie = startingNote && !pName && !startingNote.getAttribute('pname');
+      if (startingNote && !unpitchedTie) {
         if (pName !== startingNote.getAttribute('pname')) {
           data.html =
             ++count +
@@ -457,14 +481,15 @@ export function checkAccidGes(v, cm) {
         }
         // the accidental the starting note sounds with, as remembered when it was checked;
         // only a starting note that has not been visited is read from its attributes
-        let startingAccidMeaning =
+        let startingAccidMeaning = soundingAccid(
           tieStartAccids.get(startId) ||
-          startingNote.getAttribute('accid') ||
-          startingNote.querySelector('[accid]')?.getAttribute('accid') ||
-          startingNote.getAttribute('accid.ges') ||
-          startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
-          'n';
-        if ((accid || accidGesMeaning) !== startingAccidMeaning) {
+            startingNote.getAttribute('accid') ||
+            startingNote.querySelector('[accid]')?.getAttribute('accid') ||
+            startingNote.getAttribute('accid.ges') ||
+            startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
+            'n'
+        );
+        if (soundingAccid(accid || accidGesMeaning) !== startingAccidMeaning) {
           data.html =
             ++count +
             ' ' +
@@ -502,11 +527,13 @@ export function checkAccidGes(v, cm) {
           v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         }
-      } else {
+      } else if (!startingNote) {
         console.log('No starting note found for tie ' + startId);
       }
-    } else if (!accid && mAccid && mAccid !== accidGesMeaning) {
-      // check all accids having appeared in the current measure
+    } else if (!accid && mAccid && soundingAccid(mAccid) !== soundingAccid(accidGesMeaning)) {
+      // check all accids having appeared in the current measure; what the note is
+      // missing is what that accidental sounds, which may be spelled differently
+      const missing = soundingAccid(mAccid);
       data.html =
         ++count +
         ' ' +
@@ -520,12 +547,12 @@ export function checkAccidGes(v, cm) {
         '" ' +
         translator.lang.codeCheckerLacksAn.text +
         ' accid.ges="' +
-        mAccid +
+        missing +
         '", ' +
         translator.lang.codeCheckerBecauseAlreadyDefined.text +
         '.';
       data.correct = () => {
-        setAccidGes(element, mAccid);
+        setAccidGes(element, missing);
         writeToEditor(element);
       };
       v.addCodeCheckerEntry(data);
@@ -533,8 +560,8 @@ export function checkAccidGes(v, cm) {
     } else if (
       !accid &&
       affectedNotes.includes(pName) &&
-      mAccid !== accidGesMeaning &&
-      keySigAccid !== accidGesMeaning
+      soundingAccid(mAccid) !== soundingAccid(accidGesMeaning) &&
+      keySigAccid !== soundingAccid(accidGesMeaning)
     ) {
       // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
       data.html =
@@ -565,7 +592,7 @@ export function checkAccidGes(v, cm) {
     } else if (
       !accid &&
       !affectedNotes.includes(pName) &&
-      mAccid !== accidGesMeaning &&
+      soundingAccid(mAccid) !== soundingAccid(accidGesMeaning) &&
       (accidGesMeaning !== 'n' || accidGesEncoded === 'n')
     ) {
       // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure

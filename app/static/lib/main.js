@@ -361,7 +361,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true, newDocument = 
     cmd.toggleMidiPlaybackControlBar();
   }
   freshlyLoaded = setFreshlyLoaded;
-  if (newDocument) v.hideCodeCheckerPanel();
+  if (newDocument) v.resetCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);

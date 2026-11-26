@@ -195,9 +195,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Geen attributen gevonden die naar elementen kunnen worden omgezet.' },
   convertAttributesToElementsProblems: { text: '{count} attributen konden niet worden omgezet.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Controleren' },
-  meiToolboxTabConvert: { text: 'Omzetten' },
-  meiToolboxTabRenumber: { text: 'Hernummeren' },
+  meiToolboxTabCheck: {
+    text: 'Controleren',
+    description:
+      'Controleert in de codering klinkende voortekens (@accid.ges), maatduren (@metcon) en koppelingen tussen elementen (@startid, @endid, @plist, …). Toont elk gevonden probleem, waar mogelijk met een correctie.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Omzetten',
+    description:
+      'Zet geselecteerde attributen om in gelijkwaardige elementen (zoals @accid in <accid>), of elementen terug in attributen wanneer er geen informatie verloren gaat.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Hernummeren',
+    description:
+      'Hernummert de maten (@n) doorlopend, met instelbare achtervoegsels voor maten die een vorige maat voortzetten en voor maten in herhalingsslotten (volta’s).',
+  },
   meiToolboxCheckButton: { text: 'Controleren' },
   meiToolboxTestButton: { text: 'Testen', description: 'Weergeven wat er zou veranderen, zonder de codering te wijzigen' },
   meiToolboxRenumberButton: { text: 'Hernummeren' },
@@ -215,9 +227,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Maatduren (@metcon)' },
   meiToolboxCheckLinked: { text: 'Gekoppelde elementen (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'MEI-gereedschapskist sluiten' },
-  meiToolboxTabIds: { text: 'Id\'s' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Herformatteren' },
+  meiToolboxTabIds: {
+    text: 'Id\'s',
+    description:
+      'Voegt xml:id’s toe aan elementen zonder, geeft elk element een nieuwe of verwijdert ze, behalve die waarnaar verwezen wordt. Verwijzingen binnen de codering worden bijgewerkt.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Koppelt de codering aan paginabeelden: neemt een facsimile over uit een ander bestand of voegt de ontbrekende surfaces toe, één per paginaovergang.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Herformatteren',
+    description:
+      'Schrijft de hele codering opnieuw, via Verovio of de XML-parser, en legt de attribuutvolgorde vast die mei-friend gebruikt bij het terugschrijven van elementen.',
+  },
   meiToolboxIdsAdd: { text: 'xml:id\'s toevoegen (aan elementen zonder)' },
   meiToolboxIdsChange: {
     text: 'xml:id\'s wijzigen (een nieuwe voor elk element)',
@@ -293,7 +317,16 @@ export const lang = {
   convertScopeAll: { text: 'Bereik: volledige codering (selecteer tekst in de editor om de omzetting te beperken)' },
   convertScopeSelection: { text: 'Bereik: selectie, regels {from}–{to}' },
   convertSelectionSuffix: { text: 'selectie' },
-  renumberMeasuresStartNumber: { text: 'Startnummer' },
+  renumberMeasuresStartNumber: {
+    text: 'Startnummer',
+    description:
+      'Nummer van de eerste volledige maat; alle volgende maten worden vanaf dit nummer genummerd. Een onvolledige eerste maat (@metcon="false", bijv. een opmaat) krijgt één nummer minder, dus bij startnummer 1 wordt dat 0 (tenzij ‘Doorgaan bij onvolledige maten’ aan staat).',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'Bij elke mdiv opnieuw beginnen',
+    description:
+      'Begint de nummering bij elke mdiv (deel) opnieuw vanaf het startnummer, in plaats van door te tellen over de hele codering.',
+  },
   renumberMeasuresUnchanged: { text: 'ongewijzigd' },
   renumberMeasuresSummary: { text: '{total} maten, {changed} hernummerd.' },
   renumberMeasuresSummaryTest: { text: '{total} maten, {changed} zouden worden hernummerd.' },

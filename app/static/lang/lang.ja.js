@@ -189,9 +189,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: '要素に変換できる属性は見つかりませんでした。' },
   convertAttributesToElementsProblems: { text: '{count} 個の属性を変換できませんでした。' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'チェック' },
-  meiToolboxTabConvert: { text: '変換' },
-  meiToolboxTabRenumber: { text: '番号振り直し' },
+  meiToolboxTabCheck: {
+    text: 'チェック',
+    description:
+      'エンコーディング内の実音の臨時記号 (@accid.ges)、小節の長さ (@metcon)、要素間のリンク (@startid, @endid, @plist, …) を検査し、見つかった問題を一覧表示します。可能な場合は修正案も示します。',
+  },
+  meiToolboxTabConvert: {
+    text: '変換',
+    description:
+      '選択した属性を同等の要素に変換します（例：@accid を <accid> に）。また、情報が失われない場合は要素を属性に戻します。',
+  },
+  meiToolboxTabRenumber: {
+    text: '番号振り直し',
+    description:
+      '小節 (@n) を連番で振り直します。前の小節の続きとなる小節や、反復の括弧 (ending) 内の小節には、設定可能な接尾辞を付けます。',
+  },
   meiToolboxCheckButton: { text: 'チェック' },
   meiToolboxTestButton: { text: 'テスト', description: 'エンコーディングを変更せずに、変更される内容を一覧表示します' },
   meiToolboxRenumberButton: { text: '番号を振り直す' },
@@ -209,9 +221,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: '小節の長さ (@metcon)' },
   meiToolboxCheckLinked: { text: 'リンクされた要素 (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'MEI ツールボックスを閉じる' },
-  meiToolboxTabIds: { text: 'ID' },
-  meiToolboxTabFacsimile: { text: 'ファクシミリ' },
-  meiToolboxTabReformat: { text: '再フォーマット' },
+  meiToolboxTabIds: {
+    text: 'ID',
+    description:
+      'xml:id のない要素に追加する、すべての要素に新しい xml:id を付ける、または参照されているもの以外を削除します。エンコーディング内の参照は更新されます。',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'ファクシミリ',
+    description:
+      'エンコーディングをページ画像に結び付けます。別のファイルからファクシミリを取り込むか、不足している surface を改ページごとに 1 つ追加します。',
+  },
+  meiToolboxTabReformat: {
+    text: '再フォーマット',
+    description:
+      'Verovio または XML パーサーを使ってエンコーディング全体を書き直し、mei-friend が要素を書き戻す際の属性の順序を設定します。',
+  },
   meiToolboxIdsAdd: { text: 'xml:id を追加（持たない要素に）' },
   meiToolboxIdsChange: {
     text: 'xml:id を変更（全要素に新しい ID）',
@@ -281,7 +305,16 @@ export const lang = {
   convertScopeAll: { text: '範囲: エンコーディング全体（変換を限定するにはエディタでテキストを選択してください）' },
   convertScopeSelection: { text: '範囲: 選択範囲、{from}–{to} 行' },
   convertSelectionSuffix: { text: '選択範囲' },
-  renumberMeasuresStartNumber: { text: '開始番号' },
+  renumberMeasuresStartNumber: {
+    text: '開始番号',
+    description:
+      '最初の完全な小節に付ける番号で、以降の小節はこの番号から順に振られます。最初の小節が不完全な場合（@metcon="false"、例：弱起）はそれより 1 少ない番号となり、開始番号が 1 なら 0 になります（「不完全な小節を振り直し続ける」がオンの場合を除く）。',
+  },
+  renumberMeasuresRestartAtMdiv: {
+    text: 'mdiv ごとに振り直す',
+    description:
+      'mdiv（楽章）ごとに開始番号から番号を振り直します。オフの場合はエンコーディング全体で通し番号になります。',
+  },
   renumberMeasuresUnchanged: { text: '変更なし' },
   renumberMeasuresSummary: { text: '{total} 小節、{changed} 小節の番号を振り直しました。' },
   renumberMeasuresSummaryTest: { text: '{total} 小節、{changed} 小節の番号が振り直されます。' },
