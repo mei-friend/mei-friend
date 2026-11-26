@@ -593,11 +593,11 @@ export function renumberMeasures(v, cm, options = {}, change = false) {
     }
     if (metcon === 'false') notes.push('@metcon="false"');
     // 1) first measure with @metcon="false" is upbeat => @n=0
+    //    (only the very first measure: a later @metcon="false" is a split measure, see 2)
     if (!continueAcrossIncomplete && isFirstMeasure && metcon === 'false') {
-      // first measure upbeat
       n--;
-      isFirstMeasure = false;
     }
+    isFirstMeasure = false;
     // 2) treat series of @metcon="false" as one measure
     if (!continueAcrossIncomplete && metcon === 'false') {
       metcons++;

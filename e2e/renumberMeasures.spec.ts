@@ -17,7 +17,17 @@ async function measureNs(page: Page): Promise<string[]> {
   return Array.from(text.matchAll(/<measure\b[^>]*\bn="([^"]*)"/g)).map((m) => m[1]);
 }
 
-/** Opens the Renumber tab, sets the options and renumbers the encoding. */
+/** Loads the fixture with @metcon="false" on the given measures. */
+async function loadVariant(page: Page, incomplete: string[]) {
+  let variant = mei;
+  for (const id of incomplete) variant = variant.replace(`<measure xml:id="${id}"`, `<measure xml:id="${id}" metcon="false"`);
+  const variantName = 'metcon-' + incomplete.join('-') + '.mei';
+  await openLocalMei(page, variantName, variant);
+  await expect(page.locator('#statusBar')).toContainText(variantName, { timeout: 60000 });
+  await expect(page.locator('#m1a')).toBeVisible({ timeout: 30000 });
+}
+
+/** Opens the Renumber tab,sets the options and renumbers the encoding. */
 async function renumber(page: Page, startNumber: number, restartAtMdiv: boolean) {
   if (!(await page.locator('#meiToolbox').isVisible())) await page.locator('#showMeiToolboxButton').click();
   await page.locator('.mtTab[data-tab="renumber"]').click();
@@ -52,6 +62,20 @@ test.describe('Renumber measures', () => {
   test('without restart, numbers continue across mdivs', async ({ page }) => {
     await renumber(page, 1, false);
     await expect.poll(() => measureNs(page)).toEqual(['1', '2', '3', '4', '5']);
+  });
+
+  test('a split measure later in the piece is not taken for an upbeat', async ({ page }) => {
+    // m2a + m2b are one measure split in two (both @metcon="false"), as in
+    // Beethoven WoO63, Var. III; the first measure of the encoding is complete
+    await loadVariant(page, ['m2a', 'm2b']);
+    await renumber(page, 1, false);
+    await expect.poll(() => measureNs(page)).toEqual(['1', '2', '3', '3', '4']);
+  });
+
+  test('restart at mdiv: an upbeat at the start of an mdiv is numbered start - 1', async ({ page }) => {
+    await loadVariant(page, ['m2a']);
+    await renumber(page, 1, true);
+    await expect.poll(() => measureNs(page)).toEqual(['1', '2', '0', '1', '1']);
   });
 
   test('the option is remembered', async ({ page }) => {
