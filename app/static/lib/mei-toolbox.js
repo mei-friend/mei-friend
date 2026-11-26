@@ -1685,8 +1685,10 @@ function directiveText() {
  * @returns {string} 'major', 'minor' or '' when it cannot be told
  */
 function encodingKeyMode() {
-  const stated = v.xmlDoc?.querySelector('[key\\.mode], keySig[mode]');
-  const mode = stated?.getAttribute('key.mode') || stated?.getAttribute('mode');
+  const stated = openingKeyElement(
+    (element) => element.hasAttribute('key.mode') || !!childKeySig(element)?.hasAttribute('mode')
+  );
+  const mode = stated ? (stated.getAttribute('key.mode') ?? childKeySig(stated)?.getAttribute('mode')) : '';
   if (mode === 'major' || mode === 'minor') return mode;
 
   const fifths = encodingKeyFifths();
@@ -1750,22 +1752,43 @@ function intervalFifths(name) {
 } // intervalFifths()
 
 /**
- * The key signature the encoding starts with, on the line of fifths (2 for '2s', -3
- * for '3f'). An encoding that states none is read as C major, as Verovio renders it.
+ * The key signature the score opens with, on the line of fifths (2 for '2s', -3 for
+ * '3f'). It is read from the scoreDef the score opens with and from nowhere else in the
+ * document: a later movement or variation may well stand in another key. An empty
+ * keySig element, and a score that states no key signature at all, mean none.
  * @returns {number|null} null when the key signature cannot be read ('mixed')
  */
 function encodingKeyFifths() {
-  // '[keysig]' is MEI >= 5.0, '[key.sig]' up to MEI 4.0.1, '[sig]' the <keySig> element; the
-  // first of them in document order is the one the score starts with
-  const element = v.xmlDoc?.querySelector(
-    'scoreDef[key\\.sig], scoreDef[keysig], staffDef[key\\.sig], staffDef[keysig], keySig[sig]'
+  const holder = openingKeyElement(
+    (element) => element.hasAttribute('key.sig') || element.hasAttribute('keysig') || !!childKeySig(element)
   );
-  if (!element) return 0;
-  const sig = element.getAttribute('key.sig') || element.getAttribute('keysig') || element.getAttribute('sig');
+  if (!holder) return 0;
+  // '@key.sig' up to MEI 4.0.1, '@keysig' from MEI 5.0, '@sig' on the keySig element of either
+  const sig =
+    holder.getAttribute('key.sig') ??
+    holder.getAttribute('keysig') ??
+    childKeySig(holder).getAttribute('sig') ??
+    '0';
   if (sig === '0') return 0;
-  const match = /^(\d+)([fs])$/.exec(sig || '');
+  const match = /^(\d+)([fs])$/.exec(sig);
   return match ? parseInt(match[1], 10) * (match[2] === 's' ? 1 : -1) : null;
 } // encodingKeyFifths()
+
+/**
+ * The first element of the opening scoreDef — the scoreDef itself or a staffDef within
+ * it — that the test accepts: that is where a score states the key it begins in.
+ * @param {Function} test
+ * @returns {Element|null}
+ */
+function openingKeyElement(test) {
+  const scoreDef = v.xmlDoc?.querySelector('score > scoreDef') || v.xmlDoc?.querySelector('scoreDef');
+  if (!scoreDef) return null;
+  return [scoreDef, ...scoreDef.querySelectorAll('staffDef')].find(test) || null;
+} // openingKeyElement()
+
+function childKeySig(element) {
+  return Array.from(element.children).find((c) => c.localName === 'keySig');
+} // childKeySig()
 
 function transposeMode() {
   return panes.transpose?.content.querySelector('input[name="mtTransposeMode"]:checked')?.value || 'key';
