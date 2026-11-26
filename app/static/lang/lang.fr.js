@@ -201,9 +201,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Aucun attribut convertible en élément trouvé.' },
   convertAttributesToElementsProblems: { text: '{count} attributs n\'ont pas pu être convertis.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Vérifier' },
-  meiToolboxTabConvert: { text: 'Convertir' },
-  meiToolboxTabRenumber: { text: 'Renuméroter' },
+  meiToolboxTabCheck: {
+    text: 'Vérifier',
+    description:
+      'Vérifie dans l’encodage les altérations sonores (@accid.ges), les durées des mesures (@metcon) et les liens entre éléments (@startid, @endid, @plist, …). Liste chaque problème trouvé, avec une correction lorsque c’est possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convertir',
+    description:
+      'Convertit les attributs sélectionnés en éléments équivalents (par exemple @accid en <accid>), ou les éléments à nouveau en attributs lorsqu’aucune information n’est perdue.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renuméroter',
+    description:
+      'Renumérote les mesures (@n) de façon consécutive, avec des suffixes configurables pour les mesures qui en prolongent une précédente et pour les mesures dans les fins de reprise.',
+  },
   meiToolboxCheckButton: { text: 'Vérifier' },
   meiToolboxTestButton: { text: 'Tester', description: 'Lister ce qui serait modifié, sans modifier l\'encodage' },
   meiToolboxRenumberButton: { text: 'Renuméroter' },
@@ -221,9 +233,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Durées des mesures (@metcon)' },
   meiToolboxCheckLinked: { text: 'Éléments liés (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Fermer la boîte à outils MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Fac-similé' },
-  meiToolboxTabReformat: { text: 'Reformater' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Ajoute des xml:ids aux éléments qui n’en ont pas, en attribue un nouveau à chaque élément ou les supprime, sauf ceux qui sont référencés. Les références dans l’encodage sont mises à jour.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Fac-similé',
+    description:
+      'Relie l’encodage aux images de pages : importe un fac-similé depuis un autre fichier, ou ajoute les surfaces manquantes, une par saut de page.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformater',
+    description:
+      'Réécrit tout l’encodage, via Verovio ou l’analyseur XML, et définit l’ordre des attributs que mei-friend utilise lorsqu’il réécrit des éléments.',
+  },
   meiToolboxIdsAdd: { text: 'Ajouter des xml:id (aux éléments qui n’en ont pas)' },
   meiToolboxIdsChange: {
     text: 'Changer les xml:id (un nouveau pour chaque élément)',

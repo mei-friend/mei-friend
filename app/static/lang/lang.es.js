@@ -198,9 +198,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'No se encontraron atributos que puedan convertirse en elementos.' },
   convertAttributesToElementsProblems: { text: 'No se pudieron convertir {count} atributos.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Comprobar' },
-  meiToolboxTabConvert: { text: 'Convertir' },
-  meiToolboxTabRenumber: { text: 'Renumerar' },
+  meiToolboxTabCheck: {
+    text: 'Comprobar',
+    description:
+      'Comprueba en la codificación las alteraciones sonoras (@accid.ges), las duraciones de los compases (@metcon) y los enlaces entre elementos (@startid, @endid, @plist, …). Enumera cada problema encontrado, con una corrección cuando es posible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convertir',
+    description:
+      'Convierte los atributos seleccionados en elementos equivalentes (como @accid en <accid>), o los elementos de nuevo en atributos cuando no se pierde información.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumerar',
+    description:
+      'Renumera los compases (@n) de forma consecutiva, con sufijos configurables para los compases que continúan uno anterior y para los compases en finales de repetición.',
+  },
   meiToolboxCheckButton: { text: 'Comprobar' },
   meiToolboxTestButton: { text: 'Probar', description: 'Listar lo que se cambiaría, sin cambiar la codificación' },
   meiToolboxRenumberButton: { text: 'Renumerar' },
@@ -218,9 +230,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Duraciones de compases (@metcon)' },
   meiToolboxCheckLinked: { text: 'Elementos enlazados (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Cerrar la caja de herramientas MEI' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsímil' },
-  meiToolboxTabReformat: { text: 'Reformatear' },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Añade xml:ids a los elementos que no tienen, asigna uno nuevo a cada elemento o los elimina, salvo los que están referenciados. Las referencias dentro de la codificación se actualizan.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsímil',
+    description:
+      'Vincula la codificación con imágenes de página: importa un facsímil de otro archivo o añade las surfaces que faltan, una por salto de página.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformatear',
+    description:
+      'Reescribe toda la codificación, mediante Verovio o el analizador XML, y establece el orden de atributos que mei-friend usa al reescribir elementos.',
+  },
   meiToolboxIdsAdd: { text: 'Añadir xml:id (a los elementos que no lo tienen)' },
   meiToolboxIdsChange: {
     text: 'Cambiar los xml:id (uno nuevo para cada elemento)',

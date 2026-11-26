@@ -217,12 +217,36 @@ export const lang = {
   convertAttributesToElementsProblems: { text: '{count} attributes could not be converted.' },
   // MEI TOOLBOX
   meiToolboxClose: { text: 'Close MEI toolbox' },
-  meiToolboxTabCheck: { text: 'Check' },
-  meiToolboxTabConvert: { text: 'Convert' },
-  meiToolboxTabRenumber: { text: 'Renumber' },
-  meiToolboxTabIds: { text: 'Ids' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Reformat' },
+  meiToolboxTabCheck: {
+    text: 'Check',
+    description:
+      'Checks the encoding for gestural accidentals (@accid.ges), measure durations (@metcon) and links between elements (@startid, @endid, @plist, …). Lists each issue found, with a fix where one is possible.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Convert',
+    description:
+      'Converts selected attributes into equivalent elements (such as @accid into <accid>), or elements back into attributes where no information is lost.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumber',
+    description:
+      'Renumbers the measures (@n) consecutively, with configurable suffixes for measures that continue a previous one and for measures in endings.',
+  },
+  meiToolboxTabIds: {
+    text: 'Ids',
+    description:
+      'Adds xml:ids to elements that have none, gives every element a new one, or removes them, keeping those that are pointed to. References within the encoding are updated.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Links the encoding to page images: ingests a facsimile from another file, or adds the missing surfaces, one per page break.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformat',
+    description:
+      'Writes the whole encoding anew, through Verovio or the XML parser, and sets the attribute order mei-friend uses when it writes elements back.',
+  },
   meiToolboxCheckButton: { text: 'Check' },
   meiToolboxTestButton: { text: 'Test', description: 'List what would be changed, without changing the encoding' },
   meiToolboxRenumberButton: { text: 'Renumber' },

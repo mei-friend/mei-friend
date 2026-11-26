@@ -202,9 +202,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Nessun attributo trovato che possa essere convertito in elementi.' },
   convertAttributesToElementsProblems: { text: 'Non è stato possibile convertire {count} attributi.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Verifica' },
-  meiToolboxTabConvert: { text: 'Converti' },
-  meiToolboxTabRenumber: { text: 'Rinumera' },
+  meiToolboxTabCheck: {
+    text: 'Verifica',
+    description:
+      'Verifica nella codifica le alterazioni effettive (@accid.ges), le durate delle battute (@metcon) e i collegamenti tra elementi (@startid, @endid, @plist, …). Elenca ogni problema trovato, con una correzione quando possibile.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Converti',
+    description:
+      'Converte gli attributi selezionati in elementi equivalenti (ad esempio @accid in <accid>), oppure gli elementi di nuovo in attributi quando non si perde alcuna informazione.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Rinumera',
+    description:
+      'Rinumera le battute (@n) in modo consecutivo, con suffissi configurabili per le battute che ne continuano una precedente e per le battute nei finali di ripetizione.',
+  },
   meiToolboxCheckButton: { text: 'Verifica' },
   meiToolboxTestButton: { text: 'Prova', description: 'Elenca ciò che verrebbe modificato, senza modificare la codifica' },
   meiToolboxRenumberButton: { text: 'Rinumera' },
@@ -222,9 +234,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Durate delle misure (@metcon)' },
   meiToolboxCheckLinked: { text: 'Elementi collegati (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Chiudi la cassetta degli attrezzi MEI' },
-  meiToolboxTabIds: { text: 'Id' },
-  meiToolboxTabFacsimile: { text: 'Facsimile' },
-  meiToolboxTabReformat: { text: 'Riformatta' },
+  meiToolboxTabIds: {
+    text: 'Id',
+    description:
+      'Aggiunge xml:id agli elementi che non ne hanno, ne assegna uno nuovo a ogni elemento o li rimuove, tranne quelli a cui si fa riferimento. I riferimenti nella codifica vengono aggiornati.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Facsimile',
+    description:
+      'Collega la codifica alle immagini delle pagine: importa un facsimile da un altro file o aggiunge le surfaces mancanti, una per ogni interruzione di pagina.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Riformatta',
+    description:
+      'Riscrive l’intera codifica, tramite Verovio o il parser XML, e stabilisce l’ordine degli attributi che mei-friend usa quando riscrive gli elementi.',
+  },
   meiToolboxIdsAdd: { text: 'Aggiungi xml:id (agli elementi che non ne hanno)' },
   meiToolboxIdsChange: {
     text: 'Cambia gli xml:id (uno nuovo per ogni elemento)',

@@ -199,9 +199,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Ingen attributter fundet, der kan konverteres til elementer.' },
   convertAttributesToElementsProblems: { text: '{count} attributter kunne ikke konverteres.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Kontrol' },
-  meiToolboxTabConvert: { text: 'Konverter' },
-  meiToolboxTabRenumber: { text: 'Omnummerer' },
+  meiToolboxTabCheck: {
+    text: 'Kontrol',
+    description:
+      'Kontrollerer kodningen for klingende fortegn (@accid.ges), taktvarigheder (@metcon) og links mellem elementer (@startid, @endid, @plist, …). Viser hvert fundet problem, med en rettelse hvor det er muligt.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Konverter',
+    description:
+      'Konverterer valgte attributter til tilsvarende elementer (f.eks. @accid til <accid>), eller elementer tilbage til attributter, hvor ingen information går tabt.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Omnummerer',
+    description:
+      'Omnummererer takterne (@n) fortløbende, med indstillelige suffikser for takter, der fortsætter en tidligere takt, og for takter i volter.',
+  },
   meiToolboxCheckButton: { text: 'Kontroller' },
   meiToolboxTestButton: { text: 'Test', description: 'Vis hvad der ville blive ændret, uden at ændre kodningen' },
   meiToolboxRenumberButton: { text: 'Omnummerer' },
@@ -219,9 +231,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Taktvarigheder (@metcon)' },
   meiToolboxCheckLinked: { text: 'Forbundne elementer (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Luk MEI-værktøjskassen' },
-  meiToolboxTabIds: { text: 'Id’er' },
-  meiToolboxTabFacsimile: { text: 'Faksimile' },
-  meiToolboxTabReformat: { text: 'Reformatér' },
+  meiToolboxTabIds: {
+    text: 'Id’er',
+    description:
+      'Tilføjer xml:id’er til elementer uden en, giver hvert element en ny eller fjerner dem, undtagen dem der henvises til. Henvisninger i kodningen opdateres.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimile',
+    description:
+      'Forbinder kodningen med sidebilleder: indlæser et faksimile fra en anden fil eller tilføjer de manglende surfaces, én pr. sideskift.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Reformatér',
+    description:
+      'Skriver hele kodningen på ny, via Verovio eller XML-parseren, og fastlægger den attributrækkefølge, mei-friend bruger, når elementer skrives tilbage.',
+  },
   meiToolboxIdsAdd: { text: 'Tilføj xml:id (til elementer uden)' },
   meiToolboxIdsChange: {
     text: 'Skift xml:id (et nyt til hvert element)',

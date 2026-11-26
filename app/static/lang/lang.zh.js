@@ -190,9 +190,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: '未找到可转换为元素的属性。' },
   convertAttributesToElementsProblems: { text: '{count} 个属性无法转换。' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: '检查' },
-  meiToolboxTabConvert: { text: '转换' },
-  meiToolboxTabRenumber: { text: '重新编号' },
+  meiToolboxTabCheck: {
+    text: '检查',
+    description:
+      '检查编码中的实际变音记号 (@accid.ges)、小节时值 (@metcon) 以及元素之间的链接 (@startid, @endid, @plist, …)，列出发现的每个问题，并在可能时给出修正。',
+  },
+  meiToolboxTabConvert: {
+    text: '转换',
+    description:
+      '将选定的属性转换为等价的元素（例如将 @accid 转换为 <accid>），或在不丢失信息时将元素转换回属性。',
+  },
+  meiToolboxTabRenumber: {
+    text: '重新编号',
+    description:
+      '按顺序重新编号小节 (@n)，并可为延续前一小节的小节以及反复结尾 (ending) 中的小节设置后缀。',
+  },
   meiToolboxCheckButton: { text: '检查' },
   meiToolboxTestButton: { text: '测试', description: '列出将更改的内容，而不更改编码' },
   meiToolboxRenumberButton: { text: '重新编号' },
@@ -210,9 +222,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: '小节时值 (@metcon)' },
   meiToolboxCheckLinked: { text: '链接元素 (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: '关闭 MEI 工具箱' },
-  meiToolboxTabIds: { text: 'ID' },
-  meiToolboxTabFacsimile: { text: '影印件' },
-  meiToolboxTabReformat: { text: '重新格式化' },
+  meiToolboxTabIds: {
+    text: 'ID',
+    description:
+      '为没有 xml:id 的元素添加 xml:id、为每个元素分配新的 xml:id，或删除被引用者以外的 xml:id。编码中的引用会随之更新。',
+  },
+  meiToolboxTabFacsimile: {
+    text: '影印件',
+    description:
+      '将编码与页面图像关联：从另一个文件导入影印件，或按每个分页符添加一个缺失的 surface。',
+  },
+  meiToolboxTabReformat: {
+    text: '重新格式化',
+    description:
+      '通过 Verovio 或 XML 解析器重写整个编码，并设置 mei-friend 写回元素时使用的属性顺序。',
+  },
   meiToolboxIdsAdd: { text: '添加 xml:id（给没有的元素）' },
   meiToolboxIdsChange: {
     text: '更改 xml:id（为每个元素生成新 ID）',

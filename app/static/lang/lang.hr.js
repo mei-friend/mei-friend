@@ -194,9 +194,21 @@ export const lang = {
   convertAttributesToElementsNone: { text: 'Nisu pronađeni atributi koji se mogu pretvoriti u elemente.' },
   convertAttributesToElementsProblems: { text: '{count} atributa nije moguće pretvoriti.' },
   // CHECKER PANEL
-  meiToolboxTabCheck: { text: 'Provjera' },
-  meiToolboxTabConvert: { text: 'Pretvaranje' },
-  meiToolboxTabRenumber: { text: 'Renumeriranje' },
+  meiToolboxTabCheck: {
+    text: 'Provjera',
+    description:
+      'Provjerava u kodiranju gestualne predznake (@accid.ges), trajanja taktova (@metcon) i veze između elemenata (@startid, @endid, @plist, …). Navodi svaki pronađeni problem, s ispravkom gdje je to moguće.',
+  },
+  meiToolboxTabConvert: {
+    text: 'Pretvaranje',
+    description:
+      'Pretvara odabrane atribute u ekvivalentne elemente (npr. @accid u <accid>) ili elemente natrag u atribute, ako se pritom ne gubi nikakva informacija.',
+  },
+  meiToolboxTabRenumber: {
+    text: 'Renumeriranje',
+    description:
+      'Uzastopno renumerira taktove (@n), s podesivim sufiksima za taktove koji nastavljaju prethodni i za taktove u završecima (voltama).',
+  },
   meiToolboxCheckButton: { text: 'Provjeri' },
   meiToolboxTestButton: { text: 'Testiraj', description: 'Prikaži što bi bilo promijenjeno, bez mijenjanja kodiranja' },
   meiToolboxRenumberButton: { text: 'Renumeriraj' },
@@ -214,9 +226,21 @@ export const lang = {
   meiToolboxCheckMetcon: { text: 'Trajanja taktova (@metcon)' },
   meiToolboxCheckLinked: { text: 'Povezani elementi (@startid, @endid, @plist, …)' },
   meiToolboxClose: { text: 'Zatvori MEI alatnicu' },
-  meiToolboxTabIds: { text: 'Id-ovi' },
-  meiToolboxTabFacsimile: { text: 'Faksimil' },
-  meiToolboxTabReformat: { text: 'Preoblikuj' },
+  meiToolboxTabIds: {
+    text: 'Id-ovi',
+    description:
+      'Dodaje xml:id elementima koji ga nemaju, daje svakom elementu novi ili ih uklanja, osim onih na koje se upućuje. Reference unutar kodiranja se ažuriraju.',
+  },
+  meiToolboxTabFacsimile: {
+    text: 'Faksimil',
+    description:
+      'Povezuje kodiranje sa slikama stranica: preuzima faksimil iz druge datoteke ili dodaje nedostajuće surfaces, po jedan za svaki prijelom stranice.',
+  },
+  meiToolboxTabReformat: {
+    text: 'Preoblikuj',
+    description:
+      'Ispisuje cijelo kodiranje iznova, putem Verovija ili XML parsera, i određuje redoslijed atributa koji mei-friend koristi pri ponovnom zapisivanju elemenata.',
+  },
   meiToolboxIdsAdd: { text: 'Dodaj xml:id (elementima bez njega)' },
   meiToolboxIdsChange: {
     text: 'Promijeni xml:id (novi za svaki element)',
