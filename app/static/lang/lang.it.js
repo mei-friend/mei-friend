@@ -309,15 +309,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Traspone solo la notazione; la codifica resta com’è. Per trasporre anche la codifica, trasponi qui e poi riscrivila con «Tramite Verovio» nella scheda Riformatta.',
+    text: 'Traspone solo la notazione; la codifica resta com’è, tranne l’indicazione qui sotto. Per trasporre anche la codifica, trasponi qui e poi riscrivila con «Tramite Verovio» nella scheda Riformatta.',
   },
   meiToolboxTransposeReset: {
     text: 'Reimposta',
     description: 'Rimuove la trasposizione, così che la notazione torni all’altezza codificata.',
   },
-  meiToolboxTransposeDone: { text: 'La notazione è trasposta ({what}); la codifica è invariata.' },
+  meiToolboxTransposeDone: { text: 'La notazione è trasposta ({what}).' },
   meiToolboxTransposeRemoved: { text: 'La trasposizione è stata rimossa.' },
   meiToolboxTransposeNone: { text: 'Nulla da fare: nessuna trasposizione è applicata.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Aggiungi indicazione di trasposizione',
+    description:
+      'Scrive nel pgHead della partitura una riga che indica la tonalità in cui si traspone e la tonalità della codifica. Viene rimossa quando la trasposizione è reimpostata.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Trasposto in {new}\nOriginale: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Trasposto: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'L’indicazione di trasposizione è stata scritta nel pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'L’indicazione di trasposizione è stata rimossa dal pgHead.' },
 
   codeCheckerFixShown: { text: 'Correggi {n} mostrati' },
   codeCheckerIgnoreShown: { text: 'Ignora {n} mostrati' },

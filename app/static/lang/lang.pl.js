@@ -309,15 +309,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transponuje tylko notację; kodowanie pozostaje bez zmian. Aby transponować także kodowanie, transponuj tutaj, a następnie zapisz je na nowo przez „Przez Verovio” w zakładce Formatuj.',
+    text: 'Transponuje tylko notację; kodowanie pozostaje bez zmian, poza adnotacją poniżej. Aby transponować także kodowanie, transponuj tutaj, a następnie zapisz je na nowo przez „Przez Verovio” w zakładce Formatuj.',
   },
   meiToolboxTransposeReset: {
     text: 'Resetuj',
     description: 'Usuwa transpozycję, tak że notacja znów pojawia się w zakodowanej wysokości.',
   },
-  meiToolboxTransposeDone: { text: 'Notacja została transponowana ({what}); kodowanie jest niezmienione.' },
+  meiToolboxTransposeDone: { text: 'Notacja została transponowana ({what}).' },
   meiToolboxTransposeRemoved: { text: 'Transpozycja została usunięta.' },
   meiToolboxTransposeNone: { text: 'Nie ma nic do zrobienia: żadna transpozycja nie jest zastosowana.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Dodaj adnotację o transpozycji',
+    description:
+      'Wpisuje do pgHead partytury wiersz podający tonację transpozycji oraz tonację kodowania. Przy resetowaniu transpozycji zostaje usunięty.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponowano do {new}\nOryginał: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponowano: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Adnotacja o transpozycji została wpisana do pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Adnotacja o transpozycji została usunięta z pgHead.' },
 
   codeCheckerFixShown: { text: 'Popraw {n} wyświetlonych' },
   codeCheckerIgnoreShown: { text: 'Zignoruj {n} wyświetlonych' },

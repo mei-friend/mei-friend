@@ -304,15 +304,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transponas nur la notacion; la kodigo restas kia ĝi estas. Por transponi ankaŭ la kodigon, transponu ĉi tie kaj poste reskribu ĝin per „Per Verovio“ en la langeto Reformati.',
+    text: 'Transponas nur la notacion; la kodigo restas kia ĝi estas, krom la noto sube. Por transponi ankaŭ la kodigon, transponu ĉi tie kaj poste reskribu ĝin per „Per Verovio“ en la langeto Reformati.',
   },
   meiToolboxTransposeReset: {
     text: 'Restarigi',
     description: 'Forigas la transponon, tiel ke la notacio denove aperas en la kodigita alteco.',
   },
-  meiToolboxTransposeDone: { text: 'La notacio estas transponita ({what}); la kodigo estas neŝanĝita.' },
+  meiToolboxTransposeDone: { text: 'La notacio estas transponita ({what}).' },
   meiToolboxTransposeRemoved: { text: 'La transpono estis forigita.' },
   meiToolboxTransposeNone: { text: 'Nenio farenda: neniu transpono estas aplikata.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Aldoni transponan noton',
+    description:
+      'Skribas en la pgHead de la partituro linion, kiu nomas la tonalon de la transpono kaj la tonalon de la kodigo. Ĝi estas forigita, kiam la transpono estas restarigita.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponita al {new}\noriginalo: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponita: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'La transpona noto estis skribita en la pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'La transpona noto estis forigita el la pgHead.' },
 
   codeCheckerFixShown: { text: 'Korekti {n} montritajn' },
   codeCheckerIgnoreShown: { text: 'Ignori {n} montritajn' },

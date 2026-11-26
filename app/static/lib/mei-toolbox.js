@@ -68,6 +68,14 @@ const transposeIntervalValues = [
 ];
 const transposeDirectionValues = ['+', '-', ''];
 
+// where the keys of the Transpose tab sit on the line of fifths: the values run from
+// seven sharps (cs) to seven flats (cf), so the index gives the key signature
+const transposeKeyFifths = (value) => 7 - transposeKeyValues.indexOf(value);
+// fifths of the degrees of a major scale, counted from its tonic (C D E F G A B)
+const fifthsOfDegree = [0, 2, 4, -1, 1, 3, 5];
+// what a quality adds to that; 'd' on an imperfectable degree lowers by two fifths more
+const fifthsOfQuality = { P: 0, M: 0, m: -7, A: 7, d: -7 };
+
 // the two modes of the Transpose tab: the name in `storageKey` under which the
 // select of a mode is stored, its values, and the value used when nothing is stored
 const transposeModes = {
@@ -117,6 +125,7 @@ const storageKey = {
   transposeKey: 'mf-transposeKey',
   transposeInterval: 'mf-transposeInterval',
   transposeDirection: 'mf-transposeDirection',
+  transposeDirective: 'mf-meiToolboxTransposeDirective',
 };
 
 const BUDGET_MS = 30; // work per time slice before yielding to the GUI
@@ -551,24 +560,32 @@ export function runTranspose(reset = false) {
   openToolbox('transpose');
   panes.transpose.lastAction = () => runTranspose(reset);
   startRun('transpose', t(reset ? 'meiToolboxTransposeReset' : 'transposeButton'));
-  if (reset && !v.vrvOptions.transpose) {
+  v.loadXml(cm.getValue(), true); // the directive is read from and written into the encoding
+  const option = reset ? '' : transposeOption();
+  const wasTransposed = !!v.vrvOptions.transpose;
+  v.vrvOptions.transpose = option;
+  // the directive states the transposition, so it is written before the notation is drawn;
+  // when it is not wanted, one of an earlier run is taken out rather than left contradicting
+  const wanted = !reset && document.getElementById('mtTransposeDirective')?.checked;
+  const directive = e.setTranspositionDirective(v, cm, wanted ? directiveText() : '');
+  if (reset && !wasTransposed && !directive) {
     finishRun(t('meiToolboxTransposeNone', 'No transposition is applied.'), '');
     return;
   }
-  const option = reset ? '' : transposeOption();
-  v.vrvOptions.transpose = option;
   v.updateAll(cm);
   // the rendered MIDI is no longer the notation shown, so the playback bar is closed
   if (document.getElementById('showMidiPlaybackControlBar')?.checked) cmd.toggleMidiPlaybackControlBar();
-  finishRun(
-    reset
-      ? t('meiToolboxTransposeRemoved', 'The transposition has been removed.')
-      : t('meiToolboxTransposeDone', 'The notation is transposed ({what}); the encoding is unchanged.').replace(
-          '{what}',
-          transposeSummary()
-        ),
-    option ? '<code>' + esc(option) + '</code>' : ''
-  );
+  const message = reset
+    ? t('meiToolboxTransposeRemoved', 'The transposition has been removed.')
+    : t('meiToolboxTransposeDone', 'The notation is transposed ({what}).').replace('{what}', transposeSummary());
+  // what became of the encoding: it only ever changes through the directive
+  const aboutEncoding =
+    directive === 'added'
+      ? t('meiToolboxTransposeDirectiveAdded', 'The transposition directive was written into the pgHead.')
+      : directive === 'removed'
+        ? t('meiToolboxTransposeDirectiveRemoved', 'The transposition directive was removed from the pgHead.')
+        : t('meiToolboxReformatUnchanged', 'The encoding is unchanged.');
+  finishRun(message + ' ' + aboutEncoding, option ? '<code>' + esc(option) + '</code>' : '');
 } // runTranspose()
 
 /**
@@ -1236,6 +1253,18 @@ function buildTransposeOptions(content, p) {
   });
   directionRow.append(directionText, direction);
   directionGroup.appendChild(directionRow);
+
+  // directive in the pgHead, naming the key transposed to and the original one
+  const directiveRow = el('label', 'mtOption mtRow');
+  const directiveText = el('span');
+  directiveText.dataset.lang = 'meiToolboxTransposeAddDirective';
+  const directive = el('input');
+  directive.type = 'checkbox';
+  directive.id = 'mtTransposeDirective';
+  directive.checked = load(storageKey.transposeDirective, 'false') === 'true';
+  directive.addEventListener('change', () => save(storageKey.transposeDirective, directive.checked));
+  directiveRow.append(directiveText, directive);
+  directionGroup.appendChild(directiveRow);
   content.appendChild(directionGroup);
 
   content.appendChild(
@@ -1616,6 +1645,127 @@ function transposeSummary() {
     .filter(Boolean)
     .join(' \u00b7 ');
 }
+
+/**
+ * The text of the transposition directive: the key the notation is transposed to and
+ * the key of the encoding, both named as the Transpose tab names them. Where the mode
+ * of the encoding is known, only that half of a label such as 'C major / A minor' is
+ * used. When the key cannot be told (an unreadable key signature, or an interval
+ * leading beyond the fifteen keys), it states what was transposed by instead.
+ * @returns {string}
+ */
+function directiveText() {
+  const labels = translator?.lang?.transposeKey?.labels;
+  const original = encodingKeyFifths();
+  const target = targetKeyFifths(original);
+  // every label names the major key and its relative minor, separated by a slash;
+  // transposing keeps the mode, so the same half of the label applies to both keys
+  const mode = encodingKeyMode();
+  const half = mode === 'major' ? 0 : mode === 'minor' ? 1 : -1;
+  const keyName = (fifths) => {
+    if (!labels || fifths === null || Math.abs(fifths) > 7) return '';
+    const label = labels[7 - fifths];
+    const parts = label.split(' / ');
+    return half >= 0 && parts.length === 2 ? parts[half] : label;
+  };
+  if (!keyName(original) || !keyName(target)) {
+    return t('meiToolboxTransposeDirectiveUnknown', 'Transposed: {what}').replace('{what}', transposeSummary());
+  }
+  return t('meiToolboxTransposeDirectiveText', 'Transposed to {new}\noriginal: {original}')
+    .replace('{new}', keyName(target))
+    .replace('{original}', keyName(original));
+} // directiveText()
+
+/**
+ * Whether the encoding is in a major or a minor key: what it says itself (@key.mode up
+ * to MEI 4.0.1, keySig@mode from MEI 5.0), or else what the music shows. The two keys a
+ * key signature stands for have different tonics, so the note the music ends on tells
+ * them apart: the lowest note of the last measure, which is the bass of the final
+ * chord. Anything else leaves the mode open, and both keys are named.
+ * @returns {string} 'major', 'minor' or '' when it cannot be told
+ */
+function encodingKeyMode() {
+  const stated = v.xmlDoc?.querySelector('[key\\.mode], keySig[mode]');
+  const mode = stated?.getAttribute('key.mode') || stated?.getAttribute('mode');
+  if (mode === 'major' || mode === 'minor') return mode;
+
+  const fifths = encodingKeyFifths();
+  if (fifths === null) return '';
+  const finalNote = lowestNoteOfLastMeasure();
+  if (!finalNote) return '';
+  // the tonics on the line of fifths: the major one where the key signature stands,
+  // the minor one three fifths further (C major 0 and A minor 3, G major 1 and E minor 4)
+  const letterAt = (f) => 'fcgdaeb'[(((f + 1) % 7) + 7) % 7];
+  const pname = finalNote.getAttribute('pname');
+  if (pname === letterAt(fifths)) return 'major';
+  if (pname === letterAt(fifths + 3)) return 'minor';
+  return '';
+} // encodingKeyMode()
+
+/**
+ * The lowest note of the last measure of the score, by written pitch: deep enough to
+ * be the bass of the final chord, and read without accidentals, which the two tonics
+ * of a key signature do not need to be told apart (their note names already differ).
+ * @returns {Element|null}
+ */
+function lowestNoteOfLastMeasure() {
+  const measures = v.xmlDoc?.querySelectorAll('measure');
+  const notes = measures?.length ? Array.from(measures[measures.length - 1].querySelectorAll('note')) : [];
+  const height = (note) =>
+    parseInt(note.getAttribute('oct'), 10) * 7 + 'cdefgab'.indexOf(note.getAttribute('pname'));
+  return notes
+    .filter((note) => note.getAttribute('pname') && Number.isFinite(height(note)))
+    .reduce((lowest, note) => (!lowest || height(note) < height(lowest) ? note : lowest), null);
+} // lowestNoteOfLastMeasure()
+
+/**
+ * The key the notation is transposed to, on the line of fifths: the key chosen, or the
+ * key of the encoding moved by the interval chosen (downwards for a falling interval).
+ * @param {number|null} original fifths of the key of the encoding
+ * @returns {number|null} null when it cannot be told
+ */
+function targetKeyFifths(original) {
+  if (transposeMode() === 'key') return transposeKeyFifths(transposeSelect('key')?.value);
+  const fifths = intervalFifths(transposeSelect('interval')?.value);
+  if (fifths === null || original === null) return null;
+  // 'closest' (an empty direction) transposes upwards, as a Verovio interval without a sign does
+  return original + (document.getElementById('mtTransposeDirection')?.value === '-' ? -fifths : fifths);
+} // targetKeyFifths()
+
+/**
+ * Where an interval moves the key signature on the line of fifths when the music is
+ * transposed up by it: 'P5' → 1 (a sharp more), 'm3' → -3. Unison, fourth, fifth and
+ * octave are perfectable (P), the other degrees major or minor.
+ * @param {string} name interval as the Verovio transpose option writes it, e.g. 'M2'
+ * @returns {number|null} null when the name cannot be read
+ */
+function intervalFifths(name) {
+  const match = /^([PMmAd])(\d+)$/.exec(name || '');
+  if (!match) return null;
+  const [, quality, number] = match;
+  const degree = (parseInt(number, 10) - 1) % 7;
+  const perfectable = [0, 3, 4].includes(degree);
+  if (perfectable === 'Mm'.includes(quality)) return null; // M/m only on the others, P only here
+  return fifthsOfDegree[degree] + fifthsOfQuality[quality] - (!perfectable && quality === 'd' ? 7 : 0);
+} // intervalFifths()
+
+/**
+ * The key signature the encoding starts with, on the line of fifths (2 for '2s', -3
+ * for '3f'). An encoding that states none is read as C major, as Verovio renders it.
+ * @returns {number|null} null when the key signature cannot be read ('mixed')
+ */
+function encodingKeyFifths() {
+  // '[keysig]' is MEI >= 5.0, '[key.sig]' up to MEI 4.0.1, '[sig]' the <keySig> element; the
+  // first of them in document order is the one the score starts with
+  const element = v.xmlDoc?.querySelector(
+    'scoreDef[key\\.sig], scoreDef[keysig], staffDef[key\\.sig], staffDef[keysig], keySig[sig]'
+  );
+  if (!element) return 0;
+  const sig = element.getAttribute('key.sig') || element.getAttribute('keysig') || element.getAttribute('sig');
+  if (sig === '0') return 0;
+  const match = /^(\d+)([fs])$/.exec(sig || '');
+  return match ? parseInt(match[1], 10) * (match[2] === 's' ? 1 : -1) : null;
+} // encodingKeyFifths()
 
 function transposeMode() {
   return panes.transpose?.content.querySelector('input[name="mtTransposeMode"]:checked')?.value || 'key';

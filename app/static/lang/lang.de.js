@@ -307,15 +307,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transponiert nur die Notation; die Kodierung bleibt, wie sie ist. Um auch die Kodierung zu transponieren, hier transponieren und sie dann mit „Über Verovio“ im Reiter „Neu formatieren“ neu schreiben lassen.',
+    text: 'Transponiert nur die Notation; die Kodierung bleibt, wie sie ist, abgesehen von der Angabe unten. Um auch die Kodierung zu transponieren, hier transponieren und sie dann mit „Über Verovio“ im Reiter „Neu formatieren“ neu schreiben lassen.',
   },
   meiToolboxTransposeReset: {
     text: 'Zurücksetzen',
     description: 'Nimmt die Transposition zurück, sodass die Notation wieder in der kodierten Tonhöhe erscheint.',
   },
-  meiToolboxTransposeDone: { text: 'Die Notation ist transponiert ({what}); die Kodierung ist unverändert.' },
+  meiToolboxTransposeDone: { text: 'Die Notation ist transponiert ({what}).' },
   meiToolboxTransposeRemoved: { text: 'Die Transposition wurde zurückgenommen.' },
   meiToolboxTransposeNone: { text: 'Nichts zu tun: Es ist keine Transposition angewandt.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Transpositionsangabe hinzufügen',
+    description:
+      'Schreibt eine Zeile in den pgHead der Partitur, die die Tonart der Transposition und die Tonart der Kodierung nennt. Beim Zurücksetzen der Transposition wird sie wieder entfernt.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponiert nach {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponiert: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Die Transpositionsangabe wurde in den pgHead geschrieben.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Die Transpositionsangabe wurde aus dem pgHead entfernt.' },
 
   codeCheckerFixShown: { text: '{n} angezeigte beheben' },
   codeCheckerIgnoreShown: { text: '{n} angezeigte ignorieren' },

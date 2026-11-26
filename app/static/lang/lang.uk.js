@@ -300,15 +300,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Транспонує лише нотний текст; кодування залишається незмінним. Щоб транспонувати й саме кодування, транспонуйте тут, а потім перезапишіть його через «Через Verovio» на вкладці Переформатувати.',
+    text: 'Транспонує лише нотний текст; кодування залишається незмінним, окрім примітки нижче. Щоб транспонувати й саме кодування, транспонуйте тут, а потім перезапишіть його через «Через Verovio» на вкладці Переформатувати.',
   },
   meiToolboxTransposeReset: {
     text: 'Скинути',
     description: 'Знімає транспонування, тож нотний текст знову показується в закодованій висоті.',
   },
-  meiToolboxTransposeDone: { text: 'Нотний текст транспоновано ({what}); кодування не змінено.' },
+  meiToolboxTransposeDone: { text: 'Нотний текст транспоновано ({what}).' },
   meiToolboxTransposeRemoved: { text: 'Транспонування знято.' },
   meiToolboxTransposeNone: { text: 'Нічого робити: транспонування не застосовано.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Додати примітку про транспонування',
+    description:
+      'Записує до pgHead партитури рядок із тональністю транспонування та тональністю кодування. Під час скидання транспонування його буде вилучено.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Транспоновано до {new}\nоригінал: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Транспоновано: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Примітку про транспонування записано до pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Примітку про транспонування вилучено з pgHead.' },
 
   codeCheckerFixShown: { text: 'Виправити {n} показаних' },
   codeCheckerIgnoreShown: { text: 'Ігнорувати {n} показаних' },

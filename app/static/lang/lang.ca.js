@@ -308,15 +308,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Només transposa la notació; la codificació queda tal com és. Per transposar també la codificació, transposeu aquí i després reescriviu-la amb «Amb Verovio» a la pestanya Reformata.',
+    text: 'Només transposa la notació; la codificació queda tal com és, llevat de la indicació de sota. Per transposar també la codificació, transposeu aquí i després reescriviu-la amb «Amb Verovio» a la pestanya Reformata.',
   },
   meiToolboxTransposeReset: {
     text: 'Restableix',
     description: 'Elimina la transposició, de manera que la notació es torna a mostrar a l’altura codificada.',
   },
-  meiToolboxTransposeDone: { text: 'La notació s’ha transposat ({what}); la codificació no ha canviat.' },
+  meiToolboxTransposeDone: { text: 'La notació s’ha transposat ({what}).' },
   meiToolboxTransposeRemoved: { text: 'S’ha eliminat la transposició.' },
   meiToolboxTransposeNone: { text: 'Res a fer: no hi ha cap transposició aplicada.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Afegeix una indicació de transposició',
+    description:
+      'Escriu al pgHead de la partitura una línia que indica la tonalitat a què es transposa i la tonalitat de la codificació. S’elimina quan es restableix la transposició.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposat a {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposat: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'La indicació de transposició s’ha escrit al pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'La indicació de transposició s’ha eliminat del pgHead.' },
 
   codeCheckerFixShown: { text: 'Corregeix els {n} mostrats' },
   codeCheckerIgnoreShown: { text: 'Ignora els {n} mostrats' },

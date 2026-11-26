@@ -333,15 +333,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transposes the notation only; the encoding stays as it is. To transpose the encoding too, transpose here and then write it anew with “Via Verovio” in the Reformat tab.',
+    text: 'Transposes the notation only; the encoding stays as it is, apart from the directive below. To transpose the encoding too, transpose here and then write it anew with “Via Verovio” in the Reformat tab.',
   },
   meiToolboxTransposeReset: {
     text: 'Reset',
     description: 'Removes the transposition, so that the notation is shown at its encoded pitch again.',
   },
-  meiToolboxTransposeDone: { text: 'The notation is transposed ({what}); the encoding is unchanged.' },
+  meiToolboxTransposeDone: { text: 'The notation is transposed ({what}).' },
   meiToolboxTransposeRemoved: { text: 'The transposition has been removed.' },
   meiToolboxTransposeNone: { text: 'Nothing to do: no transposition is applied.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Add transposition directive',
+    description:
+      'Writes a line into the pgHead of the score naming the key it is transposed to and the key of the encoding. It is removed again when the transposition is reset.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposed to {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposed: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'The transposition directive was written into the pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'The transposition directive was removed from the pgHead.' },
 
   codeCheckerFixShown: { text: 'Fix {n} shown' },
   codeCheckerIgnoreShown: { text: 'Ignore {n} shown' },

@@ -302,15 +302,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transponeert alleen de notatie; de codering blijft zoals ze is. Om ook de codering te transponeren, transponeer hier en schrijf ze daarna opnieuw met “Via Verovio” op het tabblad Herformatteren.',
+    text: 'Transponeert alleen de notatie; de codering blijft zoals ze is, afgezien van de aanduiding hieronder. Om ook de codering te transponeren, transponeer hier en schrijf ze daarna opnieuw met “Via Verovio” op het tabblad Herformatteren.',
   },
   meiToolboxTransposeReset: {
     text: 'Herstellen',
     description: 'Verwijdert de transpositie, zodat de notatie weer op de gecodeerde toonhoogte verschijnt.',
   },
-  meiToolboxTransposeDone: { text: 'De notatie is getransponeerd ({what}); de codering is ongewijzigd.' },
+  meiToolboxTransposeDone: { text: 'De notatie is getransponeerd ({what}).' },
   meiToolboxTransposeRemoved: { text: 'De transpositie is verwijderd.' },
   meiToolboxTransposeNone: { text: 'Niets te doen: er is geen transpositie toegepast.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Transpositieaanduiding toevoegen',
+    description:
+      'Schrijft in de pgHead van de partituur een regel die de toonsoort van de transpositie en die van de codering noemt. Ze wordt verwijderd wanneer de transpositie wordt hersteld.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Getransponeerd naar {new}\nOrigineel: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Getransponeerd: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'De transpositieaanduiding is in de pgHead geschreven.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'De transpositieaanduiding is uit de pgHead verwijderd.' },
 
   codeCheckerFixShown: { text: '{n} getoonde herstellen' },
   codeCheckerIgnoreShown: { text: '{n} getoonde negeren' },

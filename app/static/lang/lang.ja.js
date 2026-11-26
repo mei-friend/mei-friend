@@ -290,15 +290,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: '移調されるのは楽譜だけで、エンコーディングはそのままです。エンコーディング自体も移調するには、ここで移調してから「再フォーマット」タブの「Verovio 経由」で書き直してください。',
+    text: '移調されるのは楽譜だけで、エンコーディングは下の注記を除いてそのままです。エンコーディング自体も移調するには、ここで移調してから「再フォーマット」タブの「Verovio 経由」で書き直してください。',
   },
   meiToolboxTransposeReset: {
     text: 'リセット',
     description: '移調を取り消し、楽譜を再びエンコードされた音高で表示します。',
   },
-  meiToolboxTransposeDone: { text: '楽譜を移調しました（{what}）。エンコーディングは変更されていません。' },
+  meiToolboxTransposeDone: { text: '楽譜を移調しました（{what}）。' },
   meiToolboxTransposeRemoved: { text: '移調を取り消しました。' },
   meiToolboxTransposeNone: { text: '何もすることはありません。移調は適用されていません。' },
+  meiToolboxTransposeAddDirective: {
+    text: '移調の注記を追加',
+    description:
+      '移調先の調とエンコーディングの調を記した行を楽譜の pgHead に書き込みます。移調をリセットすると取り除かれます。',
+  },
+  meiToolboxTransposeDirectiveText: { text: '{new} へ移調\n原調: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: '移調: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: '移調の注記を pgHead に書き込みました。' },
+  meiToolboxTransposeDirectiveRemoved: { text: '移調の注記を pgHead から取り除きました。' },
 
   codeCheckerFixShown: { text: '表示中の {n} 件を修正' },
   codeCheckerIgnoreShown: { text: '表示中の {n} 件を無視' },

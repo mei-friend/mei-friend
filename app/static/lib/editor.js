@@ -2365,6 +2365,158 @@ export function addFacsimile(v, cm) {
 } // addFacsimile()
 
 /**
+ * Writes the transposition directive of the MEI toolbox into the pgHead of the first
+ * scoreDef, or removes it again: a rend element marked with @type="transposition", so
+ * that it is found again however the encoding has been edited in between. A pgHead is
+ * created when the scoreDef has none, and removed again with the directive when it
+ * holds nothing else.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} text the directive, line by line; an empty text removes the directive
+ * @returns {string} 'added', 'removed' or '' when the encoding was left as it is
+ */
+export function setTranspositionDirective(v, cm, text = '') {
+  const scoreDef = v.xmlDoc.querySelector('score > scoreDef') || v.xmlDoc.querySelector('scoreDef');
+  if (!scoreDef) return '';
+  const pgHead = childElement(scoreDef, 'pgHead');
+  const directive = pgHead ? Array.from(pgHead.children).find(isDirective) : null;
+  if (!text && !directive) return '';
+  if (text && directive && directive.textContent === text.split('\n').join('')) return ''; // already says this
+
+  return withSingleUndoStep(cm, () => {
+    v.allowCursorActivity = false;
+    cm.blockChanges = true;
+    let what = '';
+    try {
+      if (!text) {
+        // the pgHead goes with the directive when it was only there to carry it
+        const element = pgHead.children.length === 1 && !ownText(pgHead) ? pgHead : directive;
+        removeInEditor(cm, element);
+        element.remove();
+        what = 'removed';
+      } else if (directive) {
+        fillDirective(directive);
+        replaceInEditor(cm, directive);
+        what = 'added';
+      } else if (insertDirective()) {
+        what = 'added';
+      }
+      if (what) addApplicationInfo(v, cm);
+    } finally {
+      v.allowCursorActivity = true;
+      cm.blockChanges = false;
+    }
+    if (what) handleEditorChanges();
+    return what;
+  });
+
+  // the directive of an earlier run, whatever else the pgHead holds
+  function isDirective(element) {
+    return element.localName === 'rend' && element.getAttribute('type') === 'transposition';
+  } // isDirective()
+
+  function childElement(parent, name) {
+    return Array.from(parent.children).find((c) => c.localName === name);
+  } // childElement()
+
+  // text of the element itself, without the text of its child elements
+  function ownText(element) {
+    return Array.from(element.childNodes)
+      .filter((n) => n.nodeType === Node.TEXT_NODE)
+      .map((n) => n.nodeValue)
+      .join('')
+      .trim();
+  } // ownText()
+
+  /**
+   * Builds the directive (and the pgHead, when the scoreDef has none) and writes it
+   * into the editor: into the pgHead before its end tag, or, for a new pgHead, before
+   * the staffGrp, where the content model of scoreDef gives pgHead its place. The
+   * place in the editor is looked up before anything is changed, so that a pgHead that
+   * cannot be found there leaves both the document and the editor as they are.
+   * @returns {boolean} whether it could be written
+   */
+  function insertDirective() {
+    const staffGrp = pgHead ? null : childElement(scoreDef, 'staffGrp');
+    const position = pgHead ? endTagOf(pgHead) : startTagOf(staffGrp) || endTagOf(scoreDef);
+    if (!position) return false;
+
+    const rend = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'rend');
+    rend.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('rend', v.xmlIdStyle));
+    rend.setAttribute('type', 'transposition');
+    const [halign, valign] = freeSlot();
+    rend.setAttribute('halign', halign);
+    rend.setAttribute('valign', valign);
+    fillDirective(rend);
+    let element = rend;
+    if (pgHead) {
+      pgHead.appendChild(rend);
+    } else {
+      element = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'pgHead');
+      element.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('pgHead', v.xmlIdStyle));
+      element.appendChild(rend);
+      scoreDef.insertBefore(element, staffGrp || null);
+    }
+    cm.setCursor(position);
+    cm.replaceRange(dutils.xmlToString(element) + '\n', cm.getCursor());
+    for (let l = position.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
+    utils.setCursorToId(cm, rend.getAttribute('xml:id'));
+    return true;
+  } // insertDirective()
+
+  // writes the lines of the directive into the rend, separated by lb elements, since a
+  // line break of a text in MEI is an element rather than a character
+  function fillDirective(rend) {
+    while (rend.firstChild) rend.removeChild(rend.firstChild);
+    text.split('\n').forEach((line, i) => {
+      if (i > 0) {
+        const lb = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'lb');
+        lb.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('lb', v.xmlIdStyle));
+        rend.appendChild(lb);
+      }
+      rend.appendChild(v.xmlDoc.createTextNode(line));
+    });
+  } // fillDirective()
+
+  /**
+   * Where in the page head to put the directive. Verovio places every rend of a pgHead
+   * at the corner its @halign and @valign name and does not flow them, so the directive
+   * looks for a side of its own first: the right one, or the left one when the title
+   * block already writes anything down the right. Only when it uses both does the
+   * directive share a side, in a band (top, middle, bottom) that is still free there.
+   * @returns {string[]} halign and valign
+   */
+  function freeSlot() {
+    const rends = Array.from(pgHead?.children || []).filter((c) => c.localName === 'rend');
+    // a rend that names neither is drawn where Verovio puts a title: centred at the top
+    const sideOf = (rend) => rend.getAttribute('halign') || 'center';
+    const used = new Set(rends.map(sideOf));
+    const taken = new Set(rends.map((rend) => sideOf(rend) + ' ' + (rend.getAttribute('valign') || 'top')));
+    const bandOn = (halign) => ['middle', 'bottom', 'top'].find((valign) => !taken.has(halign + ' ' + valign));
+    const sides = ['right', 'left'];
+    const ownSide = sides.find((halign) => !used.has(halign) && bandOn(halign));
+    const halign = ownSide || sides.find((side) => bandOn(side)) || 'right';
+    return [halign, bandOn(halign) || 'middle'];
+  } // freeSlot()
+
+  // position of the start tag of an element in the editor, found through its xml:id
+  function startTagOf(element) {
+    const id = element?.getAttribute('xml:id');
+    if (!id) return null;
+    const sc = cm.getSearchCursor(new RegExp('<' + element.nodeName + '\\s[^>]*?xml:id=["\']' + id + '["\']'));
+    return sc.findNext() ? sc.from() : null;
+  } // startTagOf()
+
+  // position of the end tag of an element, searched from its start tag
+  function endTagOf(element) {
+    const start = startTagOf(element);
+    if (!start) return null;
+    const sc = cm.getSearchCursor('</' + element.nodeName, start);
+    return sc.findNext() ? sc.from() : null;
+  } // endTagOf()
+} // setTranspositionDirective()
+
+/**
  * Encloses/surrounds selected text in CodeMirror with the given XML tag name.
  * If tag name is not surrounded with left/right angle brackets, they will be added.
  * @param {Viewer} v

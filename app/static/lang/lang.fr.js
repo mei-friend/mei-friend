@@ -308,15 +308,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transpose uniquement la notation ; l’encodage reste tel quel. Pour transposer aussi l’encodage, transposez ici puis réécrivez-le avec « Via Verovio » dans l’onglet Reformater.',
+    text: 'Transpose uniquement la notation ; l’encodage reste tel quel, hormis l’indication ci-dessous. Pour transposer aussi l’encodage, transposez ici puis réécrivez-le avec « Via Verovio » dans l’onglet Reformater.',
   },
   meiToolboxTransposeReset: {
     text: 'Réinitialiser',
     description: 'Supprime la transposition, de sorte que la notation réapparaisse à la hauteur encodée.',
   },
-  meiToolboxTransposeDone: { text: 'La notation est transposée ({what}) ; l’encodage est inchangé.' },
+  meiToolboxTransposeDone: { text: 'La notation est transposée ({what}).' },
   meiToolboxTransposeRemoved: { text: 'La transposition a été supprimée.' },
   meiToolboxTransposeNone: { text: 'Rien à faire : aucune transposition n’est appliquée.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Ajouter une indication de transposition',
+    description:
+      'Écrit dans le pgHead de la partition une ligne indiquant la tonalité de la transposition et celle de l’encodage. Elle est supprimée lors de la réinitialisation de la transposition.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transposé en {new}\nOriginal : {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transposé : {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'L’indication de transposition a été écrite dans le pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'L’indication de transposition a été supprimée du pgHead.' },
 
   codeCheckerFixShown: { text: 'Corriger les {n} affichés' },
   codeCheckerIgnoreShown: { text: 'Ignorer les {n} affichés' },

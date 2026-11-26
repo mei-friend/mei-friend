@@ -289,15 +289,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: '只移调乐谱，编码保持不变。若要同时移调编码，请在此移调，然后在“重新格式化”选项卡中用“通过 Verovio”重新写出编码。',
+    text: '只移调乐谱，编码除下面的说明外保持不变。若要同时移调编码，请在此移调，然后在“重新格式化”选项卡中用“通过 Verovio”重新写出编码。',
   },
   meiToolboxTransposeReset: {
     text: '重置',
     description: '取消移调，使乐谱重新按编码中的音高显示。',
   },
-  meiToolboxTransposeDone: { text: '乐谱已移调（{what}）；编码未更改。' },
+  meiToolboxTransposeDone: { text: '乐谱已移调（{what}）。' },
   meiToolboxTransposeRemoved: { text: '移调已取消。' },
   meiToolboxTransposeNone: { text: '无需操作：未应用任何移调。' },
+  meiToolboxTransposeAddDirective: {
+    text: '添加移调说明',
+    description:
+      '在乐谱的 pgHead 中写入一行，注明移调后的调与编码中的调。重置移调时会再次移除。',
+  },
+  meiToolboxTransposeDirectiveText: { text: '移调至 {new}\n原调：{original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: '移调：{what}' },
+  meiToolboxTransposeDirectiveAdded: { text: '移调说明已写入 pgHead。' },
+  meiToolboxTransposeDirectiveRemoved: { text: '移调说明已从 pgHead 中移除。' },
 
   codeCheckerFixShown: { text: '修复显示的 {n} 项' },
   codeCheckerIgnoreShown: { text: '忽略显示的 {n} 项' },

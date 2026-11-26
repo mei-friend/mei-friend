@@ -306,15 +306,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Transponerer kun notationen; kodningen forbliver, som den er. For også at transponere kodningen skal du transponere her og derefter skrive den på ny med “Via Verovio” i fanen Reformatér.',
+    text: 'Transponerer kun notationen; kodningen forbliver, som den er, bortset fra angivelsen nedenfor. For også at transponere kodningen skal du transponere her og derefter skrive den på ny med “Via Verovio” i fanen Reformatér.',
   },
   meiToolboxTransposeReset: {
     text: 'Nulstil',
     description: 'Fjerner transpositionen, så notationen igen vises i den kodede tonehøjde.',
   },
-  meiToolboxTransposeDone: { text: 'Notationen er transponeret ({what}); kodningen er uændret.' },
+  meiToolboxTransposeDone: { text: 'Notationen er transponeret ({what}).' },
   meiToolboxTransposeRemoved: { text: 'Transpositionen er fjernet.' },
   meiToolboxTransposeNone: { text: 'Intet at gøre: ingen transposition er anvendt.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Tilføj transpositionsangivelse',
+    description:
+      'Skriver en linje i partiturets pgHead, som angiver den toneart, der transponeres til, og kodningens toneart. Den fjernes igen, når transpositionen nulstilles.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Transponeret til {new}\nOriginal: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Transponeret: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Transpositionsangivelsen blev skrevet i pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Transpositionsangivelsen blev fjernet fra pgHead.' },
 
   codeCheckerFixShown: { text: 'Ret {n} viste' },
   codeCheckerIgnoreShown: { text: 'Ignorer {n} viste' },

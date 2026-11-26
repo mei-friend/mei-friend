@@ -300,15 +300,24 @@ export const lang = {
 
   // MEI TOOLBOX: Transpose tab
   meiToolboxTransposeInfo: {
-    text: 'Транспонује само нотни текст; кодирање остаје какво јесте. Да бисте транспоновали и кодирање, транспонујте овде, а затим га испишите изнова помоћу „Преко Verovija“ у картици Преобликуј.',
+    text: 'Транспонује само нотни текст; кодирање остаје какво јесте, осим напомене испод. Да бисте транспоновали и кодирање, транспонујте овде, а затим га испишите изнова помоћу „Преко Verovija“ у картици Преобликуј.',
   },
   meiToolboxTransposeReset: {
     text: 'Поништи',
     description: 'Уклања транспозицију, тако да се нотни текст поново приказује у кодираној висини.',
   },
-  meiToolboxTransposeDone: { text: 'Нотни текст је транспонован ({what}); кодирање је непромењено.' },
+  meiToolboxTransposeDone: { text: 'Нотни текст је транспонован ({what}).' },
   meiToolboxTransposeRemoved: { text: 'Транспозиција је уклоњена.' },
   meiToolboxTransposeNone: { text: 'Нема шта да се уради: ниједна транспозиција није примењена.' },
+  meiToolboxTransposeAddDirective: {
+    text: 'Додај напомену о транспозицији',
+    description:
+      'Уписује у pgHead партитуре ред који наводи тоналитет у који се транспонује и тоналитет кодирања. Уклања се при поништавању транспозиције.',
+  },
+  meiToolboxTransposeDirectiveText: { text: 'Транспоновано у {new}\nоригинал: {original}' },
+  meiToolboxTransposeDirectiveUnknown: { text: 'Транспоновано: {what}' },
+  meiToolboxTransposeDirectiveAdded: { text: 'Напомена о транспозицији уписана је у pgHead.' },
+  meiToolboxTransposeDirectiveRemoved: { text: 'Напомена о транспозицији уклоњена је из pgHead.' },
 
   codeCheckerFixShown: { text: 'Поправи {n} приказаних' },
   codeCheckerIgnoreShown: { text: 'Занемари {n} приказаних' },
